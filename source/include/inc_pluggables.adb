@@ -1357,7 +1357,8 @@ is
       use Inc_Load;
       use Inc_Users;
 
-      Secure_2 : constant Boolean := Is_SSL or else Force_SSL_Admin;
+      Secure_2 : constant Boolean :=
+        Is_SSL or else Force_SSL_Admin;
 
       --
       -- Filters whether to use a secure authentication redirect.

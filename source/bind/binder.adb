@@ -2,40 +2,24 @@
 --
 --
 with Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
 
+with Logging;
 with UStrings;
 
--- with Adm_Admin;
--- with Adm_Admin_Header;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
 with Adm_Install;
 with Adm_Load_Scripts;
 with Adm_Load_Styles;
--- with Adm_Menu_Header;
--- with Adm_Menu;
--- with Adm_Nav_Menus;
 with Adm_Post;
 with Adm_Privacy;
 with Adm_Upgrade;
 with Wp_Login;
--- with Inc_Plugins;
-
--- with Adi_Menu;
--- with Adi_Nav_Menus;
-
--- with Inc_Default_Filters;
--- with Inc_Admin_Bar;
--- with Class_Admin_Bar;
--- with Class_Scripts;
--- with Inc_Class_Wp_Posts;
--- with Inc_Posts;
 
 package body Binder
 is
@@ -110,9 +94,8 @@ is
 
    exception
       when Php.Errors.Program_Termination =>
-         return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
-
-      when Redirect_Signal =>
+         Logging.Log ("binder", "program_termination");
+         Logging.Log ("binder", "doing redirect");
          declare
             use Php.HTML;
 
@@ -120,9 +103,26 @@ is
             Position : constant Natural := Index (Header, " ");
             Location : constant String  := Header (Position + 1 .. Header'Last);
          begin
-            Put_Line ("redirect:");
-            Put_Line ("  header: " & Header);
-            Put_Line ("  locati: " & Location);
+            Logging.Log ("binder", "redirect:");
+            Logging.Log ("binder", "  header: " & Header);
+            Logging.Log ("binder", "  locati: " & Location);
+
+            return AWS.Response.URL (Location => Location);
+         end;
+         return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+
+      when Redirect_Signal =>
+         Logging.Log ("binder", "redirect");
+         declare
+            use Php.HTML;
+
+            Header   : constant String  := Get_Header;
+            Position : constant Natural := Index (Header, " ");
+            Location : constant String  := Header (Position + 1 .. Header'Last);
+         begin
+            Logging.Log ("binder", "redirect:");
+            Logging.Log ("binder", "  header: " & Header);
+            Logging.Log ("binder", "  locati: " & Location);
 
             return AWS.Response.URL (Location => Location);
          end;

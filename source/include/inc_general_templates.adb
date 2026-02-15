@@ -5,8 +5,6 @@
 -- @subpackage Template
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
@@ -492,22 +490,23 @@ is
    is
       use Php.HTML;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
 
-      Login_URL : UString := +Site_URL ("wp-login.php", "login");
+      Login_URL_3 : constant String :=
+        Site_URL ("wp-login.php", "login");
+
+      Login_URL_2 : constant String :=
+        (if not Empty (Redirect)
+         then Add_Query_Arg ("redirect_to", URL_Encode (Redirect), Login_URL_3)
+         else Login_URL_3);
+
+      Login_URL : constant String :=
+        (if Force_Reauth
+         then Add_Query_Arg ("reauth", "1", Login_URL_2)
+         else Login_URL_2);
    begin
-      if not Empty (Redirect) then
-         Login_URL :=
-           +Add_Query_Arg ("redirect_to", URL_Encode (Redirect), -Login_URL);
-      end if;
-
-      if Force_Reauth then
-         Login_URL := +Add_Query_Arg ("reauth", "1", -Login_URL);
-      end if;
-
       --
       -- Filters the login URL.
       --
@@ -519,7 +518,7 @@ is
       -- @param bool   force_reauth Whether to force reauthorization, even if a
       --                            cookie is present.
       --
-      return Apply_Filters ("login_url", -Login_URL, Redirect, Force_Reauth);
+      return Apply_Filters ("login_url", Login_URL, Redirect, Force_Reauth);
    end Wp_Login_URL;
 
    -------------------------
@@ -841,9 +840,9 @@ is
 
       Output : UString := +"XXX-970";
    begin
-      Put_Line ("get_bloginfo:");
-      Put_Line ("  show  : " & Show);
-      Put_Line ("  filter: " & Filter);
+      Logging.Log ("get_bloginfo", "");
+      Logging.Log ("get_bloginfo", "  show  : " & Show);
+      Logging.Log ("get_bloginfo", "  filter: " & Filter);
 
 --         switch ( show ) then
 --                 case "home":    // Deprecated.
@@ -960,7 +959,7 @@ is
          Output := +Inc_Options.Get_Option ("blogname");
 --                         break;
       else
-         Put_Line ("Unhandled show:" & Show);
+         Logging.Log ("get_bloginfo", "Unhandled show:" & Show);
       end if;
 --         end;
 

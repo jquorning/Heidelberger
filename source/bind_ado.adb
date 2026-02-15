@@ -17,6 +17,8 @@ is
    Factor  : ADO.Sessions.Factory.Session_Factory;
    Session : ADO.Sessions.Session;
    Results : Array_Lists.Array_List;
+   Result_Last  : Natural := 0;
+   Result_Index : Natural := 0;
 
    ----------------
    -- Initialize --
@@ -46,11 +48,22 @@ is
    ------------------
 
    function Fetch_Object (Result : Databases.Three_State)
-                          return Natural
+                          return Array_Type
    is
    begin
       Logging.Log ("ado.fetch_object", "");
-      return 0;
+
+      if Result_Index = 0 then
+         Result_Index := Results.First_Index;
+      end if;
+
+      if Result_Index not in Results.First_Index .. Results.Last_Index then
+         Result_Index := 0;
+         return Empty_Array;
+      end if;
+
+      Result_Index := Result_Index + 1;
+      return Results (Result_Index - 1);
    end Fetch_Object;
 
    -----------
@@ -92,6 +105,8 @@ is
       Logging.Log ("ado.query2", Query);
 
       Results := Empty_Array_List;
+      Result_Last := 0;
+
       Stmt.Execute;
 
       while Stmt.Has_Elements loop
@@ -107,11 +122,14 @@ is
                   Col_Value : constant Nullable_String :=
                     Stmt.Get_Nullable_String (Column);
                begin
+                  Logging.Log ("ado.query2", "name :" & Col_Name);
+                  Logging.Log ("ado.query2", "value:" & (-Col_Value.Value));
                   Columns := Array_Merge (Columns,
                                           Build (Col_Name, -Col_Value.Value));
                end;
             end loop;
             Results.Append (Columns);
+            Result_Last := Result_Last + 1;
          end;
          Stmt.Next;
       end loop;

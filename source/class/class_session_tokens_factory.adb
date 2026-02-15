@@ -5,7 +5,6 @@
 with Wp_Common;
 
 with Class_User_Meta_Session_Tokens;
-with Inc_Plugins;
 
 package body Class_Session_Tokens_Factory
 is
@@ -19,7 +18,6 @@ is
    is
       use Wp_Common;
       use Class_User_Meta_Session_Tokens;
-      use Inc_Plugins;
 
       --
       -- Filters the class name for the session token manager.

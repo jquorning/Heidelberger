@@ -20,6 +20,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Globals;
 with UStrings;
 with Wp_Config;
 
@@ -92,7 +93,7 @@ is
          begin
             -- A config file doesn't exist.
 
---          WPINC := "wp-includes";
+            Globals.WPINC := +"wp-includes";
 --          require_once ABSPATH & WPINC & "/load.php";
 
             -- Standardize $_SERVER variables across setups.

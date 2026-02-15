@@ -5,8 +5,6 @@
 -- @subpackage Option
 --
 
-with Ada.Text_IO;
-
 with Php.HTML;
 with Php.Lists;
 with Php.Misc;
@@ -16,9 +14,10 @@ with Php.Types;
 
 with Binder;
 with Constants;
-with Globals;
-with UStrings;
 with Helpers;
+with Globals;
+with Logging;
+with UStrings;
 with Wp_Common;
 
 with Class_Users;
@@ -63,7 +62,7 @@ is
 
       Value : Multi_Type;
    begin
-      Ada.Text_IO.Put_Line ("Get_Option: " & Option);
+      Logging.Log ("get_option", Option);
       -- if Option = "html_type" then
       --    return "text/html";
       -- elsif Option = "blog_charset" then
@@ -435,6 +434,7 @@ is
    function Wp_Load_Alloptions (Force_Cache : Boolean := False)
             return Array_Type
    is
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_WpDB;
@@ -456,7 +456,7 @@ is
             Unused   : Boolean;
             Suppress : constant Boolean := Globals.WpDB.Suppress_Errors;
 
-            Alloptions_DB : Array_Type :=
+            Alloptions_DB : Array_List := -- Type :=
               Globals.WpDB.Get_Results (Statement_Type (
                 "SELECT option_name, option_value FROM " &
                 (-Globals.WpDB.Options) & " WHERE autoload = ""yes"""));
@@ -470,9 +470,10 @@ is
             Unused := Globals.WpDB.Suppress_Errors (Suppress);
 
             Alloptions := Empty_Array;
-            for A in Alloptions_DB.Iterate loop
+            for A of Alloptions_DB loop
+--          for A in Alloptions_DB.Iterate loop
                declare
-                  Arry : constant Array_Type := As_Array (Element (A));
+                  Arry : constant Array_Type := A; -- As_Array (Element (A));
 
                   Option_Name  : constant String :=
                     Get_As_String (Arry, "option_name");
@@ -996,9 +997,9 @@ is
          Success_2 : Boolean;
 
          Statement : constant Statement_Type :=
-           Globals.WpDB.Prepare (
-             "SELECT autoload FROM wpdb->options " &
-             "WHERE option_name = %s",
+           Globals.WpDB.Prepare (Statement_Type (
+             "SELECT autoload FROM " & (-Globals.WpDB.Options) &
+             " WHERE option_name = %s"),
              [1 => Option]
            );
 

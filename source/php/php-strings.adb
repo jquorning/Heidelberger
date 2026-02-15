@@ -8,7 +8,8 @@ with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+
+with Logging;
 
 package body Php.Strings
 is
@@ -254,10 +255,8 @@ is
       Result : UString;
       First  : Natural := Subject'First;
    begin
-      Put_Line ("str_replace:");
---    Put_Line (Search'Image);
---    Put_Line ("  subject: " & Subject);
---    Put_Line ("  replace: " & Replace);
+      Logging.Log ("str_replace", "");
+
       Count := 0;
       while First <= Subject'Last loop
          declare
@@ -597,8 +596,7 @@ is
                         return String
    is
    begin
-      Put_Line ("strip_tags: " & Item);
-      Put_Line ("  " & Allowed_Tags'Image);
+      Logging.Log ("strip_tags", Item);
       return Item;
    end Strip_Tags;
 
@@ -640,9 +638,10 @@ is
                            return String
    is
    begin
-      Put_Line ("add_c_slashes: not implemented");
-      Put_Line ("  item : " & Item);
-      Put_Line ("  chars: " & Characters);
+      Logging.Log ("add_c_slashes", "not implemented");
+      Logging.Log ("add_c_slashes", "  item : " & Item);
+      Logging.Log ("add_c_stashes", "  chars: " & Characters);
+
       return Item;
    end Add_C_Slashes;
 
@@ -750,9 +749,10 @@ is
                      return String
    is
    begin
-      Put_Line ("implode: (should this exist)");
-      Put_Line ("  separator: " & Separator);
-      Put_Line ("  item     : " & Arry);
+      Logging.Log ("implode", "(should this exist)");
+      Logging.Log ("implode", "  separator: " & Separator);
+      Logging.Log ("implode", "  item     : " & Arry);
+
       return "XXX-968";
    end Implode;
 

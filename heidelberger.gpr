@@ -37,7 +37,6 @@ project Heidelberger is
          "-gnat2022",
          "-g",
          "-O0",
---       "-O1",
          "-fstack-check",
          "-gnata",
          "-gnatwaCJ",

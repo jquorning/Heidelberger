@@ -132,7 +132,6 @@ is
 
       -- Pass the value to WP_Hook.
       Args_2.Array_Unshift (Value);
---    Array_Unshift (Arrayable_Interface'Class (Args_2), Value);
 
       declare
          Filtered : constant Array_Type :=

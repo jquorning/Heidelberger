@@ -310,19 +310,11 @@ is
    -- @param string       $url   Optional. A URL to act upon.
    -- @return string New URL query string (unescaped).
    --
-   -- function add_query_arg( ...$args ) then
+   function Add_Query_Arg (Key   : Array_Type;
+                           URL   : String := "")
+                           return String;
 
    function Add_Query_Arg (Key   : String;
-                           Value : String;
-                           URL   : String := "")
-                           return String;
-
-   function Add_Query_Arg (Key   : List_Type;
-                           Value : String;
-                           URL   : String := "")
-                           return String;
-
-   function Add_Query_Arg (Key   : Array_Type;
                            Value : String;
                            URL   : String := "")
                            return String;

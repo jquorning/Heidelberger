@@ -4,10 +4,8 @@
 -- @package WordPress
 --
 
-with Ada.Containers.Indefinite_Vectors;
-with Ada.Containers.Indefinite_Ordered_Maps;
-
 with Arrays;
+with Array_Lists;
 with Databases;
 with UStrings;
 with SQLite;
@@ -29,20 +27,17 @@ is
 
    type Statement_Type is new String;
 
-   package String_Vectors is new
-      Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
-                                         Element_Type => String);
-   subtype String_List is String_Vectors.Vector;
-
-   package String_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => String);
-
    type Status_Type is (Create_Alter, Success, Error);
 
    type Rows_Result_Type is record
       Status : Status_Type;
       Rows   : Natural;
+   end record;
+
+   type String_Error_Type is record
+      Success : Boolean;
+      Item    : UStrings.UString;
+      Error   : Class_Errors.Wp_Error;
    end record;
 
    type Wpdb_Class is tagged  -- _class added jq
@@ -131,7 +126,7 @@ is
          --
          -- @var stdClass[]|null
          --
-         Last_Result : String_List;
+         Last_Result : Array_Lists.Array_List; -- String_List;
 
          --
          -- Database query result.
@@ -1642,22 +1637,22 @@ is
    --                      first column"s value. Duplicate keys are discarded.
    -- @return array|object|null Database query results.
    --
-   procedure Get_Results (This   : in out Wpdb_Class;
-                          Query  : Statement_Type);  -- "" -- null
+   procedure Get_Results_Base (This   : in out Wpdb_Class;
+                               Query  : Statement_Type);
 
    function Get_Results (This   : in out Wpdb_Class;
-                         Query  : Statement_Type; --  := ""; -- null
+                         Query  : Statement_Type;
                          Output : String := "OBJECT")
-                         return Array_Type;
+                         return Array_Lists.Array_List; -- Array_Type;
 
    function Get_Results (This   : Wpdb_Class;
-                         Query  : Statement_Type; -- := ""; -- null
+                         Query  : Statement_Type;
                          Output : String := "OBJECT")
                          return Class_Posts.Post_Array
                          is (Class_Posts.Empty_Post_Array);
 
    function Get_Results (This   : Wpdb_Class;
-                         Query  : Statement_Type; -- := ""; -- null
+                         Query  : Statement_Type;
                          Output : String := "OBJECT")
                          return Class_Users.User_List
                          is (Class_Users.Empty_User_List);
@@ -1702,12 +1697,6 @@ is
    --                         be found.
    --
    -- protected
-
-   type String_Error_Type is record
-      Success : Boolean;
-      Item    : UStrings.UString;
-      Error   : Class_Errors.Wp_Error;
-   end record;
 
    function Get_Table_Charset (This  : in out Wpdb_Class;
                                Table : String)
@@ -1804,7 +1793,7 @@ is
    function Set_Prefix (This            : in out Wpdb_Class;
                         Prefix          : String;
                         Set_Table_Names : Boolean := True)
-                        return String;
+                        return String_Error_Type;
 
    --
    -- Sets blog ID.
@@ -1882,8 +1871,8 @@ is
    -- @return string|null Database query result (as string), or null on failure.
    --
    function Get_Var (This  : in out Wpdb_Class;
-                     Query : Statement_Type := ""; -- null
-                     X     : Integer        := 0;
+                     Query : Statement_Type := "";
+                     X     : Integer        := 1;
                      Y     : Integer        := 1)
                      return String;
 

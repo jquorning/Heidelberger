@@ -47,7 +47,7 @@ is
    is (raise Program_Error with "not implemented");
 
    function Fetch_Object (Result : Databases.Three_State)
-                          return Natural;
+                          return Array_Type;
 
    function Mysqli_Errno (Dbh : Integer)
                           return Natural
@@ -89,9 +89,9 @@ is
                        return Boolean
                        is (True);
 
-   function Mysqli_Get_Client_Info
+   function Get_Client_Info
             return String
-            is ("XXX-887");
+            is ("10.11.14");
 
    function Mysqli_Error (Dbh : Integer)
                           return String

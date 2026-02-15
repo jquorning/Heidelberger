@@ -56,7 +56,7 @@ is
 
       -- If we're adding a new priority to the list, put them back in sorted order.
       if not Priority_Existed and then This.Callbacks.Length > 1 then
-         Logging.Log ("add_filer", "ksort missing");
+         Logging.Log ("add_filter", "ksort missing");
          null; -- Ksort (This.Callbacks, SORT_NUMERIC);
       end if;
 

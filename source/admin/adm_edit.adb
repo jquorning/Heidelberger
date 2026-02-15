@@ -801,16 +801,12 @@ is
                   Clear_Echo;
 
                   Adm_Admin_Header.Run;
---  require_once ABSPATH . 'wp-admin/admin-header.php';
 
                   Echo (-Payload);
                end;
             end;
          end;
       end;
-   exception
-      when Php.Errors.Program_Termination =>
-         null;
    end Render;
 
    ------------------

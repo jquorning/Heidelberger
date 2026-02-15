@@ -604,11 +604,13 @@ is
       use Php.Strings;
       use Array_Lists;
       use UStrings;
+      use Class_WpDB;
       use Inc_Functions;
       use Inc_L10n;
+
 --    global (Wpdb);
 --    global (Table_Prefix);
-      Prefix : UString;
+      Result : String_Error_Type;
    begin
       if not Empty (-Globals.WpDB.Error) then
          Logging.Log ("wp_set_wpdb_vars", -Globals.WpDB.Error);
@@ -653,20 +655,24 @@ is
                 Build ("spam",             "%d")
         ]);
 
-      Prefix := +Globals.WpDB.Set_Prefix (-Globals.Table_Prefix);
+      Result := Globals.WpDB.Set_Prefix (-Globals.Table_Prefix);
 
-      if Is_Wp_Error (-Prefix) then
+      if not Result.Success then
+--    if Is_Wp_Error (-Prefix) then
          Wp_Load_Translations_Early;
          Wp_Die (
             Php.Strings.Sprintf (
               -- translators: 1: table_prefix, 2: wp-config.php
               abs "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores.",
               [
-                1 => "<code>table_prefix</code>",
+                1 => "<code>" & (-Globals.Table_Prefix) & " </code>",
                 2 => "<code>wp-config.php</code>"
               ]
            ));
       end if;
+
+      Globals.Table_Prefix := Result.Item;
+
    end Wp_Set_Wpdb_Vars;
 
    -------------------------------

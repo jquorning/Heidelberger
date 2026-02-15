@@ -24,7 +24,7 @@ with Php.Types;
 with Bind_ADO;
 with MySQL_Bind;
 
-with Array_Lists;
+with Arrayable_Interfaces;
 with Arrays.IO;
 with Constants;
 with Globals;
@@ -41,22 +41,9 @@ with Inc_Versions;
 package body Class_WpDB
 is
 
-   type Cb_Func is access function (This : Wpdb_Class;
-                                    Query : String)
-                                    return String;
-
-   function To_Array (This : Wpdb_Class;
-                      Cb   : Cb_Func)
-                      return Arrays.Callable;
-
-   function To_Array (This : Wpdb_Class;
-                      Cb   : Cb_Func)
-                      return Arrays.Callable
-   is
-   begin
---    raise Program_Error with "not implemented";
-      return null;
-   end To_Array;
+   function Call_Remove_Placeholder_Escape
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
 --
 -- @since 0.71
@@ -140,7 +127,7 @@ is
       --    return;
       -- end if;
 
-      Unused := This.DB_Connect; -- ()
+      Unused := This.DB_Connect;
 
       return This;
    end X_Construct;
@@ -217,7 +204,6 @@ is
       Collate : UString;
    begin
       if
---      Function_Exists ("is_multisite") and then
         Is_Multisite
       then
          Charset := +"utf8";
@@ -310,8 +296,8 @@ is
 
    procedure Set_Charset (This    : Wpdb_Class;
                           Dbh     : Integer;
-                          Charset : String := "";  -- = null
-                          Collate : String := "") -- = null
+                          Charset : String := "";
+                          Collate : String := "")
    is
       use Php.Strings;
       use UStrings;
@@ -359,7 +345,6 @@ is
 
             when Engine_MySQL =>
                if
---               Function_Exists ("mysql_set_charset") and then
                  This.Has_Cap ("set_charset")
                then
                   Set_Charset_Succeeded := Mysql_Set_Charset (Charset_2, Dbh);
@@ -413,8 +398,7 @@ is
 
          when Engine_ADO =>
             Res_2 := Bind_ADO.Query (This.Dbh, "SELECT @@SESSION.sql_mode");
-            Res := Res_2.First_Element; -- Empty_Array;
-            Arrays.IO.Dump (Res);
+            Res := Res_2.First_Element;
 
          when Engine_MySQL =>
             Res := Mysql_Query ("SELECT @@SESSION.sql_mode", This.Dbh);
@@ -509,22 +493,28 @@ is
    function Set_Prefix (This            : in out Wpdb_Class;
                         Prefix          : String;
                         Set_Table_Names : Boolean := True)
-                        return String
+                        return String_Error_Type
    is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Class_Errors;
+      use Inc_Load;
 
       Old_Prefix   : UString;
       Unused_Match : List_Type;
    begin
-      if 0 = Preg_Match ("|[^a-z0-9_]|i", Prefix, Unused_Match) then
-         Logging.Log ("set_prefix", "Invalid database prefix");
-         return "";
---       return new Wp_Error ("invalid_db_prefix", "Invalid database prefix");
-      end if;
+      Logging.Log ("set_prefix", Prefix);
+      Logging.Log ("set_prefix", "out comment check");
+      -- if 0 = Preg_Match ("|[^a-z0-9_]|i", Prefix, Unused_Match) then
+      --    Logging.Log ("set_prefix", "Invalid database prefix");
+      --    return (Success => False,
+      --            Item    => +"",
+      --            Error   => X_Construct ("invalid_db_prefix",
+      --                                    "Invalid database prefix"));
+      -- end if;
 
-      Old_Prefix := +(if Inc_Load.Is_Multisite then "" else Prefix);
+      Old_Prefix := +(if Is_Multisite then "" else Prefix);
 
       if Isset (-This.Base_Prefix) then
          Old_Prefix := This.Base_Prefix;
@@ -545,8 +535,10 @@ is
          --    end;
          -- end loop;
 
-         if Inc_Load.Is_Multisite and then This.Blogid = 0 then
-            return -Old_Prefix;
+         if Is_Multisite and then This.Blogid = 0 then
+            return (Success => True,
+                    Item    => Old_Prefix,
+                    Error   => Null_Wp_Error);
          end if;
 
          This.Prefix := +This.Get_Blog_Prefix;
@@ -574,7 +566,11 @@ is
          -- end loop;
 
       end if;
-      return -Old_Prefix;
+
+      return (Success => True,
+              Item    => Old_Prefix,
+              Error   => Null_Wp_Error);
+
    end Set_Prefix;
 
    -----------------
@@ -1333,7 +1329,7 @@ is
       use Bind_ADO;
       use UStrings;
    begin
-      This.Last_Result   := String_Vectors.Empty_Vector;
+      This.Last_Result   := Array_Lists.Empty_Array_List;
 --      This.Col_Info      := null;
       This.Last_Query    := Null_UString; -- null;
       This.Rows_Affected := 0;
@@ -1396,7 +1392,7 @@ is
    begin
       Logging.Log ("db_connect", "Allow_Bail: " & Boolean'Image (Allow_Bail));
 
-      This.Engine := Databases.Engine_ADO; -- Engine_MySQL;
+      This.Engine := Databases.Engine_ADO;
 --    This.Is_MySQL := True;
 
       --
@@ -1849,12 +1845,7 @@ is
             case This.Engine is
 
             when Engine_ADO =>
---               if This.Dbh in mysqli then -- instanceof
                   This.Last_Error := +Mysqli_Error (This.Dbh);
---               else
---                  This.Last_Error :=
---                    +abs "Unable to retrieve the error message from MySQL";
---               end if;
 
             when Engine_MySQL =>
 --               if Is_Resource (This.Dbh) then
@@ -1918,13 +1909,14 @@ is
                   case This.Engine is
 
                   when Engine_ADO =>
+                     This.Last_Result.Clear;
                      declare
-                        Row : Natural;
+                        Row : Array_Type;
                      begin
                         loop
                            Row := Bind_ADO.Fetch_Object (This.Result);
-                           exit when Row = 0;
---                         This.Last_Result (Num_Rows) := Row;
+                           exit when Row = Empty_Array;
+                           This.Last_Result.Append (Row);
                            Num_Rows := Num_Rows + 1;
                         end loop;
                      end;
@@ -1998,7 +1990,7 @@ is
                use SQLite;
 
                Command : constant Statement :=
-                 Prepare (This.Handle, Query); --  & ";"); -- ";" added
+                 Prepare (This.Handle, Query);
             begin
                Step (Command);
             end;
@@ -2094,10 +2086,11 @@ is
       --
       if
         False = Has_Filter ("query",
-                            To_Array (This, Remove_Placeholder_Escape'Access))
+                            Call_Remove_Placeholder_Escape'Access)
       then
-         Add_Filter ("query",
-                     To_Array (This, Remove_Placeholder_Escape'Access), 0);
+         Logging.Log ("placeholder_escape", "add_filter for query not called");
+--       Add_Filter ("query",
+--                   Call_Remove_Placeholder_Escape'Access, 0);
       end if;
 
       return -Static_Placeholder;
@@ -2646,8 +2639,8 @@ is
    -------------
 
    function Get_Var (This  : in out Wpdb_Class;
-                     Query : Statement_Type := ""; -- null
-                     X     : Integer        := 0;
+                     Query : Statement_Type := "";
+                     X     : Integer        := 1;
                      Y     : Integer        := 1)
                      return String
    is
@@ -2676,7 +2669,22 @@ is
          return "XXX-885";
       end if;
 
-      return This.Last_Result (Y);
+      -- Added
+      declare
+         Row  : constant Array_Type := This.Last_Result (Y);
+         Xx   : Natural := 0;
+      begin
+         for A in Row.Iterate loop
+            Xx := Xx + 1;
+            if Xx = X then
+               return As_String (Element (A));
+            end if;
+         end loop;
+      end;
+
+      raise Constraint_Error with "X out of range";
+      return "XXX-777";
+--    return This.Last_Result (Y);
       -- declare
       --    -- Extract var out of cached results based on x,y vals.
       --    Values : constant Array_Type :=
@@ -2750,8 +2758,11 @@ is
       end if;
 
 --    if "OBJECT" = Output then
-         return (if Db.Last_Result (Y) /= ""
-                 then Db.Last_Result (Y) else ""); -- null
+      return As_String (Db.Last_Result (Y).First_Element);
+
+--    return (if Db.Last_Result (Y) /= Empty_Array -- ""
+--            then Db.Last_Result (Y) else ""); -- null
+
       -- elsif "ARRAY_A" = Output then
       --    return (if Db.Last_Result (Y) /= ""
       --            then Get_Object_Vars (Db.Last_Result (Y)) else "");
@@ -2790,7 +2801,7 @@ is
          return Empty_Array; -- ""; --  null;
       end if;
 
-      if Db.Last_Result (Y) = "" then
+      if Db.Last_Result (Y) = Empty_Array then -- "" then
          return Empty_Array;
       else
          return Empty_Array; -- Get_Object_Vars (Db.Last_Result (Y));
@@ -2833,13 +2844,13 @@ is
    -- Get_Result --
    ----------------
 
-   procedure Get_Results (This  : in out Wpdb_Class;
-                          Query : Statement_Type) --  ""; -- null
+   procedure Get_Results_Base (This  : in out Wpdb_Class;
+                               Query : Statement_Type)
    is
       use UStrings;
    begin
+      Logging.Log ("get_results_base", "");
       This.Func_Call := +"\db.get_results(""" & String (Query) & """";
-      --  & Output & ")";
 
       if Query /= "" then
          if
@@ -2853,7 +2864,7 @@ is
       else
          return; --  Empty_Array; -- null
       end if;
-   end Get_Results;
+   end Get_Results_Base;
 
    -----------------
    -- Get_Results --
@@ -2862,25 +2873,25 @@ is
    function Get_Results (This   : in out Wpdb_Class;
                          Query  : Statement_Type; -- String := ""; -- null
                          Output : String := "OBJECT")
-                         return Array_Type
+                         return Array_Lists.Array_List -- Array_Type
    is
    begin
       Logging.Log ("get_results", "output: " & Output);
 
-      Get_Results (This, Query);
+      Get_Results_Base (This, Query);
       pragma Assert (Output = "OBJECT");
                 -- new_array = array();
                 -- if (OBJECT === output) then
       -- Return an integer-keyed array of row objects.
---    return This.Last_Result;
-      declare
-         Result : Array_Type;
-      begin
-         for A of This.Last_Result loop
-            Result.Append (Key => "XXX-928", Value => From_String (A));
-         end loop;
-         return Result;
-      end;
+      return This.Last_Result;
+      -- declare
+      --    Result : Array_Type;
+      -- begin
+      --    for A of This.Last_Result loop
+      --       Result.Append (A); -- Key => "XXX-928", Value => From_String (A));
+      --    end loop;
+      --    return Result;
+      -- end;
                 -- end; elseif (OBJECT_K === output) then
                 --         // Return an array of row objects with keys from column 1.
                 --         // (Duplicates are discarded.)
@@ -2923,7 +2934,9 @@ is
                                Table : String)
                                return String_Error_Type
    is
+      use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Errors;
@@ -2970,10 +2983,10 @@ is
          Table : constant String :=
            "`" & Implode ("`.`", Table_Parts) & "`";
 
-         Results : constant Array_Type :=
+         Results : constant Array_List :=
            This.Get_Results (Statement_Type ("SHOW FULL COLUMNS FROM " & Table));
       begin
-         if Results = Empty_Array then -- not
+         if Results.Is_Empty then -- not
             return
               (Success => False,
                Item    => Null_UString,
@@ -2984,48 +2997,65 @@ is
               ));
          end if;
 
-         -- for A in Results.Iterate loop
-         --    declare
-         --       Column : String := Key (A);
-         --    begin
-         --       Set (Columns, Strtolower (Column.Field), From_String (Column));
-         --    end;
-         -- end loop;
+         for Column of Results loop
+            for A in Column.Iterate loop
+               declare
+                  Field : constant String := Strtolower (Key (A));
+                  Col   : constant String := As_String (Element (A));
+               begin
+--                Logging.Log ("get_table_charset", Field);
+                  Set (Columns, Field, From_String (Col));
+--                Set (Columns, Strtolower (Column.Field), From_String (Column));
+               end;
+            end loop;
+         end loop;
 
-         -- Set (This.Col_Meta, Tablekey, From_Array (Columns));
+         Set (This.Col_Meta, Tablekey, From_Array (Columns));
 
-         -- for Column of Columns loop
-         --    if not Empty (Column.Collation) then
-         --       declare
-         --          List : List_Type := Explode ("_", Column.Collation);
-         --       begin
-         --          Charset := List.First_Element;
+         for Column in Columns.Iterate loop
+            Logging.Log ("debug", Key (Column));
+            declare
+            begin
+               if Key (Column) = "collation" then
+                  declare
+                     List : constant List_Type :=
+                       Explode ("_", As_String (Element (Column)));
 
-         --          -- If the current connection can't support utf8mb4 characters,
-         --          -- let's only send 3-byte utf8 characters.
-         --          if "utf8mb4" = Charset and then not This.Has_Cap ("utf8mb4") then
-         --             Charset := +"utf8";
-         --          end if;
+                     Charset : UString := +List.First_Element;
+                  begin
+                     -- If the current connection can't support utf8mb4 characters,
+                     -- let's only send 3-byte utf8 characters.
+                     if "utf8mb4" = Charset and then not This.Has_Cap ("utf8mb4") then
+                        Charset := +"utf8";
+                     end if;
 
-         --          Set (Charsets, Strtolower (-Charset), From_Boolean (True));
-         --       end;
-         --    end if;
+                     Set (Charsets, Strtolower (-Charset), From_Boolean (True));
+                  end;
+               end if;
 
-         --    declare
-         --       List : List_Type := Explode ("(", Column.Typ);
-         --       Typ  : String := -List.First_Element;
+               if Key (Column) = "type" then
+                  Logging.Log ("debug", As_String (Element (Column)));
+                  declare
+                     List : constant List_Type :=
+                       Explode ("(", As_String (Element (Column)));
 
-         --       Blob : constant List_Type :=
-         --         ["BINARY", "VARBINARY", "TINYBLOB",
-         --                           "MEDIUMBLOB", "BLOB", "LONGBLOB"];
-         --    begin
-         --       -- A binary/blob means the whole query gets treated like this.
-         --       if In_List (Strtoupper (Typ), Blob, True) then
-         --          Set (This.Table_Charset, Tablekey, From_String ("binary"));
-         --          return "binary";
-         --       end if;
-         --    end;
-         -- end loop;
+                     Typ : constant String := List.First_Element;
+
+                     Blob : constant List_Type :=
+                       ["BINARY", "VARBINARY", "TINYBLOB",
+                        "MEDIUMBLOB", "BLOB", "LONGBLOB"];
+                  begin
+                     -- A binary/blob means the whole query gets treated like this.
+                     if In_List (Strtoupper (Typ), Blob, True) then
+                        Set (This.Table_Charset, Tablekey, From_String ("binary"));
+                        return (Success => True,
+                                Item    => +"binary",
+                                Error   => Null_Wp_Error);
+                     end if;
+                  end;
+               end if;
+            end;
+         end loop;
 
          -- utf8mb3 is an alias for utf8.
          if Isset (Charsets, "utf8mb3") then
@@ -3197,19 +3227,18 @@ is
       end if;
 
       declare
-         Typeinfo : List_Type; --  :=
---           Explode ("(", As_String (Get (Ref_2 (This.Col_Meta,
---                                                Key_1 => Tablekey,
---                                                Key_2 => Columnkey))).Typ);
-         Typ : constant String := Strtolower (Typeinfo.First_Element); -- [0]
-         Length : Natural;
-      begin
-         if not Empty (Typeinfo (2)) then -- [1]
-            Length := Natural'Value (Trim (Typeinfo (2), ")")); -- [1]
-         else
-            Length := 0; -- False;
-         end if;
+         Typeinfo : constant List_Type :=
+           Explode ("(", As_String (Get (Ref_2 (This.Col_Meta,
+                                                Key_1 => Tablekey,
+                                                Key_2 => Columnkey))));
 
+         Typ : constant String := Strtolower (Typeinfo.First_Element); -- [0]
+
+         Length : constant String :=
+           (if Typeinfo.Length in 2  -- [1]
+            then Trim (Typeinfo (2), ")") -- [1]
+            else ""); -- false
+      begin
          if Typ in "char" | "varchar" then
             return To_Array_Type ([
               Build ("type",   "char"),
@@ -3607,8 +3636,7 @@ is
             begin
                for A in Queries.Iterate loop
                   declare
---                   Column : constant String := Key (A);
-                     Query  : constant String := As_String (Element (A));
+                     Query : constant String := As_String (Element (A));
                   begin
                      if Query = "" then -- not
                         goto Continue_2;
@@ -4079,7 +4107,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use MySQL_Bind;
-      use Bind_ADO;
       use Databases;
 
       DB_Server_Info_2 : constant String := This.DB_Server_Info;
@@ -4123,7 +4150,7 @@ is
          declare
             Client_Version : constant String :=
               (case This.Engine is
-               when Engine_ADO => Mysqli_Get_Client_Info,
+               when Engine_ADO    => Bind_ADO.Get_Client_Info,
                when Engine_MySQL  => Mysql_Get_Client_Info,
                when Engine_SQLite => "10.11.14");
          begin
@@ -4207,6 +4234,20 @@ is
       Logging.Log ("set_table", Table);
       pragma Assert (False);
    end Set_Table;
+
+   ------------------------------------
+   -- Call_Remove_Placeholder_Escape --
+   ------------------------------------
+
+   function Call_Remove_Placeholder_Escape
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
+   is
+      Unused : constant String :=
+        Remove_Placeholder_Escape (Globals.WpDB, "(empty)");
+   begin
+      return Empty_Array;
+   end Call_Remove_Placeholder_Escape;
 
 begin
    -- Globals.WpDB.M_Tables.Include ("posts",              "");

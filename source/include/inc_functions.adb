@@ -5,7 +5,6 @@
 --
 
 with Ada.Containers;
-with Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Echoing;
@@ -1166,12 +1165,10 @@ is
    -- Add_Query_Arg --
    -------------------
 
-   function Add_Query_Arg (Key   : List_Type;
-                           Value : String;
-                           URL   : String := "")
+   function Add_Query_Arg (Key : Array_Type;
+                           URL : String := "")
                            return String
    is
-      use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
@@ -1195,10 +1192,14 @@ is
         --                 uri = args[2];
         --         end if;
         -- end if;
-      URI   : constant String  := Get_As_String (Binder.X_SERVER, "REQUEST_URI");
+--    URI   : constant String := Get_As_String (Binder.X_SERVER, "REQUEST_URI");
+      URI : constant String := URL;
+--      (if Value = "1"
+--       then Get_As_String (Binder.X_SERVER, "REQUEST_URI") else URL); -- Value);
+
       URI_2 : UString := +URI;
    begin
-      Put_Line ("add_query_arg: " & URI);
+      Logging.Log ("add_query_arg", "uri: " & URI);
 
       Frag := +Strstr (URI, "#");
       if Frag = "" then
@@ -1219,7 +1220,7 @@ is
          Protocol := Null_UString;
       end if;
 
-      Put_Line ("add_query_arg: " & (-URI_2));
+      Logging.Log ("add_query_arg", "uri_2: " & (-URI_2));
 
       declare
          URI_3 : constant String := -URI_2;
@@ -1245,8 +1246,17 @@ is
 
          Wp_Parse_Str (-Query, Querys);
          Querys := URL_Encode_Deep (Querys);
+         -- This re-URL-encodes things that were already in the query string.
       end;
-      -- This re-URL-encodes things that were already in the query string.
+
+      for A in Key.Iterate loop
+         declare
+            K : constant String     := Arrays.Key (A);
+            V : constant Multi_Type := Arrays.Element (A);
+         begin
+            Set (Querys, K, V);
+         end;
+      end loop;
 
       -- if is_array( args[0] ) then
       --    for ( args[0] as k => v ) loop
@@ -1282,25 +1292,9 @@ is
                            Value : String;
                            URL   : String := "")
                            return String
-   is (Add_Query_Arg (List_Type'[Key], Value, URL));
-
-   -------------------
-   -- Add_Query_Arg --
-   -------------------
-
-   function Add_Query_Arg (Key   : Array_Type;
-                           Value : String;
-                           URL   : String := "")
-                           return String
    is
-      use UStrings;
-
-      Res : UString := +URL;
    begin
-      for A in Key.Iterate loop
-         Res := +Add_Query_Arg (Arrays.Key (A), As_String (Element (A)), -Res);
-      end loop;
-      return -Res;
+      return Add_Query_Arg (Build (Key, Value), URL);
    end Add_Query_Arg;
 
    ----------------------
@@ -1390,10 +1384,8 @@ is
 
       Array_2 : Array_Type := Arry;
    begin
-      for A in Array_2.Iterate loop -- ( (array) array as k => v ) then
+      for A in Array_2.Iterate loop
          declare
---          use Arrays.Array_Maps;
-
             K : constant String := Key (A);
             V : constant String := Get_As_String (Array_2, K);
          begin
@@ -1882,10 +1874,10 @@ is
             return Boolean
    is
       use Php.Strings;
-      use Php.Types;
+      use Array_Lists;
       use UStrings;
-      use Inc_Caches;
       use Class_WpDB;
+      use Inc_Caches;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Options;
@@ -1959,14 +1951,14 @@ is
                end if;
 
                declare
-                  Described_Table : constant Array_Type :=
+                  Described_Table : constant Array_List := -- Array_Type :=
                     Globals.WpDB.Get_Results ("DESCRIBE table;");
                begin
                   if
-                    (Described_Table = Empty_Array and then
+                    (Described_Table.Is_Empty and then --  = Empty_Array and then
                      Empty (Globals.WpDB.Last_Error))
                     or else
-                    (Is_Array (Described_Table) and then
+                    ( -- Is_Array (Described_Table) and then
                      Described_Table.Length in 0)
                   then
                      goto Continue;

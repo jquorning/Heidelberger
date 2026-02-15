@@ -41,12 +41,7 @@ is
       use UStrings;
       use Inc_L10n;
 
-      List : constant List_Type :=
-         Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
-
       Admin_Header    : UString;
-      Display_Version : constant String     := List.First_Element;
-      Credits         : constant JSON_Value := Adi_Credits.Wp_Credits;
    begin
       Globals.Title := +abs "Credits";
 
@@ -56,6 +51,12 @@ is
       Admin_Header := +Get_Echo;
 
       declare
+         List : constant List_Type :=
+           Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
+
+         Display_Version : constant String     := List.First_Element;
+         Credits         : constant JSON_Value := Adi_Credits.Wp_Credits;
+
          use Templates_Parser;
 
          type My_Lazy is new Dynamic.Lazy_Tag with null record;

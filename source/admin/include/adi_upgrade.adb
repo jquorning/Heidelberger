@@ -2508,7 +2508,7 @@ is
                   -- Fetch the table column structure from the database.
                   Suppress : constant Boolean := WpDB.Suppress_Errors;
 
-                  Tablefields : constant Array_Type :=
+                  Tablefields : constant Array_List := -- Array_Type :=
                     WpDB.Get_Results (Statement_Type ("DESCRIBE " & Table & ";"));
                begin
                   WpDB.Suppress_Errors (Suppress);
@@ -2708,11 +2708,8 @@ is
                      end;
 
                      -- For every field in the table.
-                     for Tablefield_0 in Tablefields.Iterate loop
+                     for Tablefield of Tablefields loop
                         declare
-                           Tablefield : constant Array_Type :=
-                             As_Array (Element (Tablefield_0));
-
                            Tablefield_Field_Lowercased : constant String :=
                              Strtolower (Get_As_String (Tablefield, "Field"));
 
@@ -2889,7 +2886,7 @@ is
                      -- Index stuff goes here. Fetch the table index structure from
                      -- the database.
                      declare
-                        Tableindices : constant Array_Type :=
+                        Tableindices : constant Array_List :=
                           WpDB.Get_Results (Statement_Type (
                             "SHOW INDEX FROM " & Table & ";"));
                      begin
@@ -2899,13 +2896,11 @@ is
                               Index_Ary : Array_Type;
                            begin
                               -- For every index in the table.
-                              for Tableindex_0 in Tableindices.Iterate loop
+                              for Tableindex of Tableindices loop
                                  declare
-                                    Tableindex : constant Array_Type :=
-                                      As_Array (Element (Tableindex_0));
-
                                     Keyname : constant String :=
-                                      Strtolower (Get_As_String (Tableindex, "Key_Name"));
+                                      Strtolower (Get_As_String (Tableindex,
+                                                                 "Key_Name"));
                                  begin
                                     -- Add the index to the index data array.
                                     Append_2
@@ -3474,6 +3469,8 @@ is
 
    procedure Pre_Schema_Upgrade
    is
+      use Array_Lists;
+      use Array_Lists.Vectors;
       use Globals;
       use UStrings;
       use Class_WpDB;
@@ -3565,7 +3562,7 @@ is
          and then
            WpDB.Get_Results (
              "SHOW INDEX FROM " & Termmeta &
-             " WHERE Column_name = 'meta_key'") /= Empty_Array
+             " WHERE Column_name = 'meta_key'") /= Empty_Array_List
          then
             WpDB.Query
               ("ALTER TABLE " & Termmeta &

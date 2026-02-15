@@ -7,6 +7,7 @@ with Ada.Strings.Fixed;
 with Php.Strings;
 
 with Lists;
+with Logging;
 
 with AWS.Status;
 with AWS.URL;
@@ -23,18 +24,23 @@ is
                               Going => Ada.Strings.Backward);
 
    Request_URI : constant String := PHP_Self (Position .. PHP_Self'Last);
+
+   Obj : constant AWS.URL.Object := AWS.URL.Parse (AWS.Status.URL (Status));
+
+   HTTP_Host   : constant String := AWS.URL.Host (Obj) & ":" & AWS.URL.Port (Obj);
+   -- PHP_Self (PHP_Self'First + 1 .. Position - 1);
 begin
-   Put_Line ("web_server_to_php:");
-   Put_Line ("  uri: " & URI (Status));
-   Put_Line ("  url: " & URL (Status));
-   Put_Line ("  PHP_Self   : " & PHP_Self);
-   Put_Line ("  Request_URI: " & Request_URI);
+   Logging.Log ("web_server_to_php", "");
+   Logging.Log ("web_server_to_php", "  uri: " & URI (Status));
+   Logging.Log ("web_server_to_php", "  url: " & URL (Status));
+   Logging.Log ("web_server_to_php", "  PHP_Self   : " & PHP_Self);
+   Logging.Log ("web_server_to_php", "  Request_URI: " & Request_URI);
 
    Set (X_SERVER, "PHP_SELF",        From_String (PHP_Self));
    Set (X_SERVER, "HTTP_USER_AGENT", From_String ("XXX-790"));
    Set (X_SERVER, "SERVER_SOFTWARE", From_String ("Apache"));
    Set (X_SERVER, "REQUEST_URI",     From_String (Request_URI));
-   Set (X_SERVER, "HTTP_HOST",       From_String ("XXX-902"));
+   Set (X_SERVER, "HTTP_HOST",       From_String (HTTP_Host));
    Set (X_SERVER, "REQUEST_METHOD",
         From_String (Request_Method'(Method (Status))'Image));
 

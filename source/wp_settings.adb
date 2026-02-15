@@ -31,6 +31,7 @@ is
 
    procedure Run
    is
+      use UStrings;
       use Wp_Common;
    begin
       --
@@ -39,7 +40,7 @@ is
       --
       -- @since 1.0.0
       --
---    WPINC := "wp-includes";
+      Globals.WPINC := +"wp-includes";
 
       --
       -- Version information for the current WordPress release.

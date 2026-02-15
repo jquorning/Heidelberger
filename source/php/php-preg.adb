@@ -2,8 +2,6 @@
 --
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Logging;
 with UStrings;
 
@@ -304,9 +302,9 @@ is
                             return Integer
    is
    begin
-      Put_Line ("preg_match_all:");
-      Put_Line ("  pattern: " & Pattern);
-      Put_Line ("  subject: " & Subject);
+      Logging.Log ("preg_match_all", "not implemented");
+      Logging.Log ("preg_match_all", "  pattern: " & Pattern);
+      Logging.Log ("preg_match_all", "  subject: " & Subject);
       return 0;
    end Preg_Match_All;
 
@@ -346,10 +344,10 @@ is
 
       List : List_Type;
    begin
-      Put_Line ("preg_split:");
-      Put_Line ("  pattern: " & Pattern);
-      Put_Line ("    pyned: " & Pattern (Marks.First .. Marks.Last));
-      Put_Line ("  subject: " & Subject);
+      Logging.Log ("preg_split", "");
+      Logging.Log ("preg_split", "  pattern: " & Pattern);
+      Logging.Log ("preg_split", "    pyned: " & Pattern (Marks.First .. Marks.Last));
+      Logging.Log ("preg_split", "  subject: " & Subject);
 
       Match (Engine, Subject, Result);
 
@@ -403,13 +401,13 @@ is
    begin
       Match (Re, Subject, Result);
 
-      Put_Line ("preg_replace_callback:");
-      Put_Line ("  pattern: " & Pattern_2);
-      Put_Line ("    pyned: " & Pattern_2 (Marks.First .. Marks.Last));
-      Put_Line ("  subject: " & Subject);
---    raise Program_Error with "not implemented";
+      Logging.Log ("preg_replace_callback", "not implemented");
+      Logging.Log ("preg_replace_callback", "  pattern: " & Pattern_2);
+      Logging.Log ("preg_replace_callback",
+                   "    pyned: " & Pattern_2 (Marks.First .. Marks.Last));
+      Logging.Log ("preg_replace_callback", "  subject: " & Subject);
+
       return Subject;
---    return "XXX-968";
    end Preg_Replace_Callback;
 
 end Php.Preg;
