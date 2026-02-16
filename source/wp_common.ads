@@ -458,6 +458,11 @@ is
                            return Inc_Users.User_Error_Type;
 
    function Apply_Filters (Hook_Name   : String;
+                           Value       : Inc_Users.User_Error_Type;
+                           Password    : String)
+                           return Inc_Users.User_Error_Type;
+
+   function Apply_Filters (Hook_Name   : String;
                            Value       : String;
                            Errors      : Class_Errors.Wp_Error)
                            return String;

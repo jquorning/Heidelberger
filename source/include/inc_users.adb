@@ -10,26 +10,30 @@ with Php.Strings;
 
 with Array_Lists;
 with Binder;
+with Constants;
 with Globals;
 with Helpers;
+with Logging;
 with UStrings;
 with Wp_Common;
 
-with Inc_Caches;
 with Class_Sites;
 with Class_WpDB;
--- with Class_Session_Tokens;
--- with Class_Session_Tokens_Factory;
+with Inc_Caches;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_General_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
+with Inc_Plugins;
 
 package body Inc_Users
 is
+
+   Global_Auth_Secure_Cookie : Boolean;
 
    ---------------
    -- Wp_Signon --
@@ -44,6 +48,7 @@ is
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Load;
+      use Inc_Plugins;
       use Inc_Pluggables;
 
       Credentials_2   : Array_Type := Credentials;
@@ -114,9 +119,9 @@ is
 
 --    global auth_secure_cookie;
       -- XXX ugly hack to pass this to wp_authenticate_cookie().
---    Auth_Secure_Cookie := Secure_Cookie_2;
+      Global_Auth_Secure_Cookie := Secure_Cookie_2;
 
---    Add_Filter ("authenticate", "wp_authenticate_cookie", 30, 3);
+      Add_Filter ("authenticate", Wp_Authenticate_Cookie'Access, 30, 3);
 
       declare
          User : constant User_Error_Type :=
@@ -145,195 +150,313 @@ is
       end;
    end Wp_Signon;
 
--- --
--- -- Authenticates a user, confirming the username and password are valid.
--- --
--- -- @since 2.8.0
--- --
--- -- @param WP_User|WP_Error|null user     WP_User or WP_Error object from a previous callback. Default null.
--- -- @param string                username Username for authentication.
--- -- @param string                password Password for authentication.
--- -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
--- --
--- function wp_authenticate_username_password( user, username, password ) then
---         if ( user instanceof WP_User ) then
---                 return user;
---         end;
+   ---------------------------------------
+   -- Wp_Authenticate_Username_Password --
+   ---------------------------------------
 
---         if ( empty( username ) || empty( password ) ) then
---                 if ( is_wp_error( user ) ) then
---                         return user;
---                 end;
+   function Wp_Authenticate_Username_Password (User     : User_Error_Type;
+                                               Username : String;
+                                               Password : String)
+                                               return User_Error_Type
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Errors;
+      use Class_Users;
+      use Inc_General_Templates;
+      use Inc_L10n;
+      use Inc_Pluggables;
+   begin
+      if User.Success then
+--    if User in Wp_User then -- instanceof
+         return User;
+      end if;
 
---                 error = new WP_Error();
+      if Empty (Username) or Empty (Password) then
+         if not User.Success then
+--       if Is_Wp_Error (User) then
+            return User;
+         end if;
 
---                 if ( empty( username ) ) then
---                         error->add( "empty_username", __( "<strong>Error:</strong> The username field is empty." ) );
---                 end;
+         declare
+            Error : Wp_Error := X_Construct;
+         begin
+            if Empty (Username) then
+               Error.Add ("empty_username",
+                          abs "<strong>Error:</strong> The username field is empty.");
+            end if;
 
---                 if ( empty( password ) ) then
---                         error->add( "empty_password", __( "<strong>Error:</strong> The password field is empty." ) );
---                 end;
+            if Empty (Password) then
+               Error.Add ("empty_password",
+                          abs "<strong>Error:</strong> The password field is empty.");
+            end if;
 
---                 return error;
---         end;
+            return (Success => False,
+                    Error   => Error,
+                    User    => Null_User);
+         end;
+      end if;
 
---         user = get_user_by( "login", username );
+      declare
+         User : User_Error_Type := (Success => True,
+                                    User    => Get_User_By ("login", Username),
+                                    Error   => Null_Wp_Error);
+--       User : Wp_User := Get_User_By ("login", Username);
+      begin
+         if User.User = Null_User then
+            return
+              (Success => False,
+               User    => Null_User,
+               Error   => X_Construct ( -- new Wp_Error (
+                 "invalid_username",
+                 Sprintf (
+                   -- translators: %s: User name.
+                   abs "<strong>Error:</strong> The username <strong>%s</strong> is not registered on this site. If you are unsure of your username, try your email address instead.",
+                   [1 => Username]
+                 )
+               ));
+         end if;
 
---         if ( ! user ) then
---                 return new WP_Error(
---                         "invalid_username",
---                         sprintf(
---                                 /* translators: %s: User name.--
---                                 __( "<strong>Error:</strong> The username <strong>%s</strong> is not registered on this site. If you are unsure of your username, try your email address instead." ),
---                                 username
---                         )
---                 );
---         end;
+         --
+         -- Filters whether the given user can be authenticated with the provided
+         -- password.
+         --
+         -- @since 2.5.0
+         --
+         -- @param WP_User|WP_Error user     WP_User or WP_Error object if a previous
+         --                                   callback failed authentication.
+         -- @param string           password Password to check against the user.
+         --
+         User := Apply_Filters ("wp_authenticate_user", User, Password);
+         if not User.Success then
+--       if Is_Wp_Error (User) then
+            return User;
+         end if;
 
---         --
---         -- Filters whether the given user can be authenticated with the provided password.
---         --
---         -- @since 2.5.0
---         --
---         -- @param WP_User|WP_Error user     WP_User or WP_Error object if a previous
---         --                                   callback failed authentication.
---         -- @param string           password Password to check against the user.
---         --
---         user = apply_filters( "wp_authenticate_user", user, password );
---         if ( is_wp_error( user ) ) then
---                 return user;
---         end;
+         if
+           not Wp_Check_Password (Password, -User.User.Prop.User_Pass, User.User.Id)
+         then
+            return -- new Wp_Error (
+              (Success => False,
+               User    => Null_User,
+               Error   => X_Construct (
+                 "incorrect_password",
+                 Sprintf (
+                   -- translators: %s: User name.
+                   abs "<strong>Error:</strong> The password you entered for the username %s is incorrect.",
+                   [1 => "<strong>" & Username & "</strong>"]
+                 ) &
+                 " <a href=""" & Wp_Lostpassword_URL & """>" &
+                 abs "Lost your password?" &
+                 "</a>"
+               ));
+         end if;
 
---         if ( ! wp_check_password( password, user->user_pass, user->ID ) ) then
---                 return new WP_Error(
---                         "incorrect_password",
---                         sprintf(
---                                 /* translators: %s: User name.--
---                                 __( "<strong>Error:</strong> The password you entered for the username %s is incorrect." ),
---                                 "<strong>" . username . "</strong>"
---                         ) .
---                         " <a href="" . wp_lostpassword_url() . "">" .
---                         __( "Lost your password?" ) .
---                         "</a>"
---                 );
---         end;
+         return User;
+      end;
+   end Wp_Authenticate_Username_Password;
 
---         return user;
--- end;
+   ---------------------------------------
+   -- Wp_Authenticate_Username_Password --
+   ---------------------------------------
 
--- --
--- -- Authenticates a user using the email and password.
--- --
--- -- @since 4.5.0
--- --
--- -- @param WP_User|WP_Error|null user     WP_User or WP_Error object if a previous
--- --                                        callback failed authentication.
--- -- @param string                email    Email address for authentication.
--- -- @param string                password Password for authentication.
--- -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
--- --
--- function wp_authenticate_email_password( user, email, password ) then
---         if ( user instanceof WP_User ) then
---                 return user;
---         end;
+   function Wp_Authenticate_Username_Password
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
+   is
+      User : User_Error_Type;
+   begin
+      Logging.Log ("wp_authenticate_username_password", "");
+      User := Wp_Authenticate_Username_Password (User, "", "");
+      return Empty_Array;
+   end Wp_Authenticate_Username_Password;
 
---         if ( empty( email ) || empty( password ) ) then
---                 if ( is_wp_error( user ) ) then
---                         return user;
---                 end;
+   ------------------------------------
+   -- Wp_Authenticate_Email_Password --
+   ------------------------------------
 
---                 error = new WP_Error();
+   function Wp_Authenticate_Email_Password (User     : User_Error_Type;
+                                            Email    : String;
+                                            Password : String)
+                                            return User_Error_Type
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Errors;
+      use Class_Users;
+      use Inc_Formatting;
+      use Inc_General_Templates;
+      use Inc_L10n;
+      use Inc_Pluggables;
+   begin
+      if User.Success then
+--    if User in Wp_User then -- instanceof
+         return User;
+      end if;
 
---                 if ( empty( email ) ) then
---                         -- Uses "empty_username" for back-compat with wp_signon().
---                         error->add( "empty_username", __( "<strong>Error:</strong> The email field is empty." ) );
---                 end;
+      if Empty (Email) or Empty (Password) then
+         if not User.Success then
+--       if Is_Wp_Error (User) then
+            return User;
+         end if;
 
---                 if ( empty( password ) ) then
---                         error->add( "empty_password", __( "<strong>Error:</strong> The password field is empty." ) );
---                 end;
+         declare
+            Error : Wp_Error := X_Construct;
+         begin
+            if Empty (Email) then
+               -- Uses "empty_username" for back-compat with wp_signon().
+               Error.Add ("empty_username",
+                          abs "<strong>Error:</strong> The email field is empty.");
+            end if;
 
---                 return error;
---         end;
+            if Empty (Password) then
+               Error.Add ("empty_password",
+                          abs "<strong>Error:</strong> The password field is empty.");
+            end if;
 
---         if ( ! is_email( email ) ) then
---                 return user;
---         end;
+            return (Success => False,
+                    Error   => Error,
+                    User    => Null_User);
+         end;
+      end if;
 
---         user = get_user_by( "email", email );
+      if Is_Email (Email) = "" then
+--    if not Is_Email (Email) then
+         return User;
+      end if;
 
---         if ( ! user ) then
---                 return new WP_Error(
---                         "invalid_email",
---                         __( "Unknown email address. Check again or try your username." )
---                 );
---         end;
+      declare
+         User : User_Error_Type := (Success => True,
+                                    User    => Get_User_By ("email", Email),
+                                    Error   => Null_Wp_Error);
+--       User : Wp_User := Get_User_By ("email", Email);
+      begin
+         if User.User = Null_User then
+            return
+              (Success => False,
+               User    => Null_User,
+               Error   => X_Construct ( -- new Wp_Error (
+                 "invalid_email",
+                 abs "Unknown email address. Check again or try your username."
+              ));
+         end if;
 
---         -- This filter is documented in wp-includes/user.php--
---         user = apply_filters( "wp_authenticate_user", user, password );
+         -- This filter is documented in wp-includes/user.php
+         User := Apply_Filters ("wp_authenticate_user", User, Password);
 
---         if ( is_wp_error( user ) ) then
---                 return user;
---         end;
+         if not User.Success then
+--       if Is_Wp_Error (User) then
+            return User;
+         end if;
 
---         if ( ! wp_check_password( password, user->user_pass, user->ID ) ) then
---                 return new WP_Error(
---                         "incorrect_password",
---                         sprintf(
---                                 /* translators: %s: Email address.--
---                                 __( "<strong>Error:</strong> The password you entered for the email address %s is incorrect." ),
---                                 "<strong>" . email . "</strong>"
---                         ) .
---                         " <a href="" . wp_lostpassword_url() . "">" .
---                         __( "Lost your password?" ) .
---                         "</a>"
---                 );
---         end;
+         if
+           not Wp_Check_Password (Password, -User.User.Prop.User_Pass, User.User.Id)
+         then
+            return -- new Wp_Error (
+              (Success => False,
+               User    => Null_User,
+               Error   => X_Construct (
+                 "incorrect_password",
+                 Sprintf (
+                   -- translators: %s: Email address.
+                   abs "<strong>Error:</strong> The password you entered for the email address %s is incorrect.",
+                   [1 => "<strong>" & Email & "</strong>"]
+                 ) &
+                 " <a href=""" & Wp_Lostpassword_URL & """>" &
+                 abs "Lost your password?" &
+                 "</a>"
+              ));
+         end if;
 
---         return user;
--- end;
+         return User;
+      end;
+   end Wp_Authenticate_Email_Password;
 
--- --
--- -- Authenticates the user using the WordPress auth cookie.
--- --
--- -- @since 2.8.0
--- --
--- -- @global string auth_secure_cookie
--- --
--- -- @param WP_User|WP_Error|null user     WP_User or WP_Error object from a previous callback. Default null.
--- -- @param string                username Username. If not empty, cancels the cookie authentication.
--- -- @param string                password Password. If not empty, cancels the cookie authentication.
--- -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
--- --
--- function wp_authenticate_cookie( user, username, password ) then
---         if ( user instanceof WP_User ) then
---                 return user;
---         end;
+   ------------------------------------
+   -- Wp_Authenticate_Email_Password --
+   ------------------------------------
 
---         if ( empty( username ) && empty( password ) ) then
---                 user_id = wp_validate_auth_cookie();
---                 if ( user_id ) then
---                         return new WP_User( user_id );
---                 end;
+   function Wp_Authenticate_Email_Password
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
+   is
+      User : User_Error_Type;
+   begin
+      Logging.Log ("wp_authenticate_email_password", "");
+      User := Wp_Authenticate_Email_Password (User, "", "");
+      return Empty_Array;
+   end Wp_Authenticate_Email_Password;
 
---                 global auth_secure_cookie;
+   ----------------------------
+   -- Wp_Authenticate_Cookie --
+   ----------------------------
 
---                 if ( auth_secure_cookie ) then
---                         auth_cookie = SECURE_AUTH_COOKIE;
---                 end; else then
---                         auth_cookie = AUTH_COOKIE;
---                 end;
+   function Wp_Authenticate_Cookie (User     : User_Error_Type;
+                                    Username : String;
+                                    Password : String)
+                                    return User_Error_Type
+   is
+      use Php.Strings;
+      use UStrings;
+      use Class_Errors;
+      use Class_Users;
+      use Inc_L10n;
+      use Inc_Pluggables;
+--    global auth_secure_cookie;
+   begin
+      if User.Success then
+--    if User in Wp_User then -- instaceof
+         return User;
+      end if;
 
---                 if ( ! empty( _COOKIE[ auth_cookie ] ) ) then
---                         return new WP_Error( "expired_session", __( "Please log in again." ) );
---                 end;
+      if Empty (Username) and Empty (Password) then
+         declare
+            User_Id : constant User_Id_Type := Wp_Validate_Auth_Cookie;
+         begin
+            if User_Id /= 0 then
+               return (Success => True,
+                       User    => X_Construct (User_Id), -- new WP_User( user_id );
+                       Error   => Null_Wp_Error);
+            end if;
+         end;
 
---                 -- If the cookie is not set, be silent.
---         end;
+         declare
+            Auth_Cookie : constant String :=
+              (if Global_Auth_Secure_Cookie
+               then -Constants.SECURE_AUTH_COOKIE
+               else -Constants.AUTH_COOKIE);
+         begin
+            if not Empty (Binder.X_COOKIE, Auth_Cookie) then
+               return (Success => False,
+                       Error   => X_Construct (
+                         "expired_session",
+                         abs "Please log in again."),
+                       User    => Null_User);
+            end if;
+         end;
 
---         return user;
--- end;
+         -- If the cookie is not set, be silent.
+      end if;
+
+      return User;
+   end Wp_Authenticate_Cookie;
+
+   ----------------------------
+   -- Wp_Authenticate_Cookie --
+   ----------------------------
+
+   function Wp_Authenticate_Cookie
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
+   is
+      User : User_Error_Type;
+   begin
+      Logging.Log ("wp_authenticate_cookie", "");
+      User := Wp_Authenticate_Cookie (User, "", "");
+      return Empty_Array;
+   end Wp_Authenticate_Cookie;
 
 -- --
 -- -- Authenticates the user using an application password.

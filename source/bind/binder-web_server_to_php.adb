@@ -8,7 +8,9 @@ with Php.Strings;
 
 with Lists;
 with Logging;
+with UStrings;
 
+with AWS.Headers.Values;
 with AWS.Status;
 with AWS.URL;
 
@@ -23,18 +25,19 @@ is
      Ada.Strings.Fixed.Index (PHP_Self, "/",
                               Going => Ada.Strings.Backward);
 
-   Request_URI : constant String := PHP_Self (Position .. PHP_Self'Last);
+   Request_URI : constant String :=
+     PHP_Self (Position .. PHP_Self'Last);
 
-   Obj : constant AWS.URL.Object := AWS.URL.Parse (AWS.Status.URL (Status));
+   Obj : constant AWS.URL.Object :=
+     AWS.URL.Parse (AWS.Status.URL (Status));
 
-   HTTP_Host   : constant String := AWS.URL.Host (Obj) & ":" & AWS.URL.Port (Obj);
-   -- PHP_Self (PHP_Self'First + 1 .. Position - 1);
+   HTTP_Host : constant String :=
+     AWS.URL.Host (Obj) & ":" & AWS.URL.Port (Obj);
 begin
-   Logging.Log ("web_server_to_php", "");
-   Logging.Log ("web_server_to_php", "  uri: " & URI (Status));
-   Logging.Log ("web_server_to_php", "  url: " & URL (Status));
-   Logging.Log ("web_server_to_php", "  PHP_Self   : " & PHP_Self);
-   Logging.Log ("web_server_to_php", "  Request_URI: " & Request_URI);
+   Logging.Log ("web_server_to_php", "uri: " & URI (Status));
+   Logging.Log ("web_server_to_php", "url: " & URL (Status));
+   Logging.Log ("web_server_to_php", "PHP_Self   : " & PHP_Self);
+   Logging.Log ("web_server_to_php", "Request_URI: " & Request_URI);
 
    Set (X_SERVER, "PHP_SELF",        From_String (PHP_Self));
    Set (X_SERVER, "HTTP_USER_AGENT", From_String ("XXX-790"));
@@ -43,6 +46,21 @@ begin
    Set (X_SERVER, "HTTP_HOST",       From_String (HTTP_Host));
    Set (X_SERVER, "REQUEST_METHOD",
         From_String (Request_Method'(Method (Status))'Image));
+
+   -- Set cookies
+   declare
+      use AWS.Headers;
+      use UStrings;
+
+      Lst  : constant List       := Header (Status);
+      Cook : constant String     := Get_Values (Lst, "Cookie");
+      S    : constant Values.Set := Values.Split (Cook);
+   begin
+      X_COOKIE := Empty_Array;
+      for A of S loop
+         Set (X_COOKIE, -A.Name, From_String (-A.Value));
+      end loop;
+   end;
 
    XX_GET := Empty_Array;
    declare

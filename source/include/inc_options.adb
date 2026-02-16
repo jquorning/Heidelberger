@@ -293,6 +293,11 @@ is
          return Get_Option ("siteurl");
       end if;
 
+      -- XXX development jq
+      if In_List (Option, List_Type'["siteurl", "home"], True) then
+         Value := From_String (As_String (Value) & ":8080");
+      end if;
+
       if
         In_List (Option, List_Type'["siteurl", "home", "category_base",
                                     "tag_base"], True)

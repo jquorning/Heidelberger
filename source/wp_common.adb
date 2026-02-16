@@ -1072,6 +1072,20 @@ is
    end Apply_Filters;
 
    function Apply_Filters (Hook_Name   : String;
+                           Value       : Inc_Users.User_Error_Type;
+                           Password    : String)
+                           return Inc_Users.User_Error_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters (Hook_Name   : String;
                            Value       : String;
                            Errors      : Class_Errors.Wp_Error)
                            return String

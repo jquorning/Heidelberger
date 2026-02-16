@@ -16,8 +16,6 @@
 -- @package WordPress
 --
 
--- with Ada.Text_IO; use Ada.Text_IO;
-
 with Arrays;
 with Binder;
 with Constants;
@@ -33,6 +31,7 @@ with Inc_Robots_Templates;
 with Inc_Script_Loader;
 with Inc_Taxonomys;
 with Inc_Themes;
+with Inc_Users;
 
 package body Inc_Default_Filters
 is
@@ -594,8 +593,10 @@ is
 --    Add_Filter ("heartbeat_nopriv_send", "wp_auth_check");
 
       -- Default authentication filters.
---    Add_Filter ("authenticate", "wp_authenticate_username_password", 20, 3);
---    Add_Filter ("authenticate", "wp_authenticate_email_password", 20, 3);
+      Add_Filter ("authenticate",
+                  Inc_Users.Wp_Authenticate_Username_Password'Access, 20, 3);
+      Add_Filter ("authenticate",
+                  Inc_Users.Wp_Authenticate_Email_Password'Access, 20, 3);
 --    Add_Filter ("authenticate", "wp_authenticate_application_password", 20, 3);
 --    Add_Filter ("authenticate", "wp_authenticate_spam_check", 99);
 --    Add_Filter ("determine_current_user", "wp_validate_auth_cookie");

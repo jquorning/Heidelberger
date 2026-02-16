@@ -6,6 +6,7 @@
 --
 
 with Arrays;
+with Arrayable_Interfaces;
 
 with Class_Errors;
 with Class_Users;
@@ -59,6 +60,70 @@ is
    function Wp_Signon (Credentials   : Array_Type := Empty_Array;
                        Secure_Cookie : Boolean    := False) -- String := ""
                        return User_Error_Type;
+
+   --
+   -- Authenticates a user, confirming the username and password are valid.
+   --
+   -- @since 2.8.0
+   --
+   -- @param WP_User|WP_Error|null user     WP_User or WP_Error object from a
+   --                                       previous callback. Default null.
+   -- @param string                username Username for authentication.
+   -- @param string                password Password for authentication.
+   -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
+   --
+   function Wp_Authenticate_Username_Password (User     : User_Error_Type;
+                                               Username : String;
+                                               Password : String)
+                                               return User_Error_Type;
+
+   function Wp_Authenticate_Username_Password
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
+
+   --
+   -- Authenticates a user using the email and password.
+   --
+   -- @since 4.5.0
+   --
+   -- @param WP_User|WP_Error|null user     WP_User or WP_Error object if a previous
+   --                                        callback failed authentication.
+   -- @param string                email    Email address for authentication.
+   -- @param string                password Password for authentication.
+   -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
+   --
+   function Wp_Authenticate_Email_Password (User     : User_Error_Type;
+                                            Email    : String;
+                                            Password : String)
+                                            return User_Error_Type;
+
+   function Wp_Authenticate_Email_Password
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
+
+   --
+   -- Authenticates the user using the WordPress auth cookie.
+   --
+   -- @since 2.8.0
+   --
+   -- @global string auth_secure_cookie
+   --
+   -- @param WP_User|WP_Error|null user     WP_User or WP_Error object from a previous
+   --                                       callback. Default null.
+   -- @param string                username Username. If not empty, cancels the cookie
+   --                                       authentication.
+   -- @param string                password Password. If not empty, cancels the cookie
+   --                                       authentication.
+   -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
+   --
+   function Wp_Authenticate_Cookie (User     : User_Error_Type;
+                                    Username : String;
+                                    Password : String)
+                                    return User_Error_Type;
+
+   function Wp_Authenticate_Cookie
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Retrieves user option that can be either per Site or per Network.
