@@ -563,7 +563,8 @@ is
 
       if not Empty (Input_Id) then
          Echo ("<script type=""text/javascript"">" & NL);
-         Echo ("  try{document.getElementById('" & Input_Id & "').focus();}catch(e){}" & NL);
+         Echo ("  try{document.getElementById('" & Input_Id &
+               "').focus();}catch(e){}" & NL);
          Echo ("  if(typeof wpOnload==='function')wpOnload();" & NL);
          Echo ("</script>" & NL);
       end if;

@@ -43,6 +43,7 @@ is
    function Dummy_Init (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                         return Array_Type
    is
+      pragma Unreferenced (Arry);
    begin
       Init (Globals.Global_Wp_Scripts);
       return Empty_Array;
@@ -173,12 +174,12 @@ is
    overriding
    function Do_Item (This   : in out Wp_Scripts;
                      Handle : String;
-                     Group  : Integer := 0) -- Boolean := False)
+                     Group  : Integer := 0)
                      return Boolean
    is
-      use Php.Preg;
       use Php.Echoing;
       use Php.Lists;
+      use Php.Preg;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
@@ -192,7 +193,7 @@ is
          return False;
       end if;
 
-      if 0 = Group then -- and then This.Groups (Handle) > 0 then
+      if 0 = Group and then This.Groups (Handle) > 0 then
          This.In_Footer.Append (Handle);
          return False;
       end if;
@@ -809,6 +810,17 @@ is
         Do_Items (This, False, Group => 1);
    begin
       return This.Done;
+   end Do_Footer_Items;
+
+   ---------------------
+   -- Do_Footer_Items --
+   ---------------------
+
+   procedure Do_Footer_Items (This : in out Wp_Scripts)
+   is
+      Unused : constant List_Type := Do_Footer_Items (This);
+   begin
+      null;
    end Do_Footer_Items;
 
    --------------------

@@ -3013,7 +3013,7 @@ is
          Set (This.Col_Meta, Tablekey, From_Array (Columns));
 
          for Column in Columns.Iterate loop
-            Logging.Log ("debug", Key (Column));
+--          Logging.Log ("debug", Key (Column));
             declare
             begin
                if Key (Column) = "collation" then
@@ -3034,7 +3034,7 @@ is
                end if;
 
                if Key (Column) = "type" then
-                  Logging.Log ("debug", As_String (Element (Column)));
+--                Logging.Log ("debug", As_String (Element (Column)));
                   declare
                      List : constant List_Type :=
                        Explode ("(", As_String (Element (Column)));

@@ -612,7 +612,7 @@ is
          return False;
       end if;
 
-      Ada.Text_IO.Put_Line (This'Image);
+--    Ada.Text_IO.Put_Line (This'Image);
       This.Groups.Insert (Key      => Handle,
                           New_Item => Group);
 

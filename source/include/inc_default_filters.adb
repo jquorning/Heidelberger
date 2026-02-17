@@ -435,9 +435,11 @@ is
 --    Add_Action ("wp_head", Wp_Shortlink_Wp_Head'Access, 10, 0);
       Add_Action ("wp_head", Inc_Themes.Wp_Custom_CSS_CB'Access, 101);
 --    Add_Action ("wp_head", Wp_Site_Icon'Access, 99);
---    Add_Action ("wp_footer", Wp_Print_Footer_Scripts'Access, 20);
+      Add_Action ("wp_footer",
+                  Inc_Script_Loader.Wp_Print_Footer_Scripts'Access, 20);
 --    Add_Action ("template_redirect", Wp_Shortlink_Header'Access, 11, 0);
---    Add_Action ("wp_print_footer_scripts", X_Wp_Footer_Scripts'Access);
+      Add_Action ("wp_print_footer_scripts",
+                  Inc_Script_Loader.X_Wp_Footer_Scripts'Access);
 --    Add_Action ("init", X_Register_Core_Block_Patterns_And_Categories'Access);
 --    Add_Action ("init", Check_Theme_Switched'Access, 99);
 
@@ -463,7 +465,8 @@ is
       Add_Action ("login_head",
                   Inc_Script_Loader.Print_Admin_Styles'Access, 9);
 --    Add_Action ("login_head", Wp_Site_Icon'Access, 99);
---    Add_Action ("login_footer", Wp_Print_Footer_Scripts'Access, 20);
+      Add_Action ("login_footer",
+                  Inc_Script_Loader.Wp_Print_Footer_Scripts'Access, 20);
 --    Add_Action ("login_init", Send_Frame_Options_Header'Access, 10, 0);
 
       -- Feed generator tags.
@@ -820,7 +823,8 @@ is
 
 --    Add_Action ("embed_footer", Print_Embed_Sharing_Dialog'Access);
 --    Add_Action ("embed_footer", Print_Embed_Scripts'Access);
---    Add_Action ("embed_footer", Wp_Print_Footer_Scripts'Access, 20);
+      Add_Action ("embed_footer",
+                  Inc_Script_Loader.Wp_Print_Footer_Scripts'Access, 20);
 
 --    Add_Filter ("excerpt_more", "wp_embed_excerpt_more", 20);
 --    Add_Filter ("the_excerpt_embed", "wptexturize");

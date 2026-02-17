@@ -418,6 +418,8 @@ is
                              return List_Type
                              with Side_Effects;
 
+   procedure Do_Footer_Items (This : in out Wp_Scripts);
+
    --
    -- Whether a handle"s source is in a default directory.
    --

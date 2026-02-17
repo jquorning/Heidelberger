@@ -90,6 +90,21 @@ is
             return List_Type;
 
    --
+   -- Prints the scripts that were queued for the footer or too late for the HTML head.
+   --
+   -- @since 2.8.0
+   --
+   -- @global WP_Scripts wp_scripts
+   -- @global bool       concatenate_scripts
+   --
+   -- @return array
+   --
+   function Print_Footer_Scripts
+            return List_Type;
+
+   procedure Print_Footer_Scripts;
+
+   --
    -- Prints scripts (internal use only)
    --
    -- @ignore
@@ -97,8 +112,7 @@ is
    -- @global WP_Scripts wp_scripts
    -- @global bool       compress_scripts
    --
-   procedure X_Print_Scripts
-             is null;
+   procedure X_Print_Scripts;
 
    --
    -- Registers all the WordPress packages scripts.
@@ -249,6 +263,26 @@ is
                return Array_Type;
 
    --
+   -- Private, for use in *_footer_scripts hooks
+   --
+   -- @since 3.3.0
+   --
+   procedure X_Wp_Footer_Scripts;
+
+   function X_Wp_Footer_Scripts
+     is new Helpers_2.Generic_Call_Procedure (X_Wp_Footer_Scripts);
+
+   --
+   -- Hooks to print the scripts and styles in the footer.
+   --
+   -- @since 2.8.0
+   --
+   procedure Wp_Print_Footer_Scripts;
+
+   function Wp_Print_Footer_Scripts
+     is new Helpers_2.Generic_Call_Procedure (Wp_Print_Footer_Scripts);
+
+   --
    -- Wrapper for do_action( "wp_enqueue_scripts" ).
    --
    -- Allows plugins to queue scripts for the front end using wp_enqueue_script().
@@ -291,6 +325,8 @@ is
    --
    function Print_Late_Styles
             return List_Type;
+
+   procedure Print_Late_Styles;
 
    --
    -- Prints styles (internal use only).

@@ -294,16 +294,16 @@ is
 --                 "current_pri: " & This.Current_Priority.Length'Image);
 --    Logging.Log ("apply_filters",
 --                 "this.iterations: " & This.Iterations'Image);
-      Logging.Log ("apply_filters",
-                   "this.callbacks: " & This.Callbacks'Image);
+--    Logging.Log ("apply_filters",
+--                 "this.callbacks: " & This.Callbacks'Image);
 
       for Pri of This.Callbacks loop
          declare
             Pri_List : constant Priority_List :=
               This.Iterations (Nesting_Level); -- Current_Nesting);
          begin
-            Logging.Log ("apply_filters",
-                         "this.iterations: " & This.Iterations'Image);
+--          Logging.Log ("apply_filters",
+--                       "this.iterations: " & This.Iterations'Image);
 
             This.Current_Priority.Include (Nesting_Level,
                                            Pri_List.First_Element);
@@ -314,9 +314,9 @@ is
               This.Current_Priority (Nesting_Level);
          begin
             for The_X of Pri loop -- This.Callbacks (Priority) loop
-               Logging.Log ("apply_filters",
-                            "Call function, nest: " & Nesting_Level'Image &
-                            ", pri: " & Priority'Image);
+--             Logging.Log ("apply_filters",
+--                          "Call function, nest: " & Nesting_Level'Image &
+--                          ", pri: " & Priority'Image);
                if not This.Doing_Action then
                   null;
 --                Args_2 := Value_2;

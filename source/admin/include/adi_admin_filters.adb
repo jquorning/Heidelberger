@@ -9,6 +9,7 @@
 with Adi_Misc;
 with Inc_General_Templates;
 with Inc_Plugins;
+with Inc_Script_Loader;
 with Inc_Themes;
 
 package body Adi_Admin_Filters
@@ -76,7 +77,8 @@ is
 
 -- add_action( "admin_print_scripts", "print_emoji_detection_script" );
 -- add_action( "admin_print_scripts", "print_head_scripts", 20 );
--- add_action( "admin_print_footer_scripts", "_wp_footer_scripts" );
+      Add_Action ("admin_print_footer_scripts",
+                  Inc_Script_Loader.X_Wp_Footer_Scripts'Access);
 -- add_action( "admin_print_styles", "print_emoji_styles" );
 -- add_action( "admin_print_styles", "print_admin_styles", 20 );
 

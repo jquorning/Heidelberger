@@ -20,6 +20,10 @@ begin
    Logging.Silence ("get_table_from_query");
    Logging.Silence ("find_marks");
    Logging.Silence ("check_safe_collation");
+   Logging.Silence ("get_bloginfo");
+   Logging.Silence ("get_results");
+   Logging.Silence ("get_results_base");
+   Logging.Silence ("get_table_charset");
    -- Logging.Silence ("do_action");
 
    HB_Server.Start;

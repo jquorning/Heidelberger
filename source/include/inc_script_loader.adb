@@ -2605,84 +2605,121 @@ is
       return Wp_Scripts.Done;
    end Print_Head_Scripts;
 
--- --
--- -- Prints the scripts that were queued for the footer or too late for the HTML head.
--- --
--- -- @since 2.8.0
--- --
--- -- @global WP_Scripts wp_scripts
--- -- @global bool       concatenate_scripts
--- --
--- -- @return array
--- --
--- function print_footer_scripts() then
---         global wp_scripts, concatenate_scripts;
+   --------------------------
+   -- Print_Footer_Scripts --
+   --------------------------
 
---         if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
---                 return array(); -- No need to run if not instantiated.
---         end;
---         script_concat_settings();
---         wp_scripts.do_concat = concatenate_scripts;
---         wp_scripts.do_footer_items();
+   function Print_Footer_Scripts
+            return List_Type
+   is
+      use Wp_Common;
+      use Class_Scripts;
 
---         --
---         -- Filters whether to print the footer scripts.
---         --
---         -- @since 2.8.0
---         --
---         -- @param bool print Whether to print the footer scripts. Default true.
---         --
---         if ( apply_filters( "print_footer_scripts", true ) ) then
---                 _print_scripts();
---         end;
+--    global wp_scripts, concatenate_scripts;
+      Wp_Scripts : Class_Scripts.Wp_Scripts
+        renames Globals.Global_Wp_Scripts;
+   begin
+      if Wp_Scripts not in Wp_Scripts then -- instanceof
+         return Empty_List; -- No need to run if not instantiated.
+      end if;
 
---         wp_scripts.reset();
---         return wp_scripts.done;
--- end;
+      Script_Concat_Settings;
+      Wp_Scripts.Do_Concat := Concatenate_Scripts;
+      Wp_Scripts.Do_Footer_Items;
 
--- --
--- -- Prints scripts (internal use only)
--- --
--- -- @ignore
--- --
--- -- @global WP_Scripts wp_scripts
--- -- @global bool       compress_scripts
--- --
--- function _print_scripts() then
---         global wp_scripts, compress_scripts;
+      --
+      -- Filters whether to print the footer scripts.
+      --
+      -- @since 2.8.0
+      --
+      -- @param bool print Whether to print the footer scripts. Default true.
+      --
+      if Apply_Filters ("print_footer_scripts", True) then
+         X_Print_Scripts;
+      end if;
 
---         zip = compress_scripts ? 1 : 0;
---         if ( zip && defined( "ENFORCE_GZIP" ) && ENFORCE_GZIP ) then
---                 zip = "gzip";
---         end;
+      Wp_Scripts.Reset;
+      return Wp_Scripts.Done;
+   end Print_Footer_Scripts;
 
---         concat    = trim( wp_scripts.concat, ", ");
---         type_attr = current_theme_supports( "html5", "script" ) ? "" : " type="text/javascript"";
+   --------------------------
+   -- Print_Footer_Scripts --
+   --------------------------
 
---         if ( concat ) then
---                 if ( ! empty( wp_scripts.print_code ) ) then
---                         echo "\n<scriptthentype_attrend;>\n";
---                         echo "/* <![CDATA[--\n"; -- Not needed in HTML 5.
---                         echo wp_scripts.print_code;
---                         echo "/* ]]>--\n";
---                         echo "</script>\n";
---                 end;
+   procedure Print_Footer_Scripts
+   is
+      Unused : constant List_Type := Print_Footer_Scripts;
+   begin
+      null;
+   end Print_Footer_Scripts;
 
---                 concat       = str_split( concat, 128);
---                 concatenated = "";
+   ---------------------
+   -- X_Print_Scripts --
+   ---------------------
 
---                 foreach ( concat as key => chunk ) then
---                         concatenated .= "&load%5Bchunk_thenkeyend;%5D=thenchunkend;";
---                 end;
+   procedure X_Print_Scripts
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use UStrings;
+      use Class_Scripts;
+      use Inc_Formatting;
+      use Inc_Themes;
+--    global wp_scripts, compress_scripts;
+      Scripts : Wp_Scripts renames
+         Globals.Global_Wp_Scripts;
 
---                 src = wp_scripts.base_url . "/wp-admin/load-scripts.php?c=thenzipend;" . concatenated . "&ver=" . wp_scripts.default_version;
---                 echo "<scriptthentype_attrend; src="" . esc_attr( src ) . ""></script>\n";
---         end;
+      Zip_2 : constant String :=
+        (if Compress_Scripts then "1" else "0");
 
---         if ( ! empty( wp_scripts.print_html ) ) then
---                 echo wp_scripts.print_html;
---         end;
--- end;
+      Zip : constant String :=
+        (if Zip_2 = "1" and then Constants.ENFORCE_GZIP
+         then "gzip"
+         else Zip_2);
+
+      Concat : constant String := Trim (-Scripts.Concat, ", ");
+
+      Type_Attr : constant String :=
+        (if Current_Theme_Supports ("html5", "script")
+         then "" else " type=""text/javascript""");
+   begin
+      if Concat /= "" then
+         if not Empty (Scripts.Print_Code) then
+            Echo (NL & "<script" & Type_Attr & ">" & NL);
+            Echo ("/* <![CDATA[ */" & NL); -- Not needed in HTML 5.
+            Echo (-Scripts.Print_Code);
+            Echo ("/* ]]> */" & NL);
+            Echo ("</script>" & NL);
+         end if;
+
+         declare
+            Concat_2 : constant Array_Type := Str_Split (Concat, 128);
+            Concatenated : UString;
+         begin
+            for A in Concat_2.Iterate loop
+               declare
+                  Key   : constant String := Arrays.Key (A);
+                  Chunk : constant String := As_String (Arrays.Element (A));
+               begin
+                  Append (Concatenated, "&load%5Bchunk_" & Key & "%5D=" & Chunk);
+               end;
+            end loop;
+
+            declare
+               Src : constant String :=
+                 -(Scripts.Base_URL & "/wp-admin/load-scripts.php?c=" & Zip &
+                 Concatenated & "&ver=" & Scripts.Default_Version);
+            begin
+               Echo ("<script" & Type_Attr & " src=""" & ESC_Attr (Src) &
+                     """></script>" & NL);
+            end;
+         end;
+      end if;
+
+      if not Empty (Scripts.Print_HTML) then
+         Echo (-Scripts.Print_HTML);
+      end if;
+   end X_Print_Scripts;
 
    ---------------------------
    -- Wp_Print_Head_Scripts --
@@ -2722,29 +2759,32 @@ is
       return Empty_Array;
    end Wp_Print_Head_Scripts;
 
--- --
--- -- Private, for use in--_footer_scripts hooks
--- --
--- -- @since 3.3.0
--- --
--- function _wp_footer_scripts() then
---         print_late_styles();
---         print_footer_scripts();
--- end;
+   -------------------------
+   -- X_Wp_Footer_Scripts --
+   -------------------------
 
--- --
--- -- Hooks to print the scripts and styles in the footer.
--- --
--- -- @since 2.8.0
--- --
--- function wp_print_footer_scripts() then
---         --
---         -- Fires when footer scripts are printed.
---         --
---         -- @since 2.8.0
---         --
---         do_action( "wp_print_footer_scripts");
--- end;
+   procedure X_Wp_Footer_Scripts
+   is
+   begin
+      Print_Late_Styles;
+      Print_Footer_Scripts;
+   end X_Wp_Footer_Scripts;
+
+   -----------------------------
+   -- Wp_Print_Footer_Scripts --
+   -----------------------------
+
+   procedure Wp_Print_Footer_Scripts
+   is
+      use Wp_Common;
+   begin
+      --
+      -- Fires when footer scripts are printed.
+      --
+      -- @since 2.8.0
+      --
+      Do_Action ("wp_print_footer_scripts");
+   end Wp_Print_Footer_Scripts;
 
    ------------------------
    -- Wp_Enqueue_Scripts --
@@ -2841,6 +2881,17 @@ is
 
       Styles.Reset;
       return Styles.Done;
+   end Print_Late_Styles;
+
+   -----------------------
+   -- Print_Late_Styles --
+   -----------------------
+
+   procedure Print_Late_Styles
+   is
+      Unused : constant List_Type := Print_Late_Styles;
+   begin
+      null;
    end Print_Late_Styles;
 
    --------------------
