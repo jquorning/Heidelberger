@@ -10,7 +10,7 @@ with Php.Types;
 
 with Array_Lists;
 
-package body Adi_Class_Language_Pack_Upgraders
+package body Class_Language_Pack_Upgraders
 is
 
    -----------------
@@ -66,4 +66,4 @@ is
                           return Array_Type
    is (raise Program_Error with "not implemented");
 
-end Adi_Class_Language_Pack_Upgraders;
+end Class_Language_Pack_Upgraders;

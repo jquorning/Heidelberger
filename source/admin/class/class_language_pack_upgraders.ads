@@ -11,7 +11,7 @@ with Arrays;
 with Class_Upgraders;
 with Class_Upgrader_Skins;
 
-package Adi_Class_Language_Pack_Upgraders
+package Class_Language_Pack_Upgraders
 is
    use Arrays;
 
@@ -487,4 +487,4 @@ is
         --         return true;
         -- end;
 
-end Adi_Class_Language_Pack_Upgraders;
+end Class_Language_Pack_Upgraders;

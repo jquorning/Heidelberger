@@ -21,8 +21,7 @@ with UStrings;
 with Wp_Common;
 
 with Class_Upgrader_Skins;
-
-with Adi_Class_Language_Pack_Upgraders;
+with Class_Language_Pack_Upgraders;
 with Adi_Class_Wp_Automatic_Upgrader_Skins;
 
 with Inc_Formatting;
@@ -333,8 +332,8 @@ is
    is
       use Php.Lists;
       use Array_Lists;
+      use Class_Language_Pack_Upgraders;
       use Class_Upgrader_Skins;
-      use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
       use Inc_Load;
       use Inc_L10n;
@@ -417,8 +416,8 @@ is
             return Boolean
    is
       use UStrings;
+      use Class_Language_Pack_Upgraders;
       use Class_Upgrader_Skins;
-      use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
       use Inc_Load;
    begin
