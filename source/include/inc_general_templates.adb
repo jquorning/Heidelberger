@@ -35,6 +35,7 @@ with Inc_Comments_Templates;
 with Inc_Feeds;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_Functions_Wp_Scripts;
 with Inc_Functions_Wp_Styles;
 with Inc_HTTP;
 with Inc_Link_Templates;
@@ -3832,7 +3833,7 @@ is
             -- @param string relation_type The relation type the URLs are printed for,
             --                              e.g. "preconnect" or "prerender".
             --
-            URLs : List_Type :=
+            URLs : constant List_Type :=
               Apply_Filters ("wp_resource_hints", URLs_2, Relation_Type);
          begin
             for URL of URLs loop
@@ -3841,6 +3842,8 @@ is
 --                  URL : Multi_Type := Arrays.Element (B);
 
                   Atts : Array_Type;
+
+                  URL_2 : UString := +ESC_URL (URL, ["http", "https"]);
                begin
                   -- if Kind_Of (URL) = Kind_Array then
                   --    if Isset (URL, "href") then
@@ -3851,19 +3854,17 @@ is
                   --    end if;
                   -- end if;
 
-                  URL := ESC_URL (URL, ["http", "https"]);
-
-                  if URL = "" then
+                  if URL_2 = "" then
                      goto Continue_1;
                   end if;
 
-                  if Isset (Unique_URLs, URL) then
+                  if Isset (Unique_URLs, -URL_2) then
                      goto Continue_1;
                   end if;
 
                   if In_List (Relation_Type, ["preconnect", "dns-prefetch"], True) then
                      declare
-                        Parsed : constant Array_Type := Wp_Parse_URL (URL);
+                        Parsed : constant Array_Type := Wp_Parse_URL (-URL_2);
                      begin
                         if Empty (Parsed, "host") then
                            goto Continue_1;
@@ -3873,21 +3874,21 @@ is
                           "preconnect" = Relation_Type and then
                           not Empty (Parsed, "scheme")
                         then
-                           URL :=
-                             Get_As_String (Parsed, "scheme") & "://" &
-                             Get_As_String (Parsed, "host");
+                           URL_2 :=
+                             +Get_As_String (Parsed, "scheme") & "://" &
+                              Get_As_String (Parsed, "host");
                         else
                            -- Use protocol-relative URLs for dns-prefetch or if
                            -- scheme is missing.
-                           URL := "//" & Get_As_String (Parsed, "host");
+                           URL_2 := +"//" & Get_As_String (Parsed, "host");
                         end if;
                      end;
                   end if;
 
                   Set (Atts, "rel",  From_String (Relation_Type));
-                  Set (Atts, "href", From_String (URL));
+                  Set (Atts, "href", From_String (-URL_2));
 
-                  Set (Unique_URLs, URL, From_Array (Atts));
+                  Set (Unique_URLs, -URL_2, From_Array (Atts));
                end;
                << Continue_1 >>
             end loop;
@@ -5448,23 +5449,25 @@ is
       end;
    end Wp_Admin_CSS;
 
--- --
--- -- Enqueues the default ThickBox js and css.
--- --
--- -- If any of the settings need to be changed, this can be done with another js
--- -- file similar to media-upload.js. That file should
--- -- require array("thickbox") to ensure it is loaded after.
--- --
--- -- @since 2.5.0
--- --
--- function add_thickbox() then
---         wp_enqueue_script( "thickbox" );
---         wp_enqueue_style( "thickbox" );
+   ------------------
+   -- Add_Thickbox --
+   ------------------
 
---         if ( is_network_admin() ) then
---                 add_action( "admin_head", "_thickbox_path_admin_subfolder" );
---         end;
--- end;
+   procedure Add_Thickbox
+   is
+      use Inc_Functions_Wp_Scripts;
+      use Inc_Functions_Wp_Styles;
+      use Inc_Load;
+      use Inc_Plugins;
+   begin
+      Wp_Enqueue_Script ("thickbox");
+      Wp_Enqueue_Style ("thickbox");
+
+      if Is_Network_Admin then
+         null;
+--       Add_Action ("admin_head", X_Thickbox_Path_Admin_Subfolder'Access);
+      end if;
+   end Add_Thickbox;
 
 -- --
 -- -- Displays the XHTML generator that is generated on the wp_head hook.

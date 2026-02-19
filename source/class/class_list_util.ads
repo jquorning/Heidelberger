@@ -1,16 +1,24 @@
+--
+-- WordPress List utility class
+--
+-- @package WordPress
+-- @since 4.7.0
+--
+
 with Arrays;
 
 package Class_List_Util
 is
    use Arrays;
---
--- List utility.
---
--- Utility class to handle operations on an array of objects or arrays.
---
--- @since 4.7.0
---
--- #[AllowDynamicProperties]
+
+   --
+   -- List utility.
+   --
+   -- Utility class to handle operations on an array of objects or arrays.
+   --
+   -- @since 4.7.0
+   --
+   -- #[AllowDynamicProperties]
    type Wp_List_Util is tagged
       record
         --
@@ -52,6 +60,45 @@ is
                          return Wp_List_Util;
 
    --
+   -- Returns the output array.
+   --
+   -- @since 4.7.0
+   --
+   -- @return array The output array.
+   --
+   function Get_Output (This : Wp_List_Util)
+            return Array_Type;
+
+   --
+   -- Filters the list, based on a set of key => value arguments.
+   --
+   -- Retrieves the objects from the list that match the given arguments.
+   -- Key represents property name, and value represents property value.
+   --
+   -- If an object has more properties than those specified in arguments,
+   -- that will not disqualify it. When using the 'AND' operator,
+   -- any missing properties will disqualify it.
+   --
+   -- @since 4.7.0
+   --
+   -- @param array  args     Optional. An array of key => value arguments to match
+   --                         against each object. Default empty array.
+   -- @param string operator Optional. The logical operation to perform. 'AND' means
+   --                         all elements from the array must match. 'OR' means only
+   --                         one element needs to match. 'NOT' means no elements may
+   --                         match. Default 'AND'.
+   -- @return array Array of found values.
+   --
+   function Filter (This     : in out Wp_List_Util;
+                    Args     : Array_Type := Empty_Array;
+                    Operator : String     := "AND")
+                    return Array_Type;
+
+   procedure Filter (This     : in out Wp_List_Util;
+                     Args     : Array_Type := Empty_Array;
+                     Operator : String     := "AND");
+
+   --
    -- Plucks a certain field out of each element in the input array.
    --
    -- This has the same functionality and prototype of
@@ -67,10 +114,13 @@ is
    --               `$index_key` is null, array keys from the original `$list` will
    --               be preserved in the results.
    --
-   function Pluck (List      : Wp_List_Util;
+   function Pluck (This      : in out Wp_List_Util;
                    Field     : String;
-                   Index_Key : String) -- = null )
-                   return Array_Type
-                   is (Empty_Array);
+                   Index_Key : String := "(null)")
+                   return Array_Type;
+
+   procedure Pluck (This      : in out Wp_List_Util;
+                    Field     : String;
+                    Index_Key : String := "(null)");
 
 end Class_List_Util;

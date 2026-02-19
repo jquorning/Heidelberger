@@ -37,6 +37,7 @@ is
    MINUTE_IN_SECONDS : constant Natural := 60;
    HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
    DAY_IN_SECONDS    : constant Natural := 24 * HOUR_IN_SECONDS;
+   WEEK_IN_SECONDS   : constant Natural := 7  * DAY_IN_SECONDS;
    MONTH_IN_SECONDS  : constant Natural := 30 * DAY_IN_SECONDS;
    YEAR_IN_SECONDS   : constant Natural := 365 * DAY_IN_SECONDS;
 

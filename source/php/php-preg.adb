@@ -321,7 +321,11 @@ is
                              Offset  : Integer := 0)
    is
    begin
-      raise Program_Error with "not implemented";
+      Logging.Log ("preg_match_all", "not implemented");
+      Logging.Log ("preg_match_all", "  pattern: " & Pattern);
+      Logging.Log ("preg_match_all", "  subject: " & Subject);
+      Append (Matches, "(not implemented 1)");
+      Append (Matches, "(not implemented 2)");
    end Preg_Match_All;
 
    ----------------
@@ -337,27 +341,29 @@ is
       use GNAT.Regpat;
 
       Marks : constant Marks_Type := Find_Marks (Pattern);
-
-      Engine : constant Pattern_Matcher :=
-        Compile (Pattern (Marks.First .. Marks.Last),
-                 Flags => Marks.Flags);
-
-      Result : Match_Array (0 .. Paren_Count (Engine));
-
-      List : List_Type;
    begin
       Logging.Log ("preg_split", "");
       Logging.Log ("preg_split", "  pattern: " & Pattern);
       Logging.Log ("preg_split", "    pyned: " & Pattern (Marks.First .. Marks.Last));
       Logging.Log ("preg_split", "  subject: " & Subject);
 
-      Match (Engine, Subject, Result);
+      declare
+         Engine : constant Pattern_Matcher :=
+           Compile (Pattern (Marks.First .. Marks.Last),
+                    Flags => Marks.Flags);
 
-      for A of Result (1 .. Result'Last) loop
-         List.Append (Subject (A.First .. A.Last));
-      end loop;
+         Result : Match_Array (0 .. Paren_Count (Engine));
 
-      return List;
+         List : List_Type;
+      begin
+         Match (Engine, Subject, Result);
+
+         for A of Result (1 .. Result'Last) loop
+            List.Append (Subject (A.First .. A.Last));
+         end loop;
+
+         return List;
+      end;
    end Preg_Split;
 
    ------------------

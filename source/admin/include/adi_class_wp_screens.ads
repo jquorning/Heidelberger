@@ -34,8 +34,8 @@ is
         --
         -- The base type of the screen.
         --
-        -- This is typically the same as `id` but with any post types and taxonomies stripped.
-        -- For example, for an `id` of "edit-post" the base is "edit".
+        -- This is typically the same as `id` but with any post types and taxonomies
+        -- stripped. For example, for an `id` of "edit-post" the base is "edit".
         --
         -- @since 3.3.0
         -- @var string
@@ -48,7 +48,8 @@ is
         -- @since 3.4.0
         -- @var int
         --
---        private columns = 0;
+        -- private
+        Columns : Natural := 0;
 
         --
         -- The unique ID of the screen.
@@ -233,6 +234,22 @@ is
    function In_Admin (This  : Wp_Screen;
                       Admin : String := "") -- null
                       return Boolean;
+
+   --
+   -- Gets the number of layout columns the user has selected.
+   --
+   -- The layout_columns option controls the max number and default number of
+   -- columns. This method returns the number of columns within that range selected
+   -- by the user via Screen Options. If no selection has been made, the default
+   -- provisioned in layout_columns is returned. If the screen does not support
+   -- selecting the number of layout columns, 0 is returned.
+   --
+   -- @since 3.4.0
+   --
+   -- @return int Number of columns to display.
+   --
+   function Get_Columns (This : Wp_Screen)
+                         return Natural;
 
       --
       -- Renders the screen"s help section.

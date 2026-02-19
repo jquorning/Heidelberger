@@ -5397,49 +5397,31 @@ is
 --         return count( string_keys ) === 0;
 -- end;
 
---
--- Filters a list of objects, based on a set of key => value arguments.
---
--- Retrieves the objects from the list that match the given arguments.
--- Key represents property name, and value represents property value.
---
--- If an object has more properties than those specified in arguments,
--- that will not disqualify it. When using the "AND" operator,
--- any missing properties will disqualify it.
---
--- When using the `field` argument, this function can also retrieve
--- a particular field from all matching objects, whereas wp_list_filter()
--- only does the filtering.
---
--- @since 3.0.0
--- @since 4.7.0 Uses `WP_List_Util` class.
---
--- @param array       list     An array of objects to filter.
--- @param array       args     Optional. An array of key => value arguments to match
---                              against each object. Default empty array.
--- @param string      operator Optional. The logical operation to perform. "AND" means
---                              all elements from the array must match. "OR" means only
---                              one element needs to match. "NOT" means no elements may
---                              match. Default "AND".
--- @param bool|string field    Optional. A field from the object to place instead
---                              of the entire object. Default false.
--- @return array A list of objects or object fields.
---
--- function wp_filter_object_list( list, args = array(), operator = "and", field = false ) then
---         if ( ! is_array( list ) ) then
---                 return array();
---         end;
+   ---------------------------
+   -- Wp_Filter_Object_List --
+   ---------------------------
 
---         util = new WP_List_Util( list );
+   function Wp_Filter_Object_List (List     : Array_Type;
+                                   Args     : Array_Type := Empty_Array;
+                                   Operator : String := "and";
+                                   Field    : String := "(false)")
+                                   return Array_Type
+   is
+      use Class_List_Util;
+      -- if not Is_Array (List) then
+      --    return array();
+      -- end if;
 
---         util->filter( args, operator );
+      Util : Wp_List_Util := X_Construct (List);
+   begin
+      Util.Filter (Args, Operator);
 
---         if ( field ) then
---                 util->pluck( field );
---         end;
+      if Field /= "(false)" then
+         Util.Pluck (Field);
+      end if;
 
---         return util->get_output();
--- end;
+      return Util.Get_Output;
+   end Wp_Filter_Object_List;
 
 --
 -- Filters a list of objects, based on a set of key => value arguments.
@@ -5496,16 +5478,14 @@ is
                            Index_Key : String := "")  -- null)
                            return Array_Type
    is
+      use Class_List_Util;
    begin
  --     if not Is_Array (List) then
  --        return Empty_Array;
  --     end if;
 
       declare
-         use Class_List_Util;
-
-         Util : constant Wp_List_Util := X_Construct (List);
-         -- = new WP_List_Util( list );
+         Util : Wp_List_Util := X_Construct (List);
       begin
          return Util.Pluck (Field, Index_Key);
       end;

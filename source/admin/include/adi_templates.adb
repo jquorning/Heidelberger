@@ -18,15 +18,18 @@ with Php.Types;
 
 with Array_Lists;
 with Binder;
+with Constants;
 with Helpers;
 with Helpers_3;
 with UStrings;
 with Wp_Common;
 
-with Inc_Admin_Bar;
-with Inc_Capabilities;
 with Class_Taxonomy;
 with Class_Terms;
+with Adi_Posts;
+with Adi_Screens;
+with Inc_Admin_Bar;
+with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -35,10 +38,13 @@ with Inc_Options;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
+with Inc_Users;
 with Inc_Vars;
 
 package body Adi_Templates
 is
+
+   Global_Wp_Meta_Boxes : Array_Type;
 
 -- -- Walker_Category_Checklist class
 -- -- require_once ABSPATH . 'wp-admin/includes/class-walker-category-checklist.php';
@@ -1449,195 +1455,272 @@ is
 --         return null;
 -- end X_Get_Plugin_From_Callback;
 
--- --
--- -- Meta-Box template function.
--- --
--- -- @since 2.5.0
--- --
--- -- @global array wp_meta_boxes
--- --
--- -- @param string|WP_Screen screen      The screen identifier. If you have used add_menu_page() or
--- --                                      add_submenu_page() to create a new screen (and hence screen_id)
--- --                                      make sure your menu slug conforms to the limits of sanitize_key()
--- --                                      otherwise the "screen" menu may not correctly render on your page.
--- -- @param string           context     The screen context for which to display meta boxes.
--- -- @param mixed            data_object Gets passed to the meta box callback function as the first parameter.
--- --                                      Often this is the object That's the focus of the current screen,
--- --                                      for example a `WP_Post` or `WP_Comment` object.
--- -- @return int Number of meta_boxes.
--- --
--- function Do_Meta_Boxes (Screen      : String;
---                         Context     : String;
---                         Data_Object : Mixed) return Integer
--- is
---    I : Natural := 0;
--- begin
--- --        global wp_meta_boxes;
--- --        static Already_Sorted := False;
+   -------------------
+   -- Do_Meta_Boxes --
+   -------------------
 
---         if Empty (Screen) then
---                 Screen := Get_Current_Screen;  -- ();
---         elsif Is_String (Screen) then
---                 Screen := Convert_To_Screen (Screen);
---         end if;
+   Static_Already_Sorted : Boolean := False;
 
---         Page := Screen.Id;
+   function Do_Meta_Boxes (Screen      : String;
+                           Context     : String;
+                           Data_Object : Multi_Type)
+                           return Natural
+   is
+      use Php.Echoing;
+      use Php.Lists;
+      use Php.Strings;
+      use UStrings;
+      use Adi_Class_Wp_Screens;
+      use Adi_Posts;
+      use Adi_Screens;
+      use Inc_Formatting;
+      use Inc_L10n;
+      use Inc_Users;
+--        global wp_meta_boxes;
 
---         Hidden := Get_Hidden_Meta_Boxes (Screen);
+      I : Natural := 0;
 
---         printf ("<div id=""%s-sortables"" class=""meta-box-sortables"">", Esc_Attr (Context));
+      Screen_2 : constant Wp_Screen :=
+        (if Empty (Screen) then Get_Current_Screen
+         -- elsif Is_String (Screen) then Convert_To_Screen (Screen)
+         else Convert_To_Screen (Screen)); -- else Screen);
 
---         -- Grab the ones the user has manually sorted.
---         -- Pull them out of their previous context/priority and into the one the user chose.
---         Sorted := Get_User_Option ("meta-box-order_page");
+      Page : constant String := -Screen_2.Id;
 
---         if not Already_Sorted and then Sorted then
---                 for A of Sorted loop
---                         Box_Context := A.Key;
---                         Ids         := A.Value;
+      Hidden : constant List_Type := Get_Hidden_Meta_Boxes (Screen_2);
+   begin
+      Printf ("<div id=""%s-sortables"" class=""meta-box-sortables"">",
+              [1 => ESC_Attr (Context)]);
 
---                         for Id of Explode (",", Ids) loop
---                                 if Id and then "dashboard_browser_nag" /= Id then
---                                         Add_Meta_Box (Id, null, null, Screen, Box_Context, "sorted");
---                                 end if;
---                         end loop;
---                 end loop;
---         end if;
+      -- Grab the ones the user has manually sorted.
+      -- Pull them out of their previous context/priority and into the one the
+      -- user chose.
+      declare
+         Sorted : constant Array_Type :=
+           Get_User_Option ("meta-box-order_page");
+      begin
+         if not Static_Already_Sorted and then not Sorted.Is_Empty then
+            for A in Sorted.Iterate loop
+               declare
+                  Box_Context : constant String := Key (A);
+                  Ids         : constant String := As_String (Element (A));
+               begin
+                  for Id of List_Type'(Explode (",", Ids)) loop
+                     if Id /= "" and then "dashboard_browser_nag" /= Id then
+                        Add_Meta_Box (Id, "(null)", null, Screen_2,
+                                      Box_Context, "sorted");
+                     end if;
+                  end loop;
+               end;
+            end loop;
+         end if;
+      end;
 
---         Already_Sorted := True;
+      Static_Already_Sorted := True;
 
---         I := 0;
+      I := 0;
 
---         if Isset (Hb_Meta_Boxes (page) (context)) then
---                 for Priority of To_array ("high", "sorted", "core", "default", "low") loop
---                         if Is_set (Hb_Meta_Boxes (page) (context) (priority)) then
---                                 for Box of Hb_Meta_Boxes (page) (Context) (Priority) loop  -- (array)
---                                         if False = Box or else not Box ("title") then
---                                                 goto Continue;
---                                         end if;
+      if Isset_2 (Global_Wp_Meta_Boxes, Key_1 => Page, Key_2 => Context) then
+         for Priority of List_Type'["high", "sorted", "core", "default", "low"] loop
+            if
+              Isset_3 (Global_Wp_Meta_Boxes,
+                       Key_1 => Page,
+                       Key_2 => Context,
+                       Key_3 => Priority)
+            then
+               for
+                 A in -- Box in
+                 As_Array (Get (Ref_3 (Global_Wp_Meta_Boxes,
+                                       Key_1 => Page,
+                                       Key_2 => Context,
+                                       Key_3 => Priority))).Iterate
+               loop
+                  declare
+                     Box : Array_Type := As_Array (Element (A));
+                     Block_Compatible : Boolean := True;
+                  begin
+                     if Empty_Array = Box or else not Isset (Box, "title") then
+--                   if False = Box or else not Box ("title") then
+                        goto Continue;
+                     end if;
 
---                                         Block_Compatible := True;
---                                         if Is_Array (Box ("args")) then
---                                                 -- If a meta box is just here for back compat, Don't show it in the block editor.
---                                                 if
---                                                   Screen.Is_Block_Editor and then Isset (Box ("args") ("__back_compat_meta_box")) and then
---                                                   Box ("args") ("__back_compat_meta_box")
---                                                 then
---                                                         goto Continue;
---                                                 end if;
+                     if Kind_Of (Get (Box, "args")) = Kind_Array then
+                        -- If a meta box is just here for back compat, Don't show it
+                        -- in the block editor.
+                        if
+                          Screen_2.Is_Block_Editor and then
+                          Isset_2 (Box, "args", "__back_compat_meta_box") and then
+                          As_Boolean (Get (Ref_2 (Box, "args", "__back_compat_meta_box")))
+                        then
+                           goto Continue;
+                        end if;
 
---                                                 if isset (Box ("args") ("__block_editor_compatible_meta_box")) then
---                                                         Block_Compatible := Boolean'Value (Box ("args") ("__block_editor_compatible_meta_box"));
---                                                         Unset (Box ("args") ("__block_editor_compatible_meta_box"));
---                                                 end if;
+                        if Isset_2 (Box, "args", "__block_editor_compatible_meta_box") then
+                           Block_Compatible :=
+                             As_Boolean (Get (Ref_2 (
+                               Box,
+                               Key_1 => "args",
+                               Key_2 => "__block_editor_compatible_meta_box")));
 
---                                                 -- If the meta box is declared as incompatible with the block editor, override the callback function.
---                                                 if not Block_Compatible and then Screen.Is_Block_Editor then
---                                                         Box ("old_callback") := Box ("callback");
---                                                         Box ("callback")     := "do_block_editor_incompatible_meta_box";
---                                                 end if;
+                           Delete (Ref_2 (Box,
+                                          Key_1 => "args",
+                                          Key_2 => "__block_editor_compatible_meta_box"));
+                        end if;
 
---                                                 if isset (Box ("args") ("__back_compat_meta_box")) then
---                                                         Block_Compatible := Block_Compatible or else Boolean'Value (Box ("args") ("__back_compat_meta_box"));
---                                                         Unset (Box ("args") ("__back_compat_meta_box"));
---                                                 end if;
---                                         end if;
+                        -- If the meta box is declared as incompatible with the block
+                        -- editor, override the callback function.
+                        if not Block_Compatible and then Screen_2.Is_Block_Editor then
+                           Set (Box, "old_callback", Get (Box, "callback"));
+                           Set (Box, "callback",
+                                From_String ("do_block_editor_incompatible_meta_box"));
+                        end if;
 
---                                         I := I + 1;
---                                         -- get_hidden_meta_boxes() doesn't apply in the block editor.
---                                         Hidden_Class :=  (if not Screen.Is_Block_Editor and then In_Array (Box ("id"), hidden, true) then " hide-if-js" else "");
---                                         echo ("<div id=""" & Box ("id") & """ class=""postbox " & Postbox_Classes (Box ("id"), Page) & Hidden_Class & """ """ & ">" & "\n");
+                        if Isset_2 (Box, "args", "__back_compat_meta_box") then
 
---                                         echo ("<div class=""postbox-header"">");
---                                         echo ("<h2 class=""hndle"">");
---                                         if "dashboard_php_nag" = Box ("id") then
---                                                 echo ("<span aria-hidden=""true"" class=""dashicons dashicons-warning""></span>");
---                                                 echo ("<span class=""screen-reader-text"">" & abs "Warning:" & " </span>");
---                                         end if;
---                                         echo (Box ("title"));
---                                         echo ("</h2>\n");
+                           Block_Compatible :=
+                             Block_Compatible or
+                             As_Boolean (Get (Ref_2 (Box,
+                                                     Key_1 => "args",
+                                                     Key_2 => "__back_compat_meta_box")));
 
---                                         if "dashboard_browser_nag" /= Box ("id") then
---                                                 Widget_Title := Box ("title");
+                           Delete (Ref_2 (Box, "args", "__back_compat_meta_box"));
+                        end if;
+                     end if;
 
---                                                 if Is_Array (Box ("args")) and then Isset (Box ("args") ("__widget_basename")) then
---                                                         Widget_Title := Box ("args") ("__widget_basename");
---                                                         -- Do not pass this parameter to the user callback function.
---                                                         Unset (Box ("args") ("__widget_basename"));
---                                                 end if;
+                     I := I + 1;
 
---                                                 echo ("<div class=""handle-actions hide-if-no-js"">");
+                     -- get_hidden_meta_boxes() doesn't apply in the block editor.
+                     declare
+                        Box_Id : constant String := Get_As_String (Box, "id");
 
---                                                 echo ("<button type=""button"" class=""handle-order-higher"" aria-disabled=""false"" aria-describedby=""" & Box ("id") & "-handle-order-higher-description"">");
---                                                 echo ("<span class=""screen-reader-text"">" & abs "Move up" & "</span>");
---                                                 echo ("<span class=""order-higher-indicator"" aria-hidden=""true""></span>");
---                                                 echo ("</button>");
---                                                 echo ("<span class=""hidden"" id=""""" & Box ("id") & "-handle-order-higher-description"">" & Sprintf (
---                                                         -- translators: %s: Meta box title.
---                                                         abs "Move %s box up",
---                                                         Widget_Title
---                                                ) & "</span>");
+                        Hidden_Class : constant String :=
+                          (if
+                             not Screen_2.Is_Block_Editor and then
+                             In_List (Box_Id, Hidden, True)
+                           then " hide-if-js" else "");
+                     begin
+                        Echo ("<div id=""" & Box_Id &
+                              """ class=""postbox " &
+                              Postbox_Classes (Box_Id, Page) &
+                              Hidden_Class & """ """ & ">" & NL);
 
---                                                 echo ("<button type=""button"" class=""handle-order-lower"" aria-disabled=""false"" aria-describedby=""""" & Box ("id") & "-handle-order-lower-description"">");
---                                                 echo ("<span class=""screen-reader-text"">" & abs "Move down" & "</span>");
---                                                 echo ("<span class=""order-lower-indicator"" aria-hidden=""true""></span>");
---                                                 echo ("</button>");
---                                                 echo ("<span class=""hidden"" id=""""" & Box ("id") & "-handle-order-lower-description"">" & Sprintf (
---                                                         -- translators: %s: Meta box title.
---                                                         abs "Move %s box down",
---                                                         Widget_Title
---                                                ) & "</span>");
+                        Echo ("<div class=""postbox-header"">");
+                        Echo ("<h2 class=""hndle"">");
+                        if "dashboard_php_nag" = Box_Id then
+                           Echo ("<span aria-hidden=""true"" class=""dashicons dashicons-warning""></span>");
+                           Echo ("<span class=""screen-reader-text"">" & abs "Warning:" & " </span>");
+                        end if;
+                     end;
+                     Echo (Get_As_String (Box, "title"));
+                     Echo ("</h2>" & NL);
 
---                                                 echo ("<button type=""button"" class=""handlediv"" aria-expanded=""true"">");
---                                                 echo ("<span class=""screen-reader-text"">" & Sprintf (
---                                                         -- translators: %s: Meta box title.
---                                                         abs "Toggle panel: %s",
---                                                         Widget_Title
---                                                ) & "</span>");
---                                                 echo ("<span class=""toggle-indicator"" aria-hidden=""true""></span>");
---                                                 echo ("</button>");
+                     if "dashboard_browser_nag" /= Get_As_String (Box, "id") then
+                        declare
+                           Widget_Title : UString := +Get_As_String (Box, "title");
+                        begin
+                           if
+                             Kind_Of (Get (Box, "args")) = Kind_Array and then
+                             Isset_2 (Box, "args", "__widget_basename")
+                           then
+                              Widget_Title :=
+                                +As_String (Get (Ref_2 (Box, "args", "__widget_basename")));
+                              -- Do not pass this parameter to the user callback function.
+                              Delete (Ref_2 (Box, "args", "__widget_basename"));
+                           end if;
 
---                                                 echo ("</div>");
---                                         end if;
---                                         echo ("</div>");
+                           Echo ("<div class=""handle-actions hide-if-no-js"">");
 
---                                         echo ("<div class=""inside"">" & "\n");
+                           Echo ("<button type=""button"" class=""handle-order-higher"" aria-disabled=""false"" aria-describedby=""" & Get_As_String (Box, "id") & "-handle-order-higher-description"">");
+                           Echo ("<span class=""screen-reader-text"">" & abs "Move up" & "</span>");
+                           Echo ("<span class=""order-higher-indicator"" aria-hidden=""true""></span>");
+                           Echo ("</button>");
+                           Echo ("<span class=""hidden"" id=""""" & Get_As_String (Box, "id") & "-handle-order-higher-description"">" & Sprintf (
+                             -- translators: %s: Meta box title.
+                             abs "Move %s box up",
+                             [1 => -Widget_Title]
+                           ) & "</span>");
 
---                                         if
---                                           HB_DEBUG and then
---                                           not Block_Compatible and then
---                                           "edit" = Screen.Parent_Base and then
---                                           not Screen.Is_Block_Editor and then
---                                           not Isset (X_GET ("meta-box-loader"))
---                                         then
---                                                 Plugin := X_Get_Plugin_From_Callback (Box ("callback"));
---                                                 if Plugin then
--- --                                                        ?>
--- --                                                        <div class="error inline">
--- --                                                                <p>
--- --                                                                        <?php
---                                                                                 -- translators: %s: The name of the plugin that generated this meta box.
---                                                                                 printf (abs "This meta box, from the %s plugin, is not compatible with the block editor.", "<strong>" & Plugin ("Name") & "</strong>");
--- --                                                                        ?>
--- --                                                                </p>
--- --                                                        </div>
--- --                                                        <?php
---                                                 end if;
---                                         end if;
+                           Echo ("<button type=""button"" class=""handle-order-lower"" aria-disabled=""false"" aria-describedby=""""" & Get_As_String (Box, "id") & "-handle-order-lower-description"">");
+                           Echo ("<span class=""screen-reader-text"">" & abs "Move down" & "</span>");
+                           Echo ("<span class=""order-lower-indicator"" aria-hidden=""true""></span>");
+                           Echo ("</button>");
+                           Echo ("<span class=""hidden"" id=""""" & Get_As_String (Box, "id") & "-handle-order-lower-description"">" & Sprintf (
+                             -- translators: %s: Meta box title.
+                             abs "Move %s box down",
+                             [1 => -Widget_Title]
+                           ) & "</span>");
 
---                                         Call_User_Func (Box ("callback"), Data_Object, Box);
---                                         echo ("</div>\n");
---                                         echo ("</div>\n");
---                                 end loop;
---                         end if;
---                 end loop;
---         end if;
+                           Echo ("<button type=""button"" class=""handlediv"" aria-expanded=""true"">");
+                           Echo ("<span class=""screen-reader-text"">" & Sprintf (
+                             -- translators: %s: Meta box title.
+                             abs "Toggle panel: %s",
+                             [1 => -Widget_Title]
+                           ) & "</span>");
+                           Echo ("<span class=""toggle-indicator"" aria-hidden=""true""></span>");
+                           Echo ("</button>");
 
---         echo ("</div>");
+                           Echo ("</div>");
+                        end;
+                     end if;
+                     Echo ("</div>");
 
---         return I;
+                     Echo ("<div class=""inside"">" & NL);
 
--- end Do_Meta_Boxes;
+                     if
+                       Constants.WP_DEBUG and then
+                       not Block_Compatible and then
+                       "edit" = Screen_2.Parent_Base and then
+                       not Screen_2.Is_Block_Editor and then
+                       not Isset (Binder.XX_GET, "meta-box-loader")
+                     then
+                        declare
+                           Plugin : constant Array_Type :=
+                             X_Get_Plugin_From_Callback (
+                               As_Callable (Get (Box, "callback")));
+                        begin
+                           if Plugin /= Empty_Array then
+                              Echo ("<div class=""error inline"">");
+                              Echo ("    <p>");
+                              -- translators: %s: The name of the plugin that generated this meta box.
+                              Printf (
+                                abs "This meta box, from the %s plugin, is not compatible with the block editor.",
+                                [1 => "<strong>" & Get_As_String (Plugin, "Name") &
+                                      "</strong>"]);
+                              Echo ("    </p>");
+                              Echo ("</div>");
+                           end if;
+                        end;
+                     end if;
+
+--                   Call_User_Func (Box ("callback"), Data_Object, Box); -- XXX
+                     Echo ("</div>" & NL);
+                     Echo ("</div>" & NL);
+                  end;
+                  << Continue >>
+               end loop;
+            end if;
+         end loop;
+      end if;
+
+      Echo ("</div>");
+
+      return I;
+
+   end Do_Meta_Boxes;
+
+   -------------------
+   -- Do_Meta_Boxes --
+   -------------------
+
+   procedure Do_Meta_Boxes (Screen      : String;
+                            Context     : String;
+                            Data_Object : Multi_Type)
+   is
+      Unused : constant Natural :=
+        Do_Meta_Boxes (Screen, Context, Data_Object);
+   begin
+      null;
+   end Do_Meta_Boxes;
 
 -- --
 -- -- Removes a meta box from one or more screens.

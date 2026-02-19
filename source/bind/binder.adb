@@ -13,6 +13,7 @@ with UStrings;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
+with Adm_Index;
 with Adm_Install;
 with Adm_Load_Scripts;
 with Adm_Load_Styles;
@@ -79,6 +80,9 @@ is
 
       elsif Index (URL, "/wp-admin/upgrade.php") /= 0 then
          Adm_Upgrade.Render;
+
+      elsif Index (URL, "/wp-admin") /= 0 then
+         Adm_Index.Render;
 
       elsif Index (URL, "/wp-login.php") /= 0 then
          Wp_Login.Render;

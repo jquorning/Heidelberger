@@ -9,7 +9,7 @@
 
 with Ada.Strings.Fixed;
 
-with Php.Lists;
+with Php.Arrays;
 with Php.Strings;
 
 with Arrays;
@@ -54,6 +54,7 @@ is
 
    procedure Render
    is
+      use Php.Arrays;
       use Php.Strings;
       use Array_Lists;
       use Binder;
@@ -262,7 +263,7 @@ is
                   end if;
 
                   if
-                    not Php.Lists.In_List (-Globals.Typenow,
+                    not In_Array (-Globals.Typenow,
                                   Inc_Posts.Get_Post_Types
                                     (To_Array_Type ([Build ("show_ui", "true")])),
                                   True)

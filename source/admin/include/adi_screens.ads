@@ -6,12 +6,14 @@
 --
 
 with Arrays;
+with Lists;
 
 with Adi_Class_Wp_Screens;
 
 package Adi_Screens
 is
    use Arrays;
+   use Lists;
 
    --
    -- Get the column headers for a screen
@@ -34,6 +36,17 @@ is
    --
    function Get_Hidden_Columns (Screen : Adi_Class_Wp_Screens.Wp_Screen)
                                 return Array_Type;
+
+   --
+   -- Gets an array of IDs of hidden meta boxes.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string|WP_Screen screen Screen identifier
+   -- @return string[] IDs of hidden meta boxes.
+   --
+   function Get_Hidden_Meta_Boxes (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+                                   return List_Type;
 
    --
    -- Register and configure an admin screen option

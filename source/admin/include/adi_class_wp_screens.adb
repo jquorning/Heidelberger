@@ -513,22 +513,16 @@ is
 --                 $this->_help_sidebar = $content;
 --         end;
 
---         --
---         -- Gets the number of layout columns the user has selected.
---         --
---         -- The layout_columns option controls the max number and default number of
---         -- columns. This method returns the number of columns within that range selected
---         -- by the user via Screen Options. If no selection has been made, the default
---         -- provisioned in layout_columns is returned. If the screen does not support
---         -- selecting the number of layout columns, 0 is returned.
---         --
---         -- @since 3.4.0
---         --
---         -- @return int Number of columns to display.
---         --
---         public function get_columns() then
---                 return $this->columns;
---         end;
+   -----------------
+   -- Get_Columns --
+   -----------------
+
+   function Get_Columns (This : Wp_Screen)
+                         return Natural
+   is
+   begin
+      return This.Columns;
+   end Get_Columns;
 
 --         --
 --         -- Gets the accessible hidden headings and text used in the screen.

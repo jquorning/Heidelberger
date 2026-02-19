@@ -11,12 +11,15 @@ with Ada.Text_IO;
 with Php.Arrays;
 with Php.Files;
 with Php.Lists;
+with Php.Misc;
 with Php.Multibyte;
+with Php.Numerics;
 with Php.Preg;
 with Php.Types;
 with Php.Strings;
 
 with Array_Lists;
+with Constants;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -338,7 +341,7 @@ is
          declare
             Tagnames : constant List_Type :=
               List_Intersect (Array_Keys (Global_Shortcode_Tags),
-                              [Matches (1)]);
+                              [Matches (2)]);
 
             Found_Shortcodes : constant Boolean := not Tagnames.Is_Empty;
             Shortcode_Regex  : constant String :=
@@ -348,9 +351,9 @@ is
             Regex : constant String :=
               X_Get_Wptexturize_Split_Regex (Shortcode_Regex);
 
-            Textarr : constant List_Type :=
-              Preg_Split (Regex, Text, -1,
-                          PREG_SPLIT_DELIM_CAPTURE + PREG_SPLIT_NO_EMPTY);
+            Textarr : constant List_Type := Empty_List; -- XXX
+--            Preg_Split (Regex, Text, -1,
+--                        PREG_SPLIT_DELIM_CAPTURE + PREG_SPLIT_NO_EMPTY);
          begin
             for Curl_0 of Textarr loop -- &
                -- Only call _wptexturize_pushpop_element if curl is a delimiter.
@@ -3672,89 +3675,147 @@ is
 --         return apply_filters( "sanitize_email", sanitized_email, email, null );
 -- end;
 
--- --
--- -- Determines the difference between two timestamps.
--- --
--- -- The difference is returned in a human readable format such as "1 hour",
--- -- "5 mins", "2 days".
--- --
--- -- @since 1.5.0
--- -- @since 5.3.0 Added support for showing a difference in seconds.
--- --
--- -- @param int from Unix timestamp from which the difference begins.
--- -- @param int to   Optional. Unix timestamp to end the time difference. Default becomes time() if not set.
--- -- @return string Human readable time difference.
--- --
--- function human_time_diff( from, to = 0 ) then
---         if ( empty( to ) ) then
---                 to = time();
---         end;
+   ---------------------
+   -- Human_Time_Diff --
+   ---------------------
 
---         diff = (int) abs( to - from );
+   function Human_Time_Diff (From : Integer;
+                             To   : Integer := 0)
+                             return String
+   is
+      use Php.Misc;
+      use Php.Numerics;
+      use Php.Strings;
+      use Constants;
+      use UStrings;
+      use Wp_Common;
+      use Inc_L10n;
 
---         if ( diff < MINUTE_IN_SECONDS ) then
---                 secs = diff;
---                 if ( secs <= 1 ) then
---                         secs = 1;
---                 end;
---                 /* translators: Time difference between two dates, in seconds. %s: Number of seconds.--
---                 since = sprintf( _n( "%s second", "%s seconds", secs ), secs );
---         end; elseif ( diff < HOUR_IN_SECONDS && diff >= MINUTE_IN_SECONDS ) then
---                 mins = round( diff / MINUTE_IN_SECONDS );
---                 if ( mins <= 1 ) then
---                         mins = 1;
---                 end;
---                 /* translators: Time difference between two dates, in minutes (min=minute). %s: Number of minutes.--
---                 since = sprintf( _n( "%s min", "%s mins", mins ), mins );
---         end; elseif ( diff < DAY_IN_SECONDS && diff >= HOUR_IN_SECONDS ) then
---                 hours = round( diff / HOUR_IN_SECONDS );
---                 if ( hours <= 1 ) then
---                         hours = 1;
---                 end;
---                 /* translators: Time difference between two dates, in hours. %s: Number of hours.--
---                 since = sprintf( _n( "%s hour", "%s hours", hours ), hours );
---         end; elseif ( diff < WEEK_IN_SECONDS && diff >= DAY_IN_SECONDS ) then
---                 days = round( diff / DAY_IN_SECONDS );
---                 if ( days <= 1 ) then
---                         days = 1;
---                 end;
---                 /* translators: Time difference between two dates, in days. %s: Number of days.--
---                 since = sprintf( _n( "%s day", "%s days", days ), days );
---         end; elseif ( diff < MONTH_IN_SECONDS && diff >= WEEK_IN_SECONDS ) then
---                 weeks = round( diff / WEEK_IN_SECONDS );
---                 if ( weeks <= 1 ) then
---                         weeks = 1;
---                 end;
---                 /* translators: Time difference between two dates, in weeks. %s: Number of weeks.--
---                 since = sprintf( _n( "%s week", "%s weeks", weeks ), weeks );
---         end; elseif ( diff < YEAR_IN_SECONDS && diff >= MONTH_IN_SECONDS ) then
---                 months = round( diff / MONTH_IN_SECONDS );
---                 if ( months <= 1 ) then
---                         months = 1;
---                 end;
---                 /* translators: Time difference between two dates, in months. %s: Number of months.--
---                 since = sprintf( _n( "%s month", "%s months", months ), months );
---         end; elseif ( diff >= YEAR_IN_SECONDS ) then
---                 years = round( diff / YEAR_IN_SECONDS );
---                 if ( years <= 1 ) then
---                         years = 1;
---                 end;
---                 /* translators: Time difference between two dates, in years. %s: Number of years.--
---                 since = sprintf( _n( "%s year", "%s years", years ), years );
---         end;
+      package Float_IO is new Ada.Text_IO.Float_IO (Float);
 
---         --
---         -- Filters the human readable difference between two timestamps.
---         --
---         -- @since 4.0.0
---         --
---         -- @param string since The difference in human readable text.
---         -- @param int    diff  The difference in seconds.
---         -- @param int    from  Unix timestamp from which the difference begins.
---         -- @param int    to    Unix timestamp to end the time difference.
---         --
---         return apply_filters( "human_time_diff", since, diff, from, to );
--- end;
+      function Round (Value    : Natural;
+                      Dividend : Natural)
+                      return Float;
+
+      function To_String (Value : Float)
+                          return String;
+
+      -----------
+      -- Round --
+      -----------
+
+      function Round (Value    : Natural;
+                      Dividend : Natural)
+                      return Float
+      is
+      begin
+         return Float'Max (1.0, Round (Float (Value) / Float (Dividend)));
+      end Round;
+
+      ---------------
+      -- To_String --
+      ---------------
+
+      function To_String (Value : Float)
+                          return String
+      is
+         Image : String (1 .. 10);
+      begin
+         Float_IO.Put (Image, Value, Aft => 0, Exp => 0);
+         return Trim (Image);
+      end To_String;
+
+      To_2 : constant Integer :=
+        (if To = 0 then Time else To);
+
+      Diff   : constant Natural := abs (To_2 - From);
+--    Diff_F : constant Float   := Float (Diff);
+
+      Since : UString;
+   begin
+      if Diff < MINUTE_IN_SECONDS then
+         declare
+            Secs : constant Float := Round (Diff, 1);
+         begin
+            -- translators: Time difference between two dates, in seconds.
+            -- translators: %s: Number of seconds.
+            Since := +Sprintf (X_N ("%s second", "%s seconds", Integer (Secs)),
+                               [1 => To_String (Secs)]);
+         end;
+
+      elsif Diff in MINUTE_IN_SECONDS .. HOUR_IN_SECONDS then
+         declare
+            Mins : constant Float := Round (Diff, MINUTE_IN_SECONDS);
+         begin
+            -- translators: Time difference between two dates, in minutes (min=minute).
+            -- translators: %s: Number of minutes.
+            Since := +Sprintf (X_N ("%s min", "%s mins", Integer (Mins)),
+                               [1 => To_String (Mins)]);
+         end;
+
+      elsif Diff in HOUR_IN_SECONDS .. DAY_IN_SECONDS then
+         declare
+            Hours : constant Float := Round (Diff, HOUR_IN_SECONDS);
+         begin
+            -- translators: Time difference between two dates, in hours.
+            -- translators: %s: Number of hours.
+            Since := +Sprintf (X_N ("%s hour", "%s hours", Integer (Hours)),
+                               [1 => To_String (Hours)]);
+         end;
+
+      elsif Diff in DAY_IN_SECONDS .. WEEK_IN_SECONDS then
+         declare
+            Days : constant Float := Round (Diff, DAY_IN_SECONDS);
+         begin
+            -- translators: Time difference between two dates, in days.
+            -- translators: %s: Number of days.
+            Since := +Sprintf (X_N ("%s day", "%s days", Integer (Days)),
+                               [1 => To_String (Days)]);
+         end;
+
+      elsif Diff in WEEK_IN_SECONDS .. MONTH_IN_SECONDS then
+         declare
+            Weeks : constant Float := Round (Diff, WEEK_IN_SECONDS);
+         begin
+            -- translators: Time difference between two dates, in weeks.
+            -- translators: %s: Number of weeks.
+            Since := +Sprintf (X_N ("%s week", "%s weeks", Integer (Weeks)),
+                               [1 => To_String (Weeks)]);
+         end;
+
+      elsif Diff in MONTH_IN_SECONDS .. YEAR_IN_SECONDS then
+         declare
+            Months : constant Float := Round (Diff, MONTH_IN_SECONDS);
+         begin
+            -- translators: Time difference between two dates, in months.
+            -- translators: %s: Number of months.
+            Since := +Sprintf (X_N ("%s month", "%s months", Integer (Months)),
+                               [1 => To_String (Months)]);
+         end;
+
+      elsif Diff >= YEAR_IN_SECONDS then
+         declare
+            Years : constant Float := Round (Diff, YEAR_IN_SECONDS);
+         begin
+            -- translators: Time difference between two dates, in years.
+            -- translators: %s: Number of years.
+            Since := +Sprintf (X_N ("%s year", "%s years", Integer (Years)),
+                               [1 => To_String (Years)]);
+         end;
+      end if;
+
+      --
+      -- Filters the human readable difference between two timestamps.
+      --
+      -- @since 4.0.0
+      --
+      -- @param string since The difference in human readable text.
+      -- @param int    diff  The difference in seconds.
+      -- @param int    from  Unix timestamp from which the difference begins.
+      -- @param int    to    Unix timestamp to end the time difference.
+      --
+      return Apply_Filters ("human_time_diff", -Since, Diff, From, To);
+   end Human_Time_Diff;
 
 -- --
 -- -- Generates an excerpt from the content, if needed.

@@ -5,6 +5,10 @@
 -- @since 4.7.0
 --
 
+with Php.Arrays;
+with Php.Lists;
+with Php.Strings;
+
 package body Class_List_Util
 is
    --
@@ -39,146 +43,177 @@ is
 --                 return this.input;
 --         end;
 
---         --
---         -- Returns the output array.
---         --
---         -- @since 4.7.0
---         --
---         -- @return array The output array.
---         --
---         public function get_output() then
---                 return this.output;
---         end;
+   ----------------
+   -- Get_Output --
+   ----------------
 
---         --
---         -- Filters the list, based on a set of key => value arguments.
---         --
---         -- Retrieves the objects from the list that match the given arguments.
---         -- Key represents property name, and value represents property value.
---         --
---         -- If an object has more properties than those specified in arguments,
---         -- that will not disqualify it. When using the 'AND' operator,
---         -- any missing properties will disqualify it.
---         --
---         -- @since 4.7.0
---         --
---         -- @param array  args     Optional. An array of key => value arguments to match
---         --                         against each object. Default empty array.
---         -- @param string operator Optional. The logical operation to perform. 'AND' means
---         --                         all elements from the array must match. 'OR' means only
---         --                         one element needs to match. 'NOT' means no elements may
---         --                         match. Default 'AND'.
---         -- @return array Array of found values.
---         --
---         public function filter( args = array(), operator = 'AND' ) then
---                 if ( empty( args ) ) then
---                         return this.output;
---                 end;
+   function Get_Output (This : Wp_List_Util)
+            return Array_Type
+   is
+   begin
+      return This.Output;
+   end Get_Output;
 
---                 operator = strtoupper( operator );
+   ------------
+   -- Filter --
+   ------------
 
---                 if ( ! in_array( operator, array( 'AND', 'OR', 'NOT' ), true ) ) then
---                         this.output = array();
---                         return this.output;
---                 end;
+   function Filter (This     : in out Wp_List_Util;
+                    Args     : Array_Type := Empty_Array;
+                    Operator : String     := "AND")
+                    return Array_Type
+   is
+      use Php.Arrays;
+      use Php.Lists;
+      use Php.Strings;
 
---                 count    = count( args );
---                 filtered = array();
+      Operator_2 : constant String := Strtoupper (Operator);
+   begin
+      if Args.Is_Empty then
+         return This.Output;
+      end if;
 
---                 foreach ( this.output as key => obj ) then
---                         matched = 0;
+      if not In_List (Operator_2, ["AND", "OR", "NOT"], True) then
+         This.Output := Empty_Array;
+         return This.Output;
+      end if;
 
---                         foreach ( args as m_key => m_value ) then
---                                 if ( is_array( obj ) ) then
---                                         // Treat object as an array.
---                                         if ( array_key_exists( m_key, obj ) && ( m_value == obj[ m_key ] ) ) then
---                                                 matched++;
---                                         end;
---                                 end; elseif ( is_object( obj ) ) then
---                                         // Treat object as an object.
---                                         if ( isset( obj.thenm_keyend; ) && ( m_value == obj.thenm_keyend; ) ) then
---                                                 matched++;
---                                         end;
---                                 end;
---                         end;
+      declare
+         Count    : constant Natural := Args.Length;
+         Filtered : Array_Type;
+      begin
+         for A in This.Output.Iterate loop
+            declare
+               Key : constant String     := Arrays.Key (A);
+               Obj : constant Array_Type := As_Array (Arrays.Element (A));
+               Matched : Natural := 0;
+            begin
+               for B in Args.Iterate loop
+                  declare
+                     M_Key   : constant String     := Arrays.Key (B);
+                     M_Value : constant Multi_Type := Arrays.Element (B);
+                  begin
+--                   if Kind_Of (Obj) = Kind_Array then
+                        -- Treat object as an array.
+                        if
+                          Array_Key_Exists (M_Key, Obj) and then
+                          (M_Value = Get (Obj, M_Key))
+                        then
+                           Matched := Matched + 1;
+                        end if;
+                     -- elsif ( is_object( obj ) ) then
+                     --         -- Treat object as an object.
+                     --         if ( isset( obj.thenm_keyend; ) && ( m_value == obj.thenm_keyend; ) ) then
+                     --                 matched++;
+                     --         end;
+--                   end if;
+                  end;
+               end loop;
 
---                         if ( ( 'AND' === operator && matched === count )
---                                 || ( 'OR' === operator && matched > 0 )
---                                 || ( 'NOT' === operator && 0 === matched )
---                         ) then
---                                 filtered[ key ] = obj;
---                         end;
---                 end;
+               if
+                 ("AND" = Operator_2 and then Matched = Count) or else
+                 ("OR"  = Operator_2 and then Matched  > 0)    or else
+                 ("NOT" = Operator_2 and then 0 = Matched)
+               then
+                  Set (Filtered, Key, From_Array (Obj));
+               end if;
+            end;
+         end loop;
 
---                 this.output = filtered;
+         This.Output := Filtered;
+      end;
+      return This.Output;
+   end Filter;
 
---                 return this.output;
---         end;
+   ------------
+   -- Filter --
+   ------------
 
---         --
---         -- Plucks a certain field out of each element in the input array.
---         --
---         -- This has the same functionality and prototype of
---         -- array_column() (PHP 5.5) but also supports objects.
---         --
---         -- @since 4.7.0
---         --
---         -- @param int|string field     Field to fetch from the object or array.
---         -- @param int|string index_key Optional. Field from the element to use as keys for the new array.
---         --                              Default null.
---         -- @return array Array of found values. If `index_key` is set, an array of found values with keys
---         --               corresponding to `index_key`. If `index_key` is null, array keys from the original
---         --               `list` will be preserved in the results.
---         --
--- --        public function pluck( field, index_key = null ) then
---         function Pluck (List      : Wp_List_Util;
---                         Field     : String;
---                         Index_Key : String) -- = null )
---                         return Array_Type;
---                 newlist = array();
+   procedure Filter (This     : in out Wp_List_Util;
+                     Args     : Array_Type := Empty_Array;
+                     Operator : String     := "AND")
+   is
+      Unused : constant Array_Type := Filter (This, Args, Operator);
+   begin
+      null;
+   end Filter;
 
---                 if ( ! index_key ) then
---                         /*
---                         -- This is simple. Could at some point wrap array_column()
---                         -- if we knew we had an array of arrays.
---                         --
---                         foreach ( this.output as key => value ) then
---                                 if ( is_object( value ) ) then
---                                         newlist[ key ] = value.field;
---                                 end; else then
---                                         newlist[ key ] = value[ field ];
---                                 end;
---                         end;
+   -----------
+   -- Pluck --
+   -----------
 
---                         this.output = newlist;
+   function Pluck (This      : in out Wp_List_Util;
+                   Field     : String;
+                   Index_Key : String := "(null)")
+                   return Array_Type
+   is
+      Newlist : Array_Type;
+   begin
+      if Index_Key = "(null)" then
+         --
+         -- This is simple. Could at some point wrap array_column()
+         -- if we knew we had an array of arrays.
+         --
+         for A in This.Output.Iterate loop
+            declare
+               Key   : constant String     := Arrays.Key (A);
+               Value : constant Array_Type := As_Array (Arrays.Element (A));
+            begin
+               -- if ( is_object( value ) ) then
+               --    newlist[ key ] = value.field;
+               -- else
+               Set (Newlist, Key, Get (Value, Field));
+               -- end if;
+            end;
+         end loop;
 
---                         return this.output;
---                 end;
+         This.Output := Newlist;
 
---                 /*
---                 -- When index_key is not set for a particular item, push the value
---                 -- to the end of the stack. This is how array_column() behaves.
---                 --
---                 foreach ( this.output as value ) then
---                         if ( is_object( value ) ) then
---                                 if ( isset( value.index_key ) ) then
---                                         newlist[ value.index_key ] = value.field;
---                                 end; else then
---                                         newlist[] = value.field;
---                                 end;
---                         end; else then
---                                 if ( isset( value[ index_key ] ) ) then
---                                         newlist[ value[ index_key ] ] = value[ field ];
---                                 end; else then
---                                         newlist[] = value[ field ];
---                                 end;
---                         end;
---                 end;
+         return This.Output;
+      end if;
 
---                 this.output = newlist;
+      --
+      -- When index_key is not set for a particular item, push the value
+      -- to the end of the stack. This is how array_column() behaves.
+      --
+      for A in This.Output.Iterate loop
+         declare
+            Value : constant Array_Type := As_Array (Element (A));
+         begin
+         -- if ( is_object( value ) ) then
+         --    if ( isset( value.index_key ) ) then
+         --       newlist[ value.index_key ] = value.field;
+         --    else
+         --       newlist[] = value.field;
+         --    end if;
+         -- else
+            if Isset (Value, Index_Key) then
+               Set (Newlist, Get_As_String (Value, Index_Key),
+                    Get (Value, Field));
+            else
+               Newlist.Append ("XXX-976", Get (Value, Field));
+            end if;
+         -- end if;
+         end;
+      end loop;
 
---                 return this.output;
---         end;
+      This.Output := Newlist;
+
+      return This.Output;
+   end Pluck;
+
+   -----------
+   -- Pluck --
+   -----------
+
+   procedure Pluck (This      : in out Wp_List_Util;
+                    Field     : String;
+                    Index_Key : String := "(null)")
+   is
+      Unused : constant Array_Type := Pluck (This, Field, Index_Key);
+   begin
+      null;
+   end Pluck;
 
 --         --
 --         -- Sorts the input array based on one or more orderby arguments.

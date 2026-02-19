@@ -43,8 +43,9 @@ is
 
    subtype Post_Type_Map is Post_Type_Maps.Map;
 
-   Wp_Post_Types           : Post_Type_Map; -- List_Type;
-   Global_Wp_Post_Statuses : Status_Maps.Map; -- Array_Type;
+   Global_Wp_Post_Types           : Post_Type_Map;
+   Global_Wp_Post_Types_2         : Array_Type;
+   Global_Wp_Post_Statuses        : Status_Maps.Map;
    Global_X_Wp_Post_Type_Features : Array_Type;
 
    function Wp_Parse_Args_2 (Args     : Status_Type;
@@ -2197,7 +2198,7 @@ is
    begin
       if
 --        not Is_Scalar (Post_Type) or else
-        Has_Element (Wp_Post_Types.Find (Post_Type))  -- empty
+        Has_Element (Global_Wp_Post_Types.Find (Post_Type))  -- empty
       then
          null;
 --         return null;
@@ -2239,6 +2240,22 @@ is
       P : Class_Post_Type.Wp_Post_Type_Array;
    begin
       return P;
+   end Get_Post_Types;
+
+   --------------------
+   -- Get_Post_Types --
+   --------------------
+
+   function Get_Post_Types (Args     : Array_Type := Empty_Array;
+                            Output   : String     := "names";
+                            Operator : String     := "and")
+                            return Array_Type
+   is
+      use Inc_Functions;
+--    global wp_post_types;
+      Field : constant String := (if "names" = Output then "name" else ""); -- False
+   begin
+      return Wp_Filter_Object_List (Global_Wp_Post_Types_2, Args, Operator, Field);
    end Get_Post_Types;
 
 --
@@ -2443,7 +2460,7 @@ is
          Post_Type_Object.Add_Rewrite_Rules;
          Post_Type_Object.Register_Meta_Boxes;
 
-         Wp_Post_Types.Include (Post_Type, New_Item => Post_Type_Object);
+         Global_Wp_Post_Types.Include (Post_Type, New_Item => Post_Type_Object);
 
          Post_Type_Object.Add_Hooks;
          Post_Type_Object.Register_Taxonomies;
@@ -2869,12 +2886,14 @@ is
       use Adi_Plugins;
       use Class_Post_Type;
 
-      Post_Types : constant List_Type :=
+      Post_Types : constant Array_Type := -- List_Type :=
         Get_Post_Types (To_Array_Type ([
           Build ("show_ui", True)]));
    begin
-      for PType of Post_Types loop
+      for A in Post_Types.Iterate loop
+--    for PType of Post_Types loop
          declare
+            PType     : constant String := Key (A);
             PType_Obj : constant Wp_Post_Type := Get_Post_Type_Object (PType);
          begin
             -- Sub-menus only.

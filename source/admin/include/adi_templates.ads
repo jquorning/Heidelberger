@@ -136,40 +136,87 @@ is
    --                                             null.
    --
 
-   type Callable is access procedure;
+-- type Callable is access procedure;
    type Callable_2 is access function (Data_Object : String;
                                        Box         : Array_Type)
                                        return Array_Type;
    type Callable_3 is access procedure (Data_Object : String;
                                         Box         : Array_Type);
 
-   procedure Add_Meta_Box (Id            : String;
-                           Title         : String;
-                           Callback      : Callable;
-                           Screen        : String     := "";
-                           -- Array_type := Empty_Array; -- null;
-                           Context       : String     := "advanced";
-                           Priority      : String     := "default";
-                           Callback_Args : Array_Type := Empty_Array) -- null);
-                           is null;
+   -- procedure Add_Meta_Box (Id            : String;
+   --                         Title         : String;
+   --                         Callback      : Callable;
+   --                         Screen        : Adi_Class_Wp_Screens.Wp_Screen; String := "";
+   --                         Array_type := Empty_Array; -- null;
+   --                         Context       : String     := "advanced";
+   --                         Priority      : String     := "default";
+   --                         Callback_Args : Array_Type := Empty_Array) null);
+   -- is null;
 
    procedure Add_Meta_Box (Id            : String;
                            Title         : String;
                            Callback      : Callable_2;
-                           Screen        : String     := "";
+                           Screen        : Adi_Class_Wp_Screens.Wp_Screen; -- String := "";
                            Context       : String     := "advanced";
                            Priority      : String     := "default";
                            Callback_Args : Array_Type := Empty_Array)
                            is null;
 
-   procedure Add_Meta_Box (Id            : String;
-                           Title         : String;
-                           Callback      : Callable_3;
-                           Screen        : String     := "";
-                           Context       : String     := "advanced";
-                           Priority      : String     := "default";
-                           Callback_Args : Array_Type := Empty_Array)
-                           is null;
+   -- procedure Add_Meta_Box (Id            : String;
+   --                         Title         : String;
+   --                         Callback      : Callable_3;
+   --                         Screen        : Adi_Class_Wp_Screens.Wp_Screen; -- String := "";
+   --                         Context       : String     := "advanced";
+   --                         Priority      : String     := "default";
+   --                         Callback_Args : Array_Type := Empty_Array)
+   --                         is null;
+
+   --
+   -- Internal helper function to find the plugin from a meta box callback.
+   --
+   -- @since 5.0.0
+   --
+   -- @access private
+   --
+   -- @param callable callback The callback function to check.
+   -- @return array|null The plugin that the callback belongs to, or null if it
+   --                    Doesn't belong to a plugin.
+   --
+   function X_Get_Plugin_From_Callback (Callback : Callable)
+                                        return Array_Type
+                                        is (Empty_Array);
+
+   --
+   -- Meta-Box template function.
+   --
+   -- @since 2.5.0
+   --
+   -- @global array wp_meta_boxes
+   --
+   -- @param string|WP_Screen screen      The screen identifier. If you have used
+   --                                     add_menu_page() or add_submenu_page() to
+   --                                     create a new screen (and hence screen_id)
+   --                                     make sure your menu slug conforms to the
+   --                                     limits of sanitize_key()  otherwise the
+   --                                     "screen" menu may not correctly render on
+   --                                     your page.
+   -- @param string           context     The screen context for which to display
+   --                                     meta boxes.
+   -- @param mixed            data_object Gets passed to the meta box callback
+   --                                     function as the first parameter. Often this
+   --                                     is the object That's the focus of the
+   --                                     current screen, for example a `WP_Post` or
+   --                                     `WP_Comment` object.
+   -- @return int Number of meta_boxes.
+   --
+   function Do_Meta_Boxes (Screen      : String;
+                           Context     : String;
+                           Data_Object : Multi_Type)
+                           return Natural;
+
+   procedure Do_Meta_Boxes (Screen      : String;
+                            Context     : String;
+                            Data_Object : Multi_Type);
 
    --
    -- Echoes a submit button, with provided text and appropriate class(es).

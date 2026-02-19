@@ -296,17 +296,10 @@ is
                             Operator : String     := "and")
                             return Class_Post_Type.Wp_Post_Type_Array;
 
-   -- function Get_Post_Types (Args     : Array_Type := Empty_Array;
-   --                          Output   : String     := "names";
-   --                          Operator : String     := "and")
-   --                          return String_Array
-   --                          is (Empty_String_Array);
-
    function Get_Post_Types (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
                             Operator : String     := "and")
-                            return List_Type
-   is (raise Program_Error with "not implemented");
+                            return Array_Type;
 
 --     @type bool|array   rewrite               {
    type Rewrite_Rec is

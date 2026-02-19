@@ -27,6 +27,22 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
+                           Diff      : Integer;
+                           From      : Integer;
+                           To        : Integer)
+                           return String
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
                            Args      : Array_Type)
                            return String
    is
@@ -499,6 +515,21 @@ is
                            Id        : Adi_Class_Wp_Screens.Wp_Screen;
                            Arg_4     : Boolean := False)
                            return Array_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : List_Type;
+                           Screen    : Adi_Class_Wp_Screens.Wp_Screen;
+                           Default   : Boolean := False)
+                           return List_Type
    is
       use Arrayable_Arrays;
 

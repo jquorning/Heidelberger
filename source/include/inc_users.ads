@@ -7,6 +7,7 @@
 
 with Arrays;
 with Arrayable_Interfaces;
+with Lists;
 
 with Class_Errors;
 with Class_Users;
@@ -15,6 +16,7 @@ with Class_Admin_Bar;
 package Inc_Users
 is
    use Arrays;
+   use Lists;
 
    type User_Error_Type is record
       Success : Boolean;
@@ -168,6 +170,12 @@ is
                              Deprecated : String       := "")
                              return Array_Type
                              is (Empty_Array);
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0;
+                             Deprecated : String       := "")
+                             return List_Type
+                             is (Empty_List);
 
    --
    -- Updates user option with global blog capability.

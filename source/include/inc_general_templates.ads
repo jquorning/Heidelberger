@@ -612,6 +612,17 @@ is
                               return String;
 
    --
+   -- Enqueues the default ThickBox js and css.
+   --
+   -- If any of the settings need to be changed, this can be done with another js
+   -- file similar to media-upload.js. That file should
+   -- require array("thickbox") to ensure it is loaded after.
+   --
+   -- @since 2.5.0
+   --
+   procedure Add_Thickbox;
+
+   --
    -- Enqueues or directly prints a stylesheet link to the specified CSS file.
    --
    -- "Intelligently" decides to enqueue or to print the CSS file. If the

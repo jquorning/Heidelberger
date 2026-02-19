@@ -5,13 +5,21 @@
 -- @subpackage Administration
 --
 
+with Php.Lists;
+with Php.Strings;
+
 with Array_Lists;
+with Binder;
+with Lists;
+with Wp_Common;
 
 with Class_Block_Type_Registry;
 with Class_Block_Type;
+with Inc_Users;
 
 package body Adi_Posts
 is
+   use Lists;
 
 -- --
 -- -- Renames `_POST` data from form names to DB post columns.
@@ -1340,43 +1348,57 @@ is
 --         return array( post_mime_types, avail_post_mime_types );
 -- end;
 
--- --
--- -- Returns the list of classes to be used by a meta box.
--- --
--- -- @since 2.5.0
--- --
--- -- @param string box_id    Meta box ID (used in the "id" attribute for the meta box).
--- -- @param string screen_id The screen on which the meta box is shown.
--- -- @return string Space-separated string of class names.
--- --
--- function postbox_classes( box_id, screen_id ) then
---         if ( isset( _GET["edit"] ) && _GET["edit"] == box_id ) then
---                 classes = array( "" );
---         end; elseif ( get_user_option( "closedpostboxes_" . screen_id ) ) then
---                 closed = get_user_option( "closedpostboxes_" . screen_id );
---                 if ( ! is_array( closed ) ) then
---                         classes = array( "" );
---                 end; else then
---                         classes = in_array( box_id, closed, true ) ? array( "closed" ) : array( "" );
---                 end;
---         end; else then
---                 classes = array( "" );
---         end;
+   ---------------------
+   -- Postbox_Classes --
+   ---------------------
 
---         --
---         -- Filters the postbox classes for a specific screen and box ID combo.
---         --
---         -- The dynamic portions of the hook name, `screen_id` and `box_id`, refer to
---         -- the screen ID and meta box ID, respectively.
---         --
---         -- @since 3.2.0
---         --
---         -- @param string[] classes An array of postbox classes.
---         --
---         classes = apply_filters( "postbox_classes_thenscreen_idend;_thenbox_idend;", classes );
+   function Postbox_Classes (Box_Id    : String;
+                             Screen_Id : String)
+                             return String
+   is
+      use Php.Lists;
+      use Php.Strings;
+      use Wp_Common;
+      use Inc_Users;
 
---         return implode( " ", classes );
--- end;
+      Classes : List_Type;
+   begin
+      if
+        Isset (Binder.XX_GET, "edit") and then
+        Get_As_String (Binder.XX_GET, "edit") = Box_Id
+      then
+         Classes := [""]; -- array( "" );
+      elsif Get_User_Option ("closedpostboxes_" & Screen_Id) then
+         declare
+            Closed : constant List_Type :=
+              Get_User_Option ("closedpostboxes_" & Screen_Id);
+         begin
+--          if not Is_Array (Closed) then
+--             Classes := [""]; -- array( "" );
+--          else
+            Classes := (if In_List (Box_Id, Closed, True)
+                        then ["closed"] else [""]);
+--          end if;
+         end;
+      else
+         Classes := [""];
+      end if;
+
+      --
+      -- Filters the postbox classes for a specific screen and box ID combo.
+      --
+      -- The dynamic portions of the hook name, `screen_id` and `box_id`, refer to
+      -- the screen ID and meta box ID, respectively.
+      --
+      -- @since 3.2.0
+      --
+      -- @param string[] classes An array of postbox classes.
+      --
+      Classes :=
+        Apply_Filters ("postbox_classes_" & Screen_Id & "_" & Box_Id, Classes);
+
+      return Implode (" ", Classes);
+   end Postbox_Classes;
 
 -- --
 -- -- Returns a sample permalink based on the post name.

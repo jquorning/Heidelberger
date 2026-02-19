@@ -5,6 +5,7 @@
 -- @subpackage Administration
 --
 
+with Php.Lists;
 with Php.Types;
 
 with UStrings;
@@ -161,58 +162,62 @@ is
 --         end;
 -- end;
 
--- --
--- -- Gets an array of IDs of hidden meta boxes.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string|WP_Screen screen Screen identifier
--- -- @return string[] IDs of hidden meta boxes.
--- --
--- function get_hidden_meta_boxes( screen ) then
---         if ( is_string( screen ) ) then
---                 screen = convert_to_screen( screen );
---         end;
+   ---------------------------
+   -- Get_Hidden_Meta_Boxes --
+   ---------------------------
 
---         hidden = get_user_option( "metaboxhidden_thenscreen.idend;" );
+   function Get_Hidden_Meta_Boxes (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+                                   return List_Type
+   is
+      use Php.Lists;
+      use Wp_Common;
+      use UStrings;
+      use Inc_Users;
+      -- if Is_String (Screen) then
+      --    screen := Convert_To_Screen (Screen);
+      -- end if;
 
---         use_defaults = ! is_array( hidden );
+      Hidden : List_Type := Get_User_Option ("metaboxhidden_" & (-Screen.Id));
 
---         // Hide slug boxes by default.
---         if ( use_defaults ) then
---                 hidden = array();
+      Use_Defaults : constant Boolean := True; -- not Is_Array (Hidden);
+   begin
+      -- Hide slug boxes by default.
+      if Use_Defaults then
+         Hidden := Empty_List;
 
---                 if ( 'post' === screen.base ) then
---                         if ( in_array( screen.post_type, array( 'post', 'page', 'attachment' ), true ) ) then
---                                 hidden = array( 'slugdiv', 'trackbacksdiv', 'postcustom', 'postexcerpt', 'commentstatusdiv', 'commentsdiv', 'authordiv', 'revisionsdiv' );
---                         end; else then
---                                 hidden = array( 'slugdiv' );
---                         end;
---                 end;
+         if "post" = Screen.Base then
+            if In_List (-Screen.Post_Type, ["post", "page", "attachment"], True) then
+               Hidden := ["slugdiv", "trackbacksdiv", "postcustom",
+                          "postexcerpt", "commentstatusdiv", "commentsdiv",
+                          "authordiv", "revisionsdiv"];
+            else
+               Hidden := ["slugdiv"];
+            end if;
+         end if;
 
---                 --
---                 -- Filters the default list of hidden meta boxes.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param string[]  hidden An array of IDs of meta boxes hidden by default.
---                 -- @param WP_Screen screen WP_Screen object of the current screen.
---                 --
---                 hidden = apply_filters( 'default_hidden_meta_boxes', hidden, screen );
---         end;
+         --
+         -- Filters the default list of hidden meta boxes.
+         --
+         -- @since 3.1.0
+         --
+         -- @param string[]  hidden An array of IDs of meta boxes hidden by default.
+         -- @param WP_Screen screen WP_Screen object of the current screen.
+         --
+         Hidden := Apply_Filters ("default_hidden_meta_boxes", Hidden, Screen);
+      end if;
 
---         --
---         -- Filters the list of hidden meta boxes.
---         --
---         -- @since 3.3.0
---         --
---         -- @param string[]  hidden       An array of IDs of hidden meta boxes.
---         -- @param WP_Screen screen       WP_Screen object of the current screen.
---         -- @param bool      use_defaults Whether to show the default meta boxes.
---         --                                Default true.
---         --
---         return apply_filters( 'hidden_meta_boxes', hidden, screen, use_defaults );
--- end;
+      --
+      -- Filters the list of hidden meta boxes.
+      --
+      -- @since 3.3.0
+      --
+      -- @param string[]  hidden       An array of IDs of hidden meta boxes.
+      -- @param WP_Screen screen       WP_Screen object of the current screen.
+      -- @param bool      use_defaults Whether to show the default meta boxes.
+      --                                Default true.
+      --
+      return Apply_Filters ("hidden_meta_boxes", Hidden, Screen, Use_Defaults);
+   end Get_Hidden_Meta_Boxes;
 
 -- --
 -- -- Register and configure an admin screen option

@@ -199,7 +199,7 @@ is
 
       Adi_Admin.Run;
 
-      Auth_Redirect;
+--    Auth_Redirect; -- XXX
 
 --       -- Schedule Trash collection.
 --       if

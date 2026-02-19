@@ -4,9 +4,21 @@
 -- @package WordPress
 -- @subpackage Administration
 --
+
+with Php.Echoing;
+
+with Arrays;
+with UStrings;
+
+with Adi_Class_Wp_Screens;
+with Adi_Screens;
+with Adi_Templates;
+with Inc_Functions;
+
 package body Adi_Dashboard
 is
-   procedure Dummy is null;
+   use Arrays;
+
 -- --
 -- -- Registers dashboard widgets.
 -- --
@@ -253,40 +265,44 @@ is
 --         echo "</form>";
 -- end;
 
--- --
--- -- Displays the dashboard.
--- --
--- -- @since 2.5.0
--- --
--- function wp_dashboard() then
---         screen      = get_current_screen();
---         columns     = absint( screen->get_columns() );
---         columns_css = "";
+   ------------------
+   -- Wp_Dashboard --
+   ------------------
 
---         if ( columns ) then
---                 columns_css = " columns-columns";
---         end;
---         ?>
--- <div id="dashboard-widgets" class="metabox-holder<?php echo columns_css; ?>">
---         <div id="postbox-container-1" class="postbox-container">
---         <?php do_meta_boxes( screen->id, "normal", "" ); ?>
---         </div>
---         <div id="postbox-container-2" class="postbox-container">
---         <?php do_meta_boxes( screen->id, "side", "" ); ?>
---         </div>
---         <div id="postbox-container-3" class="postbox-container">
---         <?php do_meta_boxes( screen->id, "column3", "" ); ?>
---         </div>
---         <div id="postbox-container-4" class="postbox-container">
---         <?php do_meta_boxes( screen->id, "column4", "" ); ?>
---         </div>
--- </div>
+   procedure Wp_Dashboard
+   is
+      use Php.Echoing;
+      use UStrings;
+      use Adi_Class_Wp_Screens;
+      use Adi_Screens;
+      use Adi_Templates;
+      use Inc_Functions;
 
---         <?php
---         wp_nonce_field( "closedpostboxes", "closedpostboxesnonce", false );
---         wp_nonce_field( "meta-box-order", "meta-box-order-nonce", false );
+      Screen  : constant Wp_Screen := Get_Current_Screen;
+      Columns : constant Natural   := abs Screen.Get_Columns;
 
--- end;
+      Columns_CSS : constant String :=
+        (if Columns /= 0 then " columns-columns" else "");
+   begin
+      Echo ("<div id=""dashboard-widgets"" class=""metabox-holder" &
+            Columns_CSS & ">");
+      Echo ("    <div id=""postbox-container-1"" class=""postbox-container"">");
+      Echo ("    ");  Do_Meta_Boxes (-Screen.Id, "normal", From_String (""));
+      Echo ("    </div>");
+      Echo ("    <div id=""postbox-container-2"" class=""postbox-container"">");
+      Echo ("    ");  Do_Meta_Boxes (-Screen.Id, "side", From_String (""));
+      Echo ("    </div>");
+      Echo ("    <div id=""postbox-container-3"" class=""postbox-container"">");
+      Echo ("    ");  Do_Meta_Boxes (-Screen.Id, "column3", From_String (""));
+      Echo ("    </div>");
+      Echo ("    <div id=""postbox-container-4"" class=""postbox-container"">");
+      Echo ("    ");  Do_Meta_Boxes (-Screen.Id, "column4", From_String (""));
+      Echo ("    </div>");
+      Echo ("</div>");
+
+      Wp_Nonce_Field ("closedpostboxes", "closedpostboxesnonce", False);
+      Wp_Nonce_Field ("meta-box-order",  "meta-box-order-nonce", False);
+   end Wp_Dashboard;
 
 -- --
 -- -- Dashboard Widgets.

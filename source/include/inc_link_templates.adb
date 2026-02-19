@@ -229,7 +229,7 @@ is
 --                           Leavename : Boolean := False)
 --                           return String
    is
-      use Php.Lists;
+      use Php.Arrays;
       use Php.Strings;
       use Array_Lists;
       use UStrings;
@@ -284,8 +284,8 @@ is
       elsif "attachment" = Post.Post_Type then
          return Get_Attachment_Link (Post, Leavename);
       elsif
-        In_List (-Post.Post_Type,
-                 Get_Post_Types (To_Array_Type ([
+        In_Array (-Post.Post_Type,
+                  Get_Post_Types (To_Array_Type ([
                     Build ("_builtin", False)])), True)
       then
          return Get_Post_Permalink (Post, Leavename, Sample);

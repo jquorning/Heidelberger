@@ -28,7 +28,7 @@ is
                      return Natural;
 
    function Round (Num       : Float;
-                   Precision : Integer)
+                   Precision : Integer := 0)
                    return Float
                    is (99.99);
 

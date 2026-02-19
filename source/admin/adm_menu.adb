@@ -221,7 +221,7 @@ is
          X_Wp_Last_Object_Menu : Natural := 25;
          -- The index of the last top-level menu in the object menu group.
 
-         Types  : constant List_Type := Get_Post_Types (  -- (array)
+         Types : constant Array_Type := Get_Post_Types (
             To_Array_Type ([
                 Build ("show_ui",      "true"),
                 Build ("_builtin",     "false"),
@@ -232,8 +232,11 @@ is
 --               Build ("post", ""),
 --               Build ("page", "")]);
       begin
-         for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
+         for A in Types.Iterate loop
+--       for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
+               Ptype : constant String := Key (A);
+
                Ptype_Obj : constant Class_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
 

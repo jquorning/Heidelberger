@@ -64,8 +64,9 @@ is
    Pagenow     : UStrings.UString;
    Hook_Suffix : UStrings.UString;
 
-   Title         : UStrings.UString;
-   Post_New_File : UStrings.UString;
+   Title              : UStrings.UString;
+   Global_Parent_File : UStrings.UString;
+   Post_New_File      : UStrings.UString;
 
    Current_Screen     : Adi_Class_Wp_Screens.Wp_Screen;
    Wp_Locale          : Class_Locales.Wp_Locale;

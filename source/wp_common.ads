@@ -43,6 +43,13 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
+                           Diff      : Integer;
+                           From      : Integer;
+                           To        : Integer)
+                           return String;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
                            Args      : Array_Type)
                            return String;
 
@@ -232,6 +239,12 @@ is
                            Id        : Adi_Class_Wp_Screens.Wp_Screen;
                            Arg_4     : Boolean := False)
                            return Array_Type;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : List_Type;
+                           Screen    : Adi_Class_Wp_Screens.Wp_Screen;
+                           Default   : Boolean := False)
+                           return List_Type;
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Class_Terms.Wp_Term;

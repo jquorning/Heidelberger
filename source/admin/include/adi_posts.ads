@@ -14,6 +14,20 @@ is
    use Arrays;
 
    --
+   -- Returns the list of classes to be used by a meta box.
+   --
+   -- @since 2.5.0
+   --
+   -- @param string box_id    Meta box ID (used in the "id" attribute for the meta
+   --                         box).
+   -- @param string screen_id The screen on which the meta box is shown.
+   -- @return string Space-separated string of class names.
+   --
+   function Postbox_Classes (Box_Id    : String;
+                             Screen_Id : String)
+                             return String;
+
+   --
    -- Processes the post data for the bulk editing of posts.
    --
    -- Updates all bulk edited posts/pages, adding (but not removing) tags and

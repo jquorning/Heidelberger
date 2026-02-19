@@ -6,7 +6,7 @@
 -- @since 3.1.0
 --
 
-with Php.Lists;
+with Php.Arrays;
 with Php.Strings;
 
 with Array_Lists;
@@ -28,7 +28,7 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_Terms_List_Table
    is
-      use Php.Lists;
+      use Php.Arrays;
       use Php.Strings;
       use Array_Lists;
       use UStrings;
@@ -68,10 +68,10 @@ is
       -- @todo Still needed? Maybe just the show_ui part.
       if
         Empty (-Globals.Post_Type) or else
-        not In_List (-Globals.Post_Type,
-                     Inc_Posts.Get_Post_Types (To_Array_Type ([
-                       Build ("show_ui", "true")])),
-                     True)
+        not In_Array (-Globals.Post_Type,
+                      Inc_Posts.Get_Post_Types (To_Array_Type ([
+                        Build ("show_ui", "true")])),
+                      True)
       then
          Globals.Post_Type := +"post";
       end if;
