@@ -7,13 +7,10 @@
 -- @subpackage Dependencies
 --
 
-with Ada.Text_IO;
-
 with Php.Lists;
 with Php.Strings;
 
 with Helpers;
-with Helpers_3;
 with Logging;
 
 package body Class_Dependencies
@@ -136,7 +133,6 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Helpers_3;
       use List_Vectors;
       use Class_Dependency;
       use Class_Dependency.Dependency_Maps;

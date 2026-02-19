@@ -509,62 +509,11 @@ is
    -- @return array options
    --
    -- protected static
-   function Set_Defaults (URL     : in out String;           -- all &
-                          Headers : in out Array_Type;
-                          Data    : in out Array_Type;
-                          Typ     : in out String;
-                          Options : in out Array_Type)
-                          return Array_Type;
-        --         if (!preg_match("/^http(s)?:\/\//i", url, matches)) then
-        --                 throw new Requests_Exception("Only HTTP(S) requests are handled.", "nonhttp", url);
-        --         end;
-
-        --         if (empty(options["hooks"])) then
-        --                 options["hooks"] = new Requests_Hooks();
-        --         end;
-
-        --         if (is_array(options["auth"])) then
-        --                 options["auth"] = new Requests_Auth_Basic(options["auth"]);
-        --         end;
-        --         if (options["auth"] !== false) then
-        --                 options["auth"].register(options["hooks"]);
-        --         end;
-
-        --         if (is_string(options["proxy"]) || is_array(options["proxy"])) then
-        --                 options["proxy"] = new Requests_Proxy_HTTP(options["proxy"]);
-        --         end;
-        --         if (options["proxy"] !== false) then
-        --                 options["proxy"].register(options["hooks"]);
-        --         end;
-
-        --         if (is_array(options["cookies"])) then
-        --                 options["cookies"] = new Requests_Cookie_Jar(options["cookies"]);
-        --         end;
-        --         elseif (empty(options["cookies"])) then
-        --                 options["cookies"] = new Requests_Cookie_Jar();
-        --         end;
-        --         if (options["cookies"] !== false) then
-        --                 options["cookies"].register(options["hooks"]);
-        --         end;
-
-        --         if (options["idn"] !== false) then
-        --                 iri       = new Requests_IRI(url);
-        --                 iri.host = Requests_IDNAEncoder::encode(iri.ihost);
-        --                 url       = iri.uri;
-        --         end;
-
-        --         -- Massage the type to ensure we support it.
-        --         type = strtoupper(type);
-
-        --         if (!isset(options["data_format"])) then
-        --                 if (in_array(type, array(self::HEAD, self::GET, self::DELETE), true)) then
-        --                         options["data_format"] = "query";
-        --                 end;
-        --                 else then
-        --                         options["data_format"] = "body";
-        --                 end;
-        --         end;
-        -- end;
+   procedure Set_Defaults (URL     : in out UStrings.UString;           -- all &
+                           Headers : in out Array_Type;
+                           Data    : in out Array_Type;
+                           Typ     : in out UStrings.UString;
+                           Options : in out Array_Type);
 
    --
    -- HTTP response parser

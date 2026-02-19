@@ -66,8 +66,4 @@ is
                  return String
                  is ("XXX-240");
 
-   function Array_Keys (Arry : Class_Dependency.Dependency_Map)
-                        return List_Type
-                        is (Empty_List);
-
 end Helpers_3;

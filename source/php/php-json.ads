@@ -11,13 +11,11 @@ is
    function JSON_Encode (Value : Multi_Type;
                          Flags : Integer := 0;
                          Depth : Integer := 512)
-                         return String
-                         is ("XXX-007");
+                         return String;
 
    function JSON_Decode (JSON        : String;
                          Associative : Boolean := False)
-                         return Array_Type
-                         is (Empty_Array);
+                         return Array_Type;
 
    JSON_ERROR_NONE : constant Integer := 0; -- Arbitrary value
 
@@ -31,10 +29,10 @@ is
 
    function Serialize (Value : Multi_Type)
                        return String
-                       is (raise Program_Error with "not implemented");
+   is (raise Program_Error with "not implemented");
 
    function Unserialize (Data : String)
                          return Multi_Type
-                         is (raise Program_Error with "not implemented");
+   is (raise Program_Error with "not implemented");
 
 end Php.JSON;

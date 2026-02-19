@@ -11,38 +11,31 @@ is
    use Lists;
 
    function File_Exists (Filename : String)
-                         return Boolean
-                         is (False);
+                         return Boolean;
 
    function Filesize (Filename : String)
                       return Natural
-                      is (999);
+   is (raise Program_Error with "not implemented");
 
    function Is_Dir (Filename : String)
-                    return Boolean
-                    is (False);
+                    return Boolean;
 
    function Is_File (Filename : String)
-                     return Boolean
-                     is (False);
+                     return Boolean;
 
    function Basename (Path : String;
                       Suffix : String := "")
-                      return String
-                      is ("XXX-521");
+                      return String;
 
    function Is_Readable (Filename : String)
-                         return Boolean
-                         is (True);
+                         return Boolean;
 
    function Is_Writable (Filename : String)
-                         return Boolean
-                         is (False);
+                         return Boolean;
 
    function Dirname (Path   : String;
                      Levels : Positive := 1)
-                     return String
-                     is ("XXX-702");
+                     return String;
 
    function Copy (From : String;
                   To   : String)
@@ -72,12 +65,21 @@ is
 
    function Realpath (Path : String)
             return String
-            is ("XXX-779");
+   is (raise Program_Error with "not implemented");
 
+   --
+   --
+   --
    function Glob (Pattern : String;
                   Flags   : Integer := 0)
-                  return List_Type
-                  is (Empty_List);
+                  return List_Type;
+
+   --
+   --
+   --
+   function Glob_2 (Path      : String;
+                    Extension : String)
+                    return List_Type;
 
    type Resource is access all Integer;
 

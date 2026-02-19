@@ -2,10 +2,10 @@
 --
 --
 
-with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
 with Helpers;
+with Logging;
 
 package body Arrays
 is
@@ -324,7 +324,6 @@ is
    function As_String (Arry : Multi_Type)
                       return String
    is
-      use Ada.Text_IO;
    begin
       case Arry.Kind is
       when Kind_String  => return -Arry.Str;
@@ -333,8 +332,7 @@ is
       when Kind_Null    => return "(null)";
       when Kind_Array   => return "(array)";
       when others =>
-         Put_Line ("as_string: ");
-         Put_Line ("  kind: " & Kind_Of (Arry)'Image);
+         Logging.Log ("as_string", "kind: " & Kind_Of (Arry)'Image);
          pragma Assert (False);
          return "";
       end case;
@@ -363,14 +361,12 @@ is
    function As_Boolean (Arry : Multi_Type)
                        return Boolean
    is
-      use Ada.Text_IO;
    begin
       case Kind_Of (Arry) is
       when Kind_Boolean =>  return Arry.Bool;
       when Kind_Null    =>  return False;
       when others =>
-         Put_Line ("as_boolean:");
-         Put_Line ("  kind: " & Kind_Of (Arry)'Image);
+         Logging.Log ("as_boolean", "kind: " & Kind_Of (Arry)'Image);
          pragma Assert (False);
          return False;
       end case;

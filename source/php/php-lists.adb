@@ -17,12 +17,13 @@ is
                      return Boolean
    is
    begin
-      for A of Haystack loop
-         if Needle = A then
-            return True;
-         end if;
-      end loop;
-      return False;
+      return List_Vectors.Has_Element (Haystack.Find (Needle));
+      -- for A of Haystack loop
+      --    if Needle = A then
+      --       return True;
+      --    end if;
+      -- end loop;
+      -- return False;
    end In_List;
 
    ----------------
@@ -62,11 +63,20 @@ is
    function List_Diff (Left, Right : List_Type)
                        return List_Type
    is
-      Result : List_Type := Left;
+      Result : List_Type;
    begin
-      for A of Right loop
-         Result := List_Diff (Result, A);
+      for A of Left loop
+         if not In_List (A, Right) then
+            Result.Append (A);
+         end if;
       end loop;
+
+      for A of Right loop
+         if not In_List (A, Left) then
+            Result.Append (A);
+         end if;
+      end loop;
+
       return Result;
    end List_Diff;
 
@@ -135,7 +145,7 @@ is
    procedure List_Shift (List : in out List_Type)
    is
    begin
-      List.Delete_Last;
+      List.Delete_First;
    end List_Shift;
 
    ----------------

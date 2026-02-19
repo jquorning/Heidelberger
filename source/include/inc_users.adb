@@ -382,7 +382,12 @@ is
               (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                return Array_Type
    is
-      User : User_Error_Type;
+      use Class_Errors;
+      use Class_Users;
+
+      User : User_Error_Type := (Success => False,
+                                 User    => Null_User,
+                                 Error   => Null_Wp_Error);
    begin
       Logging.Log ("wp_authenticate_email_password", "");
       User := Wp_Authenticate_Email_Password (User, "", "");
@@ -451,7 +456,12 @@ is
               (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                return Array_Type
    is
-      User : User_Error_Type;
+      use Class_Errors;
+      use Class_Users;
+
+      User : User_Error_Type := (Success => False,
+                                 User    => Null_User,
+                                 Error   => Null_Wp_Error);
    begin
       Logging.Log ("wp_authenticate_cookie", "");
       User := Wp_Authenticate_Cookie (User, "", "");

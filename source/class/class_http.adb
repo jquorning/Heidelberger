@@ -14,8 +14,10 @@ with Php.Preg;
 with Php.Strings;
 
 with Array_Lists;
+with Arrays.IO;
 with Constants;
 with Lists;
+with Logging;
 with UStrings;
 with Wp_Common;
 
@@ -54,7 +56,7 @@ is
       use Inc_L10n;
 
       Defaults : Array_Type := To_Array_Type ([
-        Build ("method",              "GET"),
+        Build ("method", "GET"),
         --
         -- Filters the timeout value for an HTTP request.
         --
@@ -119,7 +121,7 @@ is
         Build ("blocking",            True),
         Build ("headers",             Empty_Array),
         Build ("cookies",             Empty_Array),
-        Build ("body",                Null_Value),
+        Build ("body",                Empty_Array), -- Null_Value),
         Build ("compress",            False),
         Build ("decompress",          True),
         Build ("sslverify",           True),
@@ -277,12 +279,12 @@ is
             -- Setup arguments.
             Headers : constant Array_Type := As_Array (Get (Parsed_Args, "headers"));
             Data    : constant Array_Type := As_Array (Get (Parsed_Args, "body"));
-            Typ     : constant String := Get_As_String (Parsed_Args, "method");
+            Typ     : constant String     := Get_As_String (Parsed_Args, "method");
             Options : Array_Type := To_Array_Type ([
-                        Build ("timeout",   Get_As_String (Parsed_Args, "timeout")),
-                        Build ("useragent", Get_As_String (Parsed_Args, "user-agent")),
-                        Build ("blocking",  Get_As_String (Parsed_Args, "blocking"))
---           Build ("hooks",     new Wp_Http_Requests_Hooks (URL, Parsed_Args))
+              Build ("timeout",   Get_As_String (Parsed_Args, "timeout")),
+              Build ("useragent", Get_As_String (Parsed_Args, "user-agent")),
+              Build ("blocking",  Get_As_String (Parsed_Args, "blocking"))
+--            Build ("hooks",     new Wp_Http_Requests_Hooks (URL, Parsed_Args))
             ]);
          begin
             -- Ensure redirects follow browser behaviour.
@@ -416,7 +418,7 @@ is
                return Response;
             end if;
 
-            if not Empty (Parsed_Args, "blocking") then -- Empty added
+            if not As_Boolean (Get (Parsed_Args, "blocking")) then
                return (Success => True,
                        Error   => Null_Wp_Error,
                        Arry    =>

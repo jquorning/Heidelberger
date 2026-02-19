@@ -75,12 +75,9 @@ is
                            return Array_Type
    is
       use Arrayable_Arrays;
-
-      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
-      return Empty_Array;
+      return Inc_Plugins.Apply_Filters (Hook_Name, Value, Empty_Arrayable);
    end Apply_Filters;
 
    function Apply_Filters (Hook_Name : String;

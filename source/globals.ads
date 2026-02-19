@@ -37,6 +37,7 @@ is
 
    WPINC           : UStrings.UString;
    WP_CONTENT_DIR  : UStrings.UString;
+   WP_LANG_DIR     : UStrings.UString;
 
    Wp_Importers : Array_Type;
 

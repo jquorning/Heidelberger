@@ -5,7 +5,6 @@
 -- @subpackage Administration
 --
 
-with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
@@ -149,7 +148,6 @@ is
                      Res.Arry :=
                        JSON_Decode (
                          Wp_Remote_Retrieve_Body (Request), True);
-
                      if
                        not Is_Object (Res.Arry) and then
                        not Is_Array (Res.Arry)
@@ -251,8 +249,8 @@ is
 
    procedure Wp_Install_Language_Form (Languages : Array_Type)
    is
-      use Php.Arrays;
       use Php.Echoing;
+      use Php.Lists;
       use Php.Strings;
       use UStrings;
       use Inc_Formatting;
@@ -261,7 +259,7 @@ is
       Wp_Local_Package : UString
         renames Global_Wp_Local_Package;
 
-      Installed_Languages : constant Array_Type := Get_Available_Languages;
+      Installed_Languages : constant List_Type := Get_Available_Languages;
    begin
       Echo ("<label class=""screen-reader-text"" for=""language"">Select a default language</label>" & NL);
       Echo ("<select size=""14"" name=""language"" id=""language"">" & NL);
@@ -289,8 +287,8 @@ is
                                                               Key_1 => "strings",
                                                               Key_2 => "continue")))
                                   else "Continue"),
-                   4 => (if In_Array (Get_As_String (Language, "language"),
-                                      Installed_Languages, True)
+                   4 => (if In_List (Get_As_String (Language, "language"),
+                                     Installed_Languages, True)
                          then " data-installed=""1""" else ""),
                    5 => ESC_HTML (Get_As_String (Language, "native_name"))
                  ]
@@ -313,8 +311,8 @@ is
                        (if As_Boolean (Get (Ref_2 (Language, "strings", "continue")))
                         then As_String (Get (Ref_2 (Language, "strings", "continue")))
                         else "Continue"),
-                4 => (if In_Array (Get_As_String (Language, "language"),
-                                   Installed_Languages, True)
+                4 => (if In_List (Get_As_String (Language, "language"),
+                                  Installed_Languages, True)
                       then " data-installed=""1""" else ""),
                 5 => ESC_HTML (Get_As_String (Language, "native_name"))
               ]
@@ -332,7 +330,7 @@ is
    function Wp_Download_Language_Pack (Download : String)
                                        return String
    is
-      use Php.Arrays;
+      use Php.Lists;
       use Array_Lists;
       use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
@@ -341,7 +339,7 @@ is
       use Inc_L10n;
    begin
       -- Check if the translation is already installed.
-      if In_Array (Download, Get_Available_Languages, True) then
+      if In_List (Download, Get_Available_Languages, True) then
          return Download;
       end if;
 
@@ -351,7 +349,9 @@ is
 
       -- Confirm the translation is one we can download.
       declare
-         Translations : constant Array_Type := Wp_Get_Available_Translations;
+         Translations : constant Array_Type :=
+           Wp_Get_Available_Translations;
+
          Translation_To_Load : Boolean := False;
          Trans : Multi_Type; -- added
       begin
@@ -437,7 +437,7 @@ is
          declare
             Check : constant Boolean :=
               Upgrader.FS_Connect (List_Type'[-Globals.WP_CONTENT_DIR,
-                                              Constants.WP_LANG_DIR]);
+                                              -Globals.WP_LANG_DIR]);
          begin
             if not Check or else Is_Wp_Error (Check) then
                return False;

@@ -16,6 +16,7 @@ with Php.Strings;
 
 with Array_Lists;
 with Lists;
+with Logging;
 
 package body Class_Requests
 is
@@ -35,13 +36,13 @@ is
       use Php.Arrays;
       use Php.Strings;
       use Array_Lists;
+      use UStrings;
 
-      URL_2     : String     := URL;
+      URL_2     : UString    := +URL;
       Headers_2 : Array_Type := Headers;
       Data_2    : Array_Type := Data;
-      Typ_2     : String     := Typ;
+      Typ_2     : UString    := +Typ;
       Options_2 : Array_Type := Options;
-      Unused : Array_Type;
       Transport : access Req_Transports.Requests_Transport;
    begin
       if Empty (Options_2, "type") then
@@ -50,7 +51,7 @@ is
 
       Options_2 := Array_Merge (Get_Default_Options, Options_2); -- self::
 
-      Unused := Set_Defaults (URL_2, Headers_2, Data_2, Typ_2, Options_2); -- self::
+      Set_Defaults (URL_2, Headers_2, Data_2, Typ_2, Options_2); -- self::
 
 --    options["hooks"].dispatch("requests.before_request", array(&url, &headers, &data, &type, &options));
 
@@ -65,7 +66,7 @@ is
          end;
       else
          declare
-            Need_SSL : constant Boolean := Stripos (URL_2, "https://") = 0;
+            Need_SSL : constant Boolean := Stripos (-URL_2, "https://") = 0;
 
             Capabilities : Array_Type := To_Array_Type ([
               Build ("ssl", Need_SSL)]);
@@ -77,13 +78,15 @@ is
       end if;
 
       declare
-         Response : constant String := "XXX-974";
---         Transport.Request (URL_2, Headers_2, Data_2, Options_2);
+         use Req_Transports;
+         Transport : Requests_Transport;
+         Response : constant String :=
+           Transport.Request (-URL_2, Headers_2, Data_2, Options_2);
       begin
 
 --       options["hooks"].dispatch("requests.before_parse", array(&response, url, headers, data, type, options));
 
-         return Parse_Response (Response, URL_2, Headers_2, Data_2, Options_2);
+         return Parse_Response (Response, -URL_2, Headers_2, Data_2, Options_2);
          -- self::
       end;
    end Request;
@@ -147,60 +150,82 @@ is
    -- Set_Defaults --
    ------------------
 
-   function Set_Defaults (URL     : in out String;           -- all &
-                          Headers : in out Array_Type;
-                          Data    : in out Array_Type;
-                          Typ     : in out String;
-                          Options : in out Array_Type)
-                          return Array_Type
+   procedure Set_Defaults (URL     : in out UStrings.UString;           -- all &
+                           Headers : in out Array_Type;
+                           Data    : in out Array_Type;
+                           Typ     : in out UStrings.UString;
+                           Options : in out Array_Type)
    is
+      pragma Unreferenced (Headers);
+      pragma Unreferenced (Data);
       use Php.Lists;
+      use Php.Preg;
       use Php.Strings;
+      use UStrings;
+
+      Unused_Matches : List_Type;
    begin
-      -- if (!preg_match("/^http(s)?:\/\//i", url, matches)) then
-      --    throw new Requests_Exception
-      --      ("Only HTTP(S) requests are handled.", "nonhttp", url);
-      -- end;
+      if 0 = Preg_Match ("/^http(s)?:\/\//i", -URL, Unused_Matches) then
+         raise Requests_Exception
+           with "Only HTTP(S) requests are handled." & " nonhttp " & (-URL);
+      end if;
 
-      -- if (empty(options["hooks"])) then
-      --    options["hooks"] = new Requests_Hooks();
-      -- end;
+      if Empty (Options, "hooks") then
+         null;
+--       Set (Options, "hooks", new Requests_Hooks);
+      end if;
 
-      -- if (is_array(options["auth"])) then
-      --    options["auth"] = new Requests_Auth_Basic(options["auth"]);
-      -- end;
-      -- if (options["auth"] !== false) then
-      --    options["auth"].register(options["hooks"]);
-      -- end;
+      if Kind_Of (Get (Options, "auth")) = Kind_Array then
+         null;
+--       Set (Options, "auth", new Requests_Auth_Basic (Get (Options, "auth")));
+      end if;
 
-      -- if (is_string(options["proxy"]) || is_array(options["proxy"])) then
-      --    options["proxy"] = new Requests_Proxy_HTTP(options["proxy"]);
-      -- end;
-      -- if (options["proxy"] !== false) then
-      --    options["proxy"].register(options["hooks"]);
-      -- end;
+      if As_Boolean (Get (Options, "auth")) /= False then
+         null;
+--       Set (Options, "auth"].Register (Get (Options, "hooks")));
+      end if;
 
-      -- if (is_array(options["cookies"])) then
-      --    options["cookies"] = new Requests_Cookie_Jar(options["cookies"]);
-      -- elsif (empty(options["cookies"])) then
-      --    options["cookies"] = new Requests_Cookie_Jar();
-      -- end;
-      -- if (options["cookies"] !== false) then
-      --    options["cookies"].register(options["hooks"]);
-      -- end;
+      if
+        Kind_Of (Get (Options, "proxy")) in Kind_String | Kind_Array
+      then
+         null;
+--       Set (Options, "proxy", new Requests_Proxy_HTTP (Get (Options, "proxy")));
+      end if;
 
-      -- if (options["idn"] !== false) then
-      --    iri       = new Requests_IRI(url);
-      --    iri.host = Requests_IDNAEncoder::encode(iri.ihost);
-      --    url       = iri.uri;
-      -- end;
+      if As_Boolean (Get (Options, "proxy")) /= False then
+         null;
+--       Set (Options, "proxy"].Register (Get (Options, "hooks")));
+      end if;
+
+      if Kind_Of (Get (Options, "cookies")) = Kind_Array then
+         null;
+--       Set (Options, "cookies", new Requests_Cookie_Jar (Get (Options, "cookies")));
+      elsif Empty (Options, "cookies") then
+         null;
+--       Set (Options, "cookies", new Requests_Cookie_Jar);
+      end if;
+
+      if As_Boolean (Get (Options, "cookies")) /= False then
+         null;
+--       Set (Options, "cookies"].Register (Get (Options, "hooks")));
+      end if;
+
+      if As_Boolean (Get (Options, "idn")) /= False then
+         null;
+         -- declare
+         --    IRI : Duration := new Requests_IRI (-URL);
+         -- begin
+         --    IRI.Host := Requests_Idnaencoder.Encode (IRI.IHost); -- Requests_IDNAEncoder::
+         --    URL      := IRI.URI;
+         -- end;
+      end if;
 
       -- Massage the type to ensure we support it.
-      Typ := Strtoupper (Typ);
+      Typ := +Strtoupper (-Typ);
 
       if not Isset (Options, "data_format") then
          if
-           In_List (Typ, [HEAD, GET_Method, DELETE_Method], True)
+           In_List (-Typ, [HEAD, GET_Method, DELETE_Method], True)
            -- 3x self::
          then
             Set (Options, "data_format", From_String ("query"));
@@ -208,7 +233,6 @@ is
             Set (Options, "data_format", From_String ("body"));
          end if;
       end if;
-      return Options;
    end Set_Defaults;
 
    --------------------
@@ -229,10 +253,12 @@ is
 
       Options_2 : Array_Type := Options;
 
+      Headers_5 : UString := +Headers;
+
       Return2 : Req_Responses.Requests_Response :=
         Req_Responses.X_Construct;       -- new
    begin
-      if not As_Boolean (Get (Options_2, "blocking")) then
+      if Get_As_String (Options_2, "blocking") = "" then
          return Return2;
       end if;
 
@@ -240,22 +266,25 @@ is
       Return2.URL  := +URL; -- (string)
       Return2.Bodi := Null_UString;
 
+--    Logging.Log ("parse_response", Headers);
+
       if not As_Boolean (Get (Options_2, "filename")) then
          declare
-            Pos : constant Natural := Strpos (Headers, "\r\n\r\n");
+            Pos : constant Natural :=
+              Strpos (Headers, CR & LF & CR & LF); -- "\r\n\r\n");
          begin
             if Pos = 0 then
                -- Crap!
                raise Requests_Exception
                  with "Missing header/body separator" &
-                      "requests.no_crlf_separator";
+                      " requests.no_crlf_separator";
             end if;
 
-            declare
-               Headers : String := Substr (-Return2.Raw, 0, Pos);
+            Headers_5 := +Substr (-Return2.Raw, 0, Pos - 1);
                -- Headers will always be separated from the body by two new
                -- lines - `\n\r\n\r`.
-               Bodi : constant String := Substr (-Return2.Raw, Pos + 4);
+            declare
+               Bodi : constant String := Substr (-Return2.Raw, Pos + 4 - 1);
             begin
                if not Empty (Bodi) then
                   Return2.Bodi := +Bodi;
@@ -266,12 +295,12 @@ is
 
       -- Pretend CRLF = LF for compatibility (RFC 2616, section 19.3)
       declare
-         Headers_2 : constant String := Str_Replace ("\r\n", "\n", Headers);
+         Headers_2 : constant String := Str_Replace (CR & LF, LF, -Headers_5);
          -- Unfold headers (replace [CRLF] 1*( SP | HT ) with SP)
          -- as per RFC 2616 (section 2.2)
          Headers_3 : constant String := Preg_Replace ("/\n[ \t]/", " ", Headers_2);
 
-         Headers_4 : List_Type := Explode ("\n", Headers_3);
+         Headers_4 : List_Type := Explode (LF, Headers_3);
          Matches   : List_Type;
          Unused    : Natural;
       begin
@@ -281,7 +310,7 @@ is
          if Matches.Is_Empty then
             raise Requests_Exception
               with "Response could not be parsed" &
-                   "noversion"; -- , headers_4);
+                   " noversion "; -- , headers_4);
          end if;
 
          Return2.Protocol_Version := +Matches (1); -- (float)

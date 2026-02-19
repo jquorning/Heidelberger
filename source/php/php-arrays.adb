@@ -49,11 +49,9 @@ is
    -- Array_Merge --
    -----------------
 
-   function Array_Merge (Left  : Array_Type;
-                         Right : Array_Type)
-                         return Array_Type
+   procedure Array_Merge (Left  : in out Array_Type;
+                          Right : Array_Type)
    is
-      Result : Array_Type := Left;
    begin
       for A in Right.Iterate loop
          declare
@@ -61,12 +59,25 @@ is
             Value : constant Multi_Type := Standard.Arrays.Element (A);
          begin
             if In_Array (Key, Left) then
-               Result.Replace (Key, Value);
+               Left.Replace (Key, Value);
             else
-               Result.Include (Key, Value);
+               Left.Include (Key, Value);
             end if;
          end;
       end loop;
+   end Array_Merge;
+
+   -----------------
+   -- Array_Merge --
+   -----------------
+
+   function Array_Merge (Left  : Array_Type;
+                         Right : Array_Type)
+                         return Array_Type
+   is
+      Result : Array_Type := Left;
+   begin
+      Array_Merge (Result, Right);
       return Result;
    end Array_Merge;
 
@@ -79,8 +90,11 @@ is
                          Arry_3 : Array_Type)
                          return Array_Type
    is
+      Result : Array_Type := Arry_1;
    begin
-      return Array_Merge (Array_Merge (Arry_1, Arry_2), Arry_3);
+      Array_Merge (Result, Arry_2);
+      Array_Merge (Result, Arry_3);
+      return Result;
    end Array_Merge;
 
    ----------------

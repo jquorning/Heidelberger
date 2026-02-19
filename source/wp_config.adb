@@ -22,15 +22,7 @@ with Wp_Settings;
 package body Wp_Config
 is
 
--- -- That's all, stop editing! Happy publishing.
-
--- -- Absolute path to the WordPress directory.
--- if ( ! defined( 'ABSPATH' ) ) then
---         define( 'ABSPATH', __DIR__ . '/' );
--- end if;
-
--- -- Sets up WordPress vars and included files.
--- require_once ABSPATH . 'wp-settings.php';
+   -- That's all, stop editing! Happy publishing.
 
    ---------
    -- Run --
@@ -39,6 +31,12 @@ is
    procedure Run
    is
    begin
+      -- Absolute path to the WordPress directory.
+      -- if ( ! defined( 'ABSPATH' ) ) then
+--    Globals.ABSPATH := ""; --  __DIR__ . '/' );
+      -- end if;
+
+      -- Sets up WordPress vars and included files.
       Wp_Settings.Run;
    end Run;
 

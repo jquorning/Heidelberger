@@ -198,11 +198,13 @@ is
          return 0;
       else
          for A in 1 .. Paren_Count (Re) loop
-            declare
-               M : String renames Subject (Result (A).First .. Result (A).Last);
-            begin
-               Matches.Append (M);
-            end;
+            if Result (A) /= No_Match then
+               declare
+                  M : String renames Subject (Result (A).First .. Result (A).Last);
+               begin
+                  Matches.Append (M);
+               end;
+            end if;
          end loop;
          return Paren_Count (Re);
       end if;

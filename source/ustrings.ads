@@ -65,6 +65,8 @@ is
 
    NL     : constant String := "" & Ada.Characters.Latin_1.LF;
    TAB    : constant String := "" & Ada.Characters.Latin_1.HT;
+   CR     : constant String := "" & Ada.Characters.Latin_1.CR;
+   LF     : constant String := "" & Ada.Characters.Latin_1.LF;
    NL_TAB : constant String := NL & TAB;
 
 end UStrings;

@@ -534,37 +534,45 @@ is
 
    procedure Wp_Set_Lang_Dir
    is
+      use Php.Files;
+      use Constants;
+      use Globals;
+      use UStrings;
    begin
-      null;
-        -- if ( ! defined( "WP_LANG_DIR" ) ) then
-        --         if ( file_exists( WP_CONTENT_DIR . "/languages" ) && @is_dir( WP_CONTENT_DIR . "/languages" ) || ! @is_dir( ABSPATH . WPINC . "/languages" ) ) then
-        --                 --
-        --                 -- Server path of the language directory.
-        --                 --
-        --                 -- No leading slash, no trailing slash, full path, not relative to ABSPATH
-        --                 --
-        --                 -- @since 2.1.0
-        --                 --
-        --                 define( "WP_LANG_DIR", WP_CONTENT_DIR . "/languages" );
-        --                 if ( ! defined( "LANGDIR" ) ) then
-        --                         -- Old static relative path maintained for limited backward compatibility - won't work in some cases.
-        --                         define( "LANGDIR", "wp-content/languages" );
-        --                 end;
-        --         else
-        --                 --
-        --                 -- Server path of the language directory.
-        --                 --
-        --                 -- No leading slash, no trailing slash, full path, not relative to `ABSPATH`.
-        --                 --
-        --                 -- @since 2.1.0
-        --                 --
-        --                 define( "WP_LANG_DIR", ABSPATH . WPINC . "/languages" );
-        --                 if ( ! defined( "LANGDIR" ) ) then
-        --                         -- Old relative path maintained for backward compatibility.
-        --                         define( "LANGDIR", WPINC . "/languages" );
-        --                 end if;
-        --         end if;
-        -- end if;
+--    if ( ! defined( "WP_LANG_DIR" ) ) then
+      if
+        (File_Exists ((-WP_CONTENT_DIR) & "/languages") and then
+         Is_Dir (-(WP_CONTENT_DIR) & "/languages")) or else
+        not Is_Dir (-(ABSPATH & WPINC) & "/languages")
+      then
+         --
+         -- Server path of the language directory.
+         --
+         -- No leading slash, no trailing slash, full path, not relative to ABSPATH
+         --
+         -- @since 2.1.0
+         --
+         WP_LANG_DIR := WP_CONTENT_DIR & "/languages";
+         -- if not Defined ("LANGDIR") then
+         --    -- Old static relative path maintained for limited backward
+         --    -- compatibility. Won't work in some cases.
+         --    LANGDIR := "wp-content/languages";
+         -- end if;
+      else
+         --
+         -- Server path of the language directory.
+         --
+         -- No leading slash, no trailing slash, full path, not relative to `ABSPATH`.
+         --
+         -- @since 2.1.0
+         --
+         WP_LANG_DIR := ABSPATH & WPINC & "/languages";
+         -- if not Defined ("LANGDIR") then
+         --    -- Old relative path maintained for backward compatibility.
+         --    LANGDIR := WPINC & "/languages";
+         -- end if;
+      end if;
+--    end if;
    end Wp_Set_Lang_Dir;
 
    -------------------
@@ -1401,9 +1409,9 @@ is
 
          if
 --         Defined ("WP_LANG_DIR") and then
-           Is_Dir (Constants.WP_LANG_DIR)          -- @
+           Is_Dir (-Globals.WP_LANG_DIR)          -- @
          then
-            Locations.Append (Constants.WP_LANG_DIR);
+            Locations.Append (-Globals.WP_LANG_DIR);
          end if;
 
          if

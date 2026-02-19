@@ -162,4 +162,11 @@ is
                                               Element_Type => X_Wp_Dependency);
 
    subtype Dependency_Map is Dependency_Maps.Map;
+
+   --
+   --
+   --
+   function Array_Keys (Arry : Class_Dependency.Dependency_Map)
+                        return List_Type;
+
 end Class_Dependency;

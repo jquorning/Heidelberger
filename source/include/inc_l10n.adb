@@ -13,9 +13,11 @@ with Php.Strings;
 with Php.Types;
 
 with Array_Lists;
+with Arrays.IO;
 with Binder;
 with Constants;
 with Globals;
+with Logging;
 with Wp_Common;
 
 with Adi_Translation_Install;
@@ -940,28 +942,28 @@ package body Inc_L10n is
    function Load_Default_Textdomain (Locale : String := "") -- null
                                      return Boolean
    is
-      use Constants;
+      use Php.Files;
       use Globals;
+      use UStrings;
       use Inc_Load;
 
-      Locale_2 : constant String := (if Locale = ""
-                                     then Determine_Locale
-                                     else Locale);
+      Locale_2 : constant String :=
+        (if Locale = "" then Determine_Locale else Locale);
    begin
       -- Unload previously loaded strings so we can switch translations.
       Unload_Textdomain ("default");
 
       declare
          Retur : constant Boolean :=
-           Load_Textdomain ("default", WP_LANG_DIR & "/locale.mo", Locale_2);
+           Load_Textdomain ("default", -(WP_LANG_DIR & "/locale.mo"), Locale_2);
       begin
          if
            (Is_Multisite or else
             WP_INSTALLING_NETWORK) and then
-            not Php.Files.File_Exists (WP_LANG_DIR & "/admin-locale.mo")
+            not File_Exists ((-WP_LANG_DIR) & "/admin-locale.mo")
          then
             Load_Textdomain ("default",
-                             WP_LANG_DIR & "/ms-locale.mo", Locale_2);
+                             (-WP_LANG_DIR) & "/ms-locale.mo", Locale_2);
             return Retur;
          end if;
 
@@ -971,7 +973,7 @@ package body Inc_L10n is
            WP_REPAIRING
          then
             Load_Textdomain ("default",
-                             WP_LANG_DIR & "/admin-locale.mo", Locale_2);
+                             (-WP_LANG_DIR) & "/admin-locale.mo", Locale_2);
          end if;
 
          if
@@ -979,7 +981,7 @@ package body Inc_L10n is
            WP_INSTALLING_NETWORK
          then
             Load_Textdomain ("default",
-                             WP_LANG_DIR & "/admin-network-locale.mo", Locale_2);
+                             (-WP_LANG_DIR) & "/admin-network-locale.mo", Locale_2);
          end if;
 
          return Retur;
@@ -1488,18 +1490,21 @@ package body Inc_L10n is
    -----------------------------
 
    function Get_Available_Languages (Dir : String := "") -- null
-                                     return Array_Type
+                                     return List_Type
    is
       use Php.Files;
       use Php.Strings;
+      use UStrings;
       use Wp_Common;
 
-      Languages  : Array_Type;
+      Languages : List_Type;
+
+      Dir_2 : constant String :=
+        (if Dir = "" then -Globals.WP_LANG_DIR else Dir);
 
       Lang_Files : constant List_Type :=
-        Glob ((if Dir = "" -- Is_Null (Dir)
-               then Constants.WP_LANG_DIR
-               else Dir) & "/*.mo");
+        Glob_2 (Dir_2, "mo");
+--      Glob (Dir_2 & "/*.mo");
    begin
       if not Lang_Files.Is_Empty then
          for Lang_File of Lang_Files loop
@@ -1507,12 +1512,11 @@ package body Inc_L10n is
                Lang_File_2 : constant String := Basename (Lang_File, ".mo");
             begin
                if
-                 0 /= Strpos (Lang_File_2, "continents-cities") and then
-                 0 /= Strpos (Lang_File_2, "ms-") and then
-                 0 /= Strpos (Lang_File_2, "admin-")
+                 1 /= Strpos (Lang_File_2, "continents-cities") and then
+                 1 /= Strpos (Lang_File_2, "ms-") and then
+                 1 /= Strpos (Lang_File_2, "admin-")
                then
-                  Languages.Append (Key   => "XXX-886",
-                                    Value => From_String (Lang_File_2));
+                  Languages.Append (Lang_File_2);
                end if;
             end;
          end loop;
@@ -1526,7 +1530,7 @@ package body Inc_L10n is
       -- @param string[] languages An array of available language codes.
       -- @param string   dir       The directory where the language files were found.
       --
-      return Apply_Filters ("get_available_languages", Languages, Dir);
+      return Apply_Filters ("get_available_languages", Languages, Dir_2);
    end Get_Available_Languages;
 
 -- --

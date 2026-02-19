@@ -77,4 +77,21 @@ is
       return True;
    end Set_Translations;
 
+   ----------------
+   -- Array_Keys --
+   ----------------
+
+   function Array_Keys (Arry : Class_Dependency.Dependency_Map)
+                        return List_Type
+   is
+      use Class_Dependency.Dependency_Maps;
+
+      Keys : List_Type;
+   begin
+      for A in Arry.Iterate loop
+         Keys.Append (Key (A));
+      end loop;
+      return Keys;
+   end Array_Keys;
+
 end Class_Dependency;

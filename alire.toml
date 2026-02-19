@@ -1,6 +1,6 @@
 name = "heidelberger"
-description = ""
-version = "0.1.0-dev"
+description = "WordPress translation"
+version = "0.0.1"
 
 authors = ["Jesper Quorning"]
 maintainers = ["Jesper Quorning <jesper.quorning@gmail.com>"]
@@ -11,12 +11,11 @@ tags = []
 
 executables = ["heidelberger"]
 
-[test]
-runner = "alire"
+#[test]
+#runner = "alire"
 
 [[depends-on]]
 aws = "^25.2.0"
 simple_components = "^4.68.0"
-
-[[depends-on]]
 ado_mysql = "^2.5.0"
+dir_iterators = "~0.0.5"

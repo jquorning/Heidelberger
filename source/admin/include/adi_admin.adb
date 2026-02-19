@@ -7,6 +7,8 @@
 --
 
 with Constants;
+with Globals;
+with UStrings;
 
 with Adi_Admin_Filters;
 with Inc_L10n;
@@ -14,12 +16,14 @@ with Inc_L10n;
 package body Adi_Admin
 is
 
-   --
-   --
-   --
+   ---------
+   -- Run --
+   ---------
+
    procedure Run
    is
       use Constants;
+      use UStrings;
       use Inc_L10n;
    begin
       if not WP_ADMIN then
@@ -33,7 +37,7 @@ is
          begin
             Load_Textdomain (
               "default",
-              WP_LANG_DIR & "/admin-" & Admin_Locale & ".mo",
+              -(Globals.WP_LANG_DIR & "/admin-" & Admin_Locale & ".mo"),
               Admin_Locale);
          end;
       end if;

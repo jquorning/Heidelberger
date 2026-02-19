@@ -9,6 +9,7 @@
 with Php.Strings;
 
 with Constants;
+with Globals;
 with Lists;
 with UStrings;
 
@@ -106,8 +107,8 @@ is
       use Inc_Formatting;
 
       Locations : List_Type := [
-         Constants.WP_LANG_DIR & "/plugins",
-         Constants.WP_LANG_DIR & "/themes"
+         -Globals.WP_LANG_DIR & "/plugins",
+         -Globals.WP_LANG_DIR & "/themes"
       ];
       Mofile : UString;
       Path   : UString;

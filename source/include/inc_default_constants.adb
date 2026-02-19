@@ -25,6 +25,7 @@ is
 
    procedure Wp_Initial_Constants
    is
+      use UStrings;
 --    use Globals;
    begin
 --         global $blog_id, $wp_version;
@@ -85,7 +86,8 @@ is
 --         end;
 
 --         if ( ! defined( "WP_CONTENT_DIR" ) ) then
---                 define( "WP_CONTENT_DIR", ABSPATH . "wp-content" ); -- No trailing slash, full paths only - WP_CONTENT_URL is defined further down.
+      Globals.WP_CONTENT_DIR := +Constants.ABSPATH & "wp-content";
+      -- No trailing slash, full paths only - WP_CONTENT_URL is defined further down.
 --         end;
 
 --         -- Add define( "WP_DEBUG", true ); to wp-config.php to enable display of notices during development.

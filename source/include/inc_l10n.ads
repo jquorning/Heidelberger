@@ -484,7 +484,7 @@ is
    --                   extension from the language file names.
    --
    function Get_Available_Languages (Dir : String := "") -- null
-                                     return Array_Type;
+                                     return List_Type;
 
    --
    -- Displays or returns a Language selector.

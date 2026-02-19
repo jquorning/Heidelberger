@@ -1842,7 +1842,7 @@ is
 
    procedure Upgrade_400
    is
-      use Php.Arrays;
+      use Php.Lists;
       use Constants;
       use Inc_Load;
       use Inc_L10n;
@@ -1856,7 +1856,7 @@ is
             if
 --            Defined ("WPLANG") and then
               "" /= WPLANG and then
-              In_Array (WPLANG, Get_Available_Languages, True)
+              In_List (WPLANG, Get_Available_Languages, True)
             then
                Update_Option ("WPLANG", From_String (WPLANG));
             else
