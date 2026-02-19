@@ -46,7 +46,6 @@ is
    --
    -- @since 4.8.0
    --
-   procedure Wp_Print_Community_Events_Templates
-   is null;
+   procedure Wp_Print_Community_Events_Templates;
 
 end Adi_Dashboard;

@@ -14,6 +14,7 @@ with Class_Screens;
 with Adi_Screens;
 with Adi_Templates;
 with Inc_Functions;
+with Inc_L10n;
 
 package body Adi_Dashboard
 is
@@ -1419,99 +1420,91 @@ is
 --         <?php
 -- end;
 
--- --
--- -- Renders the events templates for the Event and News widget.
--- --
--- -- @since 4.8.0
--- --
--- function wp_print_community_events_templates() then
---         ?>
+   -----------------------------------------
+   -- Wp_Print_Community_Events_Templates --
+   -----------------------------------------
 
---         <script id="tmpl-community-events-attend-event-near" type="text/template">
---                 <?php
---                 printf(
---                         -- translators: %s: The name of a city.--
---                         __( "Attend an upcoming event near %s." ),
---                         "<strong>thenthen data.location.description end;end;</strong>"
---                 );
---                 ?>
---         </script>
+   procedure Wp_Print_Community_Events_Templates
+   is
+      use Php.Echoing;
+      use Inc_L10n;
+   begin
 
---         <script id="tmpl-community-events-could-not-locate" type="text/template">
---                 <?php
---                 printf(
---                         -- translators: %s is the name of the city we couldn"t locate.
---                         -- Replace the examples with cities in your locale, but test
---                         -- that they match the expected location before including them.
---                         -- Use endonyms (native locale names) whenever possible.
---                         --
---                         __( "%s could not be located. Please try another nearby city. For example: Kansas City; Springfield; Portland." ),
---                         "<em>thenthendata.unknownCityend;end;</em>"
---                 );
---                 ?>
---         </script>
+      Echo ("<script id=""tmpl-community-events-attend-event-near"" type=""text/template"">");
+      Printf (
+        -- translators: %s: The name of a city.
+        abs "Attend an upcoming event near %s.",
+        [1 => "<strong>thenthen data.location.description end;end;</strong>"]
+      );
+      Echo ("</script>");
 
---         <script id="tmpl-community-events-event-list" type="text/template">
---                 <# _.each( data.events, function( event ) then #>
---                         <li class="event event-thenthen event.type end;end; wp-clearfix">
---                                 <div class="event-info">
---                                         <div class="dashicons event-icon" aria-hidden="true"></div>
---                                         <div class="event-info-inner">
---                                                 <a class="event-title" href="thenthen event.url end;end;">thenthen event.title end;end;</a>
---                                                 <span class="event-city">thenthen event.location.location end;end;</span>
---                                         </div>
---                                 </div>
+      Echo ("<script id=""tmpl-community-events-could-not-locate"" type=""text/template"">");
+      Printf (
+        -- translators: %s is the name of the city we couldn't locate.
+        -- Replace the examples with cities in your locale, but test
+        -- that they match the expected location before including them.
+        -- Use endonyms (native locale names) whenever possible.
+        --
+        abs "%s could not be located. Please try another nearby city. For example: Kansas City; Springfield; Portland.",
+        [1 => "<em>thenthendata.unknownCityend;end;</em>"]
+      );
+      Echo ("</script>");
 
---                                 <div class="event-date-time">
---                                         <span class="event-date">thenthen event.user_formatted_date end;end;</span>
---                                         <# if ( "meetup" === event.type ) then #>
---                                                 <span class="event-time">
---                                                         thenthen event.user_formatted_time end;end; thenthen event.timeZoneAbbreviation end;end;
---                                                 </span>
---                                         <# end; #>
---                                 </div>
---                         </li>
---                 <# end; ) #>
+      Echo ("<script id=""tmpl-community-events-event-list"" type=""text/template"">");
+      Echo ("    <# _.each( data.events, function( event ) { #>");
+      Echo ("        <li class=""event event-{{ event.type }} wp-clearfix"">");
+      Echo ("            <div class=""event-info"">");
+      Echo ("                <div class=""dashicons event-icon"" aria-hidden=""true""></div>");
+      Echo ("                    <div class=""event-info-inner"">");
+      Echo ("                        <a class=""event-title"" href=""{{ event.url }}"">{{ event.title }}</a>");
+      Echo ("                        <span class=""event-city"">{{ event.location.location }}</span>");
+      Echo ("                    </div>");
+      Echo ("                </div>");
 
---                 <# if ( data.events.length <= 2 ) then #>
---                         <li class="event-none">
---                                 <?php
---                                 printf(
---                                         -- translators: %s: Localized meetup organization documentation URL.--
---                                         __( "Want more events? <a href="%s">Help organize the next one</a>!" ),
---                                         __( "https://make.wordpress.org/community/organize-event-landing-page/" )
---                                 );
---                                 ?>
---                         </li>
---                 <# end; #>
+      Echo ("                <div class=""event-date-time"">");
+      Echo ("                    <span class=""event-date"">{{ event.user_formatted_date }}</span>");
+      Echo ("                        <# if ( ""meetup"" === event.type ) then #>");
+      Echo ("                           <span class=""event-time"">");
+      Echo ("                               {{ event.user_formatted_time }} {{ event.timeZoneAbbreviation }}");
+      Echo ("                           </span>");
+      Echo ("                        <# end; #>");
+      Echo ("                </div>");
+      Echo ("        </li>");
+      Echo ("    <# end; ) #>");
 
---         </script>
+      Echo ("    <# if ( data.events.length <= 2 ) { #>");
+      Echo ("        <li class=""event-none"">");
+      Printf (
+        -- translators: %s: Localized meetup organization documentation URL.
+        abs "Want more events? <a href=""%s"">Help organize the next one</a>!",
+        [1 => abs "https://make.wordpress.org/community/organize-event-landing-page/"]
+      );
+      Echo ("        </li>");
+      Echo ("    <# end; #>");
+      Echo ("</script>");
 
---         <script id="tmpl-community-events-no-upcoming-events" type="text/template">
---                 <li class="event-none">
---                         <# if ( data.location.description ) then #>
---                                 <?php
---                                 printf(
---                                         -- translators: 1: The city the user searched for, 2: Meetup organization documentation URL.--
---                                         __( "There are no events scheduled near %1s at the moment. Would you like to <a href="%2s">organize a WordPress event</a>?" ),
---                                         "thenthen data.location.description end;end;",
---                                         __( "https://make.wordpress.org/community/handbook/meetup-organizer/welcome/" )
---                                 );
---                                 ?>
+      Echo ("<script id=""tmpl-community-events-no-upcoming-events"" type=""text/template"">");
+      Echo ("    <li class=""event-none"">");
+      Echo ("        <# if ( data.location.description ) then #>");
+      Printf (
+        -- translators: 1: The city the user searched for, 2: Meetup organization documentation URL.
+        abs "There are no events scheduled near %1s at the moment. Would you like to <a href=""%2s"">organize a WordPress event</a>?",
+        [
+          1 => "{{ data.location.description }}",
+          2 => "https://make.wordpress.org/community/handbook/meetup-organizer/welcome/"
+        ]
+      );
 
---                         <# end; else then #>
---                                 <?php
---                                 printf(
---                                         -- translators: %s: Meetup organization documentation URL.--
---                                         __( "There are no events scheduled near you at the moment. Would you like to <a href="%s">organize a WordPress event</a>?" ),
---                                         __( "https://make.wordpress.org/community/handbook/meetup-organizer/welcome/" )
---                                 );
---                                 ?>
---                         <# end; #>
---                 </li>
---         </script>
---         <?php
--- end;
+      Echo ("        <# end; else then #>");
+      Printf (
+        -- translators: %s: Meetup organization documentation URL.
+        abs "There are no events scheduled near you at the moment. Would you like to <a href=""%s"">organize a WordPress event</a>?",
+        [1 => abs "https://make.wordpress.org/community/handbook/meetup-organizer/welcome/"]
+      );
+      Echo ("       <# end; #>");
+      Echo ("    </li>");
+      Echo ("</script>");
+   end Wp_Print_Community_Events_Templates;
 
 -- --
 -- -- "WordPress Events and News" dashboard widget.
