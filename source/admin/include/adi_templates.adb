@@ -1198,137 +1198,148 @@ is
 --         end if;
 -- end Hb_Import_Upload_Form;
 
--- --
--- -- Adds a meta box to one or more screens.
--- --
--- -- @since 2.5.0
--- -- @since 4.4.0 The `screen` parameter now accepts an array of screen IDs.
--- --
--- -- @global array wp_meta_boxes
--- --
--- -- @param string                 id            Meta box ID (used in the "id" attribute for the meta box).
--- -- @param string                 title         Title of the meta box.
--- -- @param callable               callback      Function that fills the box with the desired content.
--- --                                              The function should echo its output.
--- -- @param string|array|WP_Screen screen        Optional. The screen or screens on which to show the box
--- --                                              (such as a post type, "link", or "comment"). Accepts a single
--- --                                              screen ID, WP_Screen object, or array of screen IDs. Default
--- --                                              is the current screen.  If you have used add_menu_page() or
--- --                                              add_submenu_page() to create a new screen (and hence screen_id),
--- --                                              make sure your menu slug conforms to the limits of sanitize_key()
--- --                                              otherwise the "screen" menu may not correctly render on your page.
--- -- @param string                 context       Optional. The context within the screen where the box
--- --                                              should display. Available contexts vary from screen to
--- --                                              screen. Post edit screen contexts include "normal", "side",
--- --                                              and "advanced". Comments screen contexts include "normal"
--- --                                              and "side". Menus meta boxes (accordion sections) all use
--- --                                              the "side" context. Global default is "advanced".
--- -- @param string                 priority      Optional. The priority within the context where the box should show.
--- --                                              Accepts "high", "core", "default", or "low". Default "default".
--- -- @param array                  callback_args Optional. Data that should be set as the args property
--- --                                              of the box array (which is the second parameter passed
--- --                                              to your callback). Default null.
--- --/
--- procedure Add_Meta_Box (Id : String;
---                         Title : String;
---                         Callback : Callable;
---                         Screen   : Array_type      := null;
---                         Context  : String          := "advanced";
---                         Priority : String          := "default";
---                         Callback_Args : Array_Type := null)
--- is
--- begin
--- --        global wp_meta_boxes;
+   ------------------
+   -- Add_Meta_Box --
+   ------------------
 
---         if Empty (Screen) then
---                 Screen := Get_Current_Screen; -- ();
---         elsif Is_String (Screen) then
---                 Screen := Convert_To_Screen (Screen);
---         elsif Is_Array (Screen) then
---                 for Single_Screen of Screen loop
---                         Add_Meta_Box (Id, Title, Callback, Single_Screen, Context, Priority, Callback_Args);
---                 end loop;
---         end if;
+   procedure Add_Meta_Box (Id            : String;
+                           Title         : String;
+                           Callback      : Callable_2;
+                           Screen        : Adi_Class_Wp_Screens.Wp_Screen;
+                           Context       : String     := "advanced";
+                           Priority      : String     := "default";
+                           Callback_Args : Array_Type := Empty_Array)
+   is
+      use Php.Arrays;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Adi_Class_Wp_Screens;
+--    global wp_meta_boxes;
 
---         if not isset (Screen.id) then
---                 return;
---         end if;
+      Wp_Meta_Boxes : Array_Type renames Global_Wp_Meta_Boxes;
 
---         Page := Screen.Id;
+      Screen_2 : constant Wp_Screen := Screen;
+--      (if Empty (Screen)        then Get_Current_Screen
+--       elsif Is_String (Screen) then Convert_To_Screen (Screen)
+--       else Screen);
 
---         if not isset (hb_meta_boxes) then
---                 Hb_Meta_Boxes := Empty_Array;
---         end if;
---         if not isset (Hb_Meta_Boxes (page)) then
---                 Hb_Meta_Boxes (Page) := Empty_Array;
---         end if;
---         if isset (Hb_Meta_Boxes (Page) (context)) then
---                 Hb_Meta_Boxes (Page) (Context) := Empty_Array;
---         end if;
+      -- elsif Is_Array (Screen) then
+      --    for Single_Screen of Screen loop
+      --        Add_Meta_Box (Id, Title, Callback, Single_Screen, Context, Priority, Callback_Args);
+      --    end loop;
+      -- end if;
 
---         for A_Context of Array_Keys (Hb_Meta_Boxes (Page)) loop
---                 for A_Priority of To_array ("high", "core", "default", "low") loop
---                         if not isset (Hb_Meta_Boxes (Page) (A_Context) (A_Priority) (id)) then
---                                 goto Continue_4;
---                         end if;
+      Page : constant String := -Screen_2.Id;
+   begin
 
---                         -- If a core box was previously removed, don't add.
---                         if ("core" = priority or "sorted" = priority)
---                                 and then false = Hb_Meta_Boxes (Page) (A_Context) (A_Priority) (Id)
---                         then
---                                 return;
---                         end if;
+      if not Isset (-Screen_2.Id) then
+         return;
+      end if;
 
---                         -- If a core box was previously added by a plugin, don't add.
---                         if "core" = priority then
---                                 --
---                                 -- If the box was added with default priority, give it core priority
---                                 -- to maintain sort order.
---                                 --
---                                 if "default" = A_Priority then
---                                         Hb_Meta_Boxes (Page) (A_Context) ("core") (Id)
---                                            := Hb_Meta_Boxes (Page) (A_Context) ("default") (Id);
---                                         Unset (Hb_Meta_Boxes (Page) (A_Context) ("default") (Id));
---                                 end if;
---                                 return;
---                         end if;
+      -- if not Isset (Wp_Meta_Boxes) then
+      --    Wp_Meta_Boxes := Empty_Array;
+      -- end if;
 
---                         -- If no priority given and ID already present, use existing priority.
---                         if Empty (Priority) then
---                                 Priority := A_Priority;
---                                 --
---                                 -- Else, if we"re adding to the sorted priority, we don"t know the title
---                                 -- or callback. Grab them from the previously added context/priority.
---                                 --
---                         elsif "sorted" = Priority then
---                                 Title         := Hb_Meta_Boxes (Page) (A_Context) (A_Priority) (Id) ("title");
---                                 Callback      := Hb_Meta_Boxes (Page) (A_Context) (A_Priority) (Id) ("callback");
---                                 Callback_Args := Hb_Meta_Boxes (Page) (A_Context) (A_Priority) (Id) ("args");
---                         end if;
+      if not Isset (Wp_Meta_Boxes, Page) then
+         Set (Wp_Meta_Boxes, Page, From_Array (Empty_Array));
+      end if;
 
---                         -- An ID can be in only one priority and one context.
---                         if Priority /= A_Priority or else Context /= A_Context then
---                                 Unset (Hb_Meta_Boxes (Page) (A_Context) (A_Priority) (Id));
---                         end if;
---                         << Continue_4 >>
---                 end loop;
---         end loop;
+      if Isset_2 (Wp_Meta_Boxes, Page, Context) then
+         Set_2 (Wp_Meta_Boxes, Page, Context, From_Array (Empty_Array));
+      end if;
 
---         if Empty (Priority) then
---                 Priority := "low";
---         end if;
+      declare
+         Priority_2      : UString    := +Priority;
+         Title_2         : UString    := +Title;
+         Callback_2      : Callable_2 := Callback;
+         Callback_Args_2 : Array_Type := Callback_Args;
+      begin
+         for
+           A_Context of List_Type'(Array_Keys (As_Array (Get (Wp_Meta_Boxes, Page))))
+         loop
+            for A_Priority of List_Type'["high", "core", "default", "low"] loop
+               if not Isset_4 (Wp_Meta_Boxes, Page, A_Context, A_Priority, Id) then
+                  goto Continue_4;
+               end if;
 
---         if not isset (Hb_Meta_Boxes (Page) (Context) (Priority)) then
---                 Hb_Meta_Boxes (Page) (Context) (Priority) := Empty_Array;
---         end if;
+               -- If a core box was previously removed, don't add.
+               if
+                  Priority in "core" | "sorted" and then
+                  not As_Boolean (Get (Ref_4 (Wp_Meta_Boxes,
+                                              Key_1 => Page,
+                                              Key_2 => A_Context,
+                                              Key_3 => A_Priority,
+                                              Key_4 => Id)))
+               then
+                  return;
+               end if;
 
---         Hb_Meta_Boxes (Page) (Context) (Priority) (Id) := To_Array_Type ([
---                 Build ("id",       Id),
---                 Build ("title",    Title),
---                 Build ("callback", Callback),
---                 Build ("args",     Callback_Args)
---        ));
--- end Add_Meta_Box;
+               -- If a core box was previously added by a plugin, don't add.
+               if "core" = Priority then
+                  --
+                  -- If the box was added with default priority, give it core priority
+                  -- to maintain sort order.
+                  --
+                  if "default" = A_Priority then
+                     Set_4 (Wp_Meta_Boxes, Key_1 => Page,   Key_2 => A_Context,
+                                           Key_3 => "core", Key_4 => Id,
+                            Value => Get (Ref_4 (Wp_Meta_Boxes,
+                                                Key_1 => Page,      Key_2 => A_Context,
+                                                Key_3 => "default", Key_4 => Id)));
+                     Delete (Ref_4 (Wp_Meta_Boxes, Page, A_Context, "default", Id));
+                  end if;
+                  return;
+               end if;
+
+               -- If no priority given and ID already present, use existing priority.
+               if Empty (Priority) then
+                  Priority_2 := +A_Priority;
+                  --
+                  -- Else, if we're adding to the sorted priority, we don't know
+                  -- the title or callback. Grab them from the previously added
+                  -- context/priority.
+                  --
+               elsif "sorted" = Priority then
+                  Title_2 :=
+                    +As_String (Get (Ref_5 (Wp_Meta_Boxes, Page, A_Context,
+                                            A_Priority, Id, "title")));
+
+--                Callback_2 :=
+--                  As_Callable (Get (Ref_5 (Wp_Meta_Boxes, Page, A_Context,
+--                                           A_Priority, Id, "callback")));
+
+                  Callback_Args_2 :=
+                    As_Array (Get (Ref_5 (Wp_Meta_Boxes, Page, A_Context, A_Priority,
+                                          Id, "args")));
+               end if;
+
+               -- An ID can be in only one priority and one context.
+               if Priority_2 /= A_Priority or else Context /= A_Context then
+                  Delete (Ref_4 (Wp_Meta_Boxes, Page, A_Context, A_Priority, Id));
+               end if;
+               << Continue_4 >>
+            end loop;
+         end loop;
+
+         if Empty (Priority_2) then
+            Priority_2 := +"low";
+         end if;
+
+         if not Isset_3 (Wp_Meta_Boxes, Page, Context, -Priority_2) then
+            Set_3 (Wp_Meta_Boxes, Page, Context, -Priority_2,
+                   From_Array (Empty_Array));
+         end if;
+
+         Set_4 (Wp_Meta_Boxes, Page, Context, -Priority_2, Id,
+                Value => From_Array (To_Array_Type ([
+                  Build ("id",       Id),
+                  Build ("title",    -Title_2),
+--                Build ("callback", Callback),
+                  Build ("args",     Callback_Args_2)
+                ])));
+      end;
+   end Add_Meta_Box;
 
 -- --
 -- -- Renders a "fake" meta box with an information message,

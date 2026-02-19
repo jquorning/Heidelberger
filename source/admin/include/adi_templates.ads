@@ -136,40 +136,17 @@ is
    --                                             null.
    --
 
--- type Callable is access procedure;
    type Callable_2 is access function (Data_Object : String;
                                        Box         : Array_Type)
                                        return Array_Type;
-   type Callable_3 is access procedure (Data_Object : String;
-                                        Box         : Array_Type);
-
-   -- procedure Add_Meta_Box (Id            : String;
-   --                         Title         : String;
-   --                         Callback      : Callable;
-   --                         Screen        : Adi_Class_Wp_Screens.Wp_Screen; String := "";
-   --                         Array_type := Empty_Array; -- null;
-   --                         Context       : String     := "advanced";
-   --                         Priority      : String     := "default";
-   --                         Callback_Args : Array_Type := Empty_Array) null);
-   -- is null;
 
    procedure Add_Meta_Box (Id            : String;
                            Title         : String;
                            Callback      : Callable_2;
-                           Screen        : Adi_Class_Wp_Screens.Wp_Screen; -- String := "";
+                           Screen        : Adi_Class_Wp_Screens.Wp_Screen;
                            Context       : String     := "advanced";
                            Priority      : String     := "default";
-                           Callback_Args : Array_Type := Empty_Array)
-                           is null;
-
-   -- procedure Add_Meta_Box (Id            : String;
-   --                         Title         : String;
-   --                         Callback      : Callable_3;
-   --                         Screen        : Adi_Class_Wp_Screens.Wp_Screen; -- String := "";
-   --                         Context       : String     := "advanced";
-   --                         Priority      : String     := "default";
-   --                         Callback_Args : Array_Type := Empty_Array)
-   --                         is null;
+                           Callback_Args : Array_Type := Empty_Array);
 
    --
    -- Internal helper function to find the plugin from a meta box callback.
