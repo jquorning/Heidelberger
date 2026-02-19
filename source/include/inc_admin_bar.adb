@@ -22,13 +22,14 @@ with Helpers_3;
 with Lists;
 with Wp_Common;
 
-with Adi_Class_Wp_Screens;
 with Adi_Screens;
 
 with Class_Post_Type;
 with Class_Recovery_Mode;
+with Class_Screens;
 with Class_Sites;
 with Class_Taxonomy;
+
 with Inc_Author_Templates;
 with Inc_Comments;
 with Inc_Capabilities;
@@ -1041,7 +1042,7 @@ is
       use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
-      use Adi_Class_Wp_Screens;
+      use Class_Screens;
       use Adi_Screens;
       use Class_Posts;
       use Class_Post_Type;

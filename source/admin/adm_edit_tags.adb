@@ -21,10 +21,12 @@ with Lists;
 with UStrings;
 with Wp_Common;
 
+with Class_Screens;
+with Class_Terms;
+
 with Adm_Admin;
 with Adm_Menu;
 
-with Adi_Class_Wp_Screens;
 with Adi_Class_Wp_Terms_List_Tables;
 with Adi_List_Tables;
 with Adi_Plugins;
@@ -34,7 +36,6 @@ with Adi_Templates;
 with Inc_Capabilities;
 with Inc_Categories;
 with Inc_Category_Templates;
-with Class_Terms;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;

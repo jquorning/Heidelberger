@@ -8,7 +8,6 @@ with Array_Lists;
 with Arrays;
 with Lists;
 
-with Adi_Class_Wp_Screens;
 with Adi_Translation_Install;
 
 -- with Class_Admin_Bar;
@@ -22,6 +21,7 @@ with Class_Taxonomy;
 with Class_Terms;
 with Class_Posts;
 with Class_Post_Type;
+with Class_Screens;
 with Class_Sites;
 with Class_Users;
 with Inc_Capabilities;
@@ -236,13 +236,13 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
-                           Id        : Adi_Class_Wp_Screens.Wp_Screen;
+                           Id        : Class_Screens.Wp_Screen;
                            Arg_4     : Boolean := False)
                            return Array_Type;
 
    function Apply_Filters (Hook_Name : String;
                            Value     : List_Type;
-                           Screen    : Adi_Class_Wp_Screens.Wp_Screen;
+                           Screen    : Class_Screens.Wp_Screen;
                            Default   : Boolean := False)
                            return List_Type;
 

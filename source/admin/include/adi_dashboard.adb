@@ -10,7 +10,7 @@ with Php.Echoing;
 with Arrays;
 with UStrings;
 
-with Adi_Class_Wp_Screens;
+with Class_Screens;
 with Adi_Screens;
 with Adi_Templates;
 with Inc_Functions;
@@ -273,7 +273,7 @@ is
    is
       use Php.Echoing;
       use UStrings;
-      use Adi_Class_Wp_Screens;
+      use Class_Screens;
       use Adi_Screens;
       use Adi_Templates;
       use Inc_Functions;

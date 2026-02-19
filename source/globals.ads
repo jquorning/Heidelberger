@@ -8,12 +8,11 @@ with Arrays;
 with Lists;
 with UStrings;
 
-with Adi_Class_Wp_Screens;
-
 with Class_Hook_Maps;
 with Class_Locales;
 with Class_Posts;
 with Class_Post_Type;
+with Class_Screens;
 with Class_Scripts;
 with Class_Styles;
 with Class_Taxonomy;
@@ -68,7 +67,7 @@ is
    Global_Parent_File : UStrings.UString;
    Post_New_File      : UStrings.UString;
 
-   Current_Screen     : Adi_Class_Wp_Screens.Wp_Screen;
+   Current_Screen     : Class_Screens.Wp_Screen;
    Wp_Locale          : Class_Locales.Wp_Locale;
    Total_Update_Count : Natural;
    Update_Title       : UStrings.UString;

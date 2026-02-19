@@ -9,7 +9,7 @@
 with Php.Echoing;
 with Php.Strings;
 
-package body Adi_Class_Wp_Screens
+package body Class_Screens
 is
 
    ---------
@@ -1168,4 +1168,4 @@ is
             "</" & Tag & ">");
    end Render_Screen_Reader_Content;
 
-end Adi_Class_Wp_Screens;
+end Class_Screens;

@@ -512,7 +512,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
-                           Id        : Adi_Class_Wp_Screens.Wp_Screen;
+                           Id        : Class_Screens.Wp_Screen;
                            Arg_4     : Boolean := False)
                            return Array_Type
    is
@@ -527,7 +527,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : List_Type;
-                           Screen    : Adi_Class_Wp_Screens.Wp_Screen;
+                           Screen    : Class_Screens.Wp_Screen;
                            Default   : Boolean := False)
                            return List_Type
    is

@@ -33,11 +33,11 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
-with Adi_Class_Wp_Screens;
-
 with Class_Dependency;
+with Class_Screens;
 with Class_Theme_JSON_Resolver;
 with Class_Users;
+
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
@@ -3232,7 +3232,7 @@ is
       use Wp_Common;
 --    global current_screen;
       Is_Block_Editor_Screen : constant Boolean :=
-        Globals.Current_Screen in Adi_Class_Wp_Screens.Wp_Screen and then -- instanceof
+        Globals.Current_Screen in Class_Screens.Wp_Screen and then -- instanceof
         Globals.Current_Screen.Is_Block_Editor;
    begin
       --

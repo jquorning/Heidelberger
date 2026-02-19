@@ -1205,7 +1205,7 @@ is
    procedure Add_Meta_Box (Id            : String;
                            Title         : String;
                            Callback      : Callable_2;
-                           Screen        : Adi_Class_Wp_Screens.Wp_Screen;
+                           Screen        : Class_Screens.Wp_Screen;
                            Context       : String     := "advanced";
                            Priority      : String     := "default";
                            Callback_Args : Array_Type := Empty_Array)
@@ -1214,7 +1214,7 @@ is
       use Php.Strings;
       use Array_Lists;
       use UStrings;
-      use Adi_Class_Wp_Screens;
+      use Class_Screens;
 --    global wp_meta_boxes;
 
       Wp_Meta_Boxes : Array_Type renames Global_Wp_Meta_Boxes;
@@ -1481,7 +1481,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
-      use Adi_Class_Wp_Screens;
+      use Class_Screens;
       use Adi_Posts;
       use Adi_Screens;
       use Inc_Formatting;
@@ -3088,7 +3088,7 @@ is
    -----------------------
 
    function Convert_To_Screen (Hook_Name : String)
-                               return Adi_Class_Wp_Screens.Wp_Screen
+                               return Class_Screens.Wp_Screen
    is
       use Php.Strings;
       use Inc_Functions;
@@ -3116,7 +3116,7 @@ is
          --   ));
       end if;
 
-      return Adi_Class_Wp_Screens.Get (Hook_Name); -- ::
+      return Class_Screens.Get (Hook_Name); -- ::
    end Convert_To_Screen;
 
 -- --

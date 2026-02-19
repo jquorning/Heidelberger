@@ -9,7 +9,7 @@
 with Arrays;
 with UStrings;
 
-package Adi_Class_Wp_Screens
+package Class_Screens
 is
    use Arrays;
 
@@ -362,4 +362,4 @@ is
    function Get (Hook_Name : String := "")
                  return Wp_Screen;
 
-end Adi_Class_Wp_Screens;
+end Class_Screens;

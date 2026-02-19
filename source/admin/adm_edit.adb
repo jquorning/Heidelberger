@@ -32,13 +32,13 @@ with Adm_Admin_Header;
 with Adm_Menu;
 
 with Adi_Class_Wp_Posts_List_Tables;
-with Adi_Class_Wp_Screens;
 with Adi_List_Tables;
 with Adi_Posts;
 with Adi_Screens;
 
 with Class_Posts;
 with Class_Post_Type;
+with Class_Screens;
 with Class_WpDB;
 with Inc_Capabilities;
 with Inc_Formatting;

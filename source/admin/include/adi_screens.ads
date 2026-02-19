@@ -8,7 +8,7 @@
 with Arrays;
 with Lists;
 
-with Adi_Class_Wp_Screens;
+with Class_Screens;
 
 package Adi_Screens
 is
@@ -23,7 +23,7 @@ is
    -- @param string|WP_Screen screen The screen you want the headers for
    -- @return string[] The column header labels keyed by column ID.
    --
-   function Get_Column_Headers (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+   function Get_Column_Headers (Screen : Class_Screens.Wp_Screen)
                                 return Array_Type;
 
    --
@@ -34,7 +34,7 @@ is
    -- @param string|WP_Screen screen The screen you want the hidden columns for
    -- @return string[] Array of IDs of hidden columns.
    --
-   function Get_Hidden_Columns (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+   function Get_Hidden_Columns (Screen : Class_Screens.Wp_Screen)
                                 return Array_Type;
 
    --
@@ -45,7 +45,7 @@ is
    -- @param string|WP_Screen screen Screen identifier
    -- @return string[] IDs of hidden meta boxes.
    --
-   function Get_Hidden_Meta_Boxes (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+   function Get_Hidden_Meta_Boxes (Screen : Class_Screens.Wp_Screen)
                                    return List_Type;
 
    --
@@ -70,7 +70,7 @@ is
    -- @return WP_Screen|null Current screen object or null when screen not defined.
    --
    function Get_Current_Screen
-            return Adi_Class_Wp_Screens.Wp_Screen;
+            return Class_Screens.Wp_Screen;
 
    --
    -- Set the current screen object

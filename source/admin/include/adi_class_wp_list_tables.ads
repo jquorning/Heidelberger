@@ -10,7 +10,7 @@ with Arrays;
 with Lists;
 with UStrings;
 
-with Adi_Class_Wp_Screens;
+with Class_Screens;
 
 package Adi_Class_Wp_List_Tables
 is
@@ -67,7 +67,7 @@ is
          -- @var WP_Screen
          --
 --         protected
-          Screen : Adi_Class_Wp_Screens.Wp_Screen;
+          Screen : Class_Screens.Wp_Screen;
 
          --
          -- Cached bulk actions.

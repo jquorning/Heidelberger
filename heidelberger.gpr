@@ -10,6 +10,7 @@ project Heidelberger is
    for Source_Dirs use (
       "source/",
       "source/admin/",
+      "source/admin/class/",
       "source/admin/include/",
       "source/bind/",
       "source/class/",

@@ -16,7 +16,7 @@ with Inc_Users;
 
 package body Adi_Screens
 is
-   Current_Screen : Adi_Class_Wp_Screens.Wp_Screen;
+   Current_Screen : Class_Screens.Wp_Screen;
 
    Static_Column_Headers : Array_Type := Empty_Array;
 
@@ -24,7 +24,7 @@ is
    -- Get_Column_Headers --
    ------------------------
 
-   function Get_Column_Headers (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+   function Get_Column_Headers (Screen : Class_Screens.Wp_Screen)
                                 return Array_Type
    is
       use UStrings;
@@ -61,7 +61,7 @@ is
    -- Get_Hidden_Columns --
    ------------------------
 
-   function Get_Hidden_Columns (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+   function Get_Hidden_Columns (Screen : Class_Screens.Wp_Screen)
                                 return Array_Type
    is
       use Php.Types;
@@ -166,7 +166,7 @@ is
    -- Get_Hidden_Meta_Boxes --
    ---------------------------
 
-   function Get_Hidden_Meta_Boxes (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+   function Get_Hidden_Meta_Boxes (Screen : Class_Screens.Wp_Screen)
                                    return List_Type
    is
       use Php.Lists;
@@ -242,7 +242,7 @@ is
    ------------------------
 
    function Get_Current_Screen
-            return Adi_Class_Wp_Screens.Wp_Screen
+            return Class_Screens.Wp_Screen
    is
 --         global current_screen;
    begin

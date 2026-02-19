@@ -5,9 +5,8 @@
 with Arrays;
 with Lists;
 
-with Adi_Class_Wp_Screens;
-
 with Class_Posts;
+with Class_Screens;
 
 package Adi_Templates
 is
@@ -143,7 +142,7 @@ is
    procedure Add_Meta_Box (Id            : String;
                            Title         : String;
                            Callback      : Callable_2;
-                           Screen        : Adi_Class_Wp_Screens.Wp_Screen;
+                           Screen        : Class_Screens.Wp_Screen;
                            Context       : String     := "advanced";
                            Priority      : String     := "default";
                            Callback_Args : Array_Type := Empty_Array);
@@ -278,6 +277,6 @@ is
    -- @return WP_Screen Screen object.
    --
    function Convert_To_Screen (Hook_Name : String)
-                               return Adi_Class_Wp_Screens.Wp_Screen;
+                               return Class_Screens.Wp_Screen;
 
 end Adi_Templates;

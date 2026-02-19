@@ -18,7 +18,7 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
-with Adi_Class_Wp_Screens;
+with Class_Screens;
 with Adi_Dashboard;
 with Adi_Screens;
 with Adm_Admin;
@@ -54,7 +54,7 @@ is
       use Array_Lists;
       use UStrings;
       use Wp_Common;
-      use Adi_Class_Wp_Screens;
+      use Class_Screens;
       use Adi_Dashboard;
       use Adi_Screens;
       use Inc_Capabilities;
