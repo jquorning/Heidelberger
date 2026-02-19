@@ -8,7 +8,7 @@
 
 with Arrays;
 
-with Adi_Class_Wp_Upgrader_Skins;
+with Class_Upgrader_Skins;
 
 package Adi_Class_Wp_Automatic_Upgrader_Skins
 is
@@ -27,7 +27,7 @@ is
    -- @see Bulk_Upgrader_Skin
    --
    type Automatic_Upgrader_Skin
-      is new Adi_Class_Wp_Upgrader_Skins.Wp_Upgrader_Skin with
+      is new Class_Upgrader_Skins.Wp_Upgrader_Skin with
       record
          -- protected
          Messages : Array_Type;

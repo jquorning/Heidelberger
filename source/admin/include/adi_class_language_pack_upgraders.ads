@@ -9,7 +9,7 @@
 with Arrays;
 
 with Class_Upgraders;
-with Adi_Class_Wp_Upgrader_Skins;
+with Class_Upgrader_Skins;
 
 package Adi_Class_Language_Pack_Upgraders
 is
@@ -49,7 +49,7 @@ is
    --
    -- Constructor
    --
-   function X_Construct (Skin : Adi_Class_Wp_Upgrader_Skins.Wp_Upgrader_Skin) -- := null
+   function X_Construct (Skin : Class_Upgrader_Skins.Wp_Upgrader_Skin) -- := null
                          return Language_Pack_Upgrader;
 
         -- --

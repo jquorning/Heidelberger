@@ -10,7 +10,7 @@ with Array_Lists;
 
 with Inc_Functions;
 
-package body Adi_Class_Wp_Upgrader_Skins
+package body Class_Upgrader_Skins
 is
 
    -----------------
@@ -50,4 +50,4 @@ is
       This.Add_Strings;
    end Set_Upgrader;
 
-end Adi_Class_Wp_Upgrader_Skins;
+end Class_Upgrader_Skins;

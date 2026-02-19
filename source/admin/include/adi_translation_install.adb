@@ -20,9 +20,10 @@ with Lists;
 with UStrings;
 with Wp_Common;
 
+with Class_Upgrader_Skins;
+
 with Adi_Class_Language_Pack_Upgraders;
 with Adi_Class_Wp_Automatic_Upgrader_Skins;
-with Adi_Class_Wp_Upgrader_Skins;
 
 with Inc_Formatting;
 with Inc_HTTP;
@@ -332,9 +333,9 @@ is
    is
       use Php.Lists;
       use Array_Lists;
+      use Class_Upgrader_Skins;
       use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
-      use Adi_Class_Wp_Upgrader_Skins;
       use Inc_Load;
       use Inc_L10n;
    begin
@@ -384,7 +385,7 @@ is
               X_Construct;
 
             Upgrader : constant Language_Pack_Upgrader  :=
-              X_Construct (Adi_Class_Wp_Upgrader_Skins.Wp_Upgrader_Skin (Skin));
+              X_Construct (Class_Upgrader_Skins.Wp_Upgrader_Skin (Skin));
          begin
 --          Translation.Typ := +"core";
             declare
@@ -416,9 +417,9 @@ is
             return Boolean
    is
       use UStrings;
+      use Class_Upgrader_Skins;
       use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
-      use Adi_Class_Wp_Upgrader_Skins;
       use Inc_Load;
    begin
       if not Wp_Is_File_Mod_Allowed ("can_install_language_pack") then

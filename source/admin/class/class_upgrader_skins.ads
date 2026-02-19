@@ -10,7 +10,7 @@ with Arrays;
 
 limited with Class_Upgraders;
 
-package Adi_Class_Wp_Upgrader_Skins
+package Class_Upgrader_Skins
 is
    use Arrays;
 
@@ -276,4 +276,4 @@ is
         --         return false;
         -- end;
 
-end Adi_Class_Wp_Upgrader_Skins;
+end Class_Upgrader_Skins;

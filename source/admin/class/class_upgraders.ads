@@ -11,7 +11,7 @@
 with Arrays;
 with Lists;
 
-with Adi_Class_Wp_Upgrader_Skins;
+with Class_Upgrader_Skins;
 
 package Class_Upgraders
 is
@@ -74,7 +74,7 @@ is
          -- @since 2.8.0
          -- @var Automatic_Upgrader_Skin|WP_Upgrader_Skin skin
          --
-         Skin : Adi_Class_Wp_Upgrader_Skins.Wp_Upgrader_Skin; --  = null;
+         Skin : Class_Upgrader_Skins.Wp_Upgrader_Skin; --  = null;
 
          --
          -- The result of the installation.
@@ -138,7 +138,7 @@ is
    -- @param WP_Upgrader_Skin skin The upgrader skin to use. Default is a
    --                               WP_Upgrader_Skin instance.
    --
-   function X_Construct (Skin : Adi_Class_Wp_Upgrader_Skins.Wp_Upgrader_Skin) -- null
+   function X_Construct (Skin : Class_Upgrader_Skins.Wp_Upgrader_Skin) -- null
                          return Wp_Upgrader;
 
    --

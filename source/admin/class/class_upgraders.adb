@@ -17,7 +17,7 @@ is
    -- X_Construct --
    -----------------
 
-   function X_Construct (Skin : Adi_Class_Wp_Upgrader_Skins.Wp_Upgrader_Skin)
+   function X_Construct (Skin : Class_Upgrader_Skins.Wp_Upgrader_Skin)
                          return Wp_Upgrader
    is
       This : Wp_Upgrader;
