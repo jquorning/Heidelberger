@@ -20,9 +20,9 @@ with Lists;
 with UStrings;
 with Wp_Common;
 
-with Class_Upgrader_Skins;
+with Class_Automatic_Upgrader_Skins;
 with Class_Language_Pack_Upgraders;
-with Adi_Class_Wp_Automatic_Upgrader_Skins;
+with Class_Upgrader_Skins;
 
 with Inc_Formatting;
 with Inc_HTTP;
@@ -332,9 +332,9 @@ is
    is
       use Php.Lists;
       use Array_Lists;
+      use Class_Automatic_Upgrader_Skins;
       use Class_Language_Pack_Upgraders;
       use Class_Upgrader_Skins;
-      use Adi_Class_Wp_Automatic_Upgrader_Skins;
       use Inc_Load;
       use Inc_L10n;
    begin
@@ -416,9 +416,9 @@ is
             return Boolean
    is
       use UStrings;
+      use Class_Automatic_Upgrader_Skins;
       use Class_Language_Pack_Upgraders;
       use Class_Upgrader_Skins;
-      use Adi_Class_Wp_Automatic_Upgrader_Skins;
       use Inc_Load;
    begin
       if not Wp_Is_File_Mod_Allowed ("can_install_language_pack") then

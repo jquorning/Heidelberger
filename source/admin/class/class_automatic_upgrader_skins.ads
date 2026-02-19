@@ -10,7 +10,7 @@ with Arrays;
 
 with Class_Upgrader_Skins;
 
-package Adi_Class_Wp_Automatic_Upgrader_Skins
+package Class_Automatic_Upgrader_Skins
 is
    use Arrays;
 
@@ -151,4 +151,4 @@ is
         --         end;
         -- end;
 
-end Adi_Class_Wp_Automatic_Upgrader_Skins;
+end Class_Automatic_Upgrader_Skins;

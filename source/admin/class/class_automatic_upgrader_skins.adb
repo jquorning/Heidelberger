@@ -6,7 +6,7 @@
 -- @since 4.6.0
 --
 
-package body Adi_Class_Wp_Automatic_Upgrader_Skins
+package body Class_Automatic_Upgrader_Skins
 is
 
    -----------------
@@ -21,4 +21,4 @@ is
       return This;
    end X_Construct;
 
-end Adi_Class_Wp_Automatic_Upgrader_Skins;
+end Class_Automatic_Upgrader_Skins;
