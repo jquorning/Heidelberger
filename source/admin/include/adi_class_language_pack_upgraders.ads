@@ -8,7 +8,7 @@
 
 with Arrays;
 
-with Adi_Class_Wp_Upgraders;
+with Class_Upgraders;
 with Adi_Class_Wp_Upgrader_Skins;
 
 package Adi_Class_Language_Pack_Upgraders
@@ -25,7 +25,7 @@ is
    -- @see WP_Upgrader
    --
    type Language_Pack_Upgrader
-      is new Adi_Class_Wp_Upgraders.Wp_Upgrader with
+      is new Class_Upgraders.Wp_Upgrader with
       record
          --
          -- Result of the language pack upgrade.

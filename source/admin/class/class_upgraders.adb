@@ -10,7 +10,7 @@
 
 with Inc_L10n;
 
-package body Adi_Class_Wp_Upgraders
+package body Class_Upgraders
 is
 
    -----------------
@@ -92,4 +92,4 @@ is
                         return Boolean
    is (raise Program_Error with "not implemented");
 
-end Adi_Class_Wp_Upgraders;
+end Class_Upgraders;

@@ -41,7 +41,7 @@ is
    ------------------
 
    procedure Set_Upgrader (This     : in out Wp_Upgrader_Skin;
-                           Upgrader : access Adi_Class_Wp_Upgraders.Wp_Upgrader)
+                           Upgrader : access Class_Upgraders.Wp_Upgrader)
    is
    begin
 --    if Is_Object (Upgrader) then

@@ -8,7 +8,7 @@
 
 with Arrays;
 
-limited with Adi_Class_Wp_Upgraders;
+limited with Class_Upgraders;
 
 package Adi_Class_Wp_Upgrader_Skins
 is
@@ -32,7 +32,7 @@ is
          --
          -- @var WP_Upgrader
          --
-         Upgrader : access Adi_Class_Wp_Upgraders.Wp_Upgrader;
+         Upgrader : access Class_Upgraders.Wp_Upgrader;
 
          --
          -- Whether header is done.
@@ -91,7 +91,7 @@ is
    -- @param WP_Upgrader upgrader
    --
    procedure Set_Upgrader (This     : in out Wp_Upgrader_Skin;
-                           Upgrader : access Adi_Class_Wp_Upgraders.Wp_Upgrader);
+                           Upgrader : access Class_Upgraders.Wp_Upgrader);
 
    --
    -- @since 3.0.0

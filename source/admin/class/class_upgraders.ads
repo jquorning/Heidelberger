@@ -13,7 +13,7 @@ with Lists;
 
 with Adi_Class_Wp_Upgrader_Skins;
 
-package Adi_Class_Wp_Upgraders
+package Class_Upgraders
 is
    use Arrays;
    use Lists;
@@ -942,7 +942,7 @@ is
         --         return delete_option( lock_name . ".lock" );
         -- end;
 
-end Adi_Class_Wp_Upgraders;
+end Class_Upgraders;
 
 -- Plugin_Upgrader class--
 -- require_once ABSPATH . "wp-admin/includes/class-plugin-upgrader.php";
