@@ -12,7 +12,7 @@ with UStrings;
 
 with Class_Screens;
 
-package Adi_Class_Wp_List_Tables
+package Class_List_Tables
 is
    use Arrays;
    use Lists;
@@ -514,4 +514,4 @@ is
    function Get_Sortable_Columns (This : Wp_List_Table)
                                   return Array_Type;
 
-end Adi_Class_Wp_List_Tables;
+end Class_List_Tables;

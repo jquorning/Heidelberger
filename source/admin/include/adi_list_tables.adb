@@ -26,7 +26,7 @@ is
 -- function _get_list_table( class_name, args = array() ) then
    function X_Get_List_Table (Class_Name : String;
                               Args       : Array_Type := Empty_Array)
-                              return Adi_Class_Wp_List_Tables.Wp_List_Table'Class
+                              return Class_List_Tables.Wp_List_Table'Class
    is
    begin
 

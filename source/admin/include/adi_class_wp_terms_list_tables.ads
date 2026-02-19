@@ -8,7 +8,7 @@
 
 with Arrays;
 
-with Adi_Class_Wp_List_Tables;
+with Class_List_Tables;
 
 package Adi_Class_Wp_Terms_List_Tables
 is
@@ -21,7 +21,7 @@ is
    --
    -- @see WP_List_Table
    --
-   type Wp_Terms_List_Table is new Adi_Class_Wp_List_Tables.Wp_List_Table with
+   type Wp_Terms_List_Table is new Class_List_Tables.Wp_List_Table with
       record
 
 --        public callback_args;

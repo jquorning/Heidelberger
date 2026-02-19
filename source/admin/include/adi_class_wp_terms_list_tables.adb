@@ -37,7 +37,7 @@ is
 
 --    global post_type, taxonomy, action, tax;
       This : constant Wp_Terms_List_Table := (
-        Adi_Class_Wp_List_Tables.X_Construct (
+        Class_List_Tables.X_Construct (
 --      parent::x_Construct (
           To_Array_Type ([
             Build ("plural",   "tags"),

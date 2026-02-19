@@ -6,7 +6,7 @@
 -- @since 3.1.0
 --
 
-with Adi_Class_Wp_List_Tables;
+with Class_List_Tables;
 
 with Arrays;
 
@@ -27,6 +27,6 @@ is
    --
    function X_Get_List_Table (Class_Name : String;
                               Args       : Array_Type := Empty_Array)
-                              return Adi_Class_Wp_List_Tables.Wp_List_Table'Class;
+                              return Class_List_Tables.Wp_List_Table'Class;
 
 end Adi_List_Tables;

@@ -48,7 +48,7 @@ is
       use Inc_Users;
 
       List_Table : Wp_Posts_List_Table := (
-        Adi_Class_Wp_List_Tables.X_Construct (
+        Class_List_Tables.X_Construct (
           To_Array_Type ([
             Build ("plural", "posts"),
             Build ("screen", (if Isset (Args, "screen")

@@ -28,7 +28,7 @@ with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Options;
 
-package body Adi_Class_Wp_List_Tables
+package body Class_List_Tables
 is
 
    -----------------
@@ -1832,4 +1832,4 @@ is
 --         end;
 -- end;
 
-end Adi_Class_Wp_List_Tables;
+end Class_List_Tables;
