@@ -10,7 +10,7 @@ with Arrays;
 
 with Class_List_Tables;
 
-package Adi_Class_Wp_Posts_List_Tables
+package Class_Posts_List_Tables
 is
    use Arrays;
 
@@ -96,4 +96,4 @@ is
    procedure Inline_Edit (This : Wp_Posts_List_Table)
                           is null;
 
-end Adi_Class_Wp_Posts_List_Tables;
+end Class_Posts_List_Tables;

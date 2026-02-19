@@ -6,8 +6,8 @@
 -- @since 3.1.0
 --
 
-with Adi_Class_Wp_Terms_List_Tables;
-with Adi_Class_Wp_Posts_List_Tables;
+with Class_Terms_List_Tables;
+with Class_Posts_List_Tables;
 
 package body Adi_List_Tables
 is
@@ -31,10 +31,10 @@ is
    begin
 
       if Class_Name = "Wp_Posts_List_Table" then
-         return Adi_Class_Wp_Posts_List_Tables.X_Construct;
+         return Class_Posts_List_Tables.X_Construct;
 
       elsif Class_Name = "Wp_Terms_List_Table" then
-         return Adi_Class_Wp_Terms_List_Tables.X_Construct;
+         return Class_Terms_List_Tables.X_Construct;
 
       end if;
       raise Program_Error;

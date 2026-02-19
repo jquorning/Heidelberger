@@ -27,19 +27,20 @@ with UStrings;
 with Lists;
 with Wp_Common;
 
-with Adm_Admin;
-with Adm_Admin_Header;
-with Adm_Menu;
-
-with Adi_Class_Wp_Posts_List_Tables;
-with Adi_List_Tables;
-with Adi_Posts;
-with Adi_Screens;
-
+with Class_Posts_List_Tables;
 with Class_Posts;
 with Class_Post_Type;
 with Class_Screens;
 with Class_WpDB;
+
+with Adm_Admin;
+with Adm_Admin_Header;
+with Adm_Menu;
+
+with Adi_List_Tables;
+with Adi_Posts;
+with Adi_Screens;
+
 with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
@@ -141,7 +142,7 @@ is
       end if;
 
       declare
-         use Adi_Class_Wp_Posts_List_Tables;
+         use Class_Posts_List_Tables;
          use Adi_List_Tables;
 
          X_Wp_List_Table : Wp_Posts_List_Table :=

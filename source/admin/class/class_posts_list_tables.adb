@@ -24,7 +24,7 @@ with Inc_Posts;
 -- with Inc_Capabilities;
 with Inc_Users;
 
-package body Adi_Class_Wp_Posts_List_Tables
+package body Class_Posts_List_Tables
 is
    use Lists;
 
@@ -2065,4 +2065,4 @@ is
 --         end;
 -- end;
 
-end Adi_Class_Wp_Posts_List_Tables;
+end Class_Posts_List_Tables;

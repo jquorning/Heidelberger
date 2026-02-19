@@ -10,7 +10,7 @@ with Arrays;
 
 with Class_List_Tables;
 
-package Adi_Class_Wp_Terms_List_Tables
+package Class_Terms_List_Tables
 is
    use Arrays;
 
@@ -56,4 +56,4 @@ is
    procedure Inline_Edit (This : Wp_Terms_List_Table)
                           is null;
 
-end Adi_Class_Wp_Terms_List_Tables;
+end Class_Terms_List_Tables;

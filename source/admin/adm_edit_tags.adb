@@ -23,11 +23,11 @@ with Wp_Common;
 
 with Class_Screens;
 with Class_Terms;
+with Class_Terms_List_Tables;
 
 with Adm_Admin;
 with Adm_Menu;
 
-with Adi_Class_Wp_Terms_List_Tables;
 with Adi_List_Tables;
 with Adi_Plugins;
 with Adi_Screens;
@@ -353,8 +353,8 @@ is
       use Helpers_3;
       use UStrings;
       use Wp_Common;
+      use Class_Terms_List_Tables;
       use Adi_Screens;
-      use Adi_Class_Wp_Terms_List_Tables;
       use Adi_List_Tables;
       use Adi_Plugins;
       use Adm_Menu;

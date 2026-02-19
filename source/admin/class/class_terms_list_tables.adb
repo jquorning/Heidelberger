@@ -18,7 +18,7 @@ with Inc_Taxonomys;
 with Inc_L10n;
 with Inc_Posts;
 
-package body Adi_Class_Wp_Terms_List_Tables
+package body Class_Terms_List_Tables
 is
 
    -----------------
@@ -728,4 +728,4 @@ is
 --         end;
 -- end;
 
-end Adi_Class_Wp_Terms_List_Tables;
+end Class_Terms_List_Tables;
