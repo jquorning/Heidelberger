@@ -107,18 +107,20 @@ is
                                 Code : String := "")
                                 return List_Type;
 
-        -- --
-        -- -- Gets a single error message.
-        -- --
-        -- -- This will get the first message available for the code. If no code is
-        -- -- given then the first code available will be used.
-        -- --
-        -- -- @since 2.1.0
-        -- --
-        -- -- @param string|int code Optional. Error code to retrieve message.
-        -- -- @return string The error message.
-        -- --
-        -- public function get_error_message( code = '' ) then
+   --
+   -- Gets a single error message.
+   --
+   -- This will get the first message available for the code. If no code is
+   -- given then the first code available will be used.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string|int code Optional. Error code to retrieve message.
+   -- @return string The error message.
+   --
+   function Get_Error_Message (This : Wp_Error;
+                               Code : String := "")
+                               return String;
         --         if ( empty( code ) ) then
         --                 code = this->get_error_code();
         --         end;

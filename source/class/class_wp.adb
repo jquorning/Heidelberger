@@ -5,9 +5,21 @@
 -- @since 2.0.0
 --
 
+with Php.Arrays;
+with Php.HTML;
+with Php.Strings;
+
+with Globals;
+
+with Class_Posts;
+with Class_Users;
+
+with Inc_Pluggables;
+with Inc_Plugins;
+with Inc_Querys;
+
 package body Class_Wp
 is
-   procedure Dummy is null;
 
 --         --
 --         -- Adds a query variable to the list of public query variables.
@@ -45,21 +57,14 @@ is
 --                 $this->query_vars[ $key ] = $value;
 --         end;
 
---         --
---         -- Parses the request to find the correct WordPress query.
---         --
---         -- Sets up the query variables based on the request. There are also many
---         -- filters and actions that can be used to further manipulate the result.
---         --
---         -- @since 2.0.0
---         -- @since 6.0.0 A return value was added.
---         --
---         -- @global WP_Rewrite $wp_rewrite WordPress rewrite component.
---         --
---         -- @param array|string $extra_query_vars Set the extra query variables.
---         -- @return bool Whether the request was parsed.
---         --
---         public function parse_request( $extra_query_vars = "" ) then
+   -------------------
+   -- Parse_Request --
+   -------------------
+
+   function Parse_Request (This             : Wp_Class;
+                           Extra_Query_Vars : Array_Type) --  = ""
+                           return Boolean
+   is (raise Program_Error with "not implemented");
 --                 global $wp_rewrite;
 
 --                 --
@@ -327,19 +332,15 @@ is
 --                 return true;
 --         end;
 
---         --
---         -- Sends additional HTTP headers for caching, content type, etc.
---         --
---         -- Sets the Content-Type header. Sets the "error" status (if passed) and optionally exits.
---         -- If showing a feed, it will also send Last-Modified, ETag, and 304 status if needed.
---         --
---         -- @since 2.0.0
---         -- @since 4.4.0 `X-Pingback` header is added conditionally for single posts that allow pings.
---         -- @since 6.1.0 Runs after posts have been queried.
---         --
---         -- @global WP_Query $wp_query WordPress Query object.
---         --
---         public function send_headers() then
+   ------------------
+   -- Send_Headers --
+   ------------------
+
+   procedure Send_Headers (This : Wp_Class)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Send_Headers;
 --                 global $wp_query;
 
 --                 $headers       = array();
@@ -487,126 +488,152 @@ is
 --                 do_action_ref_array( "send_headers", array( &$this ) );
 --         end;
 
---         --
---         -- Sets the query string property based off of the query variable property.
---         --
---         -- The then@see "query_string"end; filter is deprecated, but still works. Plugins should
---         -- use the then@see "request"end; filter instead.
---         --
---         -- @since 2.0.0
---         --
---         public function build_query_string() then
---                 $this->query_string = "";
---                 foreach ( (array) array_keys( $this->query_vars ) as $wpvar ) then
---                         if ( "" != $this->query_vars[ $wpvar ] ) then
---                                 $this->query_string .= ( strlen( $this->query_string ) < 1 ) ? "" : "&";
---                                 if ( ! is_scalar( $this->query_vars[ $wpvar ] ) ) then // Discard non-scalars.
---                                         continue;
---                                 end;
---                                 $this->query_string .= $wpvar . "=" . rawurlencode( $this->query_vars[ $wpvar ] );
---                         end;
---                 end;
+   ------------------------
+   -- Build_Query_String --
+   ------------------------
 
---                 if ( has_filter( "query_string" ) ) then  // Don"t bother filtering and parsing if no plugins are hooked in.
---                         --
---                         -- Filters the query string before parsing.
---                         --
---                         -- @since 1.5.0
---                         -- @deprecated 2.1.0 Use then@see "query_vars"end; or then@see "request"end; filters instead.
---                         --
---                         -- @param string $query_string The query string to modify.
---                         --
---                         $this->query_string = apply_filters_deprecated(
---                                 "query_string",
---                                 array( $this->query_string ),
---                                 "2.1.0",
---                                 "query_vars, request"
---                         );
---                         parse_str( $this->query_string, $this->query_vars );
---                 end;
---         end;
+   procedure Build_Query_String (This : in out Wp_Class)
+   is
+      use Php.Arrays;
+      use Php.HTML;
+      use Php.Strings;
+      use Inc_Plugins;
+   begin
+      This.Query_String := +"";
 
---         --
---         -- Set up the WordPress Globals.
---         --
---         -- The query_vars property will be extracted to the GLOBALS. So care should
---         -- be taken when naming global variables that might interfere with the
---         -- WordPress environment.
---         --
---         -- @since 2.0.0
---         --
---         -- @global WP_Query     $wp_query     WordPress Query object.
---         -- @global string       $query_string Query string for the loop.
---         -- @global array        $posts        The found posts.
---         -- @global WP_Post|null $post         The current post, if available.
---         -- @global string       $request      The SQL statement for the request.
---         -- @global int          $more         Only set, if single page or post.
---         -- @global int          $single       If single page or post. Only set, if single page or post.
---         -- @global WP_User      $authordata   Only set, if author archive.
---         --
---         public function register_globals() then
+      for Wpvar of List_Type'(Array_Keys (This.Query_Vars)) loop
+         if "" /= Get_As_String (This.Query_Vars, Wpvar) then
+
+            Append (This.Query_String,
+                    (if Strlen (-This.Query_String) < 1 then "" else "&"));
+
+            if Kind_Of (Get (This.Query_Vars, Wpvar)) in Kind_Array then
+               -- Discard non-scalars.
+               goto Continue;
+            end if;
+
+            Append (This.Query_String,
+                    Wpvar & "=" &
+                    Raw_URL_Encode (Get_As_String (This.Query_Vars, Wpvar)));
+         end if;
+         << Continue >>
+      end loop;
+
+      if Has_Filter ("query_string") then
+         -- Don't bother filtering and parsing if no plugins are hooked in.
+
+         --
+         -- Filters the query string before parsing.
+         --
+         -- @since 1.5.0
+         -- @deprecated 2.1.0 Use {@see "query_vars"} or {@see "request"} filters
+         -- instead.
+         --
+         -- @param string $query_string The query string to modify.
+         --
+         This.Query_String := +Apply_Filters_Deprecated (
+           "query_string",
+           [-This.Query_String],
+           "2.1.0",
+           "query_vars, request"
+         );
+         Parse_Str (-This.Query_String, This.Query_Vars);
+      end if;
+   end Build_Query_String;
+
+   ----------------------
+   -- Register_Globals --
+   ----------------------
+
+   procedure Register_Globals (This : Wp_Class)
+   is
+      use Globals;
+      use Class_Posts;
+      use Class_Users;
+      use Inc_Pluggables;
+      use Inc_Querys;
+
+      function Isset (Post : Wp_Post)
+                      return Boolean;
+
+      function Isset (Post : Wp_Post)
+                      return Boolean
+      is
+      begin
+         return Post /= Null_Post;
+      end Isset;
 --                 global $wp_query;
+   begin
+      -- Extract updated query vars back into global namespace.
+      for A in Global_Wp_Query.Query_Vars.Iterate loop -- (array)
+         declare
+            Key   : constant String     := Arrays.Key (A);
+            Value : constant Multi_Type := Arrays.Element (A);
+         begin
+            Set (Globals.GLOBALS, Key, Value);
+         end;
+      end loop;
 
---                 // Extract updated query vars back into global namespace.
---                 foreach ( (array) $wp_query->query_vars as $key => $value ) then
---                         $GLOBALS[ $key ] = $value;
---                 end;
+      Globals.Global_Query_String := This.Query_String;
 
---                 $GLOBALS["query_string"] = $this->query_string;
---                 $GLOBALS["posts"]        = & $wp_query->posts;
---                 $GLOBALS["post"]         = isset( $wp_query->post ) ? $wp_query->post : null;
---                 $GLOBALS["request"]      = $wp_query->request;
+      Globals.Global_Posts := Global_Wp_Query.Posts;
 
---                 if ( $wp_query->is_single() || $wp_query->is_page() ) then
---                         $GLOBALS["more"]   = 1;
---                         $GLOBALS["single"] = 1;
---                 end;
+      Globals.Global_Post  := (if Isset (Global_Wp_Query.Post)
+                               then Global_Wp_Query.Post else Null_Post);
 
---                 if ( $wp_query->is_author() ) then
---                         $GLOBALS["authordata"] = get_userdata( get_queried_object_id() );
---                 end;
---         end;
+      Globals.Global_Request := Global_Wp_Query.Request;
 
---         --
---         -- Set up the current user.
---         --
---         -- @since 2.0.0
---         --
---         public function init() then
---                 wp_get_current_user();
---         end;
+      if
+        Global_Wp_Query.Is_Single or else
+        Global_Wp_Query.Is_Page
+      then
+         Globals.Global_More   := 1;
+         Globals.Global_Single := 1;
+      end if;
 
---         --
---         -- Set up the Loop based on the query variables.
---         --
---         -- @since 2.0.0
---         --
---         -- @global WP_Query $wp_the_query WordPress Query object.
---         --
---         public function query_posts() then
---                 global $wp_the_query;
---                 $this->build_query_string();
---                 $wp_the_query->query( $this->query_vars );
---         end;
+      if Global_Wp_Query.Is_Author then
+         Globals.Global_Authordata :=
+           Get_Userdata (User_Id_Type (Get_Queried_Object_Id));
+      end if;
+   end Register_Globals;
 
---         --
---         -- Set the Headers for 404, if nothing is found for requested URL.
---         --
---         -- Issue a 404 if a request doesn"t match any posts and doesn"t match any object
---         -- (e.g. an existing-but-empty category, tag, author) and a 404 was not already issued,
---         -- and if the request was not a search or the homepage.
---         --
---         -- Otherwise, issue a 200.
---         --
---         -- This sets headers after posts have been queried. handle_404() really means "handle status".
---         -- By inspecting the result of querying posts, seemingly successful requests can be switched to
---         -- a 404 so that canonical redirection logic can kick in.
---         --
---         -- @since 2.0.0
---         --
---         -- @global WP_Query $wp_query WordPress Query object.
---         --
---         public function handle_404() then
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (This : Wp_Class)
+   is
+      pragma Unreferenced (This);
+      use Class_Users;
+      use Inc_Pluggables;
+
+      Unused : constant Wp_User := Wp_Get_Current_User;
+   begin
+      null;
+   end Init;
+
+   -----------------
+   -- Query_Posts --
+   -----------------
+
+   procedure Query_Posts (This : in out Wp_Class)
+   is
+      use Inc_Querys;
+--    global $wp_the_query;
+   begin
+      This.Build_Query_String;
+      Global_Wp_The_Query.Query (This.Query_Vars);
+   end Query_Posts;
+
+   ----------------
+   -- Handle_404 --
+   ----------------
+
+   procedure Handle_404 (This : Wp_Class)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Handle_404;
 --                 global $wp_query;
 
 --                 --
@@ -689,39 +716,37 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Sets up all of the variables required by the WordPress environment.
---         --
---         -- The action then@see "wp"end; has one parameter that references the WP object. It
---         -- allows for accessing the properties and methods to further manipulate the
---         -- object.
---         --
---         -- @since 2.0.0
---         --
---         -- @param string|array $query_args Passed to parse_request().
---         --
---         public function main( $query_args = "" ) then
---                 $this->init();
+   ----------
+   -- Main --
+   ----------
 
---                 $parsed = $this->parse_request( $query_args );
+   procedure Main (This       : in out Wp_Class;
+                   Query_Args : Array_Type)
+   is
+   begin
+      This.Init;
 
---                 if ( $parsed ) then
---                         $this->query_posts();
---                         $this->handle_404();
---                         $this->register_globals();
---                 end;
+      declare
+         Parsed : constant Boolean :=
+           This.Parse_Request (Query_Args);
+      begin
+         if Parsed then
+            This.Query_Posts;
+            This.Handle_404;
+            This.Register_Globals;
+         end if;
 
---                 $this->send_headers();
+         This.Send_Headers;
 
---                 --
---                 -- Fires once the WordPress environment has been set up.
---                 --
---                 -- @since 2.1.0
---                 --
---                 -- @param WP $wp Current WordPress environment instance (passed by reference).
---                 --
---                 do_action_ref_array( "wp", array( &$this ) );
---         end;
--- end;
+         --
+         -- Fires once the WordPress environment has been set up.
+         --
+         -- @since 2.1.0
+         --
+         -- @param WP $wp Current WordPress environment instance (passed by reference).
+         --
+--       Do_Action_Ref_Array ("wp", This); -- XXX -- array( &$this ) );
+      end;
+   end Main;
 
 end Class_Wp;

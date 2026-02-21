@@ -106,6 +106,27 @@ is
       end if;
    end Get_Error_Messages;
 
+   -----------------------
+   -- Get_Error_Message --
+   -----------------------
+
+   function Get_Error_Message (This : Wp_Error;
+                               Code : String := "")
+                               return String
+   is
+      use Php.Strings;
+
+      Code_2 : constant String :=
+        (if Empty (Code) then This.Get_Error_Code else Code);
+
+      Messages : constant List_Type := This.Get_Error_Messages (Code_2);
+   begin
+      if Messages.Is_Empty then
+         return "";
+      end if;
+      return Messages.First_Element;
+   end Get_Error_Message;
+
    --------------------
    -- Get_Error_Data --
    --------------------

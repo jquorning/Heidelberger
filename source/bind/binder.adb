@@ -20,6 +20,8 @@ with Adm_Load_Styles;
 with Adm_Post;
 with Adm_Privacy;
 with Adm_Upgrade;
+
+with Wp_Index;
 with Wp_Login;
 
 package body Binder
@@ -83,6 +85,9 @@ is
 
       elsif Index (URL, "/wp-admin") /= 0 then
          Adm_Index.Render;
+
+      elsif URL = "/" or URL = "" then
+         Wp_Index.Render;
 
       elsif Index (URL, "/wp-login.php") /= 0 then
          Wp_Login.Render;

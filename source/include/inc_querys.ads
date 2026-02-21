@@ -22,6 +22,9 @@ is
    Global_Wp_Query : Class_Querys.Wp_Query :=
      Class_Querys.Null_Query;
 
+   Global_Wp_The_Query : Class_Querys.Wp_Query :=
+     Class_Querys.Null_Query;
+
    --
    -- Retrieves the value of a query variable in the WP_Query class.
    --
@@ -87,6 +90,31 @@ is
    procedure Wp_Reset_Postdata;
 
    --
+   -- Determines whether the query is for an existing archive page.
+   --
+   -- Archive pages include category, tag, author, date, custom post type,
+   -- and custom taxonomy based archives.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 1.5.0
+   --
+   -- @see is_category()
+   -- @see is_tag()
+   -- @see is_author()
+   -- @see is_date()
+   -- @see is_post_type_archive()
+   -- @see is_tax()
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for an existing archive page.
+   --
+   function Is_Archive
+            return Boolean;
+
+   --
    -- Determines whether the query is for an existing post type archive page.
    --
    -- For more information on this and similar theme functions, check out
@@ -101,8 +129,34 @@ is
    --                                    to check against. Default empty.
    -- @return bool Whether the query is for an existing post type archive page.
    --
-   function Is_Post_Type_Archive (Post_Types : String := "")
+   function Is_Post_Type_Archive (Post_Types : String)
                                   return Boolean;
+
+   function Is_Post_Type_Archive
+            return Boolean
+   is (Is_Post_Type_Archive (Post_Types => ""));
+
+   --
+   -- Determines whether the query is for an existing attachment page.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tagsend; article in the Theme Developer Handbook.
+   --
+   -- @since 2.0.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @param int|string|int[]|string[] attachment Optional. Attachment ID, title, slug, or array of such
+   --                                              to check against. Default empty.
+   -- @return bool Whether the query is for an existing attachment page.
+   --
+   function Is_Attachment (Attachment : String)  -- := ""
+                           return Boolean;
+
+   function Is_Attachment
+            return Boolean
+   is (Is_Attachment (Attachment => ""));
 
    --
    -- Determines whether the query is for an existing author archive page.
@@ -123,8 +177,12 @@ is
    --                                          Default empty.
    -- @return bool Whether the query is for an existing author archive page.
    --
-   function Is_Author (Author : String := "")
+   function Is_Author (Author : String) -- := ""
                        return Boolean;
+
+   function Is_Author
+            return Boolean
+   is (Is_Author (Author => ""));
 
    --
    -- Determines whether the query is for an existing category archive page.
@@ -145,8 +203,12 @@ is
    --                                            Default empty.
    -- @return bool Whether the query is for an existing category archive page.
    --
-   function Is_Category (Category : String := "")
+   function Is_Category (Category : String) -- := ""
                          return Boolean;
+
+   function Is_Category
+            return Boolean
+   is (Is_Category (Category => ""));
 
    --
    -- Determines whether the query is for an existing tag archive page.
@@ -166,8 +228,12 @@ is
    --                                       such to check against. Default empty.
    -- @return bool Whether the query is for an existing tag archive page.
    --
-   function Is_Tag (Tag : String := "")
+   function Is_Tag (Tag : String) -- := ""
                     return Boolean;
+
+   function Is_Tag
+            return Boolean
+   is (Is_Tag (Tag => ""));
 
    --
    -- Determines whether the query is for an existing custom taxonomy archive page.
@@ -196,9 +262,29 @@ is
    --              True for custom taxonomy archive pages, false for built-in
    --              taxonomies (category and tag archives).
    --
-   function Is_Tax (Taxonomy : String := "";
-                    Term     : String := "")
+   function Is_Tax (Taxonomy : String; -- := ""
+                    Term     : String) -- := ""
                     return Boolean;
+
+   function Is_Tax
+            return Boolean
+   is (Is_Tax (Taxonomy => "", Term => ""));
+
+   --
+   -- Determines whether the query is for an existing date archive.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 1.5.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for an existing date archive.
+   --
+   function Is_Date
+            return Boolean;
 
    --
    -- Determines whether the query is for an existing day archive.
@@ -218,6 +304,24 @@ is
    --
    function Is_Day
             return Boolean;
+
+   --
+   -- Determines whether the query is for a feed.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tagsend; article in the Theme Developer Handbook.
+   --
+   -- @since 1.5.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @param string|string[] feeds Optional. Feed type or array of feed types
+   --                                         to check against. Default empty.
+   -- @return bool Whether the query is for a feed.
+   --
+   function Is_Feed (Feeds : String := "")
+                     return Boolean;
 
    --
    -- Determines whether the query is for the front page of the site.
@@ -271,6 +375,31 @@ is
             return Boolean;
 
    --
+   -- Determines whether the query is for the Privacy Policy page.
+   --
+   -- The Privacy Policy page is the page that shows the Privacy Policy content of the
+   -- site.
+   --
+   -- is_privacy_policy() is dependent on the site"s "Change your Privacy Policy page"
+   -- Privacy Settings "wp_page_for_privacy_policy".
+   --
+   -- This function will return true only on the page you set as the "Privacy Policy
+   -- page".
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 5.2.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for the Privacy Policy page.
+   --
+   function Is_Privacy_Policy
+            return Boolean;
+
+   --
    -- Determines whether the query is for an existing month archive.
    --
    -- For more information on this and similar theme functions, check out
@@ -284,6 +413,57 @@ is
    -- @return bool Whether the query is for an existing month archive.
    --
    function Is_Month
+            return Boolean;
+
+   --
+   -- Determines whether the query is for an existing single page.
+   --
+   -- If the page parameter is specified, this function will additionally
+   -- check if the query is for one of the pages specified.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tagsend; article in the Theme Developer Handbook.
+   --
+   -- @since 1.5.0
+   --
+   -- @see is_single()
+   -- @see is_singular()
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @param int|string|int[]|string[] page Optional. Page ID, title, slug, or array
+   --                                       of such to check against. Default empty.
+   -- @return bool Whether the query is for an existing single page.
+   --
+   function Is_Page (Page : String) -- := ""
+                     return Boolean;
+
+   function Is_Page
+            return Boolean
+   is (Is_Page (Page => ""));
+
+   --
+   -- Is the query for the robots.txt file?
+   --
+   -- @since 2.1.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for the robots.txt file.
+   --
+   function Is_Robots
+            return Boolean;
+
+   --
+   -- Is the query for the favicon.ico file?
+   --
+   -- @since 5.4.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for the favicon.ico file.
+   --
+   function Is_Favicon
             return Boolean;
 
    --
@@ -324,8 +504,12 @@ is
    --                                        to check against. Default empty.
    -- @return bool Whether the query is for an existing single post.
    --
-   function Is_Single (Post : String := "")
+   function Is_Single (Post : String) -- := ""
             return Boolean;
+
+   function Is_Single
+            return Boolean
+   is (Is_Single (Post => ""));
 
    --
    -- Determines whether the query is for an existing single post of any post type
@@ -349,8 +533,28 @@ is
    -- @return bool Whether the query is for an existing single post
    --              or any of the given post types.
    --
-   function Is_Singular (Post_Types : String := "")
+   function Is_Singular (Post_Types : String) -- := ""
                          return Boolean;
+
+   function Is_Singular
+            return Boolean
+   is (Is_Singular (Post_Types => ""));
+
+   --
+   -- Determines whether the query is for a trackback endpoint call.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tagsend; article in the Theme Developer Handbook.
+   --
+   -- @since 1.5.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for a trackback endpoint call.
+   --
+   function Is_Trackback
+            return Boolean;
 
    --
    -- Determines whether the query is for an existing year archive.
@@ -382,6 +586,18 @@ is
    -- @return bool Whether the query is a 404 error.
    --
    function Is_404
+            return Boolean;
+
+   --
+   -- Is the query for an embedded post?
+   --
+   -- @since 4.4.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is for an embedded post.
+   --
+   function Is_Embed
             return Boolean;
 
    --

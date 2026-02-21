@@ -150,47 +150,34 @@ is
 -- -- Query type checks.
 -- --
 
--- --
--- -- Determines whether the query is for an existing archive page.
--- --
--- -- Archive pages include category, tag, author, date, custom post type,
--- -- and custom taxonomy based archives.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @see is_category()
--- -- @see is_tag()
--- -- @see is_author()
--- -- @see is_date()
--- -- @see is_post_type_archive()
--- -- @see is_tax()
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for an existing archive page.
--- --
--- function is_archive() then
---         global wp_query;
+   ----------------
+   -- Is_Archive --
+   ----------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Archive
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_archive();
--- end;
+      return Global_Wp_Query.Is_Archive;
+   end Is_Archive;
 
    --------------------------
    -- Is_Post_Type_Archive --
    --------------------------
 
-   function Is_Post_Type_Archive (Post_Types : String := "")
+   function Is_Post_Type_Archive (Post_Types : String) -- := "")
                                   return Boolean
    is
---    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -205,40 +192,34 @@ is
       return Global_Wp_Query.Is_Post_Type_Archive (Post_Types);
    end Is_Post_Type_Archive;
 
--- --
--- -- Determines whether the query is for an existing attachment page.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 2.0.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param int|string|int[]|string[] attachment Optional. Attachment ID, title, slug, or array of such
--- --                                              to check against. Default empty.
--- -- @return bool Whether the query is for an existing attachment page.
--- --
--- function is_attachment( attachment = "" ) then
---         global wp_query;
+   -------------------
+   -- Is_Attachment --
+   -------------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Attachment (Attachment : String)
+                           return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_attachment( attachment );
--- end;
+      return False; -- Global_Wp_Query.Is_Attachment (Attachment); -- XXX ???
+   end Is_Attachment;
 
    ---------------
    -- Is_Author --
    ---------------
 
-   function Is_Author (Author : String := "")
+   function Is_Author (Author : String)
                        return Boolean
    is
---    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -257,7 +238,7 @@ is
    -- Is_Category --
    -----------------
 
-   function Is_Category (Category : String := "")
+   function Is_Category (Category : String) --  := "")
                          return Boolean
    is
 --    use UStrings;
@@ -280,7 +261,7 @@ is
    -- Is_Tag --
    ------------
 
-   function Is_Tag (Tag : String := "")
+   function Is_Tag (Tag : String) --  := "")
                     return Boolean
    is
 --    use UStrings;
@@ -302,8 +283,8 @@ is
    -- Is_Tax --
    ------------
 
-   function Is_Tax (Taxonomy : String := "";
-                    Term     : String := "")
+   function Is_Tax (Taxonomy : String; --  := "";
+                    Term     : String) --  := "")
                     return Boolean
    is
 --    use UStrings;
@@ -321,29 +302,26 @@ is
       return Global_Wp_Query.Is_Tax (Taxonomy, Term);
    end Is_Tax;
 
--- --
--- -- Determines whether the query is for an existing date archive.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for an existing date archive.
--- --
--- function is_date() then
---         global wp_query;
+   -------------
+   -- Is_Date --
+   -------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Date
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_date();
--- end;
+      return Global_Wp_Query.Is_Date;
+   end Is_Date;
 
    ------------
    -- Is_Day --
@@ -352,10 +330,8 @@ is
    function Is_Day
             return Boolean
    is
---    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
---    global wp_query;
    begin
       if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
@@ -368,31 +344,27 @@ is
       return Global_Wp_Query.Is_Day;
    end Is_Day;
 
--- --
--- -- Determines whether the query is for a feed.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param string|string[] feeds Optional. Feed type or array of feed types
--- --                                         to check against. Default empty.
--- -- @return bool Whether the query is for a feed.
--- --
--- function is_feed( feeds = "" ) then
---         global wp_query;
+   -------------
+   -- Is_Feed --
+   -------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Feed (Feeds : String := "")
+                     return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+--    global wp_query;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_feed( feeds );
--- end;
+      return False; -- Global_Wp_Query.Is_Feed (Feeds); -- XXX ???
+   end Is_Feed;
 
 -- --
 -- -- Is the query for a comments feed?
@@ -460,35 +432,26 @@ is
       return Global_Wp_Query.Is_Home;
    end Is_Home;
 
--- --
--- -- Determines whether the query is for the Privacy Policy page.
--- --
--- -- The Privacy Policy page is the page that shows the Privacy Policy content of the site.
--- --
--- -- is_privacy_policy() is dependent on the site"s "Change your Privacy Policy page" Privacy Settings "wp_page_for_privacy_policy".
--- --
--- -- This function will return true only on the page you set as the "Privacy Policy page".
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 5.2.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for the Privacy Policy page.
--- --
--- function is_privacy_policy() then
---         global wp_query;
+   -----------------------
+   -- Is_Privacy_Policy --
+   -----------------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Privacy_Policy
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_privacy_policy();
--- end;
+      return Global_Wp_Query.Is_Privacy_Policy;
+   end Is_Privacy_Policy;
 
    --------------
    -- Is_Month --
@@ -497,10 +460,8 @@ is
    function Is_Month
             return Boolean
    is
---    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
---         global wp_query;
    begin
       if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
@@ -513,36 +474,28 @@ is
       return Global_Wp_Query.Is_Month;
    end Is_Month;
 
--- --
--- -- Determines whether the query is for an existing single page.
--- --
--- -- If the page parameter is specified, this function will additionally
--- -- check if the query is for one of the pages specified.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @see is_single()
--- -- @see is_singular()
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param int|string|int[]|string[] page Optional. Page ID, title, slug, or array of such
--- --                                        to check against. Default empty.
--- -- @return bool Whether the query is for an existing single page.
--- --
--- function is_page( page = "" ) then
---         global wp_query;
+   -------------
+   -- Is_Page --
+   -------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Page (Page : String) --  := "")
+                     return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
 
---         return wp_query->is_page( page );
--- end;
+--    global wp_query;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
+
+      return Global_Wp_Query.Is_Page (Page);
+   end Is_Page;
 
 -- --
 -- -- Determines whether the query is for a paged result and not for the first page.
@@ -592,45 +545,51 @@ is
 --         return wp_query->is_preview();
 -- end;
 
--- --
--- -- Is the query for the robots.txt file?
--- --
--- -- @since 2.1.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for the robots.txt file.
--- --
--- function is_robots() then
---         global wp_query;
+   ---------------
+   -- Is_Robots --
+   ---------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Robots
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
 
---         return wp_query->is_robots();
--- end;
+--    global wp_query;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
--- --
--- -- Is the query for the favicon.ico file?
--- --
--- -- @since 5.4.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for the favicon.ico file.
--- --
--- function is_favicon() then
---         global wp_query;
+      return Global_Wp_Query.Is_Robots;
+   end Is_Robots;
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   ----------------
+   -- Is_Favicon --
+   ----------------
 
---         return wp_query->is_favicon();
--- end;
+   function Is_Favicon
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+
+--    global wp_query;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
+
+      return Global_Wp_Query.Is_Favicon;
+   end Is_Favicon;
 
    ---------------
    -- Is_Search --
@@ -658,7 +617,7 @@ is
    -- Is_Single --
    ---------------
 
-   function Is_Single (Post : String := "")
+   function Is_Single (Post : String) -- := "")
             return Boolean
    is
 --    use UStrings;
@@ -680,7 +639,7 @@ is
    -- Is_Singular --
    -----------------
 
-   function Is_Singular (Post_Types : String := "")
+   function Is_Singular (Post_Types : String) -- := "")
                          return Boolean
    is
 --    use UStrings;
@@ -722,29 +681,28 @@ is
 --         return wp_query->is_time();
 -- end;
 
--- --
--- -- Determines whether the query is for a trackback endpoint call.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for a trackback endpoint call.
--- --
--- function is_trackback() then
---         global wp_query;
+   ------------------
+   -- Is_Trackback --
+   ------------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Trackback
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
 
---         return wp_query->is_trackback();
--- end;
+--    global wp_query;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
+
+      return Global_Wp_Query.Is_Trackback;
+   end Is_Trackback;
 
    -------------
    -- Is_Year --
@@ -776,7 +734,6 @@ is
    function Is_404
             return Boolean
    is
---    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --    global wp_query;
@@ -792,25 +749,27 @@ is
       return Global_Wp_Query.Is_404;
    end Is_404;
 
--- --
--- -- Is the query for an embedded post?
--- --
--- -- @since 4.4.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for an embedded post.
--- --
--- function is_embed() then
---         global wp_query;
+   --------------
+   -- Is_Embed --
+   --------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Embed
+            return Boolean
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+--    global wp_query;
+   begin
+      if not Isset (Global_Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_embed();
--- end;
+      return Global_Wp_Query.Is_Embed;
+   end Is_Embed;
 
    -------------------
    -- Is_Main_Query --

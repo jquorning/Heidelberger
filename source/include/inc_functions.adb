@@ -30,11 +30,14 @@ with Logging;
 with UStrings;
 with Wp_Common;
 
-with Inc_Caches;
-with Inc_Capabilities;
-with Class_WpDB;
+with Class_Querys;
 with Class_List_Util;
 with Class_Networks;
+with Class_WpDB;
+
+with Inc_Caches;
+with Inc_Capabilities;
+with Inc_Feeds;
 with Inc_Formatting;
 with Inc_General_Templates;
 with Inc_Link_Templates;
@@ -45,6 +48,7 @@ with Inc_Ms_Networks;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Pluggables;
+with Inc_Querys;
 
 package body Inc_Functions
 is
@@ -1418,26 +1422,33 @@ is
 --         return wp_remote_retrieve_body( response );
 -- end;
 
---
--- Sets up the WordPress query.
---
--- @since 2.0.0
---
--- @global WP       wp           Current WordPress environment instance.
--- @global WP_Query wp_query     WordPress Query object.
--- @global WP_Query wp_the_query Copy of the WordPress Query object.
---
--- @param string|array query_vars Default WP_Query arguments.
---
--- function wp( query_vars = "" ) then
---         global wp, wp_query, wp_the_query;
+   --------
+   -- Wp --
+   --------
 
---         wp->main( query_vars );
+   procedure Wp (Query_Vars : Array_Type := Empty_Array)
+   is
+      use Class_Querys;
+      use Inc_Querys;
+--    global wp, wp_query, wp_the_query;
 
---         if ( ! isset( wp_the_query ) ) then
---                 wp_the_query = wp_query;
---         end;
--- end;
+      function Isset (Query : Wp_Query)
+                      return Boolean;
+
+      function Isset (Query : Wp_Query)
+                      return Boolean
+      is
+      begin
+         return Query /= Null_Query;
+      end Isset;
+
+   begin
+      Globals.Global_Wp.Main (Query_Vars);
+
+      if not Isset (Global_Wp_The_Query) then
+         Global_Wp_The_Query := Global_Wp_Query;
+      end if;
+   end Wp;
 
    ----------------------------
    -- Get_Status_Header_Desc --
@@ -1691,54 +1702,53 @@ is
 --         return ( "y" === strtolower( yn ) );
 -- end;
 
---
--- Loads the feed template from the use of an action hook.
---
--- If the feed action does not have a hook, then the function will die with a
--- message telling the visitor that the feed is not valid.
---
--- It is better to only have one hook for each feed.
---
--- @since 2.1.0
---
--- @global WP_Query wp_query WordPress Query object.
---
--- function do_feed() then
---         global wp_query;
+   -------------
+   -- Do_Feed --
+   -------------
 
---         feed = get_query_var( "feed" );
+   procedure Do_Feed
+   is
+      use Php.Preg;
+      use Wp_Common;
+      use Inc_Feeds;
+      use Inc_L10n;
+      use Inc_Querys;
+      use Inc_Plugins;
+--    global wp_query;
 
---         // Remove the pad, if present.
---         feed = preg_replace( "/^_+/", "", feed );
+      Feed_3 : constant String := Get_Query_Var ("feed");
 
---         if ( "" === feed || "feed" === feed ) then
---                 feed = get_default_feed();
---         end;
+      -- Remove the pad, if present.
+      Feed_2 : constant String := Preg_Replace ("/^_+/", "", Feed_3);
 
---         if ( ! has_action( "do_feed_thenfeedend;" ) ) then
---                 wp_die( __( "<strong>Error:</strong> This is not a valid feed template." ), "", array( "response" => 404 ) );
---         end;
+      Feed : constant String :=
+        (if Feed_2 in "" | "feed" then Get_Default_Feed else Feed_2);
+   begin
+      if not Has_Action ("do_feed_" & Feed) then
+         Wp_Die (abs "<strong>Error:</strong> This is not a valid feed template.",
+                 "", 404); -- Build ("response", 404));
+      end if;
 
---         --
---         -- Fires once the given feed is loaded.
---         --
---         -- The dynamic portion of the hook name, `feed`, refers to the feed template name.
---         --
---         -- Possible hook names include:
---         --
---         --  - `do_feed_atom`
---         --  - `do_feed_rdf`
---         --  - `do_feed_rss`
---         --  - `do_feed_rss2`
---         --
---         -- @since 2.1.0
---         -- @since 4.4.0 The `feed` parameter was added.
---         --
---         -- @param bool   is_comment_feed Whether the feed is a comment feed.
---         -- @param string feed            The feed name.
---         --
---         do_action( "do_feed_thenfeedend;", wp_query->is_comment_feed, feed );
--- end;
+      --
+      -- Fires once the given feed is loaded.
+      --
+      -- The dynamic portion of the hook name, `feed`, refers to the feed template name.
+      --
+      -- Possible hook names include:
+      --
+      --  - `do_feed_atom`
+      --  - `do_feed_rdf`
+      --  - `do_feed_rss`
+      --  - `do_feed_rss2`
+      --
+      -- @since 2.1.0
+      -- @since 4.4.0 The `feed` parameter was added.
+      --
+      -- @param bool   is_comment_feed Whether the feed is a comment feed.
+      -- @param string feed            The feed name.
+      --
+      Do_Action ("do_feed_" & Feed, Global_Wp_Query.Is_Comment_Feed, Feed);
+   end Do_Feed;
 
 --
 -- Loads the RDF RSS 0.91 Feed template.

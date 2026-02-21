@@ -333,7 +333,7 @@ is
 --    This.Label  := This.Labels.Name;
    end Set_Props;
 
-   Wp : Class_Wp.Wp;
+--   Wp : Class_Wp.Wp_Class;
 
    -----------------------
    -- Add_Rewrite_Rules --
@@ -352,7 +352,7 @@ is
       -- in the admin.
       if "" /= This.Query_Var then -- and then Wp then
 --    if False /= This.Query_Var and then wp then
-         Wp.Add_Query_Var (-This.Query_Var);
+         Globals.Global_Wp.Add_Query_Var (-This.Query_Var);
       end if;
 
       if

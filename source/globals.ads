@@ -16,7 +16,9 @@ with Class_Screens;
 with Class_Scripts;
 with Class_Styles;
 with Class_Taxonomy;
+with Class_Users;
 with Class_WpDB;
+with Class_Wp;
 
 package Globals
 is
@@ -50,6 +52,8 @@ is
         (Key_Type     => String,
          Element_Type => Natural);
 
+   Global_Wp                : Class_Wp.Wp_Class;
+
    Global_Wp_Filter         : Class_Hook_Maps.Hook_Maps.Map;
    Global_Wp_Actions        : Count_Maps.Map;
    Global_Wp_Filters        : Natural_Maps.Map;
@@ -75,7 +79,16 @@ is
    Global_Post_Id   : Class_Posts.Post_Id_Type;
    Post_Type        : UStrings.UString;
    Post_Type_Object : Class_Post_Type.Wp_Post_Type;
-   Post             : Class_Posts.Wp_Post;
+   Global_Post      : Class_Posts.Wp_Post;
+   Global_Posts     : Class_Posts.Post_Array;
+
+   Global_Query_String  : UStrings.UString;
+   Global_Wp_Did_Header : Boolean := False;
+
+   Global_Request    : UStrings.UString;
+   Global_More       : Natural;
+   Global_Single     : Natural;
+   Global_Authordata : Class_Users.Wp_User;
 
    Action   : UStrings.UString;
    Taxonomy : UStrings.UString;

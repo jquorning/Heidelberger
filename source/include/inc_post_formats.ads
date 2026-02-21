@@ -8,20 +8,25 @@
 with Arrays;
 with Lists;
 
+with Class_Posts;
+
 package Inc_Post_Formats
 is
    use Arrays;
    use Lists;
 
--- --
--- -- Retrieve the format slug for a post
--- --
--- -- @since 3.1.0
--- --
--- -- @param int|WP_Post|null post Optional. Post ID or post object. Defaults to the current post in the loop.
--- -- @return string|false The format if successful. False otherwise.
--- --
--- function get_post_format( post = null ) then
+   --
+   -- Retrieve the format slug for a post
+   --
+   -- @since 3.1.0
+   --
+   -- @param int|WP_Post|null post Optional. Post ID or post object. Defaults to the
+   --                              current post in the loop.
+   -- @return string|false The format if successful. False otherwise.
+   --
+   function Get_Post_Format (Post : Class_Posts.Wp_Post := Class_Posts.Null_Post)
+                              return String
+   is (raise Program_Error with "not implemented");
 --         post = get_post( post );
 
 --         if ( ! post ) then

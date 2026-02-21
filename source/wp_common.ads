@@ -821,4 +821,16 @@ is
    procedure Do_Action (Hook_Name : String;
                         User      : Class_Users.User_Id_Type);
 
+   procedure Do_Action (Hook_Name     : String;
+                        Post_Id       : Class_Posts.Post_Id_Type;
+                        Trackback_Url : String;
+                        Charset       : String;
+                        Title         : String;
+                        Excerpt       : String;
+                        Blog_Name     : String);
+
+   procedure Do_Action (Hook_Name  : String;
+                        Is_Comment : Boolean;
+                        Feed       : String);
+
 end Wp_Common;

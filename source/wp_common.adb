@@ -1880,4 +1880,28 @@ is
       Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
    end Do_Action;
 
+   procedure Do_Action (Hook_Name     : String;
+                        Post_Id       : Class_Posts.Post_Id_Type;
+                        Trackback_Url : String;
+                        Charset       : String;
+                        Title         : String;
+                        Excerpt       : String;
+                        Blog_Name     : String)
+   is
+      use Arrayable_Arrays;
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
+   end Do_Action;
+
+   procedure Do_Action (Hook_Name  : String;
+                        Is_Comment : Boolean;
+                        Feed       : String)
+   is
+      use Arrayable_Arrays;
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
+   end Do_Action;
+
 end Wp_Common;

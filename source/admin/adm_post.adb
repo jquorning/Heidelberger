@@ -120,11 +120,11 @@ is
             Sendback : UString;
          begin
             if Id /= 0 then
-               Post := Inc_Posts.Get_Post (Id);
+               Global_Post := Inc_Posts.Get_Post (Id);
             end if;
 
    --       if Post then
-            Post_Type        := Post.Post_Type;
+            Post_Type        := Global_Post.Post_Type;
             Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Post_Type);
    --       end if;
 
@@ -196,15 +196,15 @@ is
                      end if;
                   end;
 
-                  Post :=
+                  Global_Post :=
                     Inc_Posts.Get_Post (Post_Id_Type (As_Integer (Get (X_REQUEST, "post_ID"))));
 
-                  Check_Admin_Referer ("add-" & (-Post.Post_Type));
+                  Check_Admin_Referer ("add-" & (-Global_Post.Post_Type));
 
                   Set (X_POST, "comment_status",
-                       From_String (Get_Default_Comment_Status (-Post.Post_Type)));
+                       From_String (Get_Default_Comment_Status (-Global_Post.Post_Type)));
                   Set (X_POST, "ping_status",
-                       From_String (Get_Default_Comment_Status (-Post.Post_Type, "pingback")));
+                       From_String (Get_Default_Comment_Status (-Global_Post.Post_Type, "pingback")));
 
                   -- Wrap Quick Draft content in the Paragraph block.
                   if Ada.Strings.Fixed.Index (Get_As_String (X_POST, "content"),
@@ -253,7 +253,7 @@ is
                      goto Bailout;
                   end if;
 
-                  if Post = Null_Post then
+                  if Global_Post = Null_Post then
                      Wp_Die
                        (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
@@ -277,7 +277,7 @@ is
                        (abs "Sorry, you are not allowed to edit this item.");
                   end if;
 
-                  if "trash" = Post.Post_Status then
+                  if "trash" = Global_Post.Post_Status then
                      Wp_Die
                         (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                   end if;
@@ -294,7 +294,7 @@ is
                      goto Bailout;
                   end if;
 
-                  Post_Type := Post.Post_Type;
+                  Post_Type := Global_Post.Post_Type;
                   if "post" = Post_Type then
                      Parent_File   := +"edit.php";
                      Submenu_File  := +"edit.php";
@@ -329,19 +329,21 @@ is
                   --                false.
                   -- @param WP_Post post    Post object.
                   --
-                  if True = Apply_Filters ("replace_editor", "false", Post) then -- false
+                  if
+                    True = Apply_Filters ("replace_editor", "false", Global_Post)
+                  then -- false
                      goto Label_1; -- break;
                   end if;
 
-                  if Use_Block_Editor_For_Post (Post) then
+                  if Use_Block_Editor_For_Post (Global_Post) then
 --                        require ABSPATH . "wp-admin/edit-form-blocks.php";
                      goto Label_1; -- break;
                   end if;
 
-                  if 0 = Wp_Check_Post_Lock (Image (Post.Id)) then
+                  if 0 = Wp_Check_Post_Lock (Image (Global_Post.Id)) then
                      declare
                         Active_Post_Lock : Array_Type :=
-                           Wp_Set_Post_Lock (Integer (Post.Id));
+                           Wp_Set_Post_Lock (Integer (Global_Post.Id));
                         pragma Unreferenced (Active_Post_Lock);
                      begin
                         if "attachment" /= Post_Type then
@@ -350,7 +352,7 @@ is
                      end;
                   end if;
 
-                  Post := Inc_Posts.Get_Post (Id, "OBJECT", "edit");
+                  Global_Post := Inc_Posts.Get_Post (Id, "OBJECT", "edit");
 
                   if Post_Type_Supports (-Post_Type, "comments") then
                      Wp_Enqueue_Script ("admin-comments");
@@ -403,7 +405,7 @@ is
                elsif Action = "trash" then
                   Check_Admin_Referer ("trash-post_" & Image (Id));
 
-                  if Post = Null_Post then
+                  if Global_Post = Null_Post then
                      Wp_Die
                         (abs "The item you are trying to move to the Trash no longer exists.");
                   end if;
@@ -451,7 +453,7 @@ is
                elsif Action = "untrash" then
                   Check_Admin_Referer ("untrash-post_" & Image (Id));
 
-                  if Post = Null_Post then
+                  if Global_Post = Null_Post then
                      Wp_Die
                        (abs "The item you are trying to restore from the Trash no longer exists.");
                   end if;
@@ -460,11 +462,11 @@ is
                      Wp_Die (abs "Invalid post type.");
                   end if;
 
-                  if not Current_User_Can ("delete_post", Post) then
+                  if not Current_User_Can ("delete_post", Global_Post) then
                      Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
                   end if;
 
-                  if not Inc_Posts.Wp_Untrash_Post (Post) then
+                  if not Inc_Posts.Wp_Untrash_Post (Global_Post) then
                      Wp_Die
                         (abs "Error in restoring the item from Trash.");
                   end if;
@@ -481,7 +483,7 @@ is
                elsif Action = "delete" then
                   Check_Admin_Referer ("delete-post_" & Image (Id));
 
-                  if Post = Null_Post then
+                  if Global_Post = Null_Post then
                      Wp_Die (abs "This item has already been deleted.");
                   end if;
 
@@ -494,7 +496,7 @@ is
                         (abs "Sorry, you are not allowed to delete this item.");
                   end if;
 
-                  if "attachment" = Post.Post_Type then
+                  if "attachment" = Global_Post.Post_Type then
                      declare
                         Force : constant Boolean := not MEDIA_TRASH;
                      begin

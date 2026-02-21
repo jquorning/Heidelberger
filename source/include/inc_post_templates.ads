@@ -70,4 +70,21 @@ is
    function The_Title_Attribute (Args : Array_Type) -- ""
                                  return String;
 
+   --
+   -- Gets the specific template filename for a given post.
+   --
+   -- @since 3.4.0
+   -- @since 4.7.0 Now works with any post type, not just pages.
+   --
+   -- @param int|WP_Post post Optional. Post ID or WP_Post object. Default is global
+   --                         post.
+   -- @return string|false Page template filename. Returns an empty string when the
+   --                      default page template is in use. Returns false if the post
+   --                      does not exist.
+   --
+   function Get_Page_Template_Slug
+              (Post : Class_Posts.Wp_Post := Class_Posts.Null_Post) -- = null
+               return String
+   is (raise Program_Error with "not implemented");
+
 end Inc_Post_Templates;

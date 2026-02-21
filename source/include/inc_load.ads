@@ -399,6 +399,16 @@ is
             return Boolean;
 
    --
+   -- Determines whether the current request should use themes.
+   --
+   -- @since 5.1.0
+   --
+   -- @return bool True if themes should be used, false otherwise.
+   --
+   function Wp_Using_Themes
+            return Boolean;
+
+   --
    -- Checks whether current request is a JSON request, or is expecting a
    -- JSON response.
    --

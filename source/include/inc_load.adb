@@ -1613,23 +1613,25 @@ is
       return Apply_Filters ("wp_doing_ajax", DOING_AJAX_DEF and then DOING_AJAX);
    end Wp_Doing_AJAX;
 
--- --
--- -- Determines whether the current request should use themes.
--- --
--- -- @since 5.1.0
--- --
--- -- @return bool True if themes should be used, false otherwise.
--- --
--- function wp_using_themes() then
---         --
---         -- Filters whether the current request should use themes.
---         --
---         -- @since 5.1.0
---         --
---         -- @param bool wp_using_themes Whether the current request should use themes.
---         --
---         return apply_filters( "wp_using_themes", defined( "WP_USE_THEMES" ) && WP_USE_THEMES );
--- end;
+   ---------------------
+   -- Wp_Using_Themes --
+   ---------------------
+
+   function Wp_Using_Themes
+            return Boolean
+   is
+      use Constants;
+      use Wp_Common;
+   begin
+      --
+      -- Filters whether the current request should use themes.
+      --
+      -- @since 5.1.0
+      --
+      -- @param bool wp_using_themes Whether the current request should use themes.
+      --
+      return Apply_Filters ("wp_using_themes", WP_USE_THEMES);
+   end Wp_Using_Themes;
 
 -- --
 -- -- Determines whether the current request is a WordPress cron request.

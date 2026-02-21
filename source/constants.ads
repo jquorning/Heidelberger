@@ -33,6 +33,7 @@ is
    TEMPLATEPATH     : UStrings.UString;
    STYLESHEETPATH   : UStrings.UString;
    WP_DEFAULT_THEME : UStrings.UString;
+   WP_USE_THEMES    : Boolean := True;
 
    MINUTE_IN_SECONDS : constant Natural := 60;
    HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
