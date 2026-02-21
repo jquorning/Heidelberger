@@ -556,6 +556,18 @@ is
                          return Wp_Query;
 
    --
+   -- Sets up the current post.
+   --
+   -- Retrieves the next post, sets up the post, sets the 'in the loop'
+   -- property to true.
+   --
+   -- @since 1.5.0
+   --
+   -- @global WP_Post $post Global post object.
+   --
+   procedure The_Post (This : Wp_Query);
+
+   --
    -- Retrieves the currently queried object.
    --
    -- If queried object is not set, then the queried object will be set from
@@ -763,6 +775,39 @@ is
    --
    function Is_Main_Query (This : Wp_Query)
                            return Boolean;
+
+   --
+   -- Set up global post data.
+   --
+   -- @since 4.1.0
+   -- @since 4.4.0 Added the ability to pass a post ID to `$post`.
+   --
+   -- @global int     $id
+   -- @global WP_User $authordata
+   -- @global string  $currentday
+   -- @global string  $currentmonth
+   -- @global int     $page
+   -- @global array   $pages
+   -- @global int     $multipage
+   -- @global int     $more
+   -- @global int     $numpages
+   --
+   -- @param WP_Post|object|int $post WP_Post instance or Post ID/object.
+   -- @return true True when finished.
+   --
+   procedure Setup_Postdata (This : in out Wp_Query;
+                             Post : Class_Posts.Wp_Post)
+   is null;
+
+   --
+   -- After looping through a nested query, this function
+   -- restores the $post global to the current post in this query.
+   --
+   -- @since 3.7.0
+   --
+   -- @global WP_Post $post Global post object.
+   --
+   procedure Reset_Postdata (This : in out Wp_Query);
 
    --
    -- Sets up the WordPress query by parsing query string.

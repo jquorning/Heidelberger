@@ -7,11 +7,20 @@
 
 with Php.Echoing;
 with Php.HTML;
+with Php.JSON;
+with Php.Misc;
 with Php.Strings;
 
+with Constants;
 with Wp_Common;
+with UStrings;
 
 with Inc_Formatting;
+with Inc_Functions;
+with Inc_HTTP;
+with Inc_Link_Templates;
+with Inc_Load;
+with Inc_Options;
 
 package body Adi_Misc
 is
@@ -1575,80 +1584,109 @@ is
 --         return title;
 -- end;
 
--- --
--- -- Checks if the user needs to update PHP.
--- --
--- -- @since 5.1.0
--- -- @since 5.1.1 Added the {@see "wp_is_php_version_acceptable"} filter.
--- --
--- -- @return array|false Array of PHP version data. False on failure.
--- --
--- function wp_check_php_version() then
---         version = PHP_VERSION;
---         key     = md5( version );
+   --------------------------
+   -- Wp_Check_PHP_Version --
+   --------------------------
 
---         response = get_site_transient( "php_check_" . key );
+   function Wp_Check_PHP_Version
+            return Array_Type
+   is
+      use Php.JSON;
+      use Php.Misc;
+      use Wp_Common;
+      use UStrings;
+      use Inc_Functions;
+      use Inc_HTTP;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Options;
 
---         if ( false === response ) then
---                 url = "http://api.wordpress.org/core/serve-happy/1.0/";
+      Version : constant String := Php.Misc.PHP_VERSION;
+      Key     : constant String := Php.Misc.MD5 (Version);
 
---                 if ( wp_http_supports( array( "ssl" ) ) ) then
---                         url = set_url_scheme( url, "https" );
---                 end;
+      Response_2 : Array_Type;
+      Response : constant String_Maps.Map := Get_Site_Transient ("php_check_" & Key);
+   begin
+      if Response.Is_Empty then
+         declare
+            URL : UString := +"http://api.wordpress.org/core/serve-happy/1.0/";
+         begin
+            if Wp_HTTP_Supports (Build ("ssl", True)) then
+               URL := +Set_URL_Scheme (-URL, "https");
+            end if;
 
---                 url = add_query_arg( "php_version", version, url );
+            URL := +Add_Query_Arg ("php_version", Version, -URL);
 
---                 response = wp_remote_get( url );
+            Response_2 := Wp_Remote_Get (-URL);
 
---                 if ( is_wp_error( response ) || 200 !== wp_remote_retrieve_response_code( response ) ) then
---                         return false;
---                 end;
+            if
+              Is_Wp_Error (Response_2) or else
+              200 /= Wp_Remote_Retrieve_Response_Code (Response_2)
+            then
+               return Empty_Array; -- False
+            end if;
 
---                 --
---                 -- Response should be an array with:
---                 --  "recommended_version" - string - The PHP version recommended by WordPress.
---                 --  "is_supported" - boolean - Whether the PHP version is actively supported.
---                 --  "is_secure" - boolean - Whether the PHP version receives security updates.
---                 --  "is_acceptable" - boolean - Whether the PHP version is still acceptable or warnings
---                 --                              should be shown and an update recommended.
---                 --
---                 response = json_decode( wp_remote_retrieve_body( response ), true );
+            --
+            -- Response should be an array with:
+            --  "recommended_version" - string - The PHP version recommended by
+            --                                   WordPress.
+            --  "is_supported" - boolean - Whether the PHP version is actively
+            --                             supported.
+            --  "is_secure" - boolean - Whether the PHP version receives security
+            --                          updates.
+            --  "is_acceptable" - boolean - Whether the PHP version is still
+            --                              acceptable or warnings should be shown
+            --                              and an update recommended.
+            --
+            Response_2 :=
+              JSON_Decode (Wp_Remote_Retrieve_Body (Response_2), True);
 
---                 if ( ! is_array( response ) ) then
---                         return false;
---                 end;
+            -- if not Is_Array (Response) then
+            --    return false;
+            -- end if;
 
---                 set_site_transient( "php_check_" . key, response, WEEK_IN_SECONDS );
---         end;
+            Set_Site_Transient ("php_check_" & Key, Response_2,
+                                Constants.WEEK_IN_SECONDS);
+         end;
 
---         if ( isset( response["is_acceptable"] ) && response["is_acceptable"] ) then
---                 --
---                 -- Filters whether the active PHP version is considered acceptable by WordPress.
---                 --
---                 -- Returning false will trigger a PHP version warning to show up in the admin dashboard to administrators.
---                 --
---                 -- This filter is only run if the wordpress.org Serve Happy API considers the PHP version acceptable, ensuring
---                 -- that this filter can only make this check stricter, but not loosen it.
---                 --
---                 -- @since 5.1.1
---                 --
---                 -- @param bool   is_acceptable Whether the PHP version is considered acceptable. Default true.
---                 -- @param string version       PHP version checked.
---                 --
---                 response["is_acceptable"] = (bool) apply_filters( "wp_is_php_version_acceptable", true, version );
---         end;
+         if
+           Isset (Response_2, "is_acceptable") and then
+           As_Boolean (Get (Response_2, "is_acceptable"))
+         then
+            --
+            -- Filters whether the active PHP version is considered acceptable by
+            -- WordPress.
+            --
+            -- Returning false will trigger a PHP version warning to show up in the
+            -- admin dashboard to administrators.
+            --
+            -- This filter is only run if the wordpress.org Serve Happy API considers
+            -- the PHP version acceptable, ensuring that this filter can only make
+            -- this check stricter, but not loosen it.
+            --
+            -- @since 5.1.1
+            --
+            -- @param bool   is_acceptable Whether the PHP version is considered
+            --                             acceptable. Default true.
+            -- @param string version       PHP version checked.
+            --
+            Set (Response_2, "is_acceptable", From_Boolean (
+                 Apply_Filters ("wp_is_php_version_acceptable", True, Version)));
+         end if;
 
---         response["is_lower_than_future_minimum"] = false;
+         Set (Response_2, "is_lower_than_future_minimum", From_Boolean (False));
 
---         -- The minimum supported PHP version will be updated to 7.2. Check if the current version is lower.
---         if ( version_compare( version, "7.2", "<" ) ) then
---                 response["is_lower_than_future_minimum"] = true;
+         -- The minimum supported PHP version will be updated to 7.2. Check if the
+         -- current version is lower.
+         if Version_Compare (Version, "7.2", "<") then
+            Set (Response_2, "is_lower_than_future_minimum", From_Boolean (True));
 
---                 -- Force showing of warnings.
---                 response["is_acceptable"] = false;
---         end;
+            -- Force showing of warnings.
+            Set (Response_2, "is_acceptable", From_Boolean (False));
+         end if;
 
---         return response;
--- end;
+      end if;
+      return Response_2;
+   end Wp_Check_PHP_Version;
 
 end Adi_Misc;

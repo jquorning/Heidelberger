@@ -5,7 +5,6 @@
 -- @subpackage Comment
 --
 
-with Arrays;
 with Globals;
 with Helpers;
 with Wp_Common;
@@ -15,7 +14,6 @@ with Inc_Caches;
 
 package body Inc_Comments
 is
-   use Arrays;
 
 -- --
 -- -- Checks whether a comment passes internal checks to be allowed to add.
@@ -237,21 +235,17 @@ is
       return X_Comment;
    end Get_Comment;
 
--- --
--- -- Retrieves a list of comments.
--- --
--- -- The comment list can be for the blog as a whole or for an individual post.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string|array args Optional. Array or string of arguments. See WP_Comment_Query::__construct()
--- --                           for information on accepted arguments. Default empty.
--- -- @return WP_Comment[]|int[]|int List of comments or number of found comments if `count` argument is true.
--- --
--- function get_comments( args = "" ) then
---         query = new WP_Comment_Query;
---         return query->query( args );
--- end;
+   ------------------
+   -- Get_Comments --
+   ------------------
+
+   function Get_Comments (Args : Array_Type) -- String := "")
+                          return Class_Comments.Comments_List
+   is (raise Program_Error with "not implemented");
+   --    Query : Wp_Comment_Query := X_Construct;
+   -- begin
+   --    return Query.Query (Args);
+   -- end Get_Comments;
 
 -- --
 -- -- Retrieves all of the WordPress supported comment statuses.
@@ -369,11 +363,11 @@ is
    ------------------------
 
    function Get_Comment_Count (Post_Id : Integer := 0)
-                               return Comment_Counts
+                               return Comment_Counts_Type
    is
 --    post_id = (int) post_id;
 
-      Comment_Count : constant Comment_Counts := (others => 0);
+      Comment_Count : constant Comment_Counts_Type := (others => 0);
         --  = array(
         --         "approved"            => 0,
         --         "awaiting_moderation" => 0,
@@ -1400,7 +1394,7 @@ is
    -- }
    --
    function Wp_Count_Comments (Post_Id : Integer := 0)
-                               return Comment_Counts
+                               return Comment_Counts_Type
    is
       use Wp_Common;
       use Inc_Caches;
@@ -1418,7 +1412,7 @@ is
       -- @param int            post_id The post ID. Can be 0 to represent the whole
       --                                site.
       --
-      Filtered : constant Comment_Counts :=
+      Filtered : constant Comment_Counts_Type :=
         Apply_Filters ("wp_count_comments",
                        Null_Comment_Counts,
                        Post_Id);
@@ -1430,7 +1424,7 @@ is
 
       declare
          Found : Boolean;
-         Count : constant Comment_Counts :=
+         Count : constant Comment_Counts_Type :=
            Wp_Cache_Get ("comments-" & Helpers.Image (Post_Id),
                          "counts", Found => Found);
       begin
@@ -1441,13 +1435,13 @@ is
       end;
 
       declare
-         Stats : Comment_Counts := Get_Comment_Count (Post_Id);
+         Stats : Comment_Counts_Type := Get_Comment_Count (Post_Id);
       begin
          Stats.Moderated := Stats.Awaiting_Moderation;
 --       Delete (Ref (Stats, "awaiting_moderation"));
 
          declare
-            Stats_Object : constant Comment_Counts := Stats; -- (object) Stats;
+            Stats_Object : constant Comment_Counts_Type := Stats; -- (object) Stats;
          begin
             Wp_Cache_Set ("comments-" & (Helpers.Image (Post_Id)),
                           Stats_Object, "counts");

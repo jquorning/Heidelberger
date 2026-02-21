@@ -2,7 +2,9 @@
 --
 --
 
-package body Helpers_2 is
+package body Helpers_2
+is
+   use Lists;
 
    -------------------
    -- Generic_Image --
@@ -33,5 +35,34 @@ package body Helpers_2 is
       Procedur;
       return Arrays.Empty_Array;
    end Generic_Call_Procedure;
+
+   ------------------------------
+   -- Generic_Call_Procedure_2 --
+   ------------------------------
+
+   function Generic_Call_Procedure_2
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type
+   is
+      pragma Unreferenced (Arry);
+
+      Unused : constant List_Type := Func (Empty_List);
+   begin
+      return Arrays.Empty_Array;
+   end Generic_Call_Procedure_2;
+
+   ------------------------------
+   -- Generic_Call_Procedure_3 --
+   ------------------------------
+
+   function Generic_Call_Procedure_3
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type
+   is
+      pragma Unreferenced (Arry);
+   begin
+      Procedur ("(not implemented)");
+      return Arrays.Empty_Array;
+   end Generic_Call_Procedure_3;
 
 end Helpers_2;

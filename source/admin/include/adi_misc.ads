@@ -49,4 +49,15 @@ is
    function Wp_Admin_Headers
      is new Helpers_2.Generic_Call_Procedure (Wp_Admin_Headers);
 
+   --
+   -- Checks if the user needs to update PHP.
+   --
+   -- @since 5.1.0
+   -- @since 5.1.1 Added the {@see "wp_is_php_version_acceptable"} filter.
+   --
+   -- @return array|false Array of PHP version data. False on failure.
+   --
+   function Wp_Check_PHP_Version
+            return Array_Type;
+
 end Adi_Misc;

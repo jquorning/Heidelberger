@@ -19,7 +19,7 @@ with Class_Querys;
 package Inc_Querys
 is
 
-   Global_Wp_Query : constant Class_Querys.Wp_Query :=
+   Global_Wp_Query : Class_Querys.Wp_Query :=
      Class_Querys.Null_Query;
 
    --
@@ -75,6 +75,16 @@ is
    --
    function Get_Queried_Object_Id
             return Class_Posts.Post_Id_Type; -- Integer;
+
+   --
+   -- After looping through a separate query, this function restores
+   -- the post global to the current post in the main query.
+   --
+   -- @since 3.0.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   procedure Wp_Reset_Postdata;
 
    --
    -- Determines whether the query is for an existing post type archive page.

@@ -1176,6 +1176,36 @@ is
                                  Post_Id : Class_Posts.Post_Id_Type;
                                  Context : String := "display")
                                  return Array_Type;
+
+   --
+   -- Counts number of posts of a post type and if user has permissions to view.
+   --
+   -- This function provides an efficient method of finding the amount of post"s
+   -- type a blog has. Another method is to count the amount of items in
+   -- get_posts(), but that method has a lot of overhead with doing so. Therefore,
+   -- when developing for 2.5+, use this function instead.
+   --
+   -- The perm parameter checks for "readable" value and if the user can read
+   -- private posts, it will display that for the user that is signed in.
+   --
+   -- @since 2.5.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string type Optional. Post type to retrieve count. Default "post".
+   -- @param string perm Optional. "readable" or empty. Default empty.
+   -- @return stdClass Number of posts for each status.
+   --
+   type Post_Counts_Type is record
+      Publish : Natural;
+   end record;
+
+   Null_Post_Counts : constant Post_Counts_Type := (others => 0);
+
+   function Wp_Count_Posts (Typ  : String := "post";
+                            Perm : String := "")
+                            return Post_Counts_Type;
+
    --
    -- Moves a post or page to the Trash
    --

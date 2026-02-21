@@ -223,7 +223,7 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Comments.Comment_Counts
+                          return Inc_Comments.Comment_Counts_Type
    is
       Result : constant Multi_Type :=
         Wp_Cache_Get (Key, Group, Force, Found);

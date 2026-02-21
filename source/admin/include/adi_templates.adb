@@ -36,6 +36,7 @@ with Inc_General_Templates;
 with Inc_L10n;
 with Inc_Options;
 with Inc_Posts;
+with Inc_Post_Templates;
 with Inc_Taxonomys;
 with Inc_Themes;
 with Inc_Users;
@@ -529,22 +530,19 @@ is
 --         echo ("</div>");
 -- end Get_Inline_Data;
 
--- --
--- -- Outputs the in-line comment reply-to form in the Comments list table.
--- --
--- -- @since 2.7.0
--- --
--- -- @global WP_List_Table wp_list_table
--- --
--- -- @param int    position
--- -- @param bool   checkbox
--- -- @param string mode
--- -- @param bool   table_row
--- --
--- procedure Hb_Comment_Reply (Position : Integer := 1;
---                            Checkbox  : Boolean := False;
---                            Mode      : String  := "single";
---                            Table_Row : Boolean := True)
+   ----------------------
+   -- Wp_Comment_Reply --
+   ----------------------
+
+   procedure Wp_Comment_Reply (Position  : Integer := 1;
+                               Checkbox  : Boolean := False;
+                               Mode      : String  := "single";
+                               Table_Row : Boolean := True)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Wp_Comment_Reply;
+
 -- is
 -- --        global wp_list_table;
 --         --
@@ -671,34 +669,38 @@ is
 -- --         <?php
 -- end Hb_Comment_Reply;
 
--- --
--- -- Outputs "undo move to Trash" text for comments.
--- --
--- -- @since 2.9.0
--- --/
--- procedure Hb_Comment_Trashnotice is
--- begin
--- --         ?>
--- -- <div class="hidden" id="trash-undo-holder">
--- --         <div class="trash-undo-inside">
--- --                 <?php
--- --                 /* translators: %s: Comment author, filled by Ajax.--/
--- --                 printf (__ ("Comment by %s moved to the Trash."), "<strong></strong>");
--- --                 ?>
--- --                 <span class="undo untrash"><a href="#"><?php _e ("Undo"); ?></a></span>
--- --         </div>
--- -- </div>
--- -- <div class="hidden" id="spam-undo-holder">
--- --         <div class="spam-undo-inside">
--- --                 <?php
---                 -- translators: %s: Comment author, filled by Ajax.
---                 printf (abs "Comment by %s marked as spam.", "<strong></strong>");
--- --                 ?>
--- --                 <span class="undo unspam"><a href="#"><?php _e ("Undo"); ?></a></span>
--- --         </div>
--- -- </div>
--- --         <?php
--- end Hb_Comment_Trashnotice;
+   ----------------------------
+   -- Wp_Comment_Trashnotice --
+   ----------------------------
+
+   procedure Wp_Comment_Trashnotice
+   is
+      use Php.Echoing;
+      use Inc_L10n;
+   begin
+      Echo ("<div class=""hidden"" id=""trash-undo-holder"">");
+      Echo ("   <div class=""trash-undo-inside"">");
+
+      -- translators: %s: Comment author, filled by Ajax.
+      Printf (abs "Comment by %s moved to the Trash.", [1 => "<strong></strong>"]);
+
+      Echo ("       <span class=""undo untrash""><a href=""#"">");
+      X_E ("Undo");
+      Echo ("</a></span>");
+      Echo ("    </div>");
+      Echo ("</div>");
+      Echo ("<div class=""hidden"" id=""spam-undo-holder"">");
+      Echo ("    <div class=""spam-undo-inside"">");
+
+      -- translators: %s: Comment author, filled by Ajax.
+      Printf (abs "Comment by %s marked as spam.", [1 => "<strong></strong>"]);
+
+      Echo ("      <span class=""undo unspam""><a href=""#"">");
+      X_E ("Undo");
+      Echo ("</a></span>");
+      Echo ("    </div>");
+      Echo ("</div>");
+   end Wp_Comment_Trashnotice;
 
 -- --
 -- -- Outputs a Post's public meta data in the Custom Fields meta box.
@@ -2389,27 +2391,26 @@ is
 --       end if;
 --    end The_Post_Password;
 
---    --
---    -- Gets the post title.
---    --
---    -- The post title is fetched and if it is blank then a default string is
---    -- returned.
---    --
---    -- @since 2.7.0
---    --
---    -- @param int|WP_Post post Optional. Post ID or WP_Post object. Default is
---    --                         global post.
---    -- @return string The post title if set.
---    --
---    function X_Draft_Or_Post_Title (Post : Integer := 0) return String
---    is
---       Title : UString := +Get_The_Title (Post);
---    begin
---       if Empty (Title) then
---          Title := +abs "(no title)";
---       end if;
---       return ESC_HTML (-Title);
---    end X_Draft_Or_Post_Title;
+   ---------------------------
+   -- X_Draft_Or_Post_Title --
+   ---------------------------
+
+   function X_Draft_Or_Post_Title (Post : Integer := 0)
+                                   return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Inc_Formatting;
+      use Inc_L10n;
+      use Inc_Post_Templates;
+
+      Title : UString := +Get_The_Title (Post);
+   begin
+      if Empty (-Title) then
+         Title := +abs "(no title)";
+      end if;
+      return ESC_HTML (-Title);
+   end X_Draft_Or_Post_Title;
 
    --------------------------
    -- X_Admin_Search_Query --

@@ -36,6 +36,10 @@ is
 
    type Date_Time_Immutable is tagged private;
 
+   function X_Construct (Datetime : String := "now";
+                         Timezone : Date_Time_Zone := Null_Date_Time_Zone)
+                         return Date_Time_Immutable;
+
    function Get_Timestamp (Datetime : Date_Time_Immutable)
                            return Time_Type;
 
@@ -45,6 +49,10 @@ is
    function Format (Datetime : Date_Time_Immutable;
                     Format   : String)
                     return String;
+
+   function Modify (Datetime : Date_Time_Immutable;
+                    Modifier : String)
+                    return Date_Time_Immutable;
 
    function Set_Time_Zone (Datetime : Date_Time_Immutable;
                            Timezone : Date_Time_Zone)

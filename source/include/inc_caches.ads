@@ -193,7 +193,7 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Comments.Comment_Counts;
+                          return Inc_Comments.Comment_Counts_Type;
 
    function Wp_Cache_Get (Key   : Integer;         -- Comment_Id
                           Group : String  := "";
@@ -256,6 +256,8 @@ is
    procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (String);
    procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Array_Type);
    procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Boolean);
-   procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Inc_Comments.Comment_Counts);
+
+   procedure Wp_Cache_Set is
+     new Generic_Wp_Cache_Set (Inc_Comments.Comment_Counts_Type);
 
 end Inc_Caches;

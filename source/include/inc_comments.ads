@@ -8,10 +8,13 @@
 
 with Class_Comments;
 
+with Arrays;
+
 package Inc_Comments
 is
+   use Arrays;
 
-   type Comment_Counts is
+   type Comment_Counts_Type is
       record
          Approved            : Natural;
          Moderated           : Natural;
@@ -46,6 +49,22 @@ is
                          return Class_Comments.Wp_Comment;
 
    --
+   -- Retrieves a list of comments.
+   --
+   -- The comment list can be for the blog as a whole or for an individual post.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string|array args Optional. Array or string of arguments. See
+   --                          WP_Comment_Query::__construct() for information on
+   --                          accepted arguments. Default empty.
+   -- @return WP_Comment[]|int[]|int List of comments or number of found comments
+   --                                if `count` argument is true.
+   --
+   function Get_Comments (Args : Array_Type) -- String := "")
+                          return Class_Comments.Comments_List;
+
+   --
    -- Retrieves the total comment counts for the whole site or a single post.
    --
    -- @since 2.0.0
@@ -70,7 +89,7 @@ is
    -- }
    --
    function Get_Comment_Count (Post_Id : Integer := 0)
-                               return Comment_Counts;
+                               return Comment_Counts_Type;
 
    --
    -- Gets the default comment status for a post type.
@@ -115,9 +134,9 @@ is
    -- }
    --
    function Wp_Count_Comments (Post_Id : Integer := 0)
-                               return Comment_Counts;
+                               return Comment_Counts_Type;
 
-   Null_Comment_Counts : constant Comment_Counts :=
+   Null_Comment_Counts : constant Comment_Counts_Type :=
      (others => 0);
 
 end Inc_Comments;

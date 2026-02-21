@@ -1431,9 +1431,9 @@ is
    end Apply_Filters;
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Comments.Comment_Counts;
+                           Value     : Inc_Comments.Comment_Counts_Type;
                            Post_Id   : Integer)
-                           return Inc_Comments.Comment_Counts
+                           return Inc_Comments.Comment_Counts_Type
    is
       use Arrayable_Arrays;
 

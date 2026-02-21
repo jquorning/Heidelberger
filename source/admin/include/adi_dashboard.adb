@@ -5,266 +5,526 @@
 -- @subpackage Administration
 --
 
+with Ada.Containers.Vectors;
+
+with Php.Arrays;
 with Php.Echoing;
+with Php.Errors;
+with Php.JSON;
+with Php.Misc;
+with Php.Lists;
+with Php.Strings;
 
-with Arrays;
+with Array_Lists;
+with Arrayable_Interfaces;
+with Binder;
+with Constants;
+with Globals;
+with Helpers;
+with Helpers_2;
+with Logging;
 with UStrings;
+with Wp_Common;
 
+with Class_Admin_Bar;
 with Class_Screens;
+with Class_Posts;
+with Class_Post_Type;
+with Class_Querys;
+with Class_Users;
+
+with Adi_List_Tables;
+with Adi_Misc;
 with Adi_Screens;
+with Adi_Posts;
 with Adi_Templates;
+with Adi_Update;
+
+with Inc_Capabilities;
+with Inc_Comments;
+with Inc_Formatting;
 with Inc_Functions;
+with Inc_Functions_Wp_Scripts;
+with Inc_Functions_Wp_Styles;
+with Inc_General_Templates;
+with Inc_HTTP;
+with Inc_Link_Templates;
+with Inc_Load;
 with Inc_L10n;
+with Inc_Ms_Functions;
+with Inc_Options;
+with Inc_Plugins;
+with Inc_Pluggables;
+with Inc_Posts;
+with Inc_Post_Templates;
+with Inc_Querys;
+with Inc_Users;
+with Inc_Vars;
+with Inc_Versions;
 
 package body Adi_Dashboard
 is
-   use Arrays;
 
--- --
--- -- Registers dashboard widgets.
--- --
--- -- Handles POST data, sets up filters.
--- --
--- -- @since 2.5.0
--- --
--- -- @global array wp_registered_widgets
--- -- @global array wp_registered_widget_controls
--- -- @global callable[] wp_dashboard_control_callbacks
--- --
--- function wp_dashboard_setup() then
---         global wp_registered_widgets, wp_registered_widget_controls, wp_dashboard_control_callbacks;
+   package Callable_Vectors is new
+      Ada.Containers.Vectors (Index_Type   => Positive,
+                              Element_Type => Callable);
 
---         screen = get_current_screen();
+   Wp_Registered_Widgets          : Array_Type;
+   Wp_Registered_Widget_Controls  : Array_Type;
+   Wp_Dashboard_Control_Callbacks : Callable_Vectors.Vector;
 
---         -- Register Widgets and Controls--
---         wp_dashboard_control_callbacks = array();
+   function Wp_Dashboard_Browser_Nag is
+     new Helpers_2.Generic_Call_Procedure (Wp_Dashboard_Browser_Nag);
 
---         -- Browser version
---         check_browser = wp_check_browser_version();
+   function Wp_Dashboard_PHP_Nag is
+     new Helpers_2.Generic_Call_Procedure (Wp_Dashboard_PHP_Nag);
 
---         if ( check_browser && check_browser["upgrade"] ) then
---                 add_filter( "postbox_classes_dashboard_dashboard_browser_nag", "dashboard_browser_nag_class" );
+   function Wp_Dashboard_Site_Health is
+     new Helpers_2.Generic_Call_Procedure (Wp_Dashboard_Site_Health);
 
---                 if ( check_browser["insecure"] ) then
---                         wp_add_dashboard_widget( "dashboard_browser_nag", __( "You are using an insecure browser!" ), "wp_dashboard_browser_nag" );
---                 end; else then
---                         wp_add_dashboard_widget( "dashboard_browser_nag", __( "Your browser is out of date!" ), "wp_dashboard_browser_nag" );
---                 end;
---         end;
+   function Wp_Dashboard_Right_Now is
+     new Helpers_2.Generic_Call_Procedure (Wp_Dashboard_Right_Now);
 
---         -- PHP Version.
---         check_php = wp_check_php_version();
+   function Wp_Network_Dashboard_Right_Now is
+     new Helpers_2.Generic_Call_Procedure (Wp_Network_Dashboard_Right_Now);
 
---         if ( check_php && current_user_can( "update_php" ) ) then
---                 -- If "not acceptable" the widget will be shown.
---                 if ( isset( check_php["is_acceptable"] ) && ! check_php["is_acceptable"] ) then
---                         add_filter( "postbox_classes_dashboard_dashboard_php_nag", "dashboard_php_nag_class" );
+   function Wp_Dashboard_Site_Activity is
+     new Helpers_2.Generic_Call_Procedure (Wp_Dashboard_Site_Activity);
 
---                         if ( check_php["is_lower_than_future_minimum"] ) then
---                                 wp_add_dashboard_widget( "dashboard_php_nag", __( "PHP Update Required" ), "wp_dashboard_php_nag" );
---                         end; else then
---                                 wp_add_dashboard_widget( "dashboard_php_nag", __( "PHP Update Recommended" ), "wp_dashboard_php_nag" );
---                         end;
---                 end;
---         end;
+   function Dashboard_Browser_Nag_Class is
+     new Helpers_2.Generic_Call_Procedure_2 (Dashboard_Browser_Nag_Class);
 
---         -- Site Health.
---         if ( current_user_can( "view_site_health_checks" ) && ! is_network_admin() ) then
---                 if ( ! class_exists( "WP_Site_Health" ) ) then
---                         require_once ABSPATH . "wp-admin/includes/class-wp-site-health.php";
---                 end;
+   function Dashboard_PHP_Nag_Class is
+     new Helpers_2.Generic_Call_Procedure_2 (Dashboard_PHP_Nag_Class);
 
---                 WP_Site_Health::get_instance();
+   function Wp_Dashboard_Events_News is
+     new Helpers_2.Generic_Call_Procedure (Wp_Dashboard_Events_News);
 
---                 wp_enqueue_style( "site-health" );
---                 wp_enqueue_script( "site-health" );
+   function Wp_Dashboard_Quick_Press is
+     new Helpers_2.Generic_Call_Procedure_3 (Wp_Dashboard_Quick_Press);
 
---                 wp_add_dashboard_widget( "dashboard_site_health", __( "Site Health Status" ), "wp_dashboard_site_health" );
---         end;
+   function X_Wp_Dashboard_Control_Callback
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type;
 
---         -- Right Now.
---         if ( is_blog_admin() && current_user_can( "edit_posts" ) ) then
---                 wp_add_dashboard_widget( "dashboard_right_now", __( "At a Glance" ), "wp_dashboard_right_now" );
---         end;
+   function X_Wp_Dashboard_Control_Callback
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type
+   is
+   begin
+      X_Wp_Dashboard_Control_Callback (Dashboard => From_Null,
+                                       Meta_Box  => Empty_Array);
+      return Empty_Array;
+   end X_Wp_Dashboard_Control_Callback;
 
---         if ( is_network_admin() ) then
---                 wp_add_dashboard_widget( "network_dashboard_right_now", __( "Right Now" ), "wp_network_dashboard_right_now" );
---         end;
+   function Array_Keys (Blogs : Class_Admin_Bar.Blog_List)
+                        return List_Type;
 
---         -- Activity Widget.
---         if ( is_blog_admin() ) then
---                 wp_add_dashboard_widget( "dashboard_activity", __( "Activity" ), "wp_dashboard_site_activity" );
---         end;
+   function Array_Keys (Blogs : Class_Admin_Bar.Blog_List)
+                        return List_Type
+   is
+      Result : List_Type;
+   begin
+      for A in Blogs.First_Index .. Blogs.Last_Index loop
+         Result.Append (Helpers.Image (A));
+      end loop;
+      return Result;
+   end Array_Keys;
 
---         -- QuickPress Widget.
---         if ( is_blog_admin() && current_user_can( get_post_type_object( "post" )->cap->create_posts ) ) then
---                 quick_draft_title = sprintf( "<span class="hide-if-no-js">%1s</span> <span class="hide-if-js">%2s</span>", __( "Quick Draft" ), __( "Your Recent Drafts" ) );
---                 wp_add_dashboard_widget( "dashboard_quick_press", quick_draft_title, "wp_dashboard_quick_press" );
---         end;
+   ------------------------
+   -- Wp_Dashboard_Setup --
+   ------------------------
 
---         -- WordPress Events and News.
---         wp_add_dashboard_widget( "dashboard_primary", __( "WordPress Events and News" ), "wp_dashboard_events_news" );
+   procedure Wp_Dashboard_Setup
+   is
+      use Php.Echoing;
+      use Php.Errors;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Screens;
+      use Adi_Misc;
+      use Adi_Screens;
+      use Inc_Capabilities;
+      use Inc_Functions;
+      use Inc_Functions_Wp_Scripts;
+      use Inc_Functions_Wp_Styles;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
+      use Inc_Pluggables;
+      use Inc_Posts;
 
---         if ( is_network_admin() ) then
+--    global wp_registered_widgets;
+--    global wp_registered_widget_controls;
+--    global wp_dashboard_control_callbacks;
 
---                 --
---                 -- Fires after core widgets for the Network Admin dashboard have been registered.
---                 --
---                 -- @since 3.1.0
---                 --
---                 do_action( "wp_network_dashboard_setup" );
+      Screen : constant Wp_Screen := Get_Current_Screen;
 
---                 --
---                 -- Filters the list of widgets to load for the Network Admin dashboard.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param string[] dashboard_widgets An array of dashboard widget IDs.
---                 --
---                 dashboard_widgets = apply_filters( "wp_network_dashboard_widgets", array() );
---         end; elseif ( is_user_admin() ) then
+      Dashboard_Widgets : List_Type;
+   begin
+      -- Register Widgets and Controls
+      Wp_Dashboard_Control_Callbacks := Callable_Vectors.Empty_Vector;
 
---                 --
---                 -- Fires after core widgets for the User Admin dashboard have been registered.
---                 --
---                 -- @since 3.1.0
---                 --
---                 do_action( "wp_user_dashboard_setup" );
+      -- Browser version
+      declare
+         Check_Browser : constant Array_Type := Wp_Check_Browser_Version;
+      begin
+         if
+           Check_Browser /= Empty_Array and then
+           As_Boolean (Get (Check_Browser, "upgrade"))
+         then
+            Add_Filter ("postbox_classes_dashboard_dashboard_browser_nag",
+                        Dashboard_Browser_Nag_Class'Access);
 
---                 --
---                 -- Filters the list of widgets to load for the User Admin dashboard.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param string[] dashboard_widgets An array of dashboard widget IDs.
---                 --
---                 dashboard_widgets = apply_filters( "wp_user_dashboard_widgets", array() );
---         end; else then
+            if As_Boolean (Get (Check_Browser, "insecure")) then
+               Wp_Add_Dashboard_Widget ("dashboard_browser_nag",
+                                        abs "You are using an insecure browser!",
+                                        Wp_Dashboard_Browser_Nag'Access);
+            else
+               Wp_Add_Dashboard_Widget ("dashboard_browser_nag",
+                                        abs "Your browser is out of date!",
+                                        Wp_Dashboard_Browser_Nag'Access);
+            end if;
+         end if;
+      end;
 
---                 --
---                 -- Fires after core widgets for the admin dashboard have been registered.
---                 --
---                 -- @since 2.5.0
---                 --
---                 do_action( "wp_dashboard_setup" );
+      -- PHP Version.
+      declare
+         Check_PHP : constant Array_Type := Wp_Check_PHP_Version;
+      begin
+         if
+           Check_PHP /= Empty_Array and then
+           Current_User_Can ("update_php")
+         then
+            -- If "not acceptable" the widget will be shown.
+            if
+              Isset (Check_PHP, "is_acceptable") and then
+              not As_Boolean (Get (Check_PHP, "is_acceptable"))
+            then
+               Add_Filter ("postbox_classes_dashboard_dashboard_php_nag",
+                           Dashboard_PHP_Nag_Class'Access);
 
---                 --
---                 -- Filters the list of widgets to load for the admin dashboard.
---                 --
---                 -- @since 2.5.0
---                 --
---                 -- @param string[] dashboard_widgets An array of dashboard widget IDs.
---                 --
---                 dashboard_widgets = apply_filters( "wp_dashboard_widgets", array() );
---         end;
+               if As_Boolean (Get (Check_PHP, "is_lower_than_future_minimum")) then
+                  Wp_Add_Dashboard_Widget ("dashboard_php_nag",
+                                           abs "PHP Update Required",
+                                           Wp_Dashboard_Php_Nag'Access);
+               else
+                  Wp_Add_Dashboard_Widget ("dashboard_php_nag",
+                                           abs "PHP Update Recommended",
+                                           Wp_Dashboard_Php_Nag'Access);
+               end if;
+            end if;
+         end if;
+      end;
 
---         foreach ( dashboard_widgets as widget_id ) then
---                 name = empty( wp_registered_widgets[ widget_id ]["all_link"] ) ? wp_registered_widgets[ widget_id ]["name"] : wp_registered_widgets[ widget_id ]["name"] . " <a href="thenwp_registered_widgets[widget_id]["all_link"]end;" class="edit-box open-box">" . __( "View all" ) . "</a>";
---                 wp_add_dashboard_widget( widget_id, name, wp_registered_widgets[ widget_id ]["callback"], wp_registered_widget_controls[ widget_id ]["callback"] );
---         end;
+      -- Site Health.
+      if
+        Current_User_Can ("view_site_health_checks") and then
+        not Is_Network_Admin
+      then
+--       if not Class_Exists ("WP_Site_Health") then
+--          require_once ABSPATH & "wp-admin/includes/class-wp-site-health.php";
+--       end if;
 
---         if ( "POST" === _SERVER["REQUEST_METHOD"] && isset( _POST["widget_id"] ) ) then
---                 check_admin_referer( "edit-dashboard-widget_" . _POST["widget_id"], "dashboard-widget-nonce" );
---                 ob_start(); -- Hack - but the same hack wp-admin/widgets.php uses.
---                 wp_dashboard_trigger_widget_control( _POST["widget_id"] );
---                 ob_end_clean();
---                 wp_redirect( remove_query_arg( "edit" ) );
---                 exit;
---         end;
+--       WP_Site_Health::get_instance();
 
---         -- This action is documented in wp-admin/includes/meta-boxes.php--
---         do_action( "do_meta_boxes", screen->id, "normal", "" );
+         Wp_Enqueue_Style  ("site-health");
+         Wp_Enqueue_Script ("site-health");
 
---         -- This action is documented in wp-admin/includes/meta-boxes.php--
---         do_action( "do_meta_boxes", screen->id, "side", "" );
--- end;
+         Wp_Add_Dashboard_Widget ("dashboard_site_health",
+                                  abs "Site Health Status",
+                                  Wp_Dashboard_Site_Health'Access);
+      end if;
 
--- --
--- -- Adds a new dashboard widget.
--- --
--- -- @since 2.7.0
--- -- @since 5.6.0 The `context` and `priority` parameters were added.
--- --
--- -- @global callable[] wp_dashboard_control_callbacks
--- --
--- -- @param string   widget_id        Widget ID  (used in the "id" attribute for the widget).
--- -- @param string   widget_name      Title of the widget.
--- -- @param callable callback         Function that fills the widget with the desired content.
--- --                                   The function should echo its output.
--- -- @param callable control_callback Optional. Function that outputs controls for the widget. Default null.
--- -- @param array    callback_args    Optional. Data that should be set as the args property of the widget array
--- --                                   (which is the second parameter passed to your callback). Default null.
--- -- @param string   context          Optional. The context within the screen where the box should display.
--- --                                   Accepts "normal", "side", "column3", or "column4". Default "normal".
--- -- @param string   priority         Optional. The priority within the context where the box should show.
--- --                                   Accepts "high", "core", "default", or "low". Default "core".
--- --
--- function wp_add_dashboard_widget( widget_id, widget_name, callback, control_callback = null, callback_args = null, context = "normal", priority = "core" ) then
---         global wp_dashboard_control_callbacks;
+      -- Right Now.
+      if Is_Blog_Admin and then Current_User_Can ("edit_posts") then
+         Wp_Add_Dashboard_Widget ("dashboard_right_now",
+                                  abs "At a Glance",
+                                  Wp_Dashboard_Right_Now'Access);
+      end if;
 
---         screen = get_current_screen();
+      if Is_Network_Admin then
+         Wp_Add_Dashboard_Widget ("network_dashboard_right_now",
+                                  abs "Right Now",
+                                  Wp_Network_Dashboard_Right_Now'Access);
+      end if;
 
---         private_callback_args = array( "__widget_basename" => widget_name );
+      -- Activity Widget.
+      if Is_Blog_Admin then
+         Wp_Add_Dashboard_Widget ("dashboard_activity",
+                                  abs "Activity",
+                                  Wp_Dashboard_Site_Activity'Access);
+      end if;
 
---         if ( is_null( callback_args ) ) then
---                 callback_args = private_callback_args;
---         end; elseif ( is_array( callback_args ) ) then
---                 callback_args = array_merge( callback_args, private_callback_args );
---         end;
+      -- QuickPress Widget.
+      if
+        Is_Blog_Admin and then
+        Current_User_Can (Get_As_String (
+          Get_Post_Type_Object ("post").Cap, "create_posts"))
+      then
+         declare
+            Quick_Draft_Title : constant String :=
+              Sprintf (
+                "<span class=""hide-if-no-js"">%1s</span> <span class=""hide-if-js"">%2s</span>",
+                [
+                  1 => abs "Quick Draft",
+                  2 => abs "Your Recent Drafts"
+                ]);
+         begin
+            Wp_Add_Dashboard_Widget ("dashboard_quick_press",
+                                     Quick_Draft_Title,
+                                     Wp_Dashboard_Quick_Press'Access);
+         end;
+      end if;
 
---         if ( control_callback && is_callable( control_callback ) && current_user_can( "edit_dashboard" ) ) then
---                 wp_dashboard_control_callbacks[ widget_id ] = control_callback;
+      -- WordPress Events and News.
+      Wp_Add_Dashboard_Widget ("dashboard_primary",
+                               abs "WordPress Events and News",
+                               Wp_Dashboard_Events_News'Access);
 
---                 if ( isset( _GET["edit"] ) && widget_id === _GET["edit"] ) then
---                         list(url)    = explode( "#", add_query_arg( "edit", false ), 2 );
---                         widget_name .= " <span class="postbox-title-action"><a href="" . esc_url( url ) . "">" . __( "Cancel" ) . "</a></span>";
---                         callback     = "_wp_dashboard_control_callback";
---                 end; else then
---                         list(url)    = explode( "#", add_query_arg( "edit", widget_id ), 2 );
---                         widget_name .= " <span class="postbox-title-action"><a href="" . esc_url( "url#widget_id" ) . "" class="edit-box open-box">" . __( "Configure" ) . "</a></span>";
---                 end;
---         end;
+      if Is_Network_Admin then
+         --
+         -- Fires after core widgets for the Network Admin dashboard have been
+         -- registered.
+         --
+         -- @since 3.1.0
+         --
+         Do_Action ("wp_network_dashboard_setup");
 
---         side_widgets = array( "dashboard_quick_press", "dashboard_primary" );
+         --
+         -- Filters the list of widgets to load for the Network Admin dashboard.
+         --
+         -- @since 3.1.0
+         --
+         -- @param string[] dashboard_widgets An array of dashboard widget IDs.
+         --
+         Dashboard_Widgets :=
+           Apply_Filters ("wp_network_dashboard_widgets", Empty_List);
 
---         if ( in_array( widget_id, side_widgets, true ) ) then
---                 context = "side";
---         end;
+      elsif Is_User_Admin then
+         --
+         -- Fires after core widgets for the User Admin dashboard have been registered.
+         --
+         -- @since 3.1.0
+         --
+         Do_Action ("wp_user_dashboard_setup");
 
---         high_priority_widgets = array( "dashboard_browser_nag", "dashboard_php_nag" );
+         --
+         -- Filters the list of widgets to load for the User Admin dashboard.
+         --
+         -- @since 3.1.0
+         --
+         -- @param string[] dashboard_widgets An array of dashboard widget IDs.
+         --
+         Dashboard_Widgets :=
+           Apply_Filters ("wp_user_dashboard_widgets", Empty_List);
 
---         if ( in_array( widget_id, high_priority_widgets, true ) ) then
---                 priority = "high";
---         end;
+      else
+         --
+         -- Fires after core widgets for the admin dashboard have been registered.
+         --
+         -- @since 2.5.0
+         --
+         Do_Action ("wp_dashboard_setup");
 
---         if ( empty( context ) ) then
---                 context = "normal";
---         end;
+         --
+         -- Filters the list of widgets to load for the admin dashboard.
+         --
+         -- @since 2.5.0
+         --
+         -- @param string[] dashboard_widgets An array of dashboard widget IDs.
+         --
+         Dashboard_Widgets :=
+           Apply_Filters ("wp_dashboard_widgets", Empty_List);
+      end if;
 
---         if ( empty( priority ) ) then
---                 priority = "core";
---         end;
+      for Widget_Id of Dashboard_Widgets loop
+         declare
+            Widget_All_Link : constant String :=
+              As_String (Get (Ref_2 (Wp_Registered_Widgets, Widget_Id, "all_link")));
 
---         add_meta_box( widget_id, widget_name, callback, screen, context, priority, callback_args );
--- end;
+            Widget_Name : constant String :=
+              As_String (Get (Ref_2 (Wp_Registered_Widgets, Widget_Id, "name")));
 
--- --
--- -- Outputs controls for the current dashboard widget.
--- --
--- -- @access private
--- -- @since 2.7.0
--- --
--- -- @param mixed dashboard
--- -- @param array meta_box
--- --
--- function _wp_dashboard_control_callback( dashboard, meta_box ) then
---         echo "<form method="post" class="dashboard-widget-control-form wp-clearfix">";
---         wp_dashboard_trigger_widget_control( meta_box["id"] );
---         wp_nonce_field( "edit-dashboard-widget_" . meta_box["id"], "dashboard-widget-nonce" );
---         echo "<input type="hidden" name="widget_id" value="" . esc_attr( meta_box["id"] ) . "" />";
---         submit_button( __( "Save Changes" ) );
---         echo "</form>";
--- end;
+            Name : constant String :=
+              (if Empty (Widget_All_Link) then Widget_Name
+               else Widget_Name & " <a href=""" & Widget_All_Link &
+                 """ class=""edit-box open-box"">" & abs "View all" & "</a>");
+         begin
+            Wp_Add_Dashboard_Widget
+              (Widget_Id, Name,
+               As_Callable (Get (Ref_2 (Wp_Registered_Widgets,
+                                        Widget_Id, "callback"))),
+               As_Callable (Get (Ref_2 (Wp_Registered_Widget_Controls,
+                                        Widget_Id, "callback"))));
+         end;
+      end loop;
+
+      if
+        "POST" = Get_As_String (Binder.X_SERVER, "REQUEST_METHOD") and then
+        Isset (Binder.X_POST, "widget_id")
+      then
+         Check_Admin_Referer ("edit-dashboard-widget_" &
+                              Get_As_String (Binder.X_POST, "widget_id"),
+                              "dashboard-widget-nonce");
+
+         OB_Start; -- Hack - but the same hack wp-admin/widgets.php uses.
+         Wp_Dashboard_Trigger_Widget_Control
+           (Get_As_String (Binder.X_POST, "widget_id"));
+         OB_End_Clean;
+         Wp_Redirect (Remove_Query_Arg ("edit"));
+         Die; -- exit;
+      end if;
+
+      -- This action is documented in wp-admin/includes/meta-boxes.php
+      Do_Action ("do_meta_boxes", -Screen.Id, "normal", "");
+
+      -- This action is documented in wp-admin/includes/meta-boxes.php
+      Do_Action ("do_meta_boxes", -Screen.Id, "side", "");
+   end Wp_Dashboard_Setup;
+
+   -----------------------------
+   -- Wp_Add_Dashboard_Widget --
+   -----------------------------
+
+   procedure Wp_Add_Dashboard_Widget
+               (Widget_Id        : String;
+                Widget_Name      : String;
+                Callback         : Callable;
+                Control_Callback : Callable   := null;
+                Callback_Args    : Array_Type := Empty_Array; -- null;
+                Context          : String     := "normal";
+                Priority         : String     := "core")
+   is
+      use Php.Arrays;
+      use Php.Lists;
+      use Php.Strings;
+      use Array_Lists;
+      use Binder;
+      use UStrings;
+      use Class_Screens;
+      use Adi_Screens;
+      use Adi_Templates;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_L10n;
+
+--    global wp_dashboard_control_callbacks;
+
+      Screen : constant Wp_Screen := Get_Current_Screen;
+
+      Callback_Args_2 : Array_Type := Callback_Args;
+
+      Private_Callback_Args : constant Array_Type :=
+        To_Array_Type ([Build ("__widget_basename", Widget_Name)]);
+
+      Widget_Name_2 : UString := +Widget_Name;
+
+      Callback_2 : Arrays.Callable := Callback;
+   begin
+      -- if ( is_null( callback_args ) ) then
+      --    callback_args = private_callback_args;
+      -- elsif
+      -- if Is_Array (Callback_Args_2) then
+      Array_Merge (Callback_Args_2, Private_Callback_Args);
+      -- end if;
+
+      if
+        Control_Callback /= null and then
+--      Is_Callable (Control_Callback) and then
+        Current_User_Can ("edit_dashboard")
+      then
+         -- Set (Wp_Dashboard_Control_Callbacks, Widget_Id, -- XXX
+         --      Control_Callback);
+
+         if
+           Isset (XX_GET, "edit") and then
+           Widget_Id = Get_As_String (XX_GET, "edit")
+         then
+            declare
+               List : constant List_Type :=
+                 Explode ("#", Add_Query_Arg ("edit", "(false)"), 2);
+
+               URL : constant String := List (1);
+            begin
+               Append (Widget_Name_2,
+                       " <span class=""postbox-title-action""><a href=""" &
+                       ESC_URL (URL) & """>" & abs "Cancel" & "</a></span>");
+               Callback_2 := X_Wp_Dashboard_Control_Callback'Access;
+            end;
+         else
+            declare
+               List : constant List_Type :=
+                 Explode ("#", Add_Query_Arg ("edit", Widget_Id), 2);
+
+               URL : constant String := List (1);
+            begin
+               Append (Widget_Name_2,
+                       " <span class=""postbox-title-action""><a href=""" &
+                       ESC_URL (URL & "#" & Widget_Id) &
+                       """ class=""edit-box open-box"">" & abs "Configure" &
+                       "</a></span>");
+            end;
+         end if;
+      end if;
+
+      declare
+         Side_Widgets : constant List_Type :=
+           ["dashboard_quick_press", "dashboard_primary"];
+
+         High_Priority_Widgets : constant List_Type :=
+           ["dashboard_browser_nag", "dashboard_php_nag"];
+
+         Context_2  : UString := +Context;
+         Priority_2 : UString := +Priority;
+         Callback_3 : constant Callable_2 := null; -- XXX
+      begin
+         if In_List (Widget_Id, Side_Widgets, True) then
+            Context_2 := +"side";
+         end if;
+
+         if In_List (Widget_Id, High_Priority_Widgets, True) then
+            Priority_2 := +"high";
+         end if;
+
+         if Empty (Context_2) then
+            Context_2 := +"normal";
+         end if;
+
+         if Empty (Priority_2) then
+            Priority_2 := +"core";
+         end if;
+
+         Add_Meta_Box (Widget_Id, -Widget_Name_2, Callback_3, Screen,
+                       -Context_2, -Priority_2, Callback_Args);
+      end;
+   end Wp_Add_Dashboard_Widget;
+
+   -------------------------------------
+   -- X_Wp_Dashboard_Control_Callback --
+   -------------------------------------
+
+   procedure X_Wp_Dashboard_Control_Callback (Dashboard : Multi_Type;
+                                              Meta_Box  : Array_Type)
+   is
+      use Php.Echoing;
+      use Adi_Templates;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      Echo ("<form method=""post"" " &
+            "class=""dashboard-widget-control-form wp-clearfix"">");
+      Wp_Dashboard_Trigger_Widget_Control (Get_As_String (Meta_Box, "id"));
+      Wp_Nonce_Field ("edit-dashboard-widget_" & Get_As_String (Meta_Box, "id"),
+                      "dashboard-widget-nonce");
+      Echo ("<input type=""hidden"" name=""widget_id"" value=""" &
+            ESC_Attr (Get_As_String (Meta_Box, "id")) & """ />");
+      Submit_Button (abs "Save Changes");
+      Echo ("</form>");
+   end X_Wp_Dashboard_Control_Callback;
 
    ------------------
    -- Wp_Dashboard --
@@ -305,314 +565,458 @@ is
       Wp_Nonce_Field ("meta-box-order",  "meta-box-order-nonce", False);
    end Wp_Dashboard;
 
--- --
--- -- Dashboard Widgets.
--- --
+   ----------------------------
+   -- Wp_Dashboard_Right_Now --
+   ----------------------------
 
--- --
--- -- Dashboard widget that displays some basic stats about the site.
--- --
--- -- Formerly "Right Now". A streamlined "At a Glance" as of 3.8.
--- --
--- -- @since 2.7.0
--- --
--- function wp_dashboard_right_now() then
---         ?>
---         <div class="main">
---         <ul>
---         <?php
---         -- Posts and Pages.
---         foreach ( array( "post", "page" ) as post_type ) then
---                 num_posts = wp_count_posts( post_type );
+   procedure Wp_Dashboard_Right_Now
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Wp_Common;
+      use UStrings;
+      use Class_Post_Type;
+      use Adi_Update;
+      use Inc_Capabilities;
+      use Inc_Comments;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Options;
+      use Inc_Posts;
+   begin
+      Echo ("<div class=""main"">");
+      Echo ("<ul>");
 
---                 if ( num_posts && num_posts->publish ) then
---                         if ( "post" === post_type ) then
---                                 -- translators: %s: Number of posts.--
---                                 text = _n( "%s Post", "%s Posts", num_posts->publish );
---                         end; else then
---                                 -- translators: %s: Number of pages.--
---                                 text = _n( "%s Page", "%s Pages", num_posts->publish );
---                         end;
+      -- Posts and Pages.
+      for Post_Type of List_Type'["post", "page"] loop
+         declare
+            Num_Posts : constant Post_Counts_Type :=
+              Wp_Count_Posts (Post_Type);
+         begin
+            if
+              Num_Posts /= Null_Post_Counts and then
+              Num_Posts.Publish /= 0
+            then
+               declare
+                  Text_2 : constant String :=
+                    (if "post" = Post_Type
+                     -- translators: %s: Number of posts.
+                     then X_N ("%s Post", "%s Posts", Num_Posts.Publish)
+                     -- translators: %s: Number of pages.
+                     else X_N ("%s Page", "%s Pages", Num_Posts.Publish));
 
---                         text             = sprintf( text, number_format_i18n( num_posts->publish ) );
---                         post_type_object = get_post_type_object( post_type );
+                  Text : constant String :=
+                    Sprintf (Text_2,
+                             [1 => Number_Format_I18n (Float (Num_Posts.Publish))]);
 
---                         if ( post_type_object && current_user_can( post_type_object->cap->edit_posts ) ) then
---                                 printf( "<li class="%1s-count"><a href="edit.php?post_type=%1s">%2s</a></li>", post_type, text );
---                         end; else then
---                                 printf( "<li class="%1s-count"><span>%2s</span></li>", post_type, text );
---                         end;
---                 end;
---         end;
+                  Post_Type_Object : constant Wp_Post_Type :=
+                    Get_Post_Type_Object (Post_Type);
+               begin
+                  if
+                    Post_Type_Object /= Null_Post_Type and then
+                    Current_User_Can (Get_As_String (
+                      Post_Type_Object.Cap, "edit_posts"))
+                  then
+                     Printf ("<li class=""%1s-count""><a href=""edit.php?post_type=%1s"">%2s</a></li>",
+                             [1 => Post_Type, 2 => Text]);
+                  else
+                     Printf ("<li class=""%1s-count""><span>%2s</span></li>",
+                             [1 => Post_Type, 2 => Text]);
+                  end if;
+               end;
+            end if;
+         end;
+      end loop;
 
---         -- Comments.
---         num_comm = wp_count_comments();
+      -- Comments.
+      declare
+         Num_Comm : constant Comment_Counts_Type := Wp_Count_Comments;
+      begin
+         if
+           Num_Comm /= Null_Comment_Counts and then
+           (Num_Comm.Approved /= 0 or Num_Comm.Moderated /= 0)
+         then
+            declare
+               -- translators: %s: Number of comments.
+               Text : constant String :=
+                 Sprintf (X_N ("%s Comment", "%s Comments", Num_Comm.Approved),
+                          [1 => Number_Format_I18n (Float (Num_Comm.Approved))]);
+            begin
+               Echo ("<li class=""comment-count"">");
+               Echo ("    <a href=""edit-comments.php"">" & Text & "</a>");
+               Echo ("</li>");
+            end;
 
---         if ( num_comm && ( num_comm->approved || num_comm->moderated ) ) then
---                 -- translators: %s: Number of comments.--
---                 text = sprintf( _n( "%s Comment", "%s Comments", num_comm->approved ), number_format_i18n( num_comm->approved ) );
---                 ?>
---                 <li class="comment-count">
---                         <a href="edit-comments.php"><?php echo text; ?></a>
---                 </li>
---                 <?php
---                 moderated_comments_count_i18n = number_format_i18n( num_comm->moderated );
---                 -- translators: %s: Number of comments.--
---                 text = sprintf( _n( "%s Comment in moderation", "%s Comments in moderation", num_comm->moderated ), moderated_comments_count_i18n );
---                 ?>
---                 <li class="comment-mod-count<?php echo ! num_comm->moderated ? " hidden" : ""; ?>">
---                         <a href="edit-comments.php?comment_status=moderated" class="comments-in-moderation-text"><?php echo text; ?></a>
---                 </li>
---                 <?php
---         end;
+            declare
+               Moderated_Comments_Count_I18n : constant String :=
+                 Number_Format_I18n (Float (Num_Comm.Moderated));
 
---         --
---         -- Filters the array of extra elements to list in the "At a Glance"
---         -- dashboard widget.
---         --
---         -- Prior to 3.8.0, the widget was named "Right Now". Each element
---         -- is wrapped in list-item tags on output.
---         --
---         -- @since 3.8.0
---         --
---         -- @param string[] items Array of extra "At a Glance" widget items.
---         --
---         elements = apply_filters( "dashboard_glance_items", array() );
+               -- translators: %s: Number of comments.--
+               Text : constant String :=
+                 Sprintf (X_N ("%s Comment in moderation",
+                               "%s Comments in moderation",
+                               Num_Comm.Moderated),
+                          [1 => Moderated_Comments_Count_I18n]);
+            begin
+               Echo ("<li class=""comment-mod-count" &
+                     (if Num_Comm.Moderated = 0 then " hidden" else "") & ">");
+               Echo ("    <a href=""edit-comments.php?comment_status=moderated"" " &
+                     "class=""comments-in-moderation-text"">" & Text & "</a>");
+               Echo ("</li>");
+            end;
+         end if;
+      end;
 
---         if ( elements ) then
---                 echo "<li>" . implode( "</li>\n<li>", elements ) . "</li>\n";
---         end;
+      --
+      -- Filters the array of extra elements to list in the "At a Glance"
+      -- dashboard widget.
+      --
+      -- Prior to 3.8.0, the widget was named "Right Now". Each element
+      -- is wrapped in list-item tags on output.
+      --
+      -- @since 3.8.0
+      --
+      -- @param string[] items Array of extra "At a Glance" widget items.
+      --
+      declare
+         Elements : constant List_Type :=
+           Apply_Filters ("dashboard_glance_items", Empty_List);
+      begin
+         if not Elements.Is_Empty then
+            Echo ("<li>" & Implode ("</li>" & NL & "<li>", Elements) & "</li>" & NL);
+         end if;
+      end;
 
---         ?>
---         </ul>
---         <?php
---         update_right_now_message();
+      Echo ("</ul>");
 
---         -- Check if search engines are asked not to index this site.
---         if ( ! is_network_admin() && ! is_user_admin()
---                 && current_user_can( "manage_options" ) && ! get_option( "blog_public" )
---         ) then
+      Update_Right_Now_Message;
 
---                 --
---                 -- Filters the link title attribute for the "Search engines discouraged"
---                 -- message displayed in the "At a Glance" dashboard widget.
---                 --
---                 -- Prior to 3.8.0, the widget was named "Right Now".
---                 --
---                 -- @since 3.0.0
---                 -- @since 4.5.0 The default for `title` was updated to an empty string.
---                 --
---                 -- @param string title Default attribute text.
---                 --
---                 title = apply_filters( "privacy_on_link_title", "" );
+      -- Check if search engines are asked not to index this site.
+      if
+        not Is_Network_Admin and then
+        not Is_User_Admin    and then
+        Current_User_Can ("manage_options") and then
+        not Get_Option ("blog_public")
+      then
+         --
+         -- Filters the link title attribute for the "Search engines discouraged"
+         -- message displayed in the "At a Glance" dashboard widget.
+         --
+         -- Prior to 3.8.0, the widget was named "Right Now".
+         --
+         -- @since 3.0.0
+         -- @since 4.5.0 The default for `title` was updated to an empty string.
+         --
+         -- @param string title Default attribute text.
+         --
+         declare
+            Title : constant String :=
+              Apply_Filters ("privacy_on_link_title", "");
 
---                 --
---                 -- Filters the link label for the "Search engines discouraged" message
---                 -- displayed in the "At a Glance" dashboard widget.
---                 --
---                 -- Prior to 3.8.0, the widget was named "Right Now".
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string content Default text.
---                 --
---                 content = apply_filters( "privacy_on_link_text", __( "Search engines discouraged" ) );
+            --
+            -- Filters the link label for the "Search engines discouraged" message
+            -- displayed in the "At a Glance" dashboard widget.
+            --
+            -- Prior to 3.8.0, the widget was named "Right Now".
+            --
+            -- @since 3.0.0
+            --
+            -- @param string content Default text.
+            --
+            Content : constant String :=
+              Apply_Filters ("privacy_on_link_text", abs "Search engines discouraged");
 
---                 title_attr = "" === title ? "" : " title="title"";
+            Title_Attr : constant String :=
+              (if "" = Title then "" else " title=""title""");
+         begin
+            Echo ("<p class=""search-engines-info""><a href=""options-reading.php""" &
+                  Title_Attr & ">" & Content & "</a></p>");
+         end;
+      end if;
 
---                 echo "<p class="search-engines-info"><a href="options-reading.php"title_attr>content</a></p>";
---         end;
---         ?>
---         </div>
---         <?php
---         --
---         -- activity_box_end has a core action, but only prints content when multisite.
---         -- Using an output buffer is the only way to really check if anything"s displayed here.
---         --
---         ob_start();
+      Echo ("</div>");
 
---         --
---         -- Fires at the end of the "At a Glance" dashboard widget.
---         --
---         -- Prior to 3.8.0, the widget was named "Right Now".
---         --
---         -- @since 2.5.0
---         --
---         do_action( "rightnow_end" );
+      --
+      -- activity_box_end has a core action, but only prints content when multisite.
+      -- Using an output buffer is the only way to really check if anything's
+      -- displayed here.
+      --
+      OB_Start;
 
---         --
---         -- Fires at the end of the "At a Glance" dashboard widget.
---         --
---         -- Prior to 3.8.0, the widget was named "Right Now".
---         --
---         -- @since 2.0.0
---         --
---         do_action( "activity_box_end" );
+      --
+      -- Fires at the end of the "At a Glance" dashboard widget.
+      --
+      -- Prior to 3.8.0, the widget was named "Right Now".
+      --
+      -- @since 2.5.0
+      --
+      Do_Action ("rightnow_end");
 
---         actions = ob_get_clean();
+      --
+      -- Fires at the end of the "At a Glance" dashboard widget.
+      --
+      -- Prior to 3.8.0, the widget was named "Right Now".
+      --
+      -- @since 2.0.0
+      --
+      Do_Action ("activity_box_end");
 
---         if ( ! empty( actions ) ) :
---                 ?>
---         <div class="sub">
---                 <?php echo actions; ?>
---         </div>
---                 <?php
---         endif;
--- end;
+      declare
+         Actions : constant String := OB_Get_Clean;
+      begin
+         if not Empty (Actions) then
+            Echo ("<div class=""sub"">");
+            Echo (Actions);
+            Echo ("</div>");
+         end if;
+      end;
+   end Wp_Dashboard_Right_Now;
 
--- --
--- -- @since 3.1.0
--- --
--- function wp_network_dashboard_right_now() then
---         actions = array();
+   ------------------------------------
+   -- Wp_Network_Dashboard_Right_Now --
+   ------------------------------------
 
---         if ( current_user_can( "create_sites" ) ) then
---                 actions["create-site"] = "<a href="" . network_admin_url( "site-new.php" ) . "">" . __( "Create a New Site" ) . "</a>";
---         end;
---         if ( current_user_can( "create_users" ) ) then
---                 actions["create-user"] = "<a href="" . network_admin_url( "user-new.php" ) . "">" . __( "Create a New User" ) . "</a>";
---         end;
+   procedure Wp_Network_Dashboard_Right_Now
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Wp_Common;
+      use Array_Lists;
+      use UStrings;
+      use Adi_Templates;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Ms_Functions;
+      use Inc_Users;
 
---         c_users = get_user_count();
---         c_blogs = get_blog_count();
+      Actions : Array_Type;
+   begin
+      if Current_User_Can ("create_sites") then
+         Set (Actions, "create-site", From_String (
+              "<a href=""" & Network_Admin_URL ("site-new.php") & """>" &
+              abs "Create a New Site" & "</a>"));
+      end if;
 
---         -- translators: %s: Number of users on the network.--
---         user_text = sprintf( _n( "%s user", "%s users", c_users ), number_format_i18n( c_users ) );
---         -- translators: %s: Number of sites on the network.--
---         blog_text = sprintf( _n( "%s site", "%s sites", c_blogs ), number_format_i18n( c_blogs ) );
+      if Current_User_Can ("create_users") then
+         Set (Actions, "create-user", From_String (
+              "<a href=""" & Network_Admin_URL ("user-new.php") & """>" &
+              abs "Create a New User" & "</a>"));
+      end if;
 
---         -- translators: 1: Text indicating the number of sites on the network, 2: Text indicating the number of users on the network.--
---         sentence = sprintf( __( "You have %1s and %2s." ), blog_text, user_text );
+      declare
+         C_Users : constant Natural := Get_User_Count;
+         C_Blogs : constant Natural := Get_Blog_Count;
 
---         if ( actions ) then
---                 echo "<ul class="subsubsub">";
---                 foreach ( actions as class => action ) then
---                         actions[ class ] = "\t<li class="class">action";
---                 end;
---                 echo implode( " |</li>\n", actions ) . "</li>\n";
---                 echo "</ul>";
---         end;
---         ?>
---         <br class="clear" />
+         User_Text : constant String :=
+           -- translators: %s: Number of users on the network.
+           Sprintf (X_N ("%s user", "%s users", C_Users),
+                    [1 => Number_Format_I18n (Float (C_Users))]);
 
---         <p class="youhave"><?php echo sentence; ?></p>
+         Blog_Text : constant String :=
+           -- translators: %s: Number of sites on the network.
+           Sprintf (X_N ("%s site", "%s sites", C_Blogs),
+                    [1 => Number_Format_I18n (Float (C_Blogs))]);
 
---         <?php
---                 --
---                 -- Fires in the Network Admin "Right Now" dashboard widget
---                 -- just before the user and site search form fields.
---                 --
---                 -- @since MU (3.0.0)
---                 --
---                 do_action( "wpmuadminresult" );
---         ?>
+         -- translators: 1: Text indicating the number of sites on the network,
+         -- translators: 2: Text indicating the number of users on the network.
+         Sentence : constant String :=
+           Sprintf (abs "You have %1s and %2s.",
+                    [Blog_Text, User_Text]);
+      begin
+         if Actions /= Empty_Array then
+            Echo ("<ul class=""subsubsub"">");
+            for A in Actions.Iterate loop
+               declare
+                  Class  : constant String := Key (A);
+                  Action : constant String := As_String (Element (A));
+               begin
+                  Set (Actions, Class, From_String (
+                       TAB & "<li class=""" & Class & """>" & Action));
+               end;
+            end loop;
+            Echo (Implode (" |</li>" & NL, Actions) & "</li>" & NL);
+            Echo ("</ul>");
+         end if;
 
---         <form action="<?php echo esc_url( network_admin_url( "users.php" ) ); ?>" method="get">
---                 <p>
---                         <label class="screen-reader-text" for="search-users"><?php _e( "Search Users" ); ?></label>
---                         <input type="search" name="s" value="" size="30" autocomplete="off" id="search-users" />
---                         <?php submit_button( __( "Search Users" ), "", false, false, array( "id" => "submit_users" ) ); ?>
---                 </p>
---         </form>
+         Echo ("<br class=""clear"" />");
 
---         <form action="<?php echo esc_url( network_admin_url( "sites.php" ) ); ?>" method="get">
---                 <p>
---                         <label class="screen-reader-text" for="search-sites"><?php _e( "Search Sites" ); ?></label>
---                         <input type="search" name="s" value="" size="30" autocomplete="off" id="search-sites" />
---                         <?php submit_button( __( "Search Sites" ), "", false, false, array( "id" => "submit_sites" ) ); ?>
---                 </p>
---         </form>
---         <?php
---         --
---         -- Fires at the end of the "Right Now" widget in the Network Admin dashboard.
---         --
---         -- @since MU (3.0.0)
---         --
---         do_action( "mu_rightnow_end" );
+         Echo ("<p class=""youhave"">" & Sentence & "</p>");
+      end;
 
---         --
---         -- Fires at the end of the "Right Now" widget in the Network Admin dashboard.
---         --
---         -- @since MU (3.0.0)
---         --
---         do_action( "mu_activity_box_end" );
--- end;
+      --
+      -- Fires in the Network Admin "Right Now" dashboard widget
+      -- just before the user and site search form fields.
+      --
+      -- @since MU (3.0.0)
+      --
+      Do_Action ("wpmuadminresult");
 
--- --
--- -- The Quick Draft widget display and creation of drafts.
--- --
--- -- @since 3.8.0
--- --
--- -- @global int post_ID
--- --
--- -- @param string|false error_msg Optional. Error message. Default false.
--- --
--- function wp_dashboard_quick_press( error_msg = false ) then
---         global post_ID;
+      Echo ("<form action=""" & ESC_URL (Network_Admin_URL ("users.php")) &
+            """ method=""get"">");
+      Echo ("<p>");
+      Echo ("    <label class=""screen-reader-text"" for=""search-users"">");
+      X_E ("Search Users");
+      Echo ("</label>");
+      Echo ("    <input type=""search"" name=""s"" value="""" size=""30"" " &
+            "autocomplete=""off"" id=""search-users"" />");
+      Submit_Button (abs "Search Users", "", "(false)", False,
+                     To_Array_Type ([Build ("id", "submit_users")]));
+      Echo ("</p>");
+      Echo ("</form>");
 
---         if ( ! current_user_can( "edit_posts" ) ) then
---                 return;
---         end;
+      Echo ("<form action=""" & ESC_URL (Network_Admin_URL ("sites.php")) &
+            """ method=""get"">");
+      Echo ("<p>");
+      Echo ("    <label class=""screen-reader-text"" for=""search-sites"">");
+      X_E ("Search Sites");
+      Echo ("</label>");
+      Echo ("    <input type=""search"" name=""s"" value="""" size=""30"" " &
+            "autocomplete=""off"" id=""search-sites"" />");
+      Submit_Button (abs "Search Sites", "", "(false)", False,
+                     To_Array_Type ([Build ("id", "submit_sites")]));
+      Echo ("</p>");
+      Echo ("</form>");
 
---         -- Check if a new auto-draft (= no new post_ID) is needed or if the old can be used.
---         last_post_id = (int) get_user_option( "dashboard_quick_press_last_post_id" ); -- Get the last post_ID.
+      --
+      -- Fires at the end of the "Right Now" widget in the Network Admin dashboard.
+      --
+      -- @since MU (3.0.0)
+      --
+      Do_Action ("mu_rightnow_end");
 
---         if ( last_post_id ) then
---                 post = get_post( last_post_id );
+      --
+      -- Fires at the end of the "Right Now" widget in the Network Admin dashboard.
+      --
+      -- @since MU (3.0.0)
+      --
+      Do_Action ("mu_activity_box_end");
+   end Wp_Network_Dashboard_Right_Now;
 
---                 if ( empty( post ) || "auto-draft" !== post->post_status ) then -- auto-draft doesn"t exist anymore.
---                         post = get_default_post_to_edit( "post", true );
---                         update_user_option( get_current_user_id(), "dashboard_quick_press_last_post_id", (int) post->ID ); -- Save post_ID.
---                 end; else then
---                         post->post_title = ""; -- Remove the auto draft title.
---                 end;
---         end; else then
---                 post    = get_default_post_to_edit( "post", true );
---                 user_id = get_current_user_id();
+   ------------------------------
+   -- Wp_Dashboard_Quick_Press --
+   ------------------------------
 
---                 -- Don"t create an option if this is a super admin who does not belong to this site.
---                 if ( in_array( get_current_blog_id(), array_keys( get_blogs_of_user( user_id ) ), true ) ) then
---                         update_user_option( user_id, "dashboard_quick_press_last_post_id", (int) post->ID ); -- Save post_ID.
---                 end;
---         end;
+   procedure Wp_Dashboard_Quick_Press (Error_Msg : String := "")
+   is
+      use Php.Echoing;
+      use Php.Lists;
+      use Array_Lists;
+      use Wp_Common;
+      use UStrings;
+      use Class_Posts;
+      use Class_Users;
+      use Adi_Posts;
+      use Adi_Templates;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Posts;
+      use Inc_Users;
+--    global post_ID;
 
---         post_ID = (int) post->ID;
---         ?>
+      Post : Wp_Post;
+   begin
+      if not Current_User_Can ("edit_posts") then
+         return;
+      end if;
 
---         <form name="post" action="<?php echo esc_url( admin_url( "post.php" ) ); ?>" method="post" id="quick-press" class="initial-form hide-if-no-js">
+      -- Check if a new auto-draft (= no new post_ID) is needed or if the old can
+      -- be used.
+      declare
+         Last_Post_Id : constant Integer :=
+           Get_User_Option ("dashboard_quick_press_last_post_id");
+         -- Get the last post_ID.
+      begin
+         if Last_Post_Id /= 0 then
+            Post := Get_Post (Post_Id_Type (Last_Post_Id));
+            if
+              Post = Null_Post or else
+--            Empty (Post) or else
+              "auto-draft" /= Post.Post_Status  -- auto-draft doesn't exist anymore.
+            then
+               Post := Get_Default_Post_To_Edit ("post", True);
 
---                 <?php if ( error_msg ) : ?>
---                 <div class="error"><?php echo error_msg; ?></div>
---                 <?php endif; ?>
+               Update_User_Option (Get_Current_User_Id,
+                                   "dashboard_quick_press_last_post_id",
+                                   From_Integer (Integer (Post.Id)));
+                                   -- (int) -- Save post_ID.
+            else
+               Post.Post_Title := +""; -- Remove the auto draft title.
+            end if;
 
---                 <div class="input-text-wrap" id="title-wrap">
---                         <label for="title">
---                                 <?php
---                                 -- This filter is documented in wp-admin/edit-form-advanced.php--
---                                 echo apply_filters( "enter_title_here", __( "Title" ), post );
---                                 ?>
---                         </label>
---                         <input type="text" name="post_title" id="title" autocomplete="off" />
---                 </div>
+         else
+            Post := Get_Default_Post_To_Edit ("post", True);
+            declare
+               User_Id : constant User_Id_Type := Get_Current_User_Id;
+            begin
+               -- Don't create an option if this is a super admin who does not
+               -- belong to this site.
+               if
+                 In_List (Helpers.Image (Get_Current_Blog_Id),
+                          Array_Keys (Get_Blogs_Of_User (User_Id)), True)
+               then
+                  Update_User_Option (User_Id, "dashboard_quick_press_last_post_id",
+                                      From_Integer (Integer (Post.Id)));
+                                      -- (int) -- Save post_ID.
+               end if;
+            end;
+         end if;
+      end;
 
---                 <div class="textarea-wrap" id="description-wrap">
---                         <label for="content"><?php _e( "Content" ); ?></label>
---                         <textarea name="content" id="content" placeholder="<?php esc_attr_e( "What&#8217;s on your mind?" ); ?>" class="mceEditor" rows="3" cols="15" autocomplete="off"></textarea>
---                 </div>
+      Globals.Global_Post_Id := Post.Id; -- (int)
 
---                 <p class="submit">
---                         <input type="hidden" name="action" id="quickpost-action" value="post-quickdraft-save" />
---                         <input type="hidden" name="post_ID" value="<?php echo post_ID; ?>" />
---                         <input type="hidden" name="post_type" value="post" />
---                         <?php wp_nonce_field( "add-post" ); ?>
---                         <?php submit_button( __( "Save Draft" ), "primary", "save", false, array( "id" => "save-post" ) ); ?>
---                         <br class="clear" />
---                 </p>
+      Echo ("<form name=""post"" action=""" & ESC_URL (Admin_URL ("post.php")) &
+            """ method=""post"" id=""quick-press"" " &
+            "class=""initial-form hide-if-no-js"">");
 
---         </form>
---         <?php
---         wp_dashboard_recent_drafts();
--- end;
+      if Error_Msg /= "" then
+         Echo ("<div class=""error"">" & Error_Msg & "</div>");
+      end if;
+
+      Echo ("<div class=""input-text-wrap"" id=""title-wrap"">");
+      Echo ("    <label for=""title"">");
+
+      -- This filter is documented in wp-admin/edit-form-advanced.php
+      Echo (Apply_Filters ("enter_title_here", abs "Title", Post));
+
+      Echo ("    </label>");
+      Echo ("    <input type=""text"" name=""post_title"" " &
+            "id=""title"" autocomplete=""off"" />");
+      Echo ("</div>");
+
+      Echo ("<div class=""textarea-wrap"" id=""description-wrap"">");
+      Echo ("    <label for=""content"">");
+      X_E ("Content");
+      Echo ("</label>");
+      Echo ("    <textarea name=""content"" id=""content"" placeholder=""");
+      ESC_Attr_E ("What&#8217;s on your mind?");
+      Echo (""" class=""mceEditor"" rows=""3"" cols=""15"" autocomplete=""off"">" &
+            "</textarea>");
+      Echo ("</div>");
+
+      Echo ("<p class=""submit"">");
+      Echo ("   <input type=""hidden"" name=""action"" id=""quickpost-action"" " &
+            "value=""post-quickdraft-save"" />");
+      Echo ("   <input type=""hidden"" name=""Post_ID"" value=""" &
+            Image (Globals.Global_Post_Id) & """ />");
+      Echo ("   <input type=""hidden"" name=""post_type"" value=""post"" />");
+      Wp_Nonce_Field ("add-post");
+      Submit_Button (abs "Save Draft", "primary", "save", False,
+                     To_Array_Type ([Build ("id", "save-post")]));
+      Echo ("   <br class=""clear"" />");
+      Echo ("</p>");
+
+      Echo ("</form>");
+
+      Wp_Dashboard_Recent_Drafts;
+   end Wp_Dashboard_Quick_Press;
 
 -- --
 -- -- Show recent drafts of the user on the dashboard.
@@ -703,6 +1107,14 @@ is
 -- -- @param bool       show_date Optional. Whether to display the date.
 -- --
 -- function _wp_dashboard_recent_comments_row( &comment, show_date = true ) then
+   procedure X_Wp_Dashboard_Recent_Comments_Row
+               (Comment   : in out Class_Comments.Wp_Comment;
+                Show_Date : Boolean := True)
+   is
+   begin
+      Logging.Log ("x_wp_dashboard_recent_comments_row", "not implemented");
+   end X_Wp_Dashboard_Recent_Comments_Row;
+
 --         GLOBALS["comment"] = clone comment;
 
 --         if ( comment->comment_post_ID > 0 ) then
@@ -926,216 +1338,278 @@ is
 --         GLOBALS["comment"] = null;
 -- end;
 
--- --
--- -- Callback function for Activity widget.
--- --
--- -- @since 3.8.0
--- --
--- function wp_dashboard_site_activity() then
+   --------------------------------
+   -- Wp_Dashboard_Site_Activity --
+   --------------------------------
 
---         echo "<div id="activity-widget">";
+   procedure Wp_Dashboard_Site_Activity
+   is
+      use Php.Echoing;
+      use Array_Lists;
+      use Inc_L10n;
+   begin
+      Echo ("<div id=""activity-widget"">");
 
---         future_posts = wp_dashboard_recent_posts(
---                 array(
---                         "max"    => 5,
---                         "status" => "future",
---                         "order"  => "ASC",
---                         "title"  => __( "Publishing Soon" ),
---                         "id"     => "future-posts",
---                 )
---         );
---         recent_posts = wp_dashboard_recent_posts(
---                 array(
---                         "max"    => 5,
---                         "status" => "publish",
---                         "order"  => "DESC",
---                         "title"  => __( "Recently Published" ),
---                         "id"     => "published-posts",
---                 )
---         );
+      declare
+         Future_Posts : constant Boolean := Wp_Dashboard_Recent_Posts (
+           To_Array_Type ([
+             Build ("max",    5),
+             Build ("status", "future"),
+             Build ("order",  "ASC"),
+             Build ("title",  abs "Publishing Soon"),
+             Build ("id",     "future-posts")
+           ])
+         );
 
---         recent_comments = wp_dashboard_recent_comments();
+         Recent_Posts : constant Boolean := Wp_Dashboard_Recent_Posts (
+           To_Array_Type ([
+             Build ("max",    5),
+             Build ("status", "publish"),
+             Build ("order",  "DESC"),
+             Build ("title",  abs "Recently Published"),
+             Build ("id",     "published-posts")
+           ])
+         );
 
---         if ( ! future_posts && ! recent_posts && ! recent_comments ) then
---                 echo "<div class="no-activity">";
---                 echo "<p>" . __( "No activity yet!" ) . "</p>";
---                 echo "</div>";
---         end;
+         Recent_Comments : constant Boolean := Wp_Dashboard_Recent_Comments;
+      begin
+         if not Future_Posts and not Recent_Posts and not Recent_Comments then
+            Echo ("<div class=""no-activity"">");
+            Echo ("<p>" & abs "No activity yet!" & "</p>");
+            Echo ("</div>");
+         end if;
 
---         echo "</div>";
--- end;
+         Echo ("</div>");
+      end;
+   end Wp_Dashboard_Site_Activity;
 
--- --
--- -- Generates Publishing Soon and Recently Published sections.
--- --
--- -- @since 3.8.0
--- --
--- -- @param array args then
--- --     An array of query and display arguments.
--- --
--- --     @type int    max     Number of posts to display.
--- --     @type string status  Post status.
--- --     @type string order   Designates ascending ("ASC") or descending ("DESC") order.
--- --     @type string title   Section title.
--- --     @type string id      The container id.
--- -- end;
--- -- @return bool False if no posts were found. True otherwise.
--- --
--- function wp_dashboard_recent_posts( args ) then
---         query_args = array(
---                 "post_type"      => "post",
---                 "post_status"    => args["status"],
---                 "orderby"        => "date",
---                 "order"          => args["order"],
---                 "posts_per_page" => (int) args["max"],
---                 "no_found_rows"  => true,
---                 "cache_results"  => false,
---                 "perm"           => ( "future" === args["status"] ) ? "editable" : "readable",
---         );
+   -------------------------------
+   -- Wp_Dashboard_Recent_Posts --
+   -------------------------------
 
---         --
---         -- Filters the query arguments used for the Recent Posts widget.
---         --
---         -- @since 4.2.0
---         --
---         -- @param array query_args The arguments passed to WP_Query to produce the list of posts.
---         --
---         query_args = apply_filters( "dashboard_recent_posts_query_args", query_args );
+   function Wp_Dashboard_Recent_Posts (Args : Array_Type)
+                                       return Boolean
+   is
+      use Php.Echoing;
+      use Php.Misc;
+      use Php.Strings;
+      use Array_Lists;
+      use Wp_Common;
+      use Class_Querys;
+      use Adi_Templates;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_General_Templates;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Post_Templates;
+      use Inc_Querys;
 
---         posts = new WP_Query( query_args );
+      Query_Args_2 : constant Array_Type := To_Array_Type ([
+        Build ("post_type",      "post"),
+        Build ("post_status",    Get_As_String (Args, "status")),
+        Build ("orderby",        "date"),
+        Build ("order",          Get_As_String (Args, "order")),
+        Build ("posts_per_page", As_Integer (Get (Args, "max"))),
+        Build ("no_found_rows",  True),
+        Build ("cache_results",  False),
+        Build ("perm",
+               (if "future" = Get_As_String (Args, "status")
+                then "editable" else "readable"))
+      ]);
 
---         if ( posts->have_posts() ) then
+      --
+      -- Filters the query arguments used for the Recent Posts widget.
+      --
+      -- @since 4.2.0
+      --
+      -- @param array query_args The arguments passed to WP_Query to produce the
+      --                         list of posts.
+      --
+      Query_Args : constant Array_Type :=
+        Apply_Filters ("dashboard_recent_posts_query_args", Query_Args_2);
 
---                 echo "<div id="" . args["id"] . "" class="activity-block">";
+      Posts : Wp_Query := X_Construct (Query_Args);
+   begin
+      if Posts.Have_Posts then
 
---                 echo "<h3>" . args["title"] . "</h3>";
+         Echo ("<div id=""" & Get_As_String (Args, "id") &
+               """ class=""activity-block"">");
 
---                 echo "<ul>";
+         Echo ("<h3>" & Get_As_String (Args, "title") & "</h3>");
 
---                 today    = current_time( "Y-m-d" );
---                 tomorrow = current_datetime()->modify( "+1 day" )->format( "Y-m-d" );
---                 year     = current_time( "Y" );
+         Echo ("<ul>");
 
---                 while ( posts->have_posts() ) then
---                         posts->the_post();
+         declare
+            Today : constant String := Current_Time ("Y-m-d");
 
---                         time = get_the_time( "U" );
+            Tomorrow : constant String :=
+              Current_Datetime.Modify ("+1 day").Format ("Y-m-d");
 
---                         if ( gmdate( "Y-m-d", time ) === today ) then
---                                 relative = __( "Today" );
---                         end; elseif ( gmdate( "Y-m-d", time ) === tomorrow ) then
---                                 relative = __( "Tomorrow" );
---                         end; elseif ( gmdate( "Y", time ) !== year ) then
---                                 -- translators: Date and time format for recent posts on the dashboard, from a different calendar year, see https://www.php.net/manual/datetime.format.php--
---                                 relative = date_i18n( __( "M jS Y" ), time );
---                         end; else then
---                                 -- translators: Date and time format for recent posts on the dashboard, see https://www.php.net/manual/datetime.format.php--
---                                 relative = date_i18n( __( "M jS" ), time );
---                         end;
+            Year : constant String := Current_Time ("Y");
+         begin
+            while Posts.Have_Posts loop
+               Posts.The_Post;
+               declare
+                  Time : constant Integer := Get_The_Time ("U");
 
---                         -- Use the post edit link for those who can edit, the permalink otherwise.
---                         recent_post_link = current_user_can( "edit_post", get_the_ID() ) ? get_edit_post_link() : get_permalink();
+                  Relative : constant String :=
+                    (if GMdate ("Y-m-d", Time) = Today then abs "Today"
+                     elsif GMdate ("Y-m-d", Time) = Tomorrow then abs "Tomorrow"
+                     elsif GMdate ("Y", Time) /= Year
+                     -- translators: Date and time format for recent posts on the
+                     -- translators: dashboard, from a different calendar year, see
+                     -- translators: https://www.php.net/manual/datetime.format.php
+                     then Date_I18n (abs "M jS Y", Time)
+                     -- translators: Date and time format for recent posts on the
+                     -- translators: dashboard, see
+                     -- translators: https://www.php.net/manual/datetime.format.php
+                     else Date_I18n (abs "M jS", Time));
 
---                         draft_or_post_title = _draft_or_post_title();
---                         printf(
---                                 "<li><span>%1s</span> <a href="%2s" aria-label="%3s">%4s</a></li>",
---                                 -- translators: 1: Relative date, 2: Time.--
---                                 sprintf( _x( "%1s, %2s", "dashboard" ), relative, get_the_time() ),
---                                 recent_post_link,
---                                 -- translators: %s: Post title.--
---                                 esc_attr( sprintf( __( "Edit &#8220;%s&#8221;" ), draft_or_post_title ) ),
---                                 draft_or_post_title
---                         );
---                 end;
+                  -- Use the post edit link for those who can edit, the permalink
+                  -- otherwise.
+                  Recent_Post_Link : constant String :=
+                    (if Current_User_Can ("edit_post", Integer (Get_The_Id))
+                     then Get_Edit_Post_Link else Get_Permalink);
 
---                 echo "</ul>";
---                 echo "</div>";
+                  Draft_Or_Post_Title : constant String := X_Draft_Or_Post_Title;
+               begin
+                  Printf (
+                    "<li><span>%1s</span> <a href=""%2s"" aria-label=""%3s"">%4s</a></li>",
+                    [
+                      -- translators: 1: Relative date, 2: Time.
+                      1 => Sprintf (X_X ("%1s, %2s", "dashboard"),
+                                    [Relative, Get_The_Time]),
+                      2 => Recent_Post_Link,
+                      -- translators: %s: Post title.
+                      3 => ESC_Attr (Sprintf (abs "Edit &#8220;%s&#8221;",
+                                     [1 => Draft_Or_Post_Title])),
+                      4 => Draft_Or_Post_Title
+                    ]
+                  );
+               end;
+            end loop;
+         end;
 
---         end; else then
---                 return false;
---         end;
+         Echo ("</ul>");
+         Echo ("</div>");
+      else
+         return False;
+      end if;
 
---         wp_reset_postdata();
+      Wp_Reset_Postdata;
 
---         return true;
--- end;
+      return True;
+   end Wp_Dashboard_Recent_Posts;
 
--- --
--- -- Show Comments section.
--- --
--- -- @since 3.8.0
--- --
--- -- @param int total_items Optional. Number of comments to query. Default 5.
--- -- @return bool False if no comments were found. True otherwise.
--- --
--- function wp_dashboard_recent_comments( total_items = 5 ) then
---         -- Select all comment types and filter out spam later for better query performance.
---         comments = array();
+   ----------------------------------
+   -- Wp_Dashboard_Recent_Comments --
+   ----------------------------------
 
---         comments_query = array(
---                 "number" => total_items-- 5,
---                 "offset" => 0,
---         );
+   function Wp_Dashboard_Recent_Comments (Total_Items : Natural := 5)
+                                          return Boolean
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Class_Comments;
+      use Class_Comments.Comments_Vectors;
+      use Class_Posts;
+      use Adi_List_Tables;
+      use Adi_Templates;
+      use Inc_Capabilities;
+      use Inc_Comments;
+      use Inc_L10n;
+      use Inc_Posts;
 
---         if ( ! current_user_can( "edit_posts" ) ) then
---                 comments_query["status"] = "approve";
---         end;
+      -- Select all comment types and filter out spam later for better query
+      -- performance.
+      Comments : Comments_List; -- List_Type; -- Array_Type;
 
---         while ( count( comments ) < total_items && possible = get_comments( comments_query ) ) then
---                 if ( ! is_array( possible ) ) then
---                         break;
---                 end;
+      Comments_Query : Array_Type := To_Array_Type ([
+        Build ("number", Total_Items * 5),
+        Build ("offset", 0)
+      ]);
 
---                 foreach ( possible as comment ) then
---                         if ( ! current_user_can( "read_post", comment->comment_post_ID ) ) then
---                                 continue;
---                         end;
+      Possible : Comments_List; -- Integer_Array;
+   begin
+      if not Current_User_Can ("edit_posts") then
+         Set (Comments_Query, "status", From_String ("approve"));
+      end if;
 
---                         comments[] = comment;
+      Possible := Get_Comments (Comments_Query);
 
---                         if ( count( comments ) === total_items ) then
---                                 break 2;
---                         end;
---                 end;
+      Outer :
+      while
+        Natural (Comments.Length) < Total_Items and then
+        not Possible.Is_Empty
+      loop
+         -- if not Is_Array (Possible) then
+         --    exit Outer;
+         -- end if;
 
---                 comments_query["offset"] += comments_query["number"];
---                 comments_query["number"]  = total_items-- 10;
---         end;
+         for Comment of Possible loop
+            if
+              not Current_User_Can ("read_post",
+                                    Integer (Comment.Comment_Post_Id))
+            then
+               goto Continue;
+            end if;
 
---         if ( comments ) then
---                 echo "<div id="latest-comments" class="activity-block table-view-list">";
---                 echo "<h3>" . __( "Recent Comments" ) . "</h3>";
+            Comments.Append (Comment);
 
---                 echo "<ul id="the-comment-list" data-wp-lists="list:comment">";
---                 foreach ( comments as comment ) then
+            if Natural (Comments.Length) = Total_Items then
+               exit Outer; -- break 2;
+            end if;
+            << Continue >>
+         end loop;
 
---                         comment_post = get_post( comment->comment_post_ID );
---                         if (
---                                 current_user_can( "edit_post", comment->comment_post_ID ) ||
---                                 (
---                                         empty( comment_post->post_password ) &&
---                                         current_user_can( "read_post", comment->comment_post_ID )
---                                 )
---                         ) then
---                                 _wp_dashboard_recent_comments_row( comment );
---                         end;
---                 end;
---                 echo "</ul>";
+         Set (Comments_Query, "offset", From_Integer (
+              As_Integer (Get (Comments_Query, "offset")) +
+              As_Integer (Get (Comments_Query, "number"))));
 
---                 if ( current_user_can( "edit_posts" ) ) then
---                         echo "<h3 class="screen-reader-text">" . __( "View more comments" ) . "</h3>";
---                         _get_list_table( "WP_Comments_List_Table" )->views();
---                 end;
+         Set (Comments_Query, "number", From_Integer (Total_Items * 10));
+      end loop Outer;
 
---                 wp_comment_reply( -1, false, "dashboard", false );
---                 wp_comment_trashnotice();
+      if not Comments.Is_Empty then
+         Echo ("<div id=""latest-comments"" " &
+               "class=""activity-block table-view-list"">");
+         Echo ("<h3>" & abs "Recent Comments" & "</h3>");
 
---                 echo "</div>";
---         end; else then
---                 return false;
---         end;
---         return true;
--- end;
+         Echo ("<ul id=""the-comment-list"" data-wp-lists=""list:comment"">");
+         for Comment of Comments loop
+            declare
+               Comment_Post : constant Wp_Post :=
+                 Get_Post (Comment.Comment_Post_Id);
+            begin
+               if
+                 Current_User_Can ("edit_post", Integer (Comment.Comment_Post_Id)) or else
+                 (Empty (-Comment_Post.Post_Password) and then
+                  Current_User_Can ("read_post", Integer (Comment.Comment_Post_Id)))
+               then
+                  X_Wp_Dashboard_Recent_Comments_Row (Comment);
+               end if;
+            end;
+         end loop;
+         Echo ("</ul>");
+
+         if Current_User_Can ("edit_posts") then
+            Echo ("<h3 class=""screen-reader-text"">" &
+                  abs "View more comments" & "</h3>");
+            X_Get_List_Table ("WP_Comments_List_Table").Views;
+         end if;
+
+         Wp_Comment_Reply (-1, False, "dashboard", False);
+         Wp_Comment_Trashnotice;
+
+         Echo ("</div>");
+      else
+         return False;
+      end if;
+      return True;
+   end Wp_Dashboard_Recent_Comments;
 
 -- --
 -- -- Display generic dashboard RSS widget feed.
@@ -1213,32 +1687,32 @@ is
 -- -- Dashboard Widgets Controls.
 -- --
 
--- --
--- -- Calls widget control callback.
--- --
--- -- @since 2.5.0
--- --
--- -- @global callable[] wp_dashboard_control_callbacks
--- --
--- -- @param int|false widget_control_id Optional. Registered widget ID. Default false.
--- --
--- function wp_dashboard_trigger_widget_control( widget_control_id = false ) then
---         global wp_dashboard_control_callbacks;
+   -----------------------------------------
+   -- Wp_Dashboard_Trigger_Widget_Control --
+   -----------------------------------------
 
---         if ( is_scalar( widget_control_id ) && widget_control_id
---                 && isset( wp_dashboard_control_callbacks[ widget_control_id ] )
---                 && is_callable( wp_dashboard_control_callbacks[ widget_control_id ] )
---         ) then
---                 call_user_func(
---                         wp_dashboard_control_callbacks[ widget_control_id ],
---                         "",
---                         array(
---                                 "id"       => widget_control_id,
---                                 "callback" => wp_dashboard_control_callbacks[ widget_control_id ],
---                         )
---                 );
---         end;
--- end;
+   procedure Wp_Dashboard_Trigger_Widget_Control
+               (Widget_Control_Id : String := "")  -- Integer := 0); -- false
+   is
+--    global wp_dashboard_control_callbacks;
+   begin
+      Logging.Log ("wp_dashboard_control_callbacks", "not implemented");
+   end Wp_Dashboard_Trigger_Widget_Control;
+
+   --      if ( is_scalar( widget_control_id ) && widget_control_id
+   --              && isset( wp_dashboard_control_callbacks[ widget_control_id ] )
+   --              && is_callable( wp_dashboard_control_callbacks[ widget_control_id ] )
+   --      ) then
+   --              call_user_func(
+   --                      wp_dashboard_control_callbacks[ widget_control_id ],
+   --                      "",
+   --                      array(
+   --                              "id"       => widget_control_id,
+   --                              "callback" => wp_dashboard_control_callbacks[ widget_control_id ],
+   --                      )
+   --              );
+   --      end;
+   -- end Wp_Dashboard_Control_Callbacks;
 
 -- --
 -- -- The RSS dashboard widget control.
@@ -1293,12 +1767,15 @@ is
 --         wp_widget_rss_form( widget_options[ widget_id ], form_inputs );
 -- end;
 
--- --
--- -- Renders the Events and News dashboard widget.
--- --
--- -- @since 4.8.0
--- --
--- function wp_dashboard_events_news() then
+   ------------------------------
+   -- Wp_Dashboard_Events_News --
+   ------------------------------
+
+   procedure Wp_Dashboard_Events_News
+   is
+   begin
+      Logging.Log ("wp_dashboard_events_news", "not implemented");
+   end Wp_Dashboard_Events_News;
 --         wp_print_community_events_markup();
 
 --         ?>
@@ -1679,268 +2156,368 @@ is
 --         <?php
 -- end;
 
--- --
--- -- Displays the browser update nag.
--- --
--- -- @since 3.2.0
--- -- @since 5.8.0 Added a special message for Internet Explorer users.
--- --
--- -- @global bool is_IE
--- --
--- function wp_dashboard_browser_nag() then
---         global is_IE;
+   ------------------------------
+   -- Wp_Dashboard_Browser_Nag --
+   ------------------------------
 
---         notice   = "";
---         response = wp_check_browser_version();
+   procedure Wp_Dashboard_Browser_Nag
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Vars;
 
---         if ( response ) then
---                 if ( is_IE ) then
---                         msg = __( "Internet Explorer does not give you the best WordPress experience. Switch to Microsoft Edge, or another more modern browser to get the most from your site." );
---                 end; elseif ( response["insecure"] ) then
---                         msg = sprintf(
---                                 -- translators: %s: Browser name and link.--
---                                 __( "It looks like you"re using an insecure version of %s. Using an outdated browser makes your computer unsafe. For the best WordPress experience, please update your browser." ),
---                                 sprintf( "<a href="%s">%s</a>", esc_url( response["update_url"] ), esc_html( response["name"] ) )
---                         );
---                 end; else then
---                         msg = sprintf(
---                                 -- translators: %s: Browser name and link.--
---                                 __( "It looks like you"re using an old version of %s. For the best WordPress experience, please update your browser." ),
---                                 sprintf( "<a href="%s">%s</a>", esc_url( response["update_url"] ), esc_html( response["name"] ) )
---                         );
---                 end;
+--    global is_IE;
 
---                 browser_nag_class = "";
---                 if ( ! empty( response["img_src"] ) ) then
---                         img_src = ( is_ssl() && ! empty( response["img_src_ssl"] ) ) ? response["img_src_ssl"] : response["img_src"];
+      Notice   : UString;
+      Msg      : UString;
+      Response : constant Array_Type := Wp_Check_Browser_Version;
+   begin
+      if Response /= Empty_Array then
+         if Is_IE then
+            Msg := +abs "Internet Explorer does not give you the best WordPress experience. Switch to Microsoft Edge, or another more modern browser to get the most from your site.";
+         elsif As_Boolean (Get (Response, "insecure")) then
+            Msg := +Sprintf (
+              -- translators: %s: Browser name and link.
+              abs "It looks like you're using an insecure version of %s. Using an outdated browser makes your computer unsafe. For the best WordPress experience, please update your browser.",
+              [1 => Sprintf ("<a href=""%s"">%s</a>",
+                [
+                  1 => ESC_URL (Get_As_String (Response, "update_url")),
+                  2 => ESC_HTML (Get_As_String (Response, "name"))
+                ])
+              ]
+            );
+         else
+            Msg := +Sprintf (
+              -- translators: %s: Browser name and link.
+              abs "It looks like you're using an old version of %s. For the best WordPress experience, please update your browser.",
+              [1 => Sprintf ("<a href=""%s"">%s</a>",
+                [
+                  1 => ESC_URL (Get_As_String (Response, "update_url")),
+                  2 => ESC_HTML (Get_As_String (Response, "name"))
+                ])
+              ]
+            );
+         end if;
 
---                         notice           .= "<div class="alignright browser-icon"><img src="" . esc_url( img_src ) . "" alt="" /></div>";
---                         browser_nag_class = " has-browser-icon";
---                 end;
---                 notice .= "<p class="browser-update-nagthenbrowser_nag_classend;">thenmsgend;</p>";
+         declare
+            Browser_Nag_Class : UString;
+         begin
+            if not Empty (Response, "img_src") then
+               declare
+                  Img_Src : constant String :=
+                    (if Is_SSL and then not Empty (Response, "img_src_ssl")
+                     then Get_As_String (Response, "img_src_ssl")
+                     else Get_As_String (Response, "img_src"));
+               begin
+                  Append (Notice,
+                          "<div class=""alignright browser-icon""><img src=""" &
+                          ESC_URL (Img_Src) & """ alt="""" /></div>");
+                  Browser_Nag_Class := +" has-browser-icon";
+               end;
+            end if;
+            Append (Notice,
+                    "<p class=""browser-update-nag" & Browser_Nag_Class &
+                    """>" & Msg & "</p>");
+         end;
 
---                 browsehappy = "https://browsehappy.com/";
---                 locale      = get_user_locale();
---                 if ( "en_US" !== locale ) then
---                         browsehappy = add_query_arg( "locale", locale, browsehappy );
---                 end;
+         declare
+            Browsehappy     : UString := +"https://browsehappy.com/";
+            Msg_Browsehappy : UString;
 
---                 if ( is_IE ) then
---                         msg_browsehappy = sprintf(
---                                 -- translators: %s: Browse Happy URL.--
---                                 __( "Learn how to <a href="%s" class="update-browser-link">browse happy</a>" ),
---                                 esc_url( browsehappy )
---                         );
---                 end; else then
---                         msg_browsehappy = sprintf(
---                                 -- translators: 1: Browser update URL, 2: Browser name, 3: Browse Happy URL.--
---                                 __( "<a href="%1s" class="update-browser-link">Update %2s</a> or learn how to <a href="%3s" class="browse-happy-link">browse happy</a>" ),
---                                 esc_attr( response["update_url"] ),
---                                 esc_html( response["name"] ),
---                                 esc_url( browsehappy )
---                         );
---                 end;
+            Locale : constant String  := Get_User_Locale;
+         begin
+            if "en_US" /= Locale then
+               Browsehappy := +Add_Query_Arg ("locale", Locale, -Browsehappy);
+            end if;
 
---                 notice .= "<p>" . msg_browsehappy . "</p>";
---                 notice .= "<p class="hide-if-no-js"><a href="" class="dismiss" aria-label="" . esc_attr__( "Dismiss the browser warning panel" ) . "">" . __( "Dismiss" ) . "</a></p>";
---                 notice .= "<div class="clear"></div>";
---         end;
+            if Is_IE then
+               Msg_Browsehappy := +Sprintf (
+                 -- translators: %s: Browse Happy URL.
+                 abs "Learn how to <a href=""%s"" class=""update-browser-link"">browse happy</a>",
+                 [1 => ESC_URL (-Browsehappy)]
+               );
+            else
+               Msg_Browsehappy := +Sprintf (
+                 -- translators: 1: Browser update URL, 2: Browser name, 3: Browse Happy URL.
+                 abs "<a href=""%1s"" class=""update-browser-link"">Update %2s</a> or learn how to <a href=""%3s"" class=""browse-happy-link"">browse happy</a>",
+                 [
+                   1 => ESC_Attr (Get_As_String (Response, "update_url")),
+                   2 => ESC_HTML (Get_As_String (Response, "name")),
+                   3 => ESC_URL (-Browsehappy)
+                 ]
+               );
+            end if;
 
---         --
---         -- Filters the notice output for the "Browse Happy" nag meta box.
---         --
---         -- @since 3.2.0
---         --
---         -- @param string      notice   The notice content.
---         -- @param array|false response An array containing web browser information, or
---         --                              false on failure. See wp_check_browser_version().
---         --
---         echo apply_filters( "browse-happy-notice", notice, response ); -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
--- end;
+            Append (Notice, "<p>" & (-Msg_Browsehappy) & "</p>");
+            Append (Notice,
+                    "<p class=""hide-if-no-js""><a href="""" class=""dismiss"" " &
+                    "aria-label=""" &
+                    ESC_Attr_XX ("Dismiss the browser warning panel") & """>" &
+                    abs "Dismiss" & "</a></p>");
+            Append (Notice, "<div class=""clear""></div>");
+         end;
 
--- --
--- -- Adds an additional class to the browser nag if the current version is insecure.
--- --
--- -- @since 3.2.0
--- --
--- -- @param string[] classes Array of meta box classes.
--- -- @return string[] Modified array of meta box classes.
--- --
--- function dashboard_browser_nag_class( classes ) then
---         response = wp_check_browser_version();
+         --
+         -- Filters the notice output for the "Browse Happy" nag meta box.
+         --
+         -- @since 3.2.0
+         --
+         -- @param string      notice   The notice content.
+         -- @param array|false response An array containing web browser information, or
+         --                             false on failure.
+         --                             See wp_check_browser_version().
+         --
+         Echo (Apply_Filters ("browse-happy-notice", -Notice, Response));
+      end if;
+   end Wp_Dashboard_Browser_Nag;
 
---         if ( response && response["insecure"] ) then
---                 classes[] = "browser-insecure";
---         end;
+   ---------------------------------
+   -- Dashboard_Browser_Nag_Class --
+   ---------------------------------
 
---         return classes;
--- end;
+   function Dashboard_Browser_Nag_Class (Classes : List_Type)
+                                         return List_Type
+   is
+      Response  : constant Array_Type := Wp_Check_Browser_Version;
+      Classes_2 : List_Type  := Classes;
+   begin
+      if
+        Response /= Empty_Array and then
+        As_Boolean (Get (Response, "insecure"))
+      then
+         Classes_2.Append ("browser-insecure");
+      end if;
 
--- --
--- -- Checks if the user needs a browser update.
--- --
--- -- @since 3.2.0
--- --
--- -- @return array|false Array of browser data on success, false on failure.
--- --
--- function wp_check_browser_version() then
---         if ( empty( _SERVER["HTTP_USER_AGENT"] ) ) then
---                 return false;
---         end;
+      return Classes_2;
+   end Dashboard_Browser_Nag_Class;
 
---         key = md5( _SERVER["HTTP_USER_AGENT"] );
+   ------------------------------
+   -- Wp_Check_Browser_Version --
+   ------------------------------
 
---         response = get_site_transient( "browser_" . key );
+   function Wp_Check_Browser_Version
+            return Array_Type
+   is
+      use Php.JSON;
+      use Php.Misc;
+      use Array_Lists;
+      use Binder;
+      use UStrings;
+      use Inc_HTTP;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Options;
+   begin
+      if Empty (X_SERVER, "HTTP_USER_AGENT") then
+         return Empty_Array; -- False
+      end if;
 
---         if ( false === response ) then
---                 -- Include an unmodified wp_version.
---                 require ABSPATH . WPINC . "/version.php";
+      declare
+         Key : constant String :=
+           MD5 (Get_As_String (X_SERVER, "HTTP_USER_AGENT"));
 
---                 url     = "http://api.wordpress.org/core/browse-happy/1.1/";
---                 options = array(
---                         "body"       => array( "useragent" => _SERVER["HTTP_USER_AGENT"] ),
---                         "user-agent" => "WordPress/" . wp_version . "; " . home_url( "/" ),
---                 );
+         Response : constant String_Maps.Map :=
+           Get_Site_Transient ("browser_" & Key);
+      begin
+         if Response.Is_Empty then
+--       if False = Response then
+                -- Include an unmodified wp_version.
+                -- require ABSPATH . WPINC . "/version.php";
+            declare
+               URL : UString :=
+                 +"http://api.wordpress.org/core/browse-happy/1.1/";
 
---                 if ( wp_http_supports( array( "ssl" ) ) ) then
---                         url = set_url_scheme( url, "https" );
---                 end;
+               Options : constant Array_Type := To_Array_Type ([
+                 Build ("body",
+                        To_Array_Type ([Build ("useragent",
+                                        Get_As_String (X_SERVER, "HTTP_USER_AGENT"))])),
+                 Build ("user-agent",
+                        "WordPress/" & Inc_Versions.Wp_Version & "; " & Home_URL ("/"))
+               ]);
+            begin
+               if
+                 Wp_HTTP_Supports (Capabilities =>
+                                    To_Array_Type ([Build ("ssl", True)]))
+               then
+                  URL := +Set_URL_Scheme (-URL, "https");
+               end if;
 
---                 response = wp_remote_post( url, options );
+               declare
+                  Response_2 : Array_Type := Wp_Remote_Post (-URL, Options);
+               begin
+                  if
+                    Is_Wp_Error (Response_2) or else
+                    200 /= Wp_Remote_Retrieve_Response_Code (Response_2)
+                  then
+                     return Empty_Array; -- false
+                  end if;
 
---                 if ( is_wp_error( response ) || 200 !== wp_remote_retrieve_response_code( response ) ) then
---                         return false;
---                 end;
+                  --
+                  -- Response should be an array with:
+                  --  "platform" - string - A user-friendly platform name, if it can be
+                  --                        determined
+                  --  "name" - string - A user-friendly browser name
+                  --  "version" - string - The version of the browser the user is using
+                  --  "current_version" - string - The most recent version of the
+                  --                               browser
+                  --  "upgrade" - boolean - Whether the browser needs an upgrade
+                  --  "insecure" - boolean - Whether the browser is deemed insecure
+                  --  "update_url" - string - The url to visit to upgrade
+                  --  "img_src" - string - An image representing the browser
+                  --  "img_src_ssl" - string - An image (over SSL) representing the
+                  --                           browser
+                  --
+                  Response_2 :=
+                    JSON_Decode (Wp_Remote_Retrieve_Body (Response_2), True);
 
---                 --
---                 -- Response should be an array with:
---                 --  "platform" - string - A user-friendly platform name, if it can be determined
---                 --  "name" - string - A user-friendly browser name
---                 --  "version" - string - The version of the browser the user is using
---                 --  "current_version" - string - The most recent version of the browser
---                 --  "upgrade" - boolean - Whether the browser needs an upgrade
---                 --  "insecure" - boolean - Whether the browser is deemed insecure
---                 --  "update_url" - string - The url to visit to upgrade
---                 --  "img_src" - string - An image representing the browser
---                 --  "img_src_ssl" - string - An image (over SSL) representing the browser
---                 --
---                 response = json_decode( wp_remote_retrieve_body( response ), true );
+                  -- if not Is_Array (Response_2) then
+                  --    return Empty_Array; -- False
+                  -- end if;
 
---                 if ( ! is_array( response ) ) then
---                         return false;
---                 end;
+                  Set_Site_Transient ("browser_" & Key, Response_2,
+                                      Constants.WEEK_IN_SECONDS);
+               end;
+            end;
+         end if;
 
---                 set_site_transient( "browser_" . key, response, WEEK_IN_SECONDS );
---         end;
+         return Empty_Array; -- Response; -- XXX
+      end;
+   end Wp_Check_Browser_Version;
 
---         return response;
--- end;
+   --------------------------
+   -- Wp_Dashboard_Php_Nag --
+   --------------------------
 
--- --
--- -- Displays the PHP update nag.
--- --
--- -- @since 5.1.0
--- --
--- function wp_dashboard_php_nag() then
---         response = wp_check_php_version();
+   procedure Wp_Dashboard_PHP_Nag
+   is
+      use Php.Echoing;
+      use Php.Misc;
+      use Php.Strings;
+      use UStrings;
+      use Adi_Misc;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_L10n;
 
---         if ( ! response ) then
---                 return;
---         end;
+      Response : constant Array_Type := Wp_Check_PHP_Version;
+      Message  : UString;
+   begin
+      if Response = Empty_Array then
+         return;
+      end if;
 
---         if ( isset( response["is_secure"] ) && ! response["is_secure"] ) then
---                 -- The `is_secure` array key name doesn"t actually imply this is a secure version of PHP. It only means it receives security updates.
+      if
+        Isset (Response, "is_secure") and then
+        not As_Boolean (Get (Response, "is_secure"))
+      then
+         -- The `is_secure` array key name doesn't actually imply this is a secure
+         -- version of PHP. It only means it receives security updates.
 
---                 if ( response["is_lower_than_future_minimum"] ) then
---                         message = sprintf(
---                                 -- translators: %s: The server PHP version.--
---                                 __( "Your site is running on an outdated version of PHP (%s), which does not receive security updates and soon will not be supported by WordPress. Ensure that PHP is updated on your server as soon as possible. Otherwise you will not be able to upgrade WordPress." ),
---                                 PHP_VERSION
---                         );
---                 end; else then
---                         message = sprintf(
---                                 -- translators: %s: The server PHP version.--
---                                 __( "Your site is running on an outdated version of PHP (%s), which does not receive security updates. It should be updated." ),
---                                 PHP_VERSION
---                         );
---                 end;
---         end; elseif ( response["is_lower_than_future_minimum"] ) then
---                 message = sprintf(
---                         -- translators: %s: The server PHP version.--
---                         __( "Your site is running on an outdated version of PHP (%s), which soon will not be supported by WordPress. Ensure that PHP is updated on your server as soon as possible. Otherwise you will not be able to upgrade WordPress." ),
---                         PHP_VERSION
---                 );
---         end; else then
---                 message = sprintf(
---                         -- translators: %s: The server PHP version.--
---                         __( "Your site is running on an outdated version of PHP (%s), which should be updated." ),
---                         PHP_VERSION
---                 );
---         end;
---         ?>
---         <p class="bigger-bolder-text"><?php echo message; ?></p>
+         if As_Boolean (Get (Response, "is_lower_than_future_minimum")) then
+            Message := +Sprintf (
+              -- translators: %s: The server PHP version.
+              abs "Your site is running on an outdated version of PHP (%s), which does not receive security updates and soon will not be supported by WordPress. Ensure that PHP is updated on your server as soon as possible. Otherwise you will not be able to upgrade WordPress.",
+              [1 => PHP_VERSION]
+            );
+         else
+            Message := +Sprintf (
+              -- translators: %s: The server PHP version.
+              abs "Your site is running on an outdated version of PHP (%s), which does not receive security updates. It should be updated.",
+              [1 => PHP_VERSION]
+            );
+         end if;
 
---         <p><?php _e( "What is PHP and how does it affect my site?" ); ?></p>
---         <p>
---                 <?php _e( "PHP is one of the programming languages used to build WordPress. Newer versions of PHP receive regular security updates and may increase your site&#8217;s performance." ); ?>
---                 <?php
---                 if ( ! empty( response["recommended_version"] ) ) then
---                         printf(
---                                 -- translators: %s: The minimum recommended PHP version.--
---                                 __( "The minimum recommended version of PHP is %s." ),
---                                 response["recommended_version"]
---                         );
---                 end;
---                 ?>
---         </p>
+      elsif As_Boolean (Get (Response, "is_lower_than_future_minimum")) then
+         Message := +Sprintf (
+           -- translators: %s: The server PHP version.
+           abs "Your site is running on an outdated version of PHP (%s), which soon will not be supported by WordPress. Ensure that PHP is updated on your server as soon as possible. Otherwise you will not be able to upgrade WordPress.",
+           [1 => PHP_VERSION]
+         );
+      else
+         Message := +Sprintf (
+           -- translators: %s: The server PHP version.
+           abs "Your site is running on an outdated version of PHP (%s), which should be updated.",
+           [1 => PHP_VERSION]
+         );
+      end if;
 
---         <p class="button-container">
---                 <?php
---                 printf(
---                         "<a class="button button-primary" href="%1s" target="_blank" rel="noopener">%2s <span class="screen-reader-text">%3s</span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>",
---                         esc_url( wp_get_update_php_url() ),
---                         __( "Learn more about updating PHP" ),
---                         -- translators: Accessibility text.--
---                         __( "(opens in a new tab)" )
---                 );
---                 ?>
---         </p>
---         <?php
+      Echo ("<p class=""bigger-bolder-text"">" & (-Message) & "</p>");
 
---         wp_update_php_annotation();
---         wp_direct_php_update_button();
--- end;
+      Echo ("<p>");
+      X_E ("What is PHP and how does it affect my site?");
+      Echo ("</p>");
+      Echo ("<p>");
+      Echo ("    ");
+      X_E ("PHP is one of the programming languages used to build WordPress. Newer versions of PHP receive regular security updates and may increase your site&#8217;s performance.");
 
--- --
--- -- Adds an additional class to the PHP nag if the current version is insecure.
--- --
--- -- @since 5.1.0
--- --
--- -- @param string[] classes Array of meta box classes.
--- -- @return string[] Modified array of meta box classes.
--- --
--- function dashboard_php_nag_class( classes ) then
---         response = wp_check_php_version();
+      if not Empty (Response, "recommended_version") then
+         Printf (
+           -- translators: %s: The minimum recommended PHP version.
+           abs "The minimum recommended version of PHP is %s.",
+           [1 => Get_As_String (Response, "recommended_version")]
+         );
+      end if;
+      Echo ("</p>");
 
---         if ( ! response ) then
---                 return classes;
---         end;
+      Echo ("<p class=""button-container"">");
+      Printf (
+        "<a class=""button button-primary"" href=""%1s"" target=""_blank"" rel=""noopener"">%2s <span class=""screen-reader-text"">%3s</span><span aria-hidden=""true"" class=""dashicons dashicons-external""></span></a>",
+        [
+          1 => ESC_URL (Wp_Get_Update_PHP_URL),
+          2 => abs "Learn more about updating PHP",
+               -- translators: Accessibility text.
+          3 => abs "(opens in a new tab)"
+        ]
+      );
+      Echo ("</p>");
 
---         if ( isset( response["is_secure"] ) && ! response["is_secure"] ) then
---                 classes[] = "php-no-security-updates";
---         end; elseif ( response["is_lower_than_future_minimum"] ) then
---                 classes[] = "php-version-lower-than-future-minimum";
---         end;
+      Wp_Update_PHP_Annotation;
+      Wp_Direct_PHP_Update_Button;
+   end Wp_Dashboard_PHP_Nag;
 
---         return classes;
--- end;
+   -----------------------------
+   -- Dashboard_Php_Nag_Class --
+   -----------------------------
 
--- --
--- -- Displays the Site Health Status widget.
--- --
--- -- @since 5.4.0
--- --
--- function wp_dashboard_site_health() then
+   function Dashboard_PHP_Nag_Class (Classes : List_Type)
+                                     return List_Type
+   is
+      use Adi_Misc;
+
+      Classes_2 : List_Type := Classes;
+      Response : constant Array_Type := Wp_Check_PHP_Version;
+   begin
+      if Response = Empty_Array then
+         return Classes_2;
+      end if;
+
+      if
+        Isset (Response, "is_secure") and then
+        As_Boolean (Get (Response, "is_secure"))
+      then
+         Classes_2.Append ("php-no-security-updates");
+      elsif As_Boolean (Get (Response, "is_lower_than_future_minimum")) then
+         Classes_2.Append ("php-version-lower-than-future-minimum");
+      end if;
+
+      return Classes_2;
+   end Dashboard_PHP_Nag_Class;
+
+   ------------------------------
+   -- Wp_Dashboard_Site_Health --
+   ------------------------------
+
+   procedure Wp_Dashboard_Site_Health
+   is
+   begin
+      Logging.Log ("wp_dashboard_site_health", "not implemented");
+   end Wp_Dashboard_Site_Health;
 --         get_issues = get_transient( "health-check-site-status-result" );
 
 --         issue_counts = array();

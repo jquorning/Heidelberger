@@ -29,7 +29,6 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Meta;
-with Inc_Plugins;
 with Inc_Revisions;
 
 package body Inc_Posts
@@ -3583,7 +3582,6 @@ is
       use Php.Arrays;
       use Helpers_3;
       use UStrings;
-      use Wp_Common;
       use Class_Posts;
 
       Post_2 : Class_Posts.Wp_Post := Post;
@@ -3679,8 +3677,6 @@ is
       end if;
 
       declare
-         use Inc_Plugins;
-
          Prefixed        : Boolean    := False;
          Field_No_Prefix : UString;
 --         Value_2         : Array_Type := Value_2;
@@ -3927,26 +3923,14 @@ is
 --         return cache_key;
 -- end;
 
---
--- Counts number of posts of a post type and if user has permissions to view.
---
--- This function provides an efficient method of finding the amount of post"s
--- type a blog has. Another method is to count the amount of items in
--- get_posts(), but that method has a lot of overhead with doing so. Therefore,
--- when developing for 2.5+, use this function instead.
---
--- The perm parameter checks for "readable" value and if the user can read
--- private posts, it will display that for the user that is signed in.
---
--- @since 2.5.0
---
--- @global wpdb wpdb WordPress database abstraction object.
---
--- @param string type Optional. Post type to retrieve count. Default "post".
--- @param string perm Optional. "readable" or empty. Default empty.
--- @return stdClass Number of posts for each status.
---
--- function wp_count_posts( type = "post", perm = "" ) then
+   --------------------
+   -- Wp_Count_Posts --
+   --------------------
+
+   function Wp_Count_Posts (Typ  : String := "post";
+                            Perm : String := "")
+                            return Post_Counts_Type
+   is (raise Program_Error with "not implemented");
 --         global wpdb;
 
 --         if ( ! post_type_exists( type ) ) then

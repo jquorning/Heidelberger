@@ -7,6 +7,7 @@
 
 with Arrays;
 
+with Class_Posts;
 with Class_Users;
 
 package Adi_Posts
@@ -142,5 +143,19 @@ is
    --
    function Get_Block_Editor_Server_Block_Settings
             return Array_Type;
+
+   --
+   -- Returns default post information to use when populating the "Write Post" form.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string post_type    Optional. A post type string. Default "post".
+   -- @param bool   create_in_db Optional. Whether to insert the post into database.
+   --                            Default false.
+   -- @return WP_Post Post object containing all the default post data as attributes
+   --
+   function Get_Default_Post_To_Edit (Post_Type    : String := "post";
+                                      Create_In_DB : Boolean := False)
+                                      return Class_Posts.Wp_Post;
 
 end Adi_Posts;

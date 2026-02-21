@@ -44,6 +44,11 @@ is
    -- Date_Time_Immutable --
    -------------------------
 
+   function X_Construct (Datetime : String := "now";
+                         Timezone : Date_Time_Zone := Null_Date_Time_Zone)
+                         return Date_Time_Immutable
+   is (raise Program_Error with "not implemented");
+
    function Get_Timestamp (Datetime : Date_Time_Immutable)
                            return Time_Type
    is (raise Program_Error with "not implemented");
@@ -55,6 +60,11 @@ is
    function Format (Datetime : Date_Time_Immutable;
                     Format   : String)
                     return String
+   is (raise Program_Error with "not implemented");
+
+   function Modify (Datetime : Date_Time_Immutable;
+                    Modifier : String)
+                    return Date_Time_Immutable
    is (raise Program_Error with "not implemented");
 
    function Set_Time_Zone (Datetime : Date_Time_Immutable;

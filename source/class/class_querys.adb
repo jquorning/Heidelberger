@@ -11,6 +11,7 @@ with Ada.Containers;
 with Php.Lists;
 with Php.Strings;
 
+with Globals;
 with Helpers;
 with Lists;
 
@@ -3129,17 +3130,15 @@ is
 --                 return $this->post;
 --         end;
 
---         --
---         -- Sets up the current post.
---         --
---         -- Retrieves the next post, sets up the post, sets the 'in the loop'
---         -- property to true.
---         --
---         -- @since 1.5.0
---         --
---         -- @global WP_Post $post Global post object.
---         --
---         public function the_post() then
+   --------------
+   -- The_Post --
+   --------------
+
+   procedure The_Post (This : Wp_Query)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end The_Post;
 --                 global $post;
 
 --                 if ( ! $this->in_the_loop ) then
@@ -4418,20 +4417,20 @@ is
 --                 return "wp_query:$key:$last_changed";
 --         end;
 
---         --
---         -- After looping through a nested query, this function
---         -- restores the $post global to the current post in this query.
---         --
---         -- @since 3.7.0
---         --
---         -- @global WP_Post $post Global post object.
---         --
---         public function reset_postdata() then
---                 if ( ! empty( $this->post ) ) then
---                         $GLOBALS['post'] = $this->post;
---                         $this->setup_postdata( $this->post );
---                 end;
---         end;
+   --------------------
+   -- Reset_Postdate --
+   --------------------
+
+   procedure Reset_Postdata (This : in out Wp_Query)
+   is
+      use Class_Posts;
+   begin
+      if This.Post /= Null_Post then
+--    if not Empty (This.Post) then
+--       Set (Globals.GLOBALS, "post", This.Post); -- XXX
+         This.Setup_Postdata (This.Post);
+      end if;
+   end Reset_Postdata;
 
 --         --
 --         -- Lazyload term meta for posts in the loop.

@@ -2811,41 +2811,57 @@ is
 --         echo apply_filters( "the_time", get_the_time( format ), format );
 -- end;
 
--- --
--- -- Retrieves the time at which the post was written.
--- --
--- -- @since 1.5.0
--- --
--- -- @param string      format Optional. Format to use for retrieving the time the post
--- --                            was written. Accepts "G", "U", or PHP date format.
--- --                            Defaults to the "time_format" option.
--- -- @param int|WP_Post post   Post ID or post object. Default is global `post` object.
--- -- @return string|int|false Formatted date string or Unix timestamp if `format` is "U" or "G".
--- --                          False on failure.
--- --
--- function get_the_time( format = "", post = null ) then
---         post = get_post( post );
+   ------------------
+   -- Get_The_Time --
+   ------------------
 
---         if ( ! post ) then
---                 return false;
---         end;
+   function Get_The_Time (Format : String  := "";
+                          Post   : Integer := 0) -- null
+                          return Integer
+   is (raise Program_Error with "not implemented");
 
---         _format = ! empty( format ) ? format : get_option( "time_format" );
+   ------------------
+   -- Get_The_Time --
+   ------------------
 
---         the_time = get_post_time( _format, false, post, true );
+   function Get_The_Time (Format : String  := "";
+                          Post   : Integer := 0) -- null
+                          return String
+   is
+      use Php.Strings;
+      use Wp_Common;
+      use Class_Posts;
+      use Inc_Options;
+      use Inc_Posts;
 
---         --
---         -- Filters the time a post was written.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string|int  the_time Formatted date string or Unix timestamp if `format` is "U" or "G".
---         -- @param string      format   Format to use for retrieving the time the post
---         --                              was written. Accepts "G", "U", or PHP date format.
---         -- @param WP_Post     post     Post object.
---         --
---         return apply_filters( "get_the_time", the_time, format, post );
--- end;
+      Post_2 : constant Wp_Post := Get_Post (Post_Id_Type (Post));
+   begin
+      if Post_2 = Null_Post then
+         return ""; -- false
+      end if;
+
+      declare
+         X_Format : constant String :=
+           (if not Empty (Format) then Format else Get_Option ("time_format"));
+
+         The_Time : constant String :=
+           Get_Post_Time (X_Format, False, Post_2, True);
+      begin
+         --
+         -- Filters the time a post was written.
+         --
+         -- @since 1.5.0
+         --
+         -- @param string|int  the_time Formatted date string or Unix timestamp if
+         --                             `format` is "U" or "G".
+         -- @param string      format   Format to use for retrieving the time the post
+         --                             was written. Accepts "G", "U", or PHP date
+         --                             format.
+         -- @param WP_Post     post     Post object.
+         --
+         return Apply_Filters ("get_the_time", The_Time, Format, Post_2);
+      end;
+   end Get_The_Time;
 
    -------------------
    -- Get_Post_Time --
@@ -5464,6 +5480,7 @@ is
       Wp_Enqueue_Style ("thickbox");
 
       if Is_Network_Admin then
+         Logging.Log ("add_thickbox", "no add_action");
          null;
 --       Add_Action ("admin_head", X_Thickbox_Path_Admin_Subfolder'Access);
       end if;

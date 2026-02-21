@@ -6,9 +6,14 @@
 -- @since 3.0.0
 --
 
+with Arrays;
+
+with Inc_Options;
+
 package body Inc_Ms_Functions
 is
-   procedure Dummy is null;
+   use Arrays;
+
 -- --
 -- -- Gets the network"s site and user counts.
 -- --
@@ -102,21 +107,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Gets the number of active sites on the installation.
--- --
--- -- The count is cached and updated twice daily. This is not a live count.
--- --
--- -- @since MU (3.0.0)
--- -- @since 3.7.0 The `network_id` parameter has been deprecated.
--- -- @since 4.8.0 The `network_id` parameter is now being used.
--- --
--- -- @param int|null network_id ID of the network. Default is the current network.
--- -- @return int Number of active sites on the network.
--- --
--- function get_blog_count( network_id := null ) then
---         return get_network_option( network_id, "blog_count" );
--- end;
+   --------------------
+   -- Get_Blog_Count --
+   --------------------
+
+   function Get_Blog_Count (Network_Id : Integer := 0) -- := null
+                            return Natural
+   is
+      use Inc_Options;
+   begin
+      return As_Integer (Get_Network_Option (Network_Id, "blog_count"));
+   end Get_Blog_Count;
 
 -- --
 -- -- Gets a blog post from any site on the network.

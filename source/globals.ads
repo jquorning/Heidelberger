@@ -72,6 +72,7 @@ is
    Total_Update_Count : Natural;
    Update_Title       : UStrings.UString;
 
+   Global_Post_Id   : Class_Posts.Post_Id_Type;
    Post_Type        : UStrings.UString;
    Post_Type_Object : Class_Post_Type.Wp_Post_Type;
    Post             : Class_Posts.Wp_Post;

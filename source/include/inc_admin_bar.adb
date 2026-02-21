@@ -1443,7 +1443,7 @@ is
       use Inc_Link_Templates;
       use Inc_L10n;
 
-      Counts        : constant Comment_Counts := Wp_Count_Comments;
+      Counts        : constant Comment_Counts_Type := Wp_Count_Comments;
       Awaiting_Mod  : constant Natural := Counts.Moderated;
       Awaiting_Text : constant String  :=
          Sprintf (

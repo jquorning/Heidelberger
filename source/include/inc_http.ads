@@ -12,10 +12,12 @@
 with Php.HTML;
 
 with Arrays;
+with Lists;
 
 package Inc_HTTP
 is
    use Arrays;
+   use Lists;
 
    --
    -- Returns the initialized WP_Http Object
@@ -60,6 +62,20 @@ is
    function Wp_Remote_Post (URL  : String;
                             Args : Array_Type := Empty_Array)
                             return Array_Type;
+
+   --
+   -- Retrieve only the response code from the raw response.
+   --
+   -- Will return an empty string if incorrect parameter value is given.
+   --
+   -- @since 2.7.0
+   --
+   -- @param array|WP_Error response HTTP response.
+   -- @return int|string The response code as an integer. Empty string if incorrect
+   --                    parameter given.
+   --
+   function Wp_Remote_Retrieve_Response_Code (Response : Array_Type)
+                                              return Integer;
 
    --
    -- Determines if there is an HTTP Transport that can process this request.

@@ -127,16 +127,17 @@ is
       end;
    end Current_Time;
 
---
--- Retrieves the current time as an object using the site"s timezone.
---
--- @since 5.3.0
---
--- @return DateTimeImmutable Date and time object.
---
--- function current_datetime() then
---         return new DateTimeImmutable( "now", wp_timezone() );
--- end;
+   ----------------------
+   -- Current_DateTime --
+   ----------------------
+
+   function Current_Datetime
+            return Php.Calendar.Date_Time_Immutable
+   is
+      use Php.Calendar;
+   begin
+      return X_Construct ("now", Wp_Timezone);
+   end Current_Datetime;
 
    ------------------------
    -- Wp_Timezone_String --
@@ -180,32 +181,15 @@ is
 --    return new DateTimeZone( wp_timezone_string() );
    end Wp_Timezone;
 
---
--- Retrieves the date in localized format, based on a sum of Unix timestamp and
--- timezone offset in seconds.
---
--- If the locale specifies the locale month and weekday, then the locale will
--- take over the format for the date. If it isn"t, then the date format string
--- will be used instead.
---
--- Note that due to the way WP typically generates a sum of timestamp and offset
--- with `strtotime()`, it implies offset added at a _current_ time, not at the time
--- the timestamp represents. Storing such timestamps or calculating them differently
--- will lead to invalid output.
---
--- @since 0.71
--- @since 5.3.0 Converted into a wrapper for wp_date().
---
--- @global WP_Locale wp_locale WordPress date and time locale object.
---
--- @param string   format                Format to display the date.
--- @param int|bool timestamp_with_offset Optional. A sum of Unix timestamp and timezone offset
---                                        in seconds. Default false.
--- @param bool     gmt                   Optional. Whether to use GMT timezone. Only applies
---                                        if timestamp is not provided. Default false.
--- @return string The date, translated if locale specifies it.
---
--- function date_i18n( format, timestamp_with_offset = false, gmt = false ) then
+   ---------------
+   -- Date_I18n --
+   ---------------
+
+   function Date_I18n (Format                : String;
+                       Timestamp_With_Offset : Integer := 0; -- Boolean := False;
+                       GMT                   : Boolean := False)
+                       return String
+   is (raise Program_Error with "not implemented");
 --         timestamp = timestamp_with_offset;
 
 --         // If timestamp is omitted it should be current time (summed with offset, unless `gmt` is true).
@@ -8303,25 +8287,22 @@ is
                   "localized PHP upgrade information page");
    end Wp_Get_Default_Update_PHP_URL;
 
---
--- Prints the default annotation for the web host altering the "Update PHP" page URL.
---
--- This function is to be used after {@see wp_get_update_php_url()} to display a consistent
--- annotation if the web host has altered the default "Update PHP" page URL.
---
--- @since 5.1.0
--- @since 5.2.0 Added the `before` and `after` parameters.
---
--- @param string before Markup to output before the annotation. Default `<p class="description">`.
--- @param string after  Markup to output after the annotation. Default `</p>`.
---
--- function wp_update_php_annotation( before = "<p class="description">", after = "</p>" ) then
---         annotation = wp_get_update_php_annotation();
+   ------------------------------
+   -- Wp_Update_PHP_Annotation --
+   ------------------------------
 
---         if ( annotation ) then
---                 echo before . annotation . after;
---         end;
--- end;
+   procedure Wp_Update_PHP_Annotation
+               (Before : String := "<p class=""description"">";
+                After  : String := "</p>")
+   is
+      use Php.Echoing;
+
+      Annotation : constant String := Wp_Get_Update_PHP_Annotation;
+   begin
+      if Annotation /= "" then
+         Echo (Before & Annotation & After);
+      end if;
+   end Wp_Update_PHP_Annotation;
 
    ----------------------------------
    -- Wp_Get_Update_PHP_Annotation --
@@ -8353,62 +8334,66 @@ is
       end;
    end Wp_Get_Update_PHP_Annotation;
 
---
--- Gets the URL for directly updating the PHP version the site is running on.
---
--- A URL will only be returned if the `WP_DIRECT_UPDATE_PHP_URL` environment variable is specified or
--- by using the {@see "wp_direct_php_update_url"} filter. This allows hosts to send users directly to
--- the page where they can update PHP to a newer version.
---
--- @since 5.1.1
---
--- @return string URL for directly updating PHP or empty string.
---
--- function wp_get_direct_php_update_url() then
---         direct_update_url = "";
+   ----------------------------------
+   -- Wp_Get_Direct_PHP_Update_URL --
+   ----------------------------------
 
---         if ( false !== getenv( "WP_DIRECT_UPDATE_PHP_URL" ) ) then
---                 direct_update_url = getenv( "WP_DIRECT_UPDATE_PHP_URL" );
---         end;
+   function Wp_Get_Direct_PHP_Update_URL
+            return String
+   is
+      use Php.Misc;
+      use Wp_Common;
+      use UStrings;
 
---         --
---         -- Filters the URL for directly updating the PHP version the site is running on from the host.
---         --
---         -- @since 5.1.1
---         --
---         -- @param string direct_update_url URL for directly updating PHP.
---         --
---         direct_update_url = apply_filters( "wp_direct_php_update_url", direct_update_url );
+      Direct_Update_URL : UString;
+   begin
+      if "" /= Get_Env ("WP_DIRECT_UPDATE_PHP_URL") then -- false
+         Direct_Update_URL := +Get_Env ("WP_DIRECT_UPDATE_PHP_URL");
+      end if;
 
---         return direct_update_url;
--- end;
+      --
+      -- Filters the URL for directly updating the PHP version the site is running
+      -- on from the host.
+      --
+      -- @since 5.1.1
+      --
+      -- @param string direct_update_url URL for directly updating PHP.
+      --
+      Direct_Update_URL :=
+        +Apply_Filters ("wp_direct_php_update_url", -Direct_Update_URL);
 
---
--- Displays a button directly linking to a PHP update process.
---
--- This provides hosts with a way for users to be sent directly to their PHP update process.
---
--- The button is only displayed if a URL is returned by `wp_get_direct_php_update_url()`.
---
--- @since 5.1.1
---
--- function wp_direct_php_update_button() then
---         direct_update_url = wp_get_direct_php_update_url();
+      return -Direct_Update_URL;
+   end Wp_Get_Direct_PHP_Update_URL;
 
---         if ( empty( direct_update_url ) ) then
---                 return;
---         end;
+   ---------------------------------
+   -- Wp_Direct_PHP_Update_Button --
+   ---------------------------------
 
---         echo "<p class="button-container">";
---         printf(
---                 "<a class="button button-primary" href="%1s" target="_blank" rel="noopener">%2s <span class="screen-reader-text">%3s</span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>",
---                 esc_url( direct_update_url ),
---                 __( "Update PHP" ),
---                 /* translators: Accessibility text.--
---                 __( "(opens in a new tab)" )
---         );
---         echo "</p>";
--- end;
+   procedure Wp_Direct_PHP_Update_Button
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Inc_Formatting;
+      use Inc_L10n;
+
+      Direct_Update_URL : constant String := Wp_Get_Direct_PHP_Update_URL;
+   begin
+      if Empty (Direct_Update_URL) then
+         return;
+      end if;
+
+      Echo ("<p class=""button-container"">");
+      Printf (
+        "<a class=""button button-primary"" href=""%1s"" target=""_blank"" rel=""noopener"">%2s <span class=""screen-reader-text"">%3s</span><span aria-hidden=""true"" class=""dashicons dashicons-external""></span></a>",
+        [
+          1 => ESC_URL (Direct_Update_URL),
+          2 => abs "Update PHP",
+          -- translators: Accessibility text.
+          3 => "(opens in a new tab)"
+        ]
+      );
+      Echo ("</p>");
+   end Wp_Direct_PHP_Update_Button;
 
 --
 -- Gets the URL to learn more about updating the site to use HTTPS.

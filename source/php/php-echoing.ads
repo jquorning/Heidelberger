@@ -13,6 +13,7 @@ is
                      Args   : Lists.List_Type);
 
    procedure Clear_Echo;
+
    function Get_Echo
             return String;
 
@@ -21,6 +22,9 @@ is
 
    function OB_Get_Clean
             return String
-            is ("XXX-015");
+   is ("XXX-015");
+
+   procedure OB_End_Clean
+   is null;
 
 end Php.Echoing;

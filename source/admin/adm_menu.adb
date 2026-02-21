@@ -176,7 +176,7 @@ is
       -- Avoid the comment count query for users who cannot edit_posts.
       if Current_User_Can ("edit_posts") then
          declare
-            Comments : constant Inc_Comments.Comment_Counts :=
+            Comments : constant Inc_Comments.Comment_Counts_Type :=
                Inc_Comments.Wp_Count_Comments; --();
             Awaiting_Mod      : constant Integer := Comments.Moderated;
             Awaiting_Mod_I18n : constant String  :=

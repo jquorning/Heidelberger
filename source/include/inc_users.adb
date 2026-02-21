@@ -1509,33 +1509,35 @@ is
 --         return result;
 -- end;
 
--- --
--- -- Returns the number of active users in your installation.
--- --
--- -- Note that on a large site the count may be cached and only updated twice daily.
--- --
--- -- @since MU (3.0.0)
--- -- @since 4.8.0 The `network_id` parameter has been added.
--- -- @since 6.0.0 Moved to wp-includes/user.php.
--- --
--- -- @param int|null network_id ID of the network. Defaults to the current network.
--- -- @return int Number of active users on the network.
--- --
--- function get_user_count( network_id = null ) then
---         if ( ! is_multisite() && null !== network_id ) then
---                 _doing_it_wrong(
---                         __FUNCTION__,
---                         sprintf(
---                                 /* translators: %s: network_id--
---                                 __( "Unable to pass %s if not using multisite." ),
---                                 "<code>network_id</code>"
---                         ),
---                         "6.0.0"
---                 );
---         end;
+   --------------------
+   -- Get_User_Count --
+   --------------------
 
---         return (int) get_network_option( network_id, "user_count", -1 );
--- end;
+   function Get_User_Count (Network_Id : Integer := 0) -- null
+                            return Natural
+   is
+      use Php.Strings;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Options;
+   begin
+      if not Is_Multisite and then 0 /= Network_Id then -- null
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           Sprintf (
+             -- translators: %s: network_id
+             abs "Unable to pass %s if not using multisite.",
+             [1 => "<code>network_id</code>"]
+           ),
+           "6.0.0"
+         );
+      end if;
+
+      return
+        As_Integer (Get_Network_Option (Network_Id,
+                                        "user_count", From_Integer (-1)));
+   end Get_User_Count;
 
 -- --
 -- -- Updates the total count of users on the site if live user counting is enabled.

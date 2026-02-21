@@ -133,23 +133,20 @@ is
 --         wp_reset_postdata();
 -- end;
 
--- --
--- -- After looping through a separate query, this function restores
--- -- the post global to the current post in the main query.
--- --
--- -- @since 3.0.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- function wp_reset_postdata() then
---         global wp_query;
+   -----------------------
+   -- Wp_Reset_Postdata --
+   -----------------------
 
---         if ( isset( wp_query ) ) then
---                 wp_query->reset_postdata();
---         end;
--- end;
+   procedure Wp_Reset_Postdata
+   is
+--    global wp_query;
+   begin
+      if Isset (Global_Wp_Query) then
+         Global_Wp_Query.Reset_Postdata;
+      end if;
+   end Wp_Reset_Postdata;
 
--- /*
+-- --
 -- -- Query type checks.
 -- --
 

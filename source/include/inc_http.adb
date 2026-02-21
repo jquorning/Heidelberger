@@ -10,12 +10,10 @@
 --
 
 with Php.Arrays;
-with Php.HTML;
 with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
-with Lists;
 with UStrings;
 
 with Class_HTTP;
@@ -24,7 +22,6 @@ with Inc_Load;
 
 package body Inc_HTTP
 is
-   use Lists;
 
    subtype Wp_Http is Class_HTTP.Wp_Http;
 
@@ -255,23 +252,25 @@ is
 --         return "";
 -- end;
 
--- --
--- -- Retrieve only the response code from the raw response.
--- --
--- -- Will return an empty string if incorrect parameter value is given.
--- --
--- -- @since 2.7.0
--- --
--- -- @param array|WP_Error response HTTP response.
--- -- @return int|string The response code as an integer. Empty string if incorrect parameter given.
--- --
--- function wp_remote_retrieve_response_code( response ) then
---         if ( is_wp_error( response ) || ! isset( response["response"] ) || ! is_array( response["response"] ) ) then
---                 return "";
---         end;
+   --------------------------------------
+   -- Wp_Remote_Retrieve_Response_Code --
+   --------------------------------------
 
---         return response["response"]["code"];
--- end;
+   function Wp_Remote_Retrieve_Response_Code (Response : Array_Type)
+                                              return Integer
+   is
+      use Inc_Load;
+   begin
+      if
+        Is_Wp_Error (Response) or else
+        not Isset (Response, "response") or else
+        Kind_Of (Get (Response, "response")) /= Kind_Array
+      then
+         return 0; -- ""
+      end if;
+
+      return As_Integer (Get (Ref_2 (Response, "response", "code")));
+   end Wp_Remote_Retrieve_Response_Code;
 
 -- --
 -- -- Retrieve only the response message from the raw response.

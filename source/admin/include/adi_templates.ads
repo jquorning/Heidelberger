@@ -78,6 +78,30 @@ is
 
    function Get_Media_States (Post : Class_Posts.Wp_Post) return List_Type;
 
+   --
+   -- Outputs the in-line comment reply-to form in the Comments list table.
+   --
+   -- @since 2.7.0
+   --
+   -- @global WP_List_Table wp_list_table
+   --
+   -- @param int    position
+   -- @param bool   checkbox
+   -- @param string mode
+   -- @param bool   table_row
+   --
+   procedure Wp_Comment_Reply (Position  : Integer := 1;
+                               Checkbox  : Boolean := False;
+                               Mode      : String  := "single";
+                               Table_Row : Boolean := True);
+
+   --
+   -- Outputs "undo move to Trash" text for comments.
+   --
+   -- @since 2.9.0
+   --
+   procedure Wp_Comment_Trashnotice;
+
    -- package Term_Arrays is new
    --    Ada.Containers.Vectors (Index_Type   => Positive,
    --                            Element_Type => Inc_Class_Wp_Terms.Wp_Term,
@@ -221,6 +245,21 @@ is
                             Name             : String     := "submit";
                             Wrap             : Boolean    := True;
                             Other_Attributes : Array_Type := Empty_Array);
+
+   --
+   -- Gets the post title.
+   --
+   -- The post title is fetched and if it is blank then a default string is
+   -- returned.
+   --
+   -- @since 2.7.0
+   --
+   -- @param int|WP_Post post Optional. Post ID or WP_Post object. Default is
+   --                         global post.
+   -- @return string The post title if set.
+   --
+   function X_Draft_Or_Post_Title (Post : Integer := 0)
+                                   return String;
 
    --
    -- Displays the search query.

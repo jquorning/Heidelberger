@@ -42,6 +42,16 @@ is
                           return String;
 
    --
+   -- Retrieves the current time as an object using the site"s timezone.
+   --
+   -- @since 5.3.0
+   --
+   -- @return DateTimeImmutable Date and time object.
+   --
+   function Current_Datetime
+            return Php.Calendar.Date_Time_Immutable;
+
+   --
    -- Retrieves the timezone of the site as a string.
    --
    -- Uses the `timezone_string` option to get a proper timezone name if available,
@@ -74,6 +84,37 @@ is
    --
    function Wp_Timezone
             return Php.Calendar.Date_Time_Zone;
+
+   --
+   -- Retrieves the date in localized format, based on a sum of Unix timestamp and
+   -- timezone offset in seconds.
+   --
+   -- If the locale specifies the locale month and weekday, then the locale will
+   -- take over the format for the date. If it isn"t, then the date format string
+   -- will be used instead.
+   --
+   -- Note that due to the way WP typically generates a sum of timestamp and offset
+   -- with `strtotime()`, it implies offset added at a _current_ time, not at the time
+   -- the timestamp represents. Storing such timestamps or calculating them differently
+   -- will lead to invalid output.
+   --
+   -- @since 0.71
+   -- @since 5.3.0 Converted into a wrapper for wp_date().
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   --
+   -- @param string   format                Format to display the date.
+   -- @param int|bool timestamp_with_offset Optional. A sum of Unix timestamp and
+   --                                       timezone offset in seconds. Default false.
+   -- @param bool     gmt                   Optional. Whether to use GMT timezone.
+   --                                       Only applies if timestamp is not provided.
+   --                                       Default false.
+   -- @return string The date, translated if locale specifies it.
+   --
+   function Date_I18n (Format                : String;
+                       Timestamp_With_Offset : Integer := 0; -- Boolean := False;
+                       GMT                   : Boolean := False)
+                       return String;
 
    --
    -- Retrieves the date, in localized format.
@@ -1518,6 +1559,38 @@ is
             return String;
 
    --
+   -- Displays a button directly linking to a PHP update process.
+   --
+   -- This provides hosts with a way for users to be sent directly to their PHP
+   -- update process.
+   --
+   -- The button is only displayed if a URL is returned by
+   -- `wp_get_direct_php_update_url()`.
+   --
+   -- @since 5.1.1
+   --
+   procedure Wp_Direct_PHP_Update_Button;
+
+   --
+   -- Prints the default annotation for the web host altering the "Update PHP" page
+   -- URL.
+   --
+   -- This function is to be used after {@see wp_get_update_php_url()} to display a
+   -- consistent annotation if the web host has altered the default "Update PHP"
+   -- page URL.
+   --
+   -- @since 5.1.0
+   -- @since 5.2.0 Added the `before` and `after` parameters.
+   --
+   -- @param string before Markup to output before the annotation.
+   --                      Default `<p class="description">`.
+   -- @param string after  Markup to output after the annotation. Default `</p>`.
+   --
+   procedure Wp_Update_PHP_Annotation
+               (Before : String := "<p class=""description"">";
+                After  : String := "</p>");
+
+   --
    -- Returns the default annotation for the web hosting altering the "Update PHP"
    -- page URL.
    --
@@ -1531,6 +1604,21 @@ is
    --                 are provided.
    --
    function Wp_Get_Update_PHP_Annotation
+            return String;
+
+   --
+   -- Gets the URL for directly updating the PHP version the site is running on.
+   --
+   -- A URL will only be returned if the `WP_DIRECT_UPDATE_PHP_URL` environment
+   -- variable is specified or by using the {@see "wp_direct_php_update_url"} filter.
+   -- This allows hosts to send users directly to the page where they can update PHP
+   -- to a newer version.
+   --
+   -- @since 5.1.1
+   --
+   -- @return string URL for directly updating PHP or empty string.
+   --
+   function Wp_Get_Direct_PHP_Update_URL
             return String;
 
    --

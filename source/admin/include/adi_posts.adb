@@ -685,16 +685,14 @@ is
 --         );
 -- end;
 
--- --
--- -- Returns default post information to use when populating the "Write Post" form.
--- --
--- -- @since 2.0.0
--- --
--- -- @param string post_type    Optional. A post type string. Default "post".
--- -- @param bool   create_in_db Optional. Whether to insert the post into database. Default false.
--- -- @return WP_Post Post object containing all the default post data as attributes
--- --
--- function get_default_post_to_edit( post_type = "post", create_in_db = false ) then
+   ------------------------------
+   -- Get_Default_Post_To_Edit --
+   ------------------------------
+
+   function Get_Default_Post_To_Edit (Post_Type    : String := "post";
+                                      Create_In_DB : Boolean := False)
+                                      return Class_Posts.Wp_Post
+   is (raise Program_Error with "not implemented");
 --         post_title = "";
 --         if ( ! empty( _REQUEST["post_title"] ) ) then
 --                 post_title = esc_html( wp_unslash( _REQUEST["post_title"] ) );
