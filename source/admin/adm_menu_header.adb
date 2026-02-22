@@ -209,8 +209,8 @@ is
                      Img := +"<br />";
                      -- The value is base64-encoded data, so esc_attr() is used here
                      -- instead of esc_url().
-                     Img_Style := +" style=""background-image:url(\""" &
-                                   ESC_Attr (-Item.Icon_Url) & "\"")""";
+                     Img_Style := +" style=""background-image:url('" &
+                                   ESC_Attr (-Item.Icon_Url) & "')""";
                      Img_Class := +" svg";
                   elsif 0 = Strpos (-Item.Icon_Url, "dashicons-") then
                      Img       := +"<br />";
