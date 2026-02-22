@@ -1,5 +1,10 @@
 --
+--  heidelberger.gpr
 --
+
+--
+--  Set environment variable LOGGING_STUB to "no" to enable logging
+--  information.
 --
 
 with "config/heidelberger_config.gpr";
@@ -28,23 +33,60 @@ project Heidelberger is
    for Exec_Dir use "bin";
    for Main use ("heidelberger.adb");
 
+   type Yes_No is ("yes", "no");
+   Logging_Stub : Yes_No := External ("LOGGING_STUB", "yes");
+
+   package Naming is
+      case Logging_Stub is
+
+      when "yes" =>
+         for Spec ("logging") use "logging__stub.ads";
+         for Body ("logging") use "logging__stub.adb";
+
+      when "no" =>
+         for Spec ("logging") use "logging__log.ads";
+         for Body ("logging") use "logging__log.adb";
+
+      end case;
+   end Naming;
+
    package Compiler is
 
-      for Local_Configuration_Pragmas
-        use "source/heidelberger.adc";
+      case Heidelberger_Config.build_profile is
 
-      for Default_Switches ("Ada") use
-         Heidelberger_Config.Ada_Compiler_Switches & (
-         "-gnat2022",
-         "-g",
-         "-O0",
-         "-fstack-check",
-         "-gnata",
-         "-gnatwaCJ",
-         "-gnatef",
-         "-gnatf",
-         "-gnatyyduxCM0S" -- 0-r
-      );
+      when "development" | "validation" =>
+         for Local_Configuration_Pragmas
+           use "source/heidelberger.adc";
+
+         for Default_Switches ("Ada") use
+            Heidelberger_Config.Ada_Compiler_Switches & (
+            "-gnat2022",
+            "-g",
+            "-O0",
+            "-fstack-check",
+            "-gnata",
+            "-gnatwaCJ",
+            "-gnatef",
+            "-gnatf",
+            "-gnatyyduxCM0S-0lr" -- 0-r
+--          "-gnatyyduxCM0S" -- 0-r
+         );
+
+      when "release" =>
+         for Local_Configuration_Pragmas
+           use "source/heidelberger_release.adc";
+
+         for Default_Switches ("Ada") use
+            Heidelberger_Config.Ada_Compiler_Switches & (
+            "-gnat2022",
+            "-O2",
+            "-fstack-check",
+            "-gnata",
+            "-gnatef",
+            "-gnatf"
+         );
+      end case;
+
    end Compiler;
 
    package Binder is

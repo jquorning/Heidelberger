@@ -46,9 +46,9 @@ is
 
    procedure Clear_Echo
    is
-      use UStrings;
    begin
-      Echo_Buffer := Null_UString;
+      Echo_Buffer :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Length => Default_Buffer_Length);
    end Clear_Echo;
 
    ----------
@@ -63,4 +63,6 @@ is
       return -Echo_Buffer;
    end Get_Echo;
 
+begin
+   Clear_Echo;
 end Php.Echoing;

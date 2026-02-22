@@ -7,6 +7,8 @@ with Lists;
 package Php.Echoing
 is
 
+   Default_Buffer_Length : constant := 200_000;
+
    procedure Echo (Item : String);
 
    procedure Printf (Format : String;

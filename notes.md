@@ -53,3 +53,14 @@ Function return values can not be ignored.
 Callbacks
 
 Modifying `As_Array` referenced
+
+### Optimizations
+
+There are som low-hanging fruits:
+- Build with release profile. (done)
+- Add flag for stubbing of Logging. (done)
+- Preallocate echoing buffer. (done)
+- Return ustring from echoing buffer (`Get_Echo`).
+- Look at `Array_Type` and copying
+- Use variant record in `Array_Type`.
+- Switch off container checks. (done)
