@@ -14,6 +14,7 @@ with Adm_About;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
+with Adm_Freedoms;
 with Adm_Index;
 with Adm_Install;
 with Adm_Load_Scripts;
@@ -65,6 +66,9 @@ is
 
       elsif Index (URL, "/wp-admin/about.php") /= 0 then
          Adm_About.Render;
+
+      elsif Index (URL, "/wp-admin/freedoms.php") /= 0 then
+         Adm_Freedoms.Render;
 
       elsif Index (URL, "/wp-admin/edit.php") /= 0 then
          Adm_Edit.Render;

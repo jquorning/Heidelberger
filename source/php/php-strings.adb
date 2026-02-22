@@ -694,6 +694,9 @@ is
                Append (Buffer, Args (B));
                B := B + 1;
                A := A + 4;
+            elsif Format (A + 1) in '%' then
+               Append (Buffer, '%');
+               A := A + 2;
             else
                raise Constraint_Error with "bad format";
             end if;
