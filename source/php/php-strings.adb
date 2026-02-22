@@ -690,6 +690,12 @@ is
                Append (Buffer, Args (B));
                B := B + 1;
                A := A + 3;
+            elsif Format (A + 3) in 's' | 'd' then
+               Append (Buffer, Args (B));
+               B := B + 1;
+               A := A + 4;
+            else
+               raise Constraint_Error with "bad format";
             end if;
          else
             Append (Buffer, Format (A));

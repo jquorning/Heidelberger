@@ -10,6 +10,7 @@ with Php.HTML;
 with Logging;
 with UStrings;
 
+with Adm_About;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
@@ -61,6 +62,9 @@ is
 
       elsif Index (URL, "/wp-admin/privacy.php") /= 0 then
          Adm_Privacy.Run;
+
+      elsif Index (URL, "/wp-admin/about.php") /= 0 then
+         Adm_About.Render;
 
       elsif Index (URL, "/wp-admin/edit.php") /= 0 then
          Adm_Edit.Render;
