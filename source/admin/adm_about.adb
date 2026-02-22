@@ -784,7 +784,7 @@ is
          Echo ("  </a> |");
       end if;
 
-      Echo ("      <a href=""" & ESC_URL (Self_Admin_URL) & ">");
+      Echo ("      <a href=""" & ESC_URL (Self_Admin_URL) & """>");
       if Is_Blog_Admin then
          X_E ("Go to Dashboard &rarr; Home");
       else
