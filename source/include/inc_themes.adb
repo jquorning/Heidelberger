@@ -3951,6 +3951,7 @@ is
       use Php.Echoing;
       use Php.HTML;
       use Php.Strings;
+      use UStrings;
       use Inc_Link_Templates;
 
       Admin_Origin : constant Array_Type := Parse_URL (Admin_URL);
@@ -3964,21 +3965,21 @@ is
         (if Current_Theme_Supports ("html5", "script")
          then "" else " type=""text/javascript""");
    begin
-      Echo ("<script" & Type_Attr & ">");
-      Echo ("    (function() {");
-      Echo ("        var request, b = document.body, c = 'className', cs = 'customize-support', rcs = new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');");
+      Echo ("<script" & Type_Attr & ">" & NL);
+      Echo ("    (function() {" & NL);
+      Echo ("        var request, b = document.body, c = 'className', cs = 'customize-support', rcs = new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');" & NL);
 
       if Cross_Domain then
-         Echo ("       request = (function(){ var xhr = new XMLHttpRequest(); return ('withCredentials' in xhr); })();");
+         Echo ("       request = (function(){ var xhr = new XMLHttpRequest(); return ('withCredentials' in xhr); })();" & NL);
       else
-         Echo ("       request = true;");
+         Echo ("       request = true;" & NL);
       end if;
 
-      Echo ("          b[c] = b[c].replace( rcs, ' ' );");
-      Echo ("          // The customizer requires postMessage and CORS (if the site is cross domain).");
-      Echo ("          b[c] += ( window.postMessage && request ? ' ' : ' no-' ) + cs;");
-      Echo ("      }());");
-      Echo ("</script>");
+      Echo ("          b[c] = b[c].replace( rcs, ' ' );" & NL);
+      Echo ("          // The customizer requires postMessage and CORS (if the site is cross domain)." & NL);
+      Echo ("          b[c] += ( window.postMessage && request ? ' ' : ' no-' ) + cs;" & NL);
+      Echo ("      }());" & NL);
+      Echo ("</script>" & NL);
    end Wp_Customize_Support_Script;
 
    --------------------------
