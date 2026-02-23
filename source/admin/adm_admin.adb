@@ -248,7 +248,7 @@ is
       begin
          if Isset (XX_GET, "page") then
             Plugin_Page :=
-              +Slug_Type (Wp_Unslash (Get_As_String (XX_GET, "page")));
+              +Slug_Type (String'(Wp_Unslash (Get_As_String (XX_GET, "page"))));
 
             Plugin_Page :=
               +Slug_Type (Plugin_Basename (String (-Plugin_Page)));

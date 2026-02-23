@@ -6,7 +6,10 @@
 --
 
 with Arrays;
+with Array_Lists;
 with Lists;
+
+with Class_Errors;
 
 package Adi_Plugins
 is
@@ -14,6 +17,79 @@ is
    use Lists;
 
    X_Wp_Real_Parent_File : Array_Type;
+
+   --
+   -- Parses the plugin contents to retrieve plugin"s metadata.
+   --
+   -- All plugin headers must be on their own line. Plugin description must not have
+   -- any newlines, otherwise only parts of the description will be displayed.
+   -- The below is formatted for printing.
+   --
+   --     /*
+   --     Plugin Name: Name of the plugin.
+   --     Plugin URI: The home page of the plugin.
+   --     Description: Plugin description.
+   --     Author: Plugin author"s name.
+   --     Author URI: Link to the author"s website.
+   --     Version: Plugin version.
+   --     Text Domain: Optional. Unique identifier, should be same as the one used in
+   --          load_plugin_textdomain().
+   --     Domain Path: Optional. Only useful if the translations are located in a
+   --          folder above the plugin"s base path. For example, if .mo files are
+   --          located in the locale folder then Domain Path will be "/locale/" and
+   --          must have the first slash. Defaults to the base folder the plugin is
+   --          located in.
+   --     Network: Optional. Specify "Network: true" to require that a plugin is
+   --          activated across all sites in an installation. This will prevent a
+   --          plugin from being activated on a single site when Multisite is enabled.
+   --     Requires at least: Optional. Specify the minimum required WordPress version.
+   --     Requires PHP: Optional. Specify the minimum required PHP version.
+   --    -- / # Remove the space to close comment.
+   --
+   -- The first 8 KB of the file will be pulled in and if the plugin data is not
+   -- within that first 8 KB, then the plugin author should correct their plugin
+   -- and move the plugin data headers to the top.
+   --
+   -- The plugin file is assumed to have permissions to allow for scripts to read
+   -- the file. This is not checked however and the file is only opened for
+   -- reading.
+   --
+   -- @since 1.5.0
+   -- @since 5.3.0 Added support for `Requires at least` and `Requires PHP` headers.
+   -- @since 5.8.0 Added support for `Update URI` header.
+   --
+   -- @param string $plugin_file Absolute path to the main plugin file.
+   -- @param bool   $markup      Optional. If the returned data should have HTML
+   --                            markup applied. Default true.
+   -- @param bool   $translate   Optional. If the returned data should be translated.
+   --                            Default true.
+   -- @return array {
+   --     Plugin data. Values will be empty if not supplied by the plugin.
+   --
+   --     @type string $Name        Name of the plugin. Should be unique.
+   --     @type string $PluginURI   Plugin URI.
+   --     @type string $Version     Plugin version.
+   --     @type string $Description Plugin description.
+   --     @type string $Author      Plugin author's name.
+   --     @type string $AuthorURI   Plugin author's website address (if set).
+   --     @type string $TextDomain  Plugin textdomain.
+   --     @type string $DomainPath  Plugin's relative directory path to .mo files.
+   --     @type bool   $Network     Whether the plugin can only be activated
+   --                               network-wide.
+   --     @type string $RequiresWP  Minimum required version of WordPress.
+   --     @type string $RequiresPHP Minimum required version of PHP.
+   --     @type string $UpdateURI   ID of the plugin for update purposes, should
+   --                               be a URI.
+   --     @type string $Title       Title of the plugin and link to the plugin's
+   --                               site (if set).
+   --     @type string AuthorName  Plugin author"s name.
+   -- }
+   --
+   function Get_Plugin_Data (Plugin_File : String;
+                             Markup      : Boolean := True;
+                             Translate   : Boolean := True)
+                             return Array_Type
+   is (raise Program_Error with "not implemented");
 
    --
    -- Adds a submenu page.
@@ -188,5 +264,232 @@ is
                                  Silent       : Boolean := False;
                                  Network_Wide : Boolean := False) -- null
                                  is null;
+
+   --
+   -- Checks for "Network: true" in the plugin header to see if this should
+   -- be activated only as a network wide plugin. The plugin would also work
+   -- when Multisite is not enabled.
+   --
+   -- Checks for "Site Wide Only: true" for backward compatibility.
+   --
+   -- @since 3.0.0
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return bool True if plugin is network only, false otherwise.
+   --
+   function Is_Network_Only_Plugin (Plugin : String)
+                                    return Boolean
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Attempts activation of plugin in a "sandbox" and redirects on success.
+   --
+   -- A plugin that is already activated will not attempt to be activated again.
+   --
+   -- The way it works is by setting the redirection to the error before trying to
+   -- include the plugin file. If the plugin fails, then the redirection will not
+   -- be overwritten with the success message. Also, the options will not be
+   -- updated and the activation hook will not be called on plugin error.
+   --
+   -- It should be noted that in no way the below code will actually prevent errors
+   -- within the file. The code should not be used elsewhere to replicate the
+   -- "sandbox", which uses redirection to work.
+   -- then@source 13 1end;
+   --
+   -- If any errors are found or text is outputted, then it will be captured to
+   -- ensure that the success redirection will update the error redirection.
+   --
+   -- @since 2.5.0
+   -- @since 5.2.0 Test for WordPress version and PHP version compatibility.
+   --
+   -- @param string plugin       Path to the plugin file relative to the plugins
+   --                            directory.
+   -- @param string redirect     Optional. URL to redirect to.
+   -- @param bool   network_wide Optional. Whether to enable the plugin for all sites
+   --                            in the network or just the current site. Multisite
+   --                            only. Default false.
+   -- @param bool   silent       Optional. Whether to prevent calling activation
+   --                            hooks. Default false.
+   -- @return null|WP_Error Null on success, WP_Error on invalid file.
+   --
+
+   type Null_Error_Type is record
+      Success : Boolean;
+      Error   : Class_Errors.Wp_Error;
+   end record;
+
+   function Activate_Plugin (Plugin : String;
+                             Redirect : String := "";
+                             Network_Wide : Boolean := False;
+                             Silent       : Boolean := False)
+                             return Null_Error_Type
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Activates multiple plugins.
+   --
+   -- When WP_Error is returned, it does not mean that one of the plugins had
+   -- errors. It means that one or more of the plugin file paths were invalid.
+   --
+   -- The execution will be halted as soon as one of the plugins has an error.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string|string[] plugins      Single plugin or list of plugins to activate.
+   -- @param string          redirect     Redirect to page after successful activation.
+   -- @param bool            network_wide Whether to enable the plugin for all sites
+   --                                     in the network. Default false.
+   -- @param bool            silent       Prevent calling activation hooks. Default
+   --                                     false.
+   -- @return bool|WP_Error True when finished or WP_Error if there were errors
+   --                       during a plugin activation.
+   --
+   type Bool_Error_Type is record
+      Success : Boolean;
+      Error   : Class_Errors.Wp_Error;
+   end record;
+
+   function Activate_Plugins (Plugins      : List_Type;
+                              Redirect     : String := "";
+                              Network_Wide : Boolean := False;
+                              Silent       : Boolean := False)
+                              return Bool_Error_Type
+   is (raise Program_Error with "not implemented");
+
+   procedure Activate_Plugins (Plugins      : List_Type;
+                               Redirect     : String := "";
+                               Network_Wide : Boolean := False;
+                               Silent       : Boolean := False)
+   is null;
+
+   --
+   -- Validates the plugin path.
+   --
+   -- Checks that the main plugin file exists and is a valid plugin. See
+   -- validate_file().
+   --
+   -- @since 2.5.0
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return int|WP_Error 0 on success, WP_Error on failure.
+   --
+   function Validate_Plugin (Plugin : String)
+                             return Bool_Error_Type
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Determines whether the plugin is active for the entire network.
+   --
+   -- Only plugins installed in the plugins/ folder can be active.
+   --
+   -- Plugins in the mu-plugins/ folder can't be "activated," so this function will
+   -- return false for those plugins.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 3.0.0
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return bool True if active for the network, otherwise false.
+   --
+   function Is_Plugin_Active_For_Network (Plugin : String)
+                                          return Boolean
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Loads a given plugin attempt to generate errors.
+   --
+   -- @since 3.0.0
+   -- @since 4.4.0 Function was moved into the `wp-admin/includes/plugin.php` file.
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   --
+   procedure Plugin_Sandbox_Scrape (Plugin : String)
+   is null;
+
+   --
+   -- Determines whether the plugin is inactive.
+   --
+   -- Reverse of is_plugin_active(). Used as a callback.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 3.1.0
+   --
+   -- @see is_plugin_active()
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return bool True if inactive. False if active.
+   --
+   function Is_Plugin_Inactive (Plugin : String)
+                                return Boolean
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Determines whether the plugin can be uninstalled.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return bool Whether plugin can be uninstalled.
+   --
+   function Is_Uninstallable_Plugin (Plugin : String)
+                                     return Boolean
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Checks the plugins directory and retrieve all plugin files with plugin data.
+   --
+   -- WordPress only supports plugin files in the base plugins directory
+   -- (wp-content/plugins) and in one directory above the plugins directory
+   -- (wp-content/plugins/my-plugin). The file it looks for has the plugin data
+   -- and must be found in those two locations. It is recommended to keep your
+   -- plugin files in their own directories.
+   --
+   -- The file with the plugin data is the file that will be included and therefore
+   -- needs to have the main execution for the plugin. This does not mean
+   -- everything must be contained in the file and it is recommended that the file
+   -- be split for maintainability. Keep everything in one file for extreme
+   -- optimization purposes.
+   --
+   -- @since 1.5.0
+   --
+   -- @param string plugin_folder Optional. Relative path to single plugin folder.
+   -- @return array[] Array of arrays of plugin data, keyed by plugin file name.
+   --                 See get_plugin_data().
+   --
+   function Get_Plugins (Plugin_Folder : String := "")
+                         return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Sanitizes plugin data, optionally adds markup, optionally translates.
+   --
+   -- @since 2.7.0
+   --
+   -- @see get_plugin_data()
+   --
+   -- @access private
+   --
+   -- @param string plugin_file Path to the main plugin file.
+   -- @param array  plugin_data An array of plugin data. See get_plugin_data().
+   -- @param bool   markup      Optional. If the returned data should have HTML markup
+   --                           applied. Default true.
+   -- @param bool   translate   Optional. If the returned data should be translated.
+   --                           Default true.
+   -- @return array Plugin data. Values will be empty if not supplied by the plugin.
+   --               See get_plugin_data() for the list of possible values.
+   --
+   function X_Get_Plugin_Data_Markup_Translate
+              (Plugin_File : String;
+               Plugin_Data : Array_Type;
+               Markup      : Boolean := True;
+               Translate   : Boolean := True)
+               return Array_Type
+   is (raise Program_Error with "not implemented");
 
 end Adi_Plugins;
