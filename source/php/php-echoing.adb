@@ -2,17 +2,19 @@
 --
 --
 
-with Ada.Strings.Unbounded;
+with Ada.Strings.Bounded;
 
 with Php.Strings;
-
-with UStrings;
 
 package body Php.Echoing
 is
    use Lists;
 
-   Echo_Buffer : UStrings.UString;
+   package Bounded_Strings is
+     new Ada.Strings.Bounded.Generic_Bounded_Length (Max => 200_000);
+   use Bounded_Strings;
+
+   Echo_Buffer : Bounded_String;
 
    ----------
    -- Echo --
@@ -20,7 +22,6 @@ is
 
    procedure Echo (Item : String)
    is
-      use Ada.Strings.Unbounded;
    begin
       Append (Echo_Buffer, Item);
    end Echo;
@@ -32,7 +33,6 @@ is
    procedure Printf (Format : String;
                      Args   : List_Type)
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
 
       Item : constant String := Printf (Format, Args);
@@ -46,9 +46,8 @@ is
 
    procedure Clear_Echo
    is
-      use Ada.Strings.Unbounded;
    begin
-      Echo_Buffer := Null_Unbounded_String;
+      Echo_Buffer := Null_Bounded_String;
    end Clear_Echo;
 
    ----------
@@ -58,9 +57,8 @@ is
    function Get_Echo
             return String
    is
-      use UStrings;
    begin
-      return -Echo_Buffer;
+      return To_String (Echo_Buffer);
    end Get_Echo;
 
 begin
