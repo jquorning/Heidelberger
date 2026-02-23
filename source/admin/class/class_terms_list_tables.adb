@@ -51,9 +51,9 @@ is
       );
 
    begin
-      Globals.Action    := This.Screen.Action;
-      Globals.Post_Type := This.Screen.Post_Type;
-      Globals.Taxonomy  := This.Screen.Taxonomy;
+      Globals.Global_Action := This.Screen.Action;
+      Globals.Post_Type     := This.Screen.Post_Type;
+      Globals.Taxonomy      := This.Screen.Taxonomy;
 
       if Empty (-Globals.Taxonomy) then
          Globals.Taxonomy := +"post_tag";
