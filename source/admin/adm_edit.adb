@@ -100,7 +100,7 @@ is
 --  global $post_type, $post_type_object;
 
       Post_Type        : UString      renames Globals.Global_Post_Type;
-      Post_Type_Object : Wp_Post_Type renames Globals.Post_Type_Object;
+      Post_Type_Object : Wp_Post_Type renames Globals.Global_Post_Type_Object;
 --         := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin
       Adm_Admin.Run;
@@ -553,7 +553,8 @@ is
                   "per_page",
                   To_Array_Type ([
                      Build ("default", "20"),
-                     Build ("option",  "edit_" & (-Globals.Global_Post_Type) & "_per_page")
+                     Build ("option",
+                            "edit_" & (-Globals.Global_Post_Type) & "_per_page")
                ]));
             end;
 

@@ -76,11 +76,11 @@ is
    Total_Update_Count : Natural;
    Update_Title       : UStrings.UString;
 
-   Global_Post_Id   : Class_Posts.Post_Id_Type;
-   Global_Post_Type : UStrings.UString;
-   Post_Type_Object : Class_Post_Type.Wp_Post_Type;
-   Global_Post      : Class_Posts.Wp_Post;
-   Global_Posts     : Class_Posts.Post_Array;
+   Global_Post_Id          : Class_Posts.Post_Id_Type;
+   Global_Post_Type        : UStrings.UString;
+   Global_Post_Type_Object : Class_Post_Type.Wp_Post_Type;
+   Global_Post             : Class_Posts.Wp_Post;
+   Global_Posts            : Class_Posts.Post_Array;
 
    Global_Query_String  : UStrings.UString;
    Global_Wp_Did_Header : Boolean := False;

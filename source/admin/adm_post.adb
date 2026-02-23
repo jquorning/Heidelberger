@@ -125,7 +125,8 @@ is
 
    --       if Post then
             Global_Post_Type := Global_Post.Post_Type;
-            Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Global_Post_Type);
+            Global_Post_Type_Object :=
+              Inc_Posts.Get_Post_Type_Object (-Global_Post_Type);
    --       end if;
 
             if
@@ -258,7 +259,7 @@ is
                        (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
-                  if Post_Type_Object = Null_Post_Type then
+                  if Global_Post_Type_Object = Null_Post_Type then
                      Wp_Die (abs "Invalid post type.");
                   end if;
 
@@ -309,10 +310,10 @@ is
                      if
 --                     Isset (Post_Type_Object) and then
 --                     Post_Type_Object.Show_In_Menu_Bool and then
-                       True /= Post_Type_Object.Show_In_Menu_Bool
+                       True /= Global_Post_Type_Object.Show_In_Menu_Bool
                      then
                         Parent_File :=
-                          Unbounded_Slug (Post_Type_Object.Show_In_Menu);
+                          Unbounded_Slug (Global_Post_Type_Object.Show_In_Menu);
                      else
                         Parent_File := +"edit.php?post_type=post_type";
                      end if;
@@ -321,7 +322,7 @@ is
                   end if;
 
                   Globals.Global_Title :=
-                    +Get (Post_Type_Object, "labels.edit_item");
+                    +Get (Global_Post_Type_Object, "labels.edit_item");
 
                   --
                   -- Allows replacement of the editor.
@@ -413,7 +414,7 @@ is
                         (abs "The item you are trying to move to the Trash no longer exists.");
                   end if;
 
-                  if Post_Type_Object = Null_Post_Type then
+                  if Global_Post_Type_Object = Null_Post_Type then
                      Wp_Die (abs "Invalid post type.");
                   end if;
 
@@ -461,7 +462,7 @@ is
                        (abs "The item you are trying to restore from the Trash no longer exists.");
                   end if;
 
-                  if Post_Type_Object = Null_Post_Type then
+                  if Global_Post_Type_Object = Null_Post_Type then
                      Wp_Die (abs "Invalid post type.");
                   end if;
 
@@ -490,7 +491,7 @@ is
                      Wp_Die (abs "This item has already been deleted.");
                   end if;
 
-                  if Post_Type_Object = Null_Post_Type then
+                  if Global_Post_Type_Object = Null_Post_Type then
                      Wp_Die (abs "Invalid post type.");
                   end if;
 

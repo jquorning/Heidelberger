@@ -70,8 +70,11 @@ is
 
       Posts : constant Statement_Type := Statement_Type (-Globals.WpDB.Posts);
    begin
-      Globals.Global_Post_Type := List_Table.Screen.Post_Type;
-      Globals.Post_Type_Object := Get_Post_Type_Object (-Globals.Global_Post_Type);
+      Globals.Global_Post_Type :=
+        List_Table.Screen.Post_Type;
+
+      Globals.Global_Post_Type_Object :=
+        Get_Post_Type_Object (-Globals.Global_Post_Type);
 
       List_Table.User_Posts_Count := Natural'Value (
         Globals.WpDB.Get_Var ( -- (int)
