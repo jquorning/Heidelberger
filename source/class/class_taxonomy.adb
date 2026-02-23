@@ -76,7 +76,7 @@ is
       Args_2 := Apply_Filters ("register_taxonomy_args", Args_2, -This.Name,
                                Object_Type); -- (array)
 
-      Globals.Taxonomy := This.Name;
+      Globals.Global_Taxonomy := This.Name;
 
       --
       -- Filters the arguments for registering a specific taxonomy.
@@ -96,8 +96,9 @@ is
       -- @param string   taxonomy    Taxonomy key.
       -- @param string[] object_type Array of names of object types for the taxonomy.
       --
-      Args_2 := Apply_Filters ("register_" & (-Globals.Taxonomy) & "_taxonomy_args",
-                               Args_2, -This.Name, Object_Type); -- (array)
+      Args_2 :=
+        Apply_Filters ("register_" & (-Globals.Global_Taxonomy) & "_taxonomy_args",
+                       Args_2, -This.Name, Object_Type); -- (array)
       declare
          Defaults : constant Array_Type := To_Array_Type ([
            Build ("labels",                Empty_Array),

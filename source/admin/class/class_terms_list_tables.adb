@@ -51,19 +51,19 @@ is
       );
 
    begin
-      Globals.Global_Action := This.Screen.Action;
-      Globals.Post_Type     := This.Screen.Post_Type;
-      Globals.Taxonomy      := This.Screen.Taxonomy;
+      Globals.Global_Action   := This.Screen.Action;
+      Globals.Post_Type       := This.Screen.Post_Type;
+      Globals.Global_Taxonomy := This.Screen.Taxonomy;
 
-      if Empty (-Globals.Taxonomy) then
-         Globals.Taxonomy := +"post_tag";
+      if Empty (-Globals.Global_Taxonomy) then
+         Globals.Global_Taxonomy := +"post_tag";
       end if;
 
-      if not Inc_Taxonomys.Taxonomy_Exists (-Globals.Taxonomy) then
+      if not Inc_Taxonomys.Taxonomy_Exists (-Globals.Global_Taxonomy) then
          Inc_Functions.Wp_Die (abs "Invalid taxonomy.");
       end if;
 
-      Globals.Tax := Inc_Taxonomys.Get_Taxonomy (-Globals.Taxonomy);
+      Globals.Tax := Inc_Taxonomys.Get_Taxonomy (-Globals.Global_Taxonomy);
 
       -- @todo Still needed? Maybe just the show_ui part.
       if

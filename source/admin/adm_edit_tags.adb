@@ -675,7 +675,7 @@ is
                   --  Could not find message (jq)
                begin
                   if Var_Name = "VAR_edit_tags_add_form" then
-                     if "category" = Taxonomy then
+                     if "category" = Global_Taxonomy then
                         --
                         -- Fires at the end of the Edit Category form.
                         --
@@ -686,8 +686,9 @@ is
                         --
                         Do_Action_Deprecated ("edit_category_form",
                                               ["parent"],
-                                              "3.0.0", (-Taxonomy) & "_add_form");
-                     elsif "link_category" = Taxonomy then
+                                              "3.0.0",
+                                              (-Global_Taxonomy) & "_add_form");
+                     elsif "link_category" = Global_Taxonomy then
                         --
                         -- Fires at the end of the Edit Link form.
                         --
@@ -698,7 +699,8 @@ is
                         --
                         Do_Action_Deprecated ("edit_link_category_form",
                                               ["parent"],
-                                              "3.0.0", (-Taxonomy) & "_add_form");
+                                              "3.0.0",
+                                              (-Global_Taxonomy) & "_add_form");
                      else
                         --
                         -- Fires at the end of the Add Tag form.
@@ -708,8 +710,8 @@ is
                         --
                         -- @param string taxonomy The taxonomy slug.
                         --
-                        Do_Action_Deprecated ("add_tag_form", [-Taxonomy],
-                                      "3.0.0", (-Taxonomy) & "_add_form");
+                        Do_Action_Deprecated ("add_tag_form", [-Global_Taxonomy],
+                                      "3.0.0", (-Global_Taxonomy) & "_add_form");
                      end if;
 
                      --
@@ -727,7 +729,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ((-Taxonomy) & "_add_form", -Taxonomy);
+                     Do_Action ((-Global_Taxonomy) & "_add_form", -Global_Taxonomy);
 
                      Set ("VAR_edit_tags_add_form", "XXX-81");
 
@@ -759,7 +761,8 @@ is
                      Set ("VAR_edit_tags_category_help", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_category_is_taxonomy" then
-                     Set ("VAR_edit_tags_category_is_taxonomy", "category" = Taxonomy);
+                     Set ("VAR_edit_tags_category_is_taxonomy",
+                          "category" = Global_Taxonomy);
 
                   elsif Var_Name = "VAR_edit_tags_class" then
                      Set ("VAR_edit_tags_class", Class);
@@ -814,7 +817,7 @@ is
                      Set ("VAR_edit_tags_display", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_do_action_deprecated" then
-                     if "category" = Taxonomy then
+                     if "category" = Global_Taxonomy then
                         --
                         -- Fires before the Add Category form.
                         --
@@ -826,8 +829,9 @@ is
                         --
                         Do_Action_Deprecated ("add_category_form_pre",
                                               ["parent"],
-                                              "3.0.0", (-Taxonomy) & "_pre_add_form");
-                     elsif "link_category" = Taxonomy then
+                                              "3.0.0",
+                                              (-Global_Taxonomy) & "_pre_add_form");
+                     elsif "link_category" = Global_Taxonomy then
                         --
                         -- Fires before the link category form.
                         --
@@ -839,7 +843,8 @@ is
                         --
                         Do_Action_Deprecated ("add_link_category_form_pre",
                                               ["parent"],
-                                              "3.0.0", (-Taxonomy) & "_pre_add_form");
+                                              "3.0.0",
+                                              (-Global_Taxonomy) & "_pre_add_form");
                      else
                         --
                         -- Fires before the Add Tag form.
@@ -851,7 +856,7 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         --
                         Do_Action_Deprecated ("add_tag_form_pre",
-                                              [-Taxonomy],
+                                              [-Global_Taxonomy],
                                               "3.0.0", "{taxonomy}_pre_add_form");
                      end if;
 
@@ -869,7 +874,8 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ((-Taxonomy) & "_pre_add_form", -Taxonomy);
+                     Do_Action ((-Global_Taxonomy) & "_pre_add_form",
+                                -Global_Taxonomy);
 
                      Set ("VAR_edit_tags_do_action_deprecated", "XXX-83");
 
@@ -889,7 +895,8 @@ is
                      --
                      -- @param string taxonomy The taxonomy name.
                      --
-                     Do_Action ("after-" & (-Taxonomy) & "-table", -Taxonomy);
+                     Do_Action ("after-" & (-Global_Taxonomy) & "-table",
+                                -Global_Taxonomy);
                      -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
                      Set ("VAR_edit_tags_do_after_table", "XXX-84");
 
@@ -907,11 +914,11 @@ is
                      --
                      -- @since 3.7.0
                      --
-                     Do_Action ((-Taxonomy) & "_term_new_form_tag");
+                     Do_Action ((-Global_Taxonomy) & "_term_new_form_tag");
                      Set ("VAR_edit_tags_do_new_form", "XX-85");
 
                   elsif Var_Name = "VAR_edit_tags_do_tax_add_form_fields" then
-                     if not Is_Taxonomy_Hierarchical (-Taxonomy) then
+                     if not Is_Taxonomy_Hierarchical (-Global_Taxonomy) then
                         --
                         -- Fires after the Add Tag form fields for non-hierarchical
                         -- taxonomies.
@@ -920,7 +927,7 @@ is
                         --
                         -- @param string taxonomy The taxonomy slug.
                         --
-                        Do_Action ("add_tag_form_fields", -Taxonomy);
+                        Do_Action ("add_tag_form_fields", -Global_Taxonomy);
                      end if;
 
                      --
@@ -938,7 +945,8 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ((-Taxonomy) & "_add_form_fields", -Taxonomy);
+                     Do_Action ((-Global_Taxonomy) & "_add_form_fields",
+                                -Global_Taxonomy);
 
                      Set ("VAR_edit_tags_do_tax_add_form_fields", "XXX-86");
 
@@ -949,7 +957,7 @@ is
                         Dropdown_Args : Array_Type := To_Array_Type ([
                           Build ("hide_empty",       0),
                           Build ("hide_if_empty",    False),
-                          Build ("taxonomy",         -Taxonomy),
+                          Build ("taxonomy",         -Global_Taxonomy),
                           Build ("name",             "parent"),
                           Build ("orderby",          "name"),
                           Build ("hierarchical",     True),
@@ -981,7 +989,7 @@ is
                      begin
                         Dropdown_Args :=
                           Apply_Filters ("taxonomy_parent_dropdown_args",
-                                         Dropdown_Args, -Taxonomy, "new");
+                                         Dropdown_Args, -Global_Taxonomy, "new");
 
                         Set (Dropdown_Args, "aria_describedby",
                              From_String ("parent-description"));
@@ -1017,7 +1025,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_is_tax_hierarchical" then
                      Set ("VAR_edit_tags_is_tax_hierarchical",
-                          Is_Taxonomy_Hierarchical (-Taxonomy));
+                          Is_Taxonomy_Hierarchical (-Global_Taxonomy));
 
                   elsif Var_Name = "VAR_edit_tags_message" then
                      Set ("VAR_edit_tags_message", Message);
@@ -1034,7 +1042,8 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_post_tag_and_user_can_import" then
                      Set ("VAR_edit_tags_post_tag_and_user_can_import",
-                          "post_tag" = Taxonomy and then Current_User_Can ("import"));
+                          "post_tag" = Global_Taxonomy and then
+                          Current_User_Can ("import"));
 
                   elsif Var_Name = "VAR_edit_tags_post_type" then
                      Set ("VAR_edit_tags_post_type", ESC_Attr (-Globals.Post_Type));
@@ -1080,7 +1089,7 @@ is
                           ESC_HTML (Get_As_String (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
-                     Set ("VAR_edit_tags_taxonomy", ESC_Attr (-Taxonomy));
+                     Set ("VAR_edit_tags_taxonomy", ESC_Attr (-Global_Taxonomy));
 
                   elsif Var_Name = "VAR_edit_tags_term_name" then
                      Clear_Echo;

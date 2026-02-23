@@ -90,9 +90,9 @@ is
    Global_Single     : Natural;
    Global_Authordata : Class_Users.Wp_User;
 
-   Global_Action : UStrings.UString;
-   Taxonomy      : UStrings.UString;
-   Tax           : Class_Taxonomy.Wp_Taxonomy; -- := Class_Taxonomy.X_Construct;
+   Global_Action   : UStrings.UString;
+   Global_Taxonomy : UStrings.UString;
+   Tax             : Class_Taxonomy.Wp_Taxonomy; -- := Class_Taxonomy.X_Construct;
 
    Login_Grace_Period : Integer := 0;
 
