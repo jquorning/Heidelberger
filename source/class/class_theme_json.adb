@@ -477,7 +477,7 @@ is
    is
    begin
       if not Isset (This.Theme_JSON, "settings") then
-         return Null_Multi_Type;
+         return From_Null;
       else
          return Get (This.Theme_JSON, "settings");
       end if;
@@ -692,7 +692,7 @@ is
             declare
                use Class_Block_Type;
 
-               Block_Gap_Value : Multi_Type; -- = null;
+               Block_Gap_Value : Multi_Type (Kind_Null); -- = null;
             begin
                -- Use a fallback gap value if block gap support is not available.
                if not Has_Block_Gap_Support then
@@ -742,7 +742,7 @@ is
                      end;
                   else
                      -- Skip outputting gap value if not all sides are provided.
-                     Block_Gap_Value := Null_Multi_Type; -- null
+                     Block_Gap_Value := From_Null;
                   end if;
                end if;
 
@@ -2341,7 +2341,7 @@ is
          Has_Block_Gap_Support : constant Boolean :=
            X_Wp_Array_Get (This.Theme_JSON,
                            List_Type'["settings", "spacing", "blockGap"])
-                           /= Null_Multi_Type; -- null;
+                           /= From_Null;
       begin
          if Has_Block_Gap_Support then
             declare
@@ -2437,7 +2437,7 @@ is
 --             Node    : constant Multi_Type := Element (Node_2);
                -- Replace the spacing.units.
                Path    : UString := +Get_As_String (Node, "path");
-               Content : Multi_Type;
+               Content : Multi_Type (Kind_Null);
             begin
                Append (Path, "spacing");
                Append (Path, "units");
@@ -2607,7 +2607,7 @@ is
 
       Path : List_Type := Base_Path;
 
-      Default_Content : Multi_Type;
+      Default_Content : Multi_Type (Kind_Null);
    begin
       Path.Append ("default");
       Default_Content := X_Wp_Array_Get (This.Theme_JSON, Path);

@@ -153,19 +153,19 @@ is
 
       Maximum_Viewport_Width_Raw : constant Multi_Type :=
         (if Isset (Args, "maximum_viewport_width")
-         then Get (Args, "maximum_viewport_width") else Null_Multi_Type); -- null);
+         then Get (Args, "maximum_viewport_width") else From_Null); -- null);
 
       Minimum_Viewport_Width_Raw : Multi_Type :=
         (if Isset (Args, "minimum_viewport_width")
-         then Get (Args, "minimum_viewport_width") else Null_Multi_Type); -- null);
+         then Get (Args, "minimum_viewport_width") else From_Null); -- null);
 
       Maximum_Font_Size_Raw : constant Multi_Type :=
         (if Isset (Args, "maximum_font_size")
-         then Get (Args, "maximum_font_size") else Null_Multi_Type); -- null);
+         then Get (Args, "maximum_font_size") else From_Null); -- null);
 
       Minimum_Font_Size_Raw : constant Multi_Type :=
         (if Isset (Args, "minimum_font_size")
-         then Get (Args, "minimum_font_size") else Null_Multi_Type); -- null);
+         then Get (Args, "minimum_font_size") else From_Null); -- null);
 
       Scale_Factor : constant Float :=
         (if Isset (Args, "scale_factor")

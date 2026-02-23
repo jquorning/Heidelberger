@@ -429,7 +429,7 @@ is
                       Key_3 => Block_Name,
                       Key_4 => "spacing",
                       Key_5 => "blockGap",
-                      Value => Null_Multi_Type);
+                      Value => From_Null);
             end if;
          end;
       end loop;

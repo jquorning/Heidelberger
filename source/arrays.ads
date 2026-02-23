@@ -26,9 +26,8 @@ is
    type Array_Type;
    type Array_Access is access all Array_Type;
 
-   type Multi_Type is private;
-
-   function Null_Multi_Type return Multi_Type;
+   type Multi_Type (Kind : Array_Kind) is private;
+   type Multi_Access is access all Multi_Type;
 
    function "=" (Left, Right : Multi_Type)
                  return Boolean;
@@ -383,15 +382,17 @@ private
    Empty_Holder : constant Array_Holder :=
      (Ada.Finalization.Controlled with Holder => null);
 
-   type Multi_Type is
+   type Multi_Type (Kind : Array_Kind) is
       record
-         Kind : Array_Kind       := Kind_Null;
-         Str  : UStrings.UString;
-         Int  : Integer          := 0;
-         Arry : Array_Holder     := Empty_Holder;
-         List : Lists.List_Type;
-         Func : Callable         := null;
-         Bool : Boolean          := False;
+         case Kind is
+         when Kind_String   =>  Str  : UStrings.UString;
+         when Kind_Integer  =>  Int  : Integer          := 0;
+         when Kind_Array    =>  Arry : Array_Holder     := Empty_Holder;
+         when Kind_List     =>  List : Lists.List_Type;
+         when Kind_Callable =>  Func : Callable         := null;
+         when Kind_Boolean  =>  Bool : Boolean          := False;
+         when Kind_Null     =>  null;
+         end case;
       end record;
 
    package Array_Maps is

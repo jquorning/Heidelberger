@@ -114,7 +114,7 @@ is
             Renamed_Path  : constant List_Type := Explode (".", Renamed);
 
             Current_Value : constant Multi_Type :=
-              X_Wp_Array_Get (Settings, Original_Path, Null_Multi_Type);
+              X_Wp_Array_Get (Settings, Original_Path, From_Null);
          begin
             if Kind_Of (Current_Value) /= Kind_Null then
                X_Wp_Array_Set (Settings, Renamed_Path, Current_Value);

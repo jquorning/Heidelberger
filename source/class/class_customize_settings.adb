@@ -94,12 +94,12 @@ is
          -- then the preview short-circuits because there is nothing that needs
          -- to be previewed.
          --
-         Undefined : Multi_Type; --  := new stdClass();
+         Undefined : Multi_Type (Kind_String); --  := new stdClass();
 
          Needs_Preview : Boolean  :=
            As_String (Undefined) /= This.Post_Value (As_String (Undefined));
 
-         Value : Multi_Type; -- UString; --  := null;
+         Value : Multi_Type (Kind_String); -- UString; --  := null;
       begin
          -- Since no post value was defined, check if we have an initial value set.
          if not Needs_Preview then

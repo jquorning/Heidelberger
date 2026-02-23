@@ -117,7 +117,7 @@ is
                            Success : out Boolean);
 
    generic
-      type Data_Type is private;
+      type Data_Type (<>) is private;
    procedure Generic_Wp_Cache_Add (Key    : String;
                                    Data   : Data_Type;
                                    Group  : String  := "";

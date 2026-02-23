@@ -403,9 +403,8 @@ is
    function From_Array (Value : Array_Type)
                         return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_Array);
    begin
-      M.Kind := Kind_Array;
       if Value.Is_Empty then
          M.Arry.Holder := new Array_Type'(Empty_Array);
       else
@@ -422,9 +421,8 @@ is
    function From_List (Value : Lists.List_Type)
                        return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_List);
    begin
-      M.Kind := Kind_List;
       M.List.Append (Value);
       return M;
    end From_List;
@@ -436,9 +434,8 @@ is
    function From_String (Value : String)
                          return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_String);
    begin
-      M.Kind := Kind_String;
       M.Str  := +Value;
       return M;
    end From_String;
@@ -450,9 +447,8 @@ is
    function From_Integer (Value : Integer)
                           return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_Integer);
    begin
-      M.Kind := Kind_Integer;
       M.Int  := +Value;
       return M;
    end From_Integer;
@@ -464,9 +460,8 @@ is
    function From_Callable (Value : Callable)
                            return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_Callable);
    begin
-      M.Kind := Kind_Callable;
       M.Func := Value;
       return M;
    end From_Callable;
@@ -478,9 +473,8 @@ is
    function From_Boolean (Value : Boolean)
                           return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_Boolean);
    begin
-      M.Kind := Kind_Boolean;
       M.Bool := Value;
       return M;
    end From_Boolean;
@@ -491,9 +485,8 @@ is
 
    function From_Null return Multi_Type
    is
-      M : Multi_Type;
+      M : Multi_Type (Kind_Null);
    begin
-      M.Kind := Kind_Null;
       return M;
    end From_Null;
 
@@ -994,9 +987,8 @@ is
                    return Array_Type
    is
       Map : Array_Type;
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_Array);
    begin
-      Item.Kind := Kind_Array;
       Item.Arry.Holder := new Array_Type'(Value);
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
@@ -1024,10 +1016,9 @@ is
                    Value : Lists.List_Type)
                    return Array_Type
    is
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_List);
       Map  : Array_Type;
    begin
-      Item.Kind := Kind_List;
       Item.List := Value;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
@@ -1041,10 +1032,9 @@ is
                    Value : String)
                    return Array_Type
    is
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_String);
       Map  : Array_Type;
    begin
-      Item.Kind := Kind_String;
       Item.Str  := +Value;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
@@ -1058,10 +1048,9 @@ is
                    Value : Integer)
                    return Array_Type
    is
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_Integer);
       Map  : Array_Type;
    begin
-      Item.Kind := Kind_Integer;
       Item.Int  := Value;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
@@ -1075,10 +1064,9 @@ is
                    Value : Boolean)
                    return Array_Type
    is
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_Boolean);
       Map  : Array_Type;
    begin
-      Item.Kind := Kind_Boolean;
       Item.Bool := Value;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
@@ -1092,10 +1080,9 @@ is
                    Value : Callable)
                    return Array_Type
    is
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_Callable);
       Map  : Array_Type;
    begin
-      Item.Kind := Kind_Callable;
       Item.Func := Value;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
@@ -1109,10 +1096,9 @@ is
                    Value : Null_Type)
                    return Array_Type
    is
-      Item : Multi_Type;
+      Item : Multi_Type (Kind_Null);
       Map  : Array_Type;
    begin
-      Item.Kind := Kind_Null;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
@@ -1230,30 +1216,9 @@ is
    function Empty_Array
             return Array_Type
    is
---    Item : Multi_Type;
       Arry : Array_Type;
    begin
---    Item.Kind := Kind_Array;
---    Item.Arry.Holder := new Array_Type'(Null_Array_Type);
---    Arry.Append (Key => "XXX-929", Value => Item);
       return Arry;
    end Empty_Array;
-
-   ---------------------
-   -- Null_Multi_Type --
-   ---------------------
-
-   function Null_Multi_Type return Multi_Type
-   is
-   begin
-      return
-        (Kind => Kind_Null,
-         Str  => UStrings.Null_UString,
-         Int  => 0,
-         Arry => Empty_Holder,
-         List => Lists.Empty_List,
-         Func => null,
-         Bool => False);
-   end Null_Multi_Type;
 
 end Arrays;

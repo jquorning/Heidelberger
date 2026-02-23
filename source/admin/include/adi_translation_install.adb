@@ -353,7 +353,7 @@ is
            Wp_Get_Available_Translations;
 
          Translation_To_Load : Boolean := False;
-         Trans : Multi_Type; -- added
+         Trans : Multi_Type (Kind_String); -- added
       begin
          if Translations.Is_Empty then
             return ""; -- false

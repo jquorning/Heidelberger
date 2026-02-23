@@ -718,7 +718,7 @@ is
       end;
 
       -- In case it is set, but blank, update "home".
-      if X_Get_Option ("home") = Null_Multi_Type then -- not
+      if X_Get_Option ("home") = From_Null then -- Null_Multi_Type then -- not
          Update_Option ("home", From_String (Guess_URL));
       end if;
 

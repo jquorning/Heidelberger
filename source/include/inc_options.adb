@@ -60,7 +60,7 @@ is
         Kind_Of (Default) in Kind_String and then As_String (Default) /= "";
       -- Func_Num_Args > 1; -- ()
 
-      Value : Multi_Type;
+      Value : Multi_Access; -- Type (Kind_Null);
    begin
       Logging.Log ("get_option", Option);
       -- if Option = "html_type" then
@@ -206,11 +206,12 @@ is
                Found      : Boolean;
             begin
                if Isset (Alloptions, Option) then
-                  Value := Get (Alloptions, Option);
+                  Value := new Multi_Type'(Get (Alloptions, Option));
                else
-                  Value := Wp_Cache_Get (Option, "options", Found => Found);
+                  Value :=
+                    new Multi_Type'(Wp_Cache_Get (Option, "options", Found => Found));
 
-                  if From_Boolean (False) = Value then
+                  if From_Boolean (False) = Value.all then
                      declare
                         Success : Boolean;
 
@@ -232,7 +233,7 @@ is
                         -- funkiness with 0, false, null values.
                         if Is_Object (Row) then
 --                         Value := Row.Option_Value;
-                           Wp_Cache_Add (Option, Value, "options");
+                           Wp_Cache_Add (Option, Value.all, "options");
 
                         else
                            -- Option does not exist, so we must cache its
@@ -278,7 +279,7 @@ is
             if Is_Object (Row) then
                null;
 --             Value := Row.Option_Value;
-               Value := Get (Row, "option_value");
+               Value := new Multi_Type'(Get (Row, "option_value"));
             else
                -- This filter is documented in wp-includes/option.php
                return
@@ -289,20 +290,21 @@ is
       end if;
 
       -- If home is not set, use siteurl.
-      if "home" = Option and then "" = As_String (Value) then
+      if "home" = Option and then "" = As_String (Value.all) then
          return Get_Option ("siteurl");
       end if;
 
       -- XXX development jq
       if In_List (Option, List_Type'["siteurl", "home"], True) then
-         Value := From_String (As_String (Value) & ":8080");
+         Value := new Multi_Type'(From_String (As_String (Value.all) & ":8080"));
       end if;
 
       if
         In_List (Option, List_Type'["siteurl", "home", "category_base",
                                     "tag_base"], True)
       then
-         Value := From_String (Un_Trailing_Slash_It (As_String (Value)));
+         Value := new Multi_Type'(From_String (
+           Un_Trailing_Slash_It (As_String (Value.all))));
       end if;
 
       --
@@ -319,7 +321,7 @@ is
       -- @param string option Option name.
       --
       return Apply_Filters ("option_" & Option,
-                            Maybe_Unserialize (As_String (Value)), Option);
+                            Maybe_Unserialize (As_String (Value.all)), Option);
    end Get_Option;
 
    ----------------
@@ -622,7 +624,7 @@ is
 
          Old_Value : constant Multi_Type := Get_Option (Option);
 
-         Serialized_Value : Multi_Type;
+--       Serialized_Value : Multi_Type (Kind_Null);
       begin
          --
          -- Filters a specific option before its value is (maybe) serialized and
@@ -681,67 +683,70 @@ is
             return Add_Option (Option, Value_2, "", Autoload);
          end if;
 
-         Serialized_Value := Maybe_Serialize (As_String (Value_2));
-
-         --
-         -- Fires immediately before an option value is updated.
-         --
-         -- @since 2.9.0
-         --
-         -- @param string option    Name of the option to update.
-         -- @param mixed  old_value The old option value.
-         -- @param mixed  value     The new option value.
-         --
-         Do_Action ("update_option", Option, Old_Value, Value_2);
-
          declare
-            use Class_WpDB;
-
-            Update_Args : Array_Type := To_Array_Type ([
-              Build ("option_value", As_String (Serialized_Value))
-            ]);
-            Result : Rows_Result_Type;
+            Serialized_Value : constant Multi_Type :=
+              Maybe_Serialize (As_String (Value_2));
          begin
-            if not Autoload then -- ( null !== autoload ) then
-               Set (Update_Args, "autoload", From_Boolean (Autoload));
-               -- ( "no" === autoload || false === autoload ) ? "no" : "yes";
-            end if;
+            --
+            -- Fires immediately before an option value is updated.
+            --
+            -- @since 2.9.0
+            --
+            -- @param string option    Name of the option to update.
+            -- @param mixed  old_value The old option value.
+            -- @param mixed  value     The new option value.
+            --
+            Do_Action ("update_option", Option, Old_Value, Value_2);
 
-            Result :=
-              Globals.WpDB.Update (-Globals.WpDB.Options,
-                                   Update_Args,
-                                   To_Array_Type ([
-                                     Build ("option_name", Option)
-                                  ]));
-            if Result.Status = Error then
-               return False;
-            end if;
-         end;
-
-         declare
-            Found : Boolean;
-
-            Notoptions : constant Array_Type :=
-              Wp_Cache_Get ("notoptions", "options", Found => Found);
-         begin
-            if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
-               Delete (Ref (Notoptions, Option));
-               Wp_Cache_Set ("notoptions", Notoptions, "options");
-            end if;
-         end;
-
-         if not Wp_Installing then
             declare
-               Alloptions : Array_Type := Wp_Load_Alloptions (True);
+               use Class_WpDB;
+
+               Update_Args : Array_Type := To_Array_Type ([
+                 Build ("option_value", As_String (Serialized_Value))
+               ]);
+               Result : Rows_Result_Type;
             begin
-               if Isset (Alloptions, Option) then
-                  Set (Alloptions, Option, Serialized_Value);
-                  Wp_Cache_Set ("alloptions", Alloptions, "options");
-               else
-                  Wp_Cache_Set (Option, As_Array (Serialized_Value), "options");
+               if not Autoload then -- ( null !== autoload ) then
+                  Set (Update_Args, "autoload", From_Boolean (Autoload));
+                  -- ( "no" === autoload || false === autoload ) ? "no" : "yes";
+               end if;
+
+               Result :=
+                 Globals.WpDB.Update (-Globals.WpDB.Options,
+                                      Update_Args,
+                                      To_Array_Type ([
+                                        Build ("option_name", Option)
+                                     ]));
+               if Result.Status = Error then
+                  return False;
                end if;
             end;
-         end if;
+
+            declare
+               Found : Boolean;
+
+               Notoptions : constant Array_Type :=
+                 Wp_Cache_Get ("notoptions", "options", Found => Found);
+            begin
+               if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
+                  Delete (Ref (Notoptions, Option));
+                  Wp_Cache_Set ("notoptions", Notoptions, "options");
+               end if;
+            end;
+
+            if not Wp_Installing then
+               declare
+                  Alloptions : Array_Type := Wp_Load_Alloptions (True);
+               begin
+                  if Isset (Alloptions, Option) then
+                     Set (Alloptions, Option, Serialized_Value);
+                     Wp_Cache_Set ("alloptions", Alloptions, "options");
+                  else
+                     Wp_Cache_Set (Option, As_Array (Serialized_Value), "options");
+                  end if;
+               end;
+            end if;
+         end;
 
          --
          -- Fires after the value of a specific option has been successfully updated.
@@ -802,7 +807,7 @@ is
       use Inc_Load;
       use Inc_L10n;
 
-      Value_2 : Multi_Type;
+      Value_2 : Multi_Type (Kind_Null);
    begin
       -- if ( ! empty( deprecated ) ) then
       --    x_deprecated_argument( __FUNCTION__, "2.3.0" );
@@ -1167,7 +1172,7 @@ is
         Apply_Filters ("pre_transient_" & Transient,
                        From_Boolean (False), Transient);
 
-      Value : Multi_Type;
+      Value : Multi_Type (Kind_Null);
       Value_Bool : Boolean := True;
       Found : Boolean;
    begin
@@ -1849,7 +1854,6 @@ is
 --    use Inc_Plugins;
 
       Network_Id_2 : Integer;
-      Pre : Multi_Type;
    begin
       if Network_Id /= 0 and then not Is_Number (Network_Id) then
          return From_Boolean (False);
@@ -1886,12 +1890,15 @@ is
       -- @param mixed  default    The fallback value to return if the option does not
       --                           exist. Default false.
       --
-      Pre := Apply_Filters ("pre_site_option_" & Option, From_Boolean (False),
-                            Option, Network_Id_2, Default);
-
-      if From_Boolean (False) /= Pre then
-         return Pre;
-      end if;
+      declare
+         Pre : constant Multi_Type :=
+           Apply_Filters ("pre_site_option_" & Option, From_Boolean (False),
+                          Option, Network_Id_2, Default);
+      begin
+         if From_Boolean (False) /= Pre then
+            return Pre;
+         end if;
+      end;
 
       declare
          Found : Boolean;
@@ -1899,7 +1906,7 @@ is
          Notoptions_Key : constant String := "network_id:notoptions";
          Notoptions     : Array_Type :=
            Wp_Cache_Get (Notoptions_Key, "site-options", Found => Found);
-         Value : Multi_Type;
+         Value : Multi_Access; -- Multi_Type (Kind_Null);
       begin
          if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
             --
@@ -1928,18 +1935,21 @@ is
                  Apply_Filters ("default_site_option_" & Option,
                                 Default, Option, Network_Id);
             begin
-               Value := Get_Option (Option, Default_2);
+               Value := new Multi_Type'(Get_Option (Option, Default_2));
             end;
          else
             declare
                Cache_Key : constant String := "network_id:option";
                Found : Boolean;
             begin
-               Value := Wp_Cache_Get (Cache_Key, "site-options", Found => Found);
+               Value :=
+                 new Multi_Type'(Wp_Cache_Get (Cache_Key,
+                                               "site-options",
+                                               Found => Found));
 
                if
-                 Kind_Of (Value) in Kind_Null or else -- not Isset (Value) or else
-                 From_Boolean (False) = Value
+                 Kind_Of (Value.all) in Kind_Null or else -- not Isset (Value) or else
+                 From_Boolean (False) = Value.all
                then
                   declare
                      Success : Boolean;
@@ -1961,8 +1971,10 @@ is
                      -- funkiness with 0, false, null values.
                      if Is_Object (Row) then
 --                      Value := Row.Meta_Value;
-                        Value := Maybe_Unserialize (As_String (Value));
-                        Wp_Cache_Set (Cache_Key, As_Array (Value), "site-options");
+                        Value := new Multi_Type'(
+                          Maybe_Unserialize (As_String (Value.all)));
+
+                        Wp_Cache_Set (Cache_Key, As_Array (Value.all), "site-options");
                      else
                         if not Is_Array (Notoptions) then
                            Notoptions := Empty_Array;
@@ -1972,8 +1984,9 @@ is
                         Wp_Cache_Set (Notoptions_Key, Notoptions, "site-options");
 
                         -- This filter is documented in wp-includes/option.php
-                        Value := Apply_Filters ("default_site_option_" & Option,
-                                                Default, Option, Network_Id_2);
+                        Value := new Multi_Type'(
+                          Apply_Filters ("default_site_option_" & Option,
+                                         Default, Option, Network_Id_2));
                      end if;
                   end;
                end if;
@@ -1999,7 +2012,8 @@ is
          -- @param string option     Option name.
          -- @param int    network_id ID of the network.
          --
-         return Apply_Filters ("site_option_" & Option, Value, Option, Network_Id_2);
+         return Apply_Filters ("site_option_" & Option, Value.all,
+                               Option, Network_Id_2);
       end;
    end Get_Network_Option;
 

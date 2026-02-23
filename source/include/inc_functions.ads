@@ -7,6 +7,7 @@ with Php.Calendar;
 with Arrays;
 with Lists;
 
+with Class_Errors;
 with Class_Terms;
 with Class_Users;
 
@@ -994,7 +995,7 @@ is
 
    function X_Wp_Array_Get (Arry    : Array_Type;
                             Path    : List_Type;
-                            Default : Multi_Type := Null_Multi_Type)
+                            Default : Multi_Type := From_Null) -- Null_Multi_Type)
                             return Multi_Type;
 
    --
@@ -1250,6 +1251,9 @@ is
    procedure Wp_Die (Message : String  := "";
                      Title   : String  := "";
                      Code    : Integer := 0); -- , $args = array()
+
+   procedure Wp_Die (Error : Class_Errors.Wp_Error)
+   is null;
 
    --
    -- Reads and decodes a JSON file.

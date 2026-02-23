@@ -5213,7 +5213,7 @@ is
 
    function X_Wp_Array_Get (Arry    : Array_Type;
                             Path    : List_Type;
-                            Default : Multi_Type := Null_Multi_Type)
+                            Default : Multi_Type := From_Null)
                             return Multi_Type
    is
       use Ada.Containers;
