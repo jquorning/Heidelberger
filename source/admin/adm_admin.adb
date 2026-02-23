@@ -497,7 +497,7 @@ is
                Do_Action ("load-importer-" & Importer);
 
                -- Used in the HTML title tag.
-               Title        := +abs "Import";
+               Global_Title := +abs "Import";
                Parent_File  := Adm_Menu."+" ("tools.php");
                Submenu_File := +"import.php";
 

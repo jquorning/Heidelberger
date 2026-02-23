@@ -184,19 +184,21 @@ is
             if "Translators" = String'(Name.Get) then
                -- Considered a special slug in the API response. (Also, will never be
                -- returned for en_US.)
-               Globals.Title := +X_X ("Translators",
-                                      "Translate this to be the equivalent of English Translators in your language for the credits page Translators section");
+               Globals.Global_Title :=
+                 +X_X ("Translators",
+                       "Translate this to be the equivalent of English Translators in your language for the credits page Translators section");
+
             elsif Placeholders.Kind = JSON_Array_Type then  -- Isset
-               -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
-               Globals.Title := +Vsprintf (Translate (Name.Get), ["XXX-913"]); -- Placeholders.Get);
+               Globals.Global_Title :=
+                 +Vsprintf (Translate (Name.Get), ["XXX-913"]); -- Placeholders.Get);
 --             Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_Array); -- Placeholders.Get);
+
             else
-               -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
-               Globals.Title := +Translate (Name.Get);
+               Globals.Global_Title := +Translate (Name.Get);
             end if;
 
-            Echo ("<h2 class=""wp-people-group-title"">" & ESC_HTML (-Globals.Title) &
-                  "</h2>" & NL);
+            Echo ("<h2 class=""wp-people-group-title"">" &
+                  ESC_HTML (-Globals.Global_Title) & "</h2>" & NL);
          end if;
       end;
    end Wp_Credits_Section_Title;

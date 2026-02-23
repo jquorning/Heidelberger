@@ -43,7 +43,7 @@ is
 
       Admin_Header    : UString;
    begin
-      Globals.Title := +abs "Credits";
+      Globals.Global_Title := +abs "Credits";
 
       Adm_Admin.Run;
       Clear_Echo;

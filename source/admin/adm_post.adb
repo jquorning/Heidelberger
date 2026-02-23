@@ -318,7 +318,8 @@ is
                      Post_New_File := +"post-new.php?post_type=post_type";
                   end if;
 
-                  Globals.Title := +Get (Post_Type_Object, "labels.edit_item");
+                  Globals.Global_Title :=
+                    +Get (Post_Type_Object, "labels.edit_item");
 
                   --
                   -- Allows replacement of the editor.

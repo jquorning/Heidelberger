@@ -457,7 +457,8 @@ is
                use Adi_Screens;
             begin
                --  Used in the HTML title tag.
-               Globals.Title := +Helpers_3.Get (Post_Type_Object, "labels.name");
+               Globals.Global_Title :=
+                 +Helpers_3.Get (Post_Type_Object, "labels.name");
 
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()

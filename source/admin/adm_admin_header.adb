@@ -113,7 +113,7 @@ is
 -- end;
 
       Adi_Plugins.Get_Admin_Page_Title;
-      Globals.Title := +Strip_Tags (-Globals.Title);
+      Globals.Global_Title := +Strip_Tags (-Globals.Global_Title);
 
       if Is_Network_Admin then
          -- translators: Network admin screen title. %s: Network title.
@@ -129,12 +129,12 @@ is
          Admin_Title := +Get_Bloginfo ("name");
       end if;
 
-      if Admin_Title = Globals.Title then
+      if Admin_Title = Globals.Global_Title then
          -- translators: Admin screen title. %s: Admin screen name.
          Admin_Title := +Sprintf (abs "%s &#8212; WordPress",
-                                  [1 => -Globals.Title]);
+                                  [1 => -Globals.Global_Title]);
       else
-         Screen_Title := Globals.Title;
+         Screen_Title := Globals.Global_Title;
 
          if
            "post" = Globals.Current_Screen.Base and then
@@ -183,7 +183,8 @@ is
       -- @param string admin_title The page title, with extra context added.
       -- @param string title       The original page title.
       --
-      Admin_Title := +Apply_Filters ("admin_title", -Admin_Title, -Globals.Title);
+      Admin_Title :=
+        +Apply_Filters ("admin_title", -Admin_Title, -Globals.Global_Title);
 
       Wp_User_Settings;
 

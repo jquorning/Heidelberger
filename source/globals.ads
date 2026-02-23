@@ -67,7 +67,7 @@ is
    Pagenow     : UStrings.UString;
    Hook_Suffix : UStrings.UString;
 
-   Title              : UStrings.UString;
+   Global_Title       : UStrings.UString;
    Global_Parent_File : UStrings.UString;
    Post_New_File      : UStrings.UString;
 

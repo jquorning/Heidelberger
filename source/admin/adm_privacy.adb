@@ -41,7 +41,7 @@ is
       Adm_Admin.Run;
 
       -- Used in the HTML title tag.
-      Globals.Title := +abs "Privacy";
+      Globals.Global_Title := +abs "Privacy";
 
 --    Display_Version :=
 --      Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));

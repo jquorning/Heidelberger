@@ -65,7 +65,7 @@ is
       end if;
 
       -- Used in the HTML title tag.
-      Globals.Title := +abs "Freedoms";
+      Globals.Global_Title := +abs "Freedoms";
 
       Adm_Admin_Header.Run;
 

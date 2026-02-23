@@ -57,7 +57,7 @@ is
 
       -- Used in the HTML title tag.
       -- translators: Page title of the About WordPress page in the admin.
-      Globals.Title := +X_X ("About", "page title");
+      Globals.Global_Title := +X_X ("About", "page title");
 
       Adm_Admin_Header.Run;
 

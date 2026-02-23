@@ -97,7 +97,7 @@ is
       end if;
 
       -- Used in the HTML title tag.
-      Globals.Title              := +abs "Dashboard";
+      Globals.Global_Title       := +abs "Dashboard";
       Globals.Global_Parent_File := +"index.php";
 
       declare
@@ -231,7 +231,7 @@ is
       Adm_Admin_Header.Run;
 
       Echo ("<div class=""wrap"">");
-      Echo ("        <h1>" & ESC_HTML (-Globals.Title) & "</h1>");
+      Echo ("        <h1>" & ESC_HTML (-Globals.Global_Title) & "</h1>");
 
       if not Empty (Binder.XX_GET, "admin_email_remind_later") then
          declare

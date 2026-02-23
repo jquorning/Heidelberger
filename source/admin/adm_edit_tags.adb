@@ -433,7 +433,7 @@ is
              else
                Slug_Type'("edit-tags.php?taxonomy=taxonomy")));
 
-         Globals.Title := +"XXX-903";
+         Globals.Global_Title := +"XXX-903";
 --       Globals.Title := +Get (Tax.Labels, "name");
 
 --         null;
