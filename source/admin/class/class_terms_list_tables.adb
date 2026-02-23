@@ -51,9 +51,9 @@ is
       );
 
    begin
-      Globals.Global_Action   := This.Screen.Action;
-      Globals.Post_Type       := This.Screen.Post_Type;
-      Globals.Global_Taxonomy := This.Screen.Taxonomy;
+      Globals.Global_Action    := This.Screen.Action;
+      Globals.Global_Post_Type := This.Screen.Post_Type;
+      Globals.Global_Taxonomy  := This.Screen.Taxonomy;
 
       if Empty (-Globals.Global_Taxonomy) then
          Globals.Global_Taxonomy := +"post_tag";
@@ -67,13 +67,13 @@ is
 
       -- @todo Still needed? Maybe just the show_ui part.
       if
-        Empty (-Globals.Post_Type) or else
-        not In_Array (-Globals.Post_Type,
+        Empty (-Globals.Global_Post_Type) or else
+        not In_Array (-Globals.Global_Post_Type,
                       Inc_Posts.Get_Post_Types (To_Array_Type ([
                         Build ("show_ui", "true")])),
                       True)
       then
-         Globals.Post_Type := +"post";
+         Globals.Global_Post_Type := +"post";
       end if;
 
       return This;

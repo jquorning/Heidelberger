@@ -77,7 +77,7 @@ is
    Update_Title       : UStrings.UString;
 
    Global_Post_Id   : Class_Posts.Post_Id_Type;
-   Post_Type        : UStrings.UString;
+   Global_Post_Type : UStrings.UString;
    Post_Type_Object : Class_Post_Type.Wp_Post_Type;
    Global_Post      : Class_Posts.Wp_Post;
    Global_Posts     : Class_Posts.Post_Array;

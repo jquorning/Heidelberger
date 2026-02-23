@@ -124,14 +124,14 @@ is
             end if;
 
    --       if Post then
-            Post_Type        := Global_Post.Post_Type;
-            Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Post_Type);
+            Global_Post_Type := Global_Post.Post_Type;
+            Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Global_Post_Type);
    --       end if;
 
             if
               Isset (X_POST, "post_type") and then
    --         Post and then
-              Post_Type /= Get_As_String (X_POST, "post_type")
+              Global_Post_Type /= Get_As_String (X_POST, "post_type")
             then
                Wp_Die
                   (abs "A post type mismatch has been detected.",
@@ -153,13 +153,13 @@ is
                  Ada.Strings.Fixed.Index (-Sendback, "post.php") = 0 or else
                  Ada.Strings.Fixed.Index (-Sendback, "post-new.php") = 0
                then
-                  if "attachment" = Post_Type then
+                  if "attachment" = Global_Post_Type then
                      Sendback := +Admin_URL ("upload.php");
                   else
                      Sendback := +Admin_URL ("edit.php");
-                     if not Empty (-Post_Type) then
+                     if not Empty (-Global_Post_Type) then
                         Sendback := +Add_Query_Arg ("post_type",
-                                                    -Post_Type, -Sendback);
+                                                    -Global_Post_Type, -Sendback);
                      end if;
                   end if;
                else
@@ -238,7 +238,7 @@ is
                   goto Bailout;
 
                elsif Action = "post" or Action = "postajaxpost" then
-                  Check_Admin_Referer ("add-" & (-Post_Type));
+                  Check_Admin_Referer ("add-" & (-Global_Post_Type));
                   declare
                      Post_Id : constant Integer := (if "postajaxpost" = Action
                                                     then Edit_Post else Write_Post);
@@ -294,12 +294,14 @@ is
                      goto Bailout;
                   end if;
 
-                  Post_Type := Global_Post.Post_Type;
-                  if "post" = Post_Type then
+                  Global_Post_Type := Global_Post.Post_Type;
+
+                  if "post" = Global_Post_Type then
                      Parent_File   := +"edit.php";
                      Submenu_File  := +"edit.php";
                      Post_New_File := +"post-new.php";
-                  elsif "attachment" = Post_Type then
+
+                  elsif "attachment" = Global_Post_Type then
                      Parent_File   := +"upload.php";
                      Submenu_File  := +"upload.php";
                      Post_New_File := +"media-new.php";
@@ -347,7 +349,7 @@ is
                            Wp_Set_Post_Lock (Integer (Global_Post.Id));
                         pragma Unreferenced (Active_Post_Lock);
                      begin
-                        if "attachment" /= Post_Type then
+                        if "attachment" /= Global_Post_Type then
                            Wp_Enqueue_Script ("autosave");
                         end if;
                      end;
@@ -355,7 +357,7 @@ is
 
                   Global_Post := Inc_Posts.Get_Post (Id, "OBJECT", "edit");
 
-                  if Post_Type_Supports (-Post_Type, "comments") then
+                  if Post_Type_Supports (-Global_Post_Type, "comments") then
                      Wp_Enqueue_Script ("admin-comments");
                      Adi_Comments.Enqueue_Comment_Hotkeys_Js;
                   end if;

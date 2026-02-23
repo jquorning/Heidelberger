@@ -99,8 +99,8 @@ is
 --
 --  global $post_type, $post_type_object;
 
-      Post_Type        : UString renames Globals.Post_Type;
-      Post_Type_Object : Wp_Post_Type     renames Globals.Post_Type_Object;
+      Post_Type        : UString      renames Globals.Global_Post_Type;
+      Post_Type_Object : Wp_Post_Type renames Globals.Post_Type_Object;
 --         := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin
       Adm_Admin.Run;
@@ -168,14 +168,15 @@ is
          begin
             Parent_File :=
               +Slug_Type (if "post" = Post_Type then Slug_Type'("edit")
-                          else "edit?post_type=" & (-Post_Type));
+                          else "edit?post_type=" & (-Globals.Global_Post_Type));
 
             Submenu_File :=
               +Slug_Type (if "post" = Post_Type then Slug_Type'("edit")
-                          else "edit?post_type=" & (-Post_Type));
+                          else "edit?post_type=" & (-Globals.Global_Post_Type));
 
-            Globals.Post_New_File := +(if "post" = Post_Type then "post-new"
-                                       else "post-new?post_type=" & (-Post_Type));
+            Globals.Post_New_File :=
+              +(if "post" = Post_Type then "post-new"
+                else "post-new?post_type=" & (-Globals.Global_Post_Type));
 
             if Doaction = "" then   -- if doaction then
                Check_Admin_Referer ("bulk-posts");
@@ -226,7 +227,8 @@ is
                               --
                               Post_Ids := Globals.WpDB.Get_Col (
                                  Globals.WpDB.Prepare (
-                                   "SELECT ID FROM " & Statement_Type (-Post_Type) &
+                                   "SELECT ID FROM " &
+                                   Statement_Type (-Globals.Global_Post_Type) &
                                    " WHERE post_type=%s AND post_status = %s",
                                    [
                                      1 => -Post_Type,
@@ -551,7 +553,7 @@ is
                   "per_page",
                   To_Array_Type ([
                      Build ("default", "20"),
-                     Build ("option",  "edit_" & (-Post_Type) & "_per_page")
+                     Build ("option",  "edit_" & (-Globals.Global_Post_Type) & "_per_page")
                ]));
             end;
 

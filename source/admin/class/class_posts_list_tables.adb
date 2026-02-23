@@ -70,8 +70,8 @@ is
 
       Posts : constant Statement_Type := Statement_Type (-Globals.WpDB.Posts);
    begin
-      Globals.Post_Type        := List_Table.Screen.Post_Type;
-      Globals.Post_Type_Object := Get_Post_Type_Object (-Globals.Post_Type);
+      Globals.Global_Post_Type := List_Table.Screen.Post_Type;
+      Globals.Post_Type_Object := Get_Post_Type_Object (-Globals.Global_Post_Type);
 
       List_Table.User_Posts_Count := Natural'Value (
         Globals.WpDB.Get_Var ( -- (int)
@@ -83,7 +83,7 @@ is
             Statement_Type (Implode ("','", Exclude_States) & "' )") &
             " AND post_author = %d",
             [
-              1 => -Globals.Post_Type,
+              1 => -Globals.Global_Post_Type,
               2 => Helpers.Image (Integer (Get_Current_User_Id))
             ]
           )));
@@ -104,7 +104,7 @@ is
          Sticky_Posts : constant List_Type :=
            Inc_Options.Get_Option ("sticky_posts");
       begin
-         if "post" = Globals.Post_Type and not Sticky_Posts.Is_Empty then
+         if "post" = Globals.Global_Post_Type and not Sticky_Posts.Is_Empty then
             declare
                Sticky_Posts_2 : constant Statement_Type :=
                  Statement_Type (Implode (", ", List_Map (Absint'Access,
@@ -118,7 +118,7 @@ is
                      " WHERE post_type = %s" &
                      " AND post_status NOT IN (""trash"", ""auto-draft"")" &
                      " AND ID IN (" & Sticky_Posts_2 & ")",
-                     [1 => -Globals.Post_Type]
+                     [1 => -Globals.Global_Post_Type]
                  )));
             end;
          end if;

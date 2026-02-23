@@ -245,7 +245,8 @@ is
          end if;
 
          Wp_Redirect (
-           Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, -Globals.Post_Type)));
+           Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy,
+                                             -Globals.Global_Post_Type)));
       end;
       Php.Errors.Die;
    end Action_Edit;
@@ -417,16 +418,18 @@ is
          Location : UString;  -- jq
       begin
          Parent_File :=
-            +Slug_Type ((if "post" /= Globals.Post_Type
-                         then (if "attachment" = Post_Type
+            +Slug_Type ((if "post" /= Globals.Global_Post_Type
+                         then (if "attachment" = Global_Post_Type
                                then Slug_Type'("upload.php")
-                               else Slug_Type ("edit.php?post_type=" & (-Globals.Post_Type)))
+                               else Slug_Type ("edit.php?post_type=" &
+                                               (-Globals.Global_Post_Type)))
              elsif "link_category" = Tax.Name then Slug_Type'("link-manager.php")
              else                                  "edit.php"));
 
          Submenu_File :=
-            +Slug_Type ((if "post" /= Globals.Post_Type
-             then Slug_Type ("edit-tags.php?taxonomy=taxonomy&amp;post_type=" & (-Globals.Post_Type))
+            +Slug_Type ((if "post" /= Globals.Global_Post_Type
+             then Slug_Type ("edit-tags.php?taxonomy=taxonomy&amp;post_type=" &
+                             (-Globals.Global_Post_Type))
              elsif "link_category" = Tax.Name
              then
                Slug_Type'("edit-tags.php?taxonomy=link_category")
@@ -1046,7 +1049,8 @@ is
                           Current_User_Can ("import"));
 
                   elsif Var_Name = "VAR_edit_tags_post_type" then
-                     Set ("VAR_edit_tags_post_type", ESC_Attr (-Globals.Post_Type));
+                     Set ("VAR_edit_tags_post_type",
+                          ESC_Attr (-Globals.Global_Post_Type));
 
                   elsif Var_Name = "VAR_edit_tags_remove_message_and_error" then
                      declare
