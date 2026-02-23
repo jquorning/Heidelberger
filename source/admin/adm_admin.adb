@@ -258,18 +258,18 @@ is
            Isset (X_REQUEST, "post_type") and then
            Inc_Posts.Post_Type_Exists (Get_As_String (X_REQUEST, "post_type"))
          then
-            Typenow := +Get_As_String (X_REQUEST, "post_type");
+            Global_Typenow := +Get_As_String (X_REQUEST, "post_type");
          else
-            Typenow := Null_UString;
+            Global_Typenow := Null_UString;
          end if;
 
          if
            Isset (X_REQUEST, "taxonomy") and then
            Inc_Taxonomys.Taxonomy_Exists (Get_As_String (X_REQUEST, "taxonomy"))
          then
-            Taxnow := +Get_As_String (X_REQUEST, "taxonomy");
+            Global_Taxnow := +Get_As_String (X_REQUEST, "taxonomy");
          else
-            Taxnow := Null_UString;
+            Global_Taxnow := Null_UString;
          end if;
 
          if WP_NETWORK_ADMIN then
@@ -304,10 +304,10 @@ is
             declare
                The_Parent : UString;
             begin
-               if Typenow /= "" then
-                  The_Parent := Pagenow & "?post_type=" & Typenow;
+               if Global_Typenow /= "" then
+                  The_Parent := Global_Pagenow & "?post_type=" & Global_Typenow;
                else
-                  The_Parent := Pagenow;
+                  The_Parent := Global_Pagenow;
                end if;
 
                Page_Hook := +Get_Plugin_Page_Hook (String (-Plugin_Page),
@@ -319,7 +319,7 @@ is
                   -- Back-compat for plugins using add_management_page().
                   if
                     Page_Hook = "" and then
-                    "edit.php" = Pagenow and then
+                    "edit.php" = Global_Pagenow and then
                     "" /= Get_Plugin_Page_Hook (String (-Plugin_Page), "tools.php")
                   then
                      -- There could be plugin specific params on the URL, so we need
@@ -347,8 +347,8 @@ is
             Hook_Suffix := Page_Hook;
          elsif Plugin_Page /= "" then
             Hook_Suffix := UString (Plugin_Page);
-         elsif Pagenow /= "" then
-            Hook_Suffix := Pagenow;
+         elsif Global_Pagenow /= "" then
+            Hook_Suffix := Global_Pagenow;
          end if;
 
          Adi_Screens.Set_Current_Screen; -- ();
@@ -548,30 +548,30 @@ is
             --
             -- @since 2.1.0
             --
-            Do_Action ("load-" & (-Pagenow));
+            Do_Action ("load-" & (-Global_Pagenow));
             -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
             --
             -- The following hooks are fired to ensure backward compatibility.
             -- In all other cases, "load-" . pagenow should be used instead.
             --
-            if "page" = Typenow then
-               if "post-new.php" = Pagenow then
+            if "page" = Global_Typenow then
+               if "post-new.php" = Global_Pagenow then
                   Do_Action ("load-page-new.php");
 
-               elsif "post.php" = Pagenow then
+               elsif "post.php" = Global_Pagenow then
                   Do_Action ("load-page.php");
 
                end if;
-            elsif "edit-tags.php" = Pagenow then
-               if "category" = Taxnow then
+            elsif "edit-tags.php" = Global_Pagenow then
+               if "category" = Global_Taxnow then
                   Do_Action ("load-categories.php");
 
-               elsif "link_category" = Taxnow then
+               elsif "link_category" = Global_Taxnow then
                   Do_Action ("load-edit-link-categories.php");
 
                end if;
-            elsif "term.php" = Pagenow then
+            elsif "term.php" = Global_Pagenow then
                Do_Action ("load-edit-tags.php");
 
             end if;

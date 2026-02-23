@@ -460,8 +460,8 @@ is
       end if;
 
       if
-        Globals.Pagenow = "widgets.php" or else
-        Globals.Pagenow = "customize.php"
+        Globals.Global_Pagenow = "widgets.php" or else
+        Globals.Global_Pagenow = "customize.php"
       then
          Style_Handles.Append ("wp-widgets");
          Style_Handles.Append ("wp-edit-widgets");

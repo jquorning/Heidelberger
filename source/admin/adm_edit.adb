@@ -126,7 +126,7 @@ is
 --      }
 --  }
 
-      Post_Type        := Globals.Typenow;
+      Post_Type        := Globals.Global_Typenow;
       Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Post_Type);
 --  if Post_Type_Object = 0   -- not
 --   Wp_Die (abs  "Invalid post type.");

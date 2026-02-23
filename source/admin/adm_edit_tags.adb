@@ -371,7 +371,7 @@ is
       Adm_Admin.Run;
 
       begin
-         Tax := Get_Taxonomy (-Taxnow);
+         Tax := Get_Taxonomy (-Global_Taxnow);
       exception
          when Taxonomy_Does_Not_Exist =>
             null;

@@ -529,7 +529,7 @@ is
          end;
       end if;
 
-      if Is_Admin and then "customize.php" = Globals.Pagenow then
+      if Is_Admin and then "customize.php" = Globals.Global_Pagenow then
          This.Set_Changeset_Lock (This.Changeset_Post_Id);
       end if;
    end Establish_Loaded_Changeset;

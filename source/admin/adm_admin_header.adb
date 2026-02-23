@@ -150,7 +150,7 @@ is
                      use Inc_Posts;
 
                      Post_Type_Obj : constant Wp_Post_Type :=
-                       Get_Post_Type_Object (-Globals.Typenow);
+                       Get_Post_Type_Object (-Globals.Global_Typenow);
                   begin
                      Screen_Title := +Sprintf (
                         -- translators: Editor admin screen title. 1: "Edit item" text for the post type, 2: Post title.

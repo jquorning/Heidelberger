@@ -150,8 +150,10 @@ is
             end if;
 
             if
-              (Parent_File /= "" and then Item.Menu_Slug = Parent_File) or else
-              (Empty (-Typenow) and then Unbounded_Slug (Self) = Item.Menu_Slug)
+              (Parent_File /= "" and then
+               Item.Menu_Slug = Parent_File) or else
+              (Empty (-Global_Typenow) and then
+               Unbounded_Slug (Self) = Item.Menu_Slug)
             then
                if Submenu_Items = Inner_Maps.Empty_Map then
 --             if not Empty (Submenu_Items) then
@@ -359,8 +361,8 @@ is
                               -- Handle current for post_type=post|page|foo pages,
                               -- which won't match self.
                               Self_Type : String :=
-                                 (if not Empty (-Typenow)
-                                  then (-Self) & "?post_type=" & (-Typenow)
+                                 (if not Empty (-Global_Typenow)
+                                  then (-Self) & "?post_type=" & (-Global_Typenow)
                                   else "nothing");
                            begin
                               if 0 /= Pos then

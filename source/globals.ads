@@ -62,10 +62,10 @@ is
    Global_Wp_Scripts : Class_Scripts.Wp_Scripts;
    Global_Wp_Styles  : Class_Styles.Wp_Styles;
 
-   Typenow     : UStrings.UString;
-   Taxnow      : UStrings.UString;
-   Pagenow     : UStrings.UString;
-   Hook_Suffix : UStrings.UString;
+   Global_Typenow : UStrings.UString;
+   Global_Taxnow  : UStrings.UString;
+   Global_Pagenow : UStrings.UString;
+   Hook_Suffix    : UStrings.UString;
 
    Global_Title       : UStrings.UString;
    Global_Parent_File : UStrings.UString;
