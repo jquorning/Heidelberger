@@ -46,9 +46,9 @@ is
 
    procedure Clear_Echo
    is
+      use Ada.Strings.Unbounded;
    begin
-      Echo_Buffer :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Length => Default_Buffer_Length);
+      Echo_Buffer := Null_Unbounded_String;
    end Clear_Echo;
 
    ----------
