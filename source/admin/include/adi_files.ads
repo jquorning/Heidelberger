@@ -10,8 +10,11 @@
 -- @since 2.3.0
 --
 
+with Arrays;
+
 package Adi_Files
 is
+   use Arrays;
 
 -- -- The descriptions for theme files.--
 -- wp_file_descriptions = array(
@@ -108,20 +111,6 @@ is
    --
    function Get_Home_Path
             return String;
---         home    = set_url_scheme( get_option( "home" ), "http" );
---         siteurl = set_url_scheme( get_option( "siteurl" ), "http" );
-
---         if ( ! empty( home ) && 0 !== strcasecmp( home, siteurl ) ) then
---                 wp_path_rel_to_home = str_ireplace( home, "", siteurl ); /* siteurl - home--
---                 pos                 = strripos( str_replace( "\\", "/", _SERVER["SCRIPT_FILENAME"] ), trailingslashit( wp_path_rel_to_home ) );
---                 home_path           = substr( _SERVER["SCRIPT_FILENAME"], 0, pos );
---                 home_path           = trailingslashit( home_path );
---         end; else then
---                 home_path = ABSPATH;
---         end;
-
---         return str_replace( "\\", "/", home_path );
--- end;
 
 -- --
 -- -- Returns a listing of all files in the specified folder and all subdirectories up to 100 levels deep.
@@ -2035,33 +2024,40 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Determines which method to use for reading, writing, modifying, or deleting
--- -- files on the filesystem.
--- --
--- -- The priority of the transports are: Direct, SSH2, FTP PHP Extension, FTP Sockets
--- -- (Via Sockets class, or `fsockopen()`). Valid values for these are: "direct", "ssh2",
--- -- "ftpext" or "ftpsockets".
--- --
--- -- The return value can be overridden by defining the `FS_METHOD` constant in `wp-config.php`,
--- -- or filtering via then@see "filesystem_method"end;.
--- --
--- -- @link https://wordpress.org/support/article/editing-wp-config-php/#wordpress-upgrade-constants
--- --
--- -- Plugins may define a custom transport handler, See WP_Filesystem().
--- --
--- -- @since 2.5.0
--- --
--- -- @global callable _wp_filesystem_direct_method
--- --
--- -- @param array  args                         Optional. Connection details. Default empty array.
--- -- @param string context                      Optional. Full path to the directory that is tested
--- --                                             for being writable. Default empty.
--- -- @param bool   allow_relaxed_file_ownership Optional. Whether to allow Group/World writable.
--- --                                             Default false.
--- -- @return string The transport to use, see description for valid return values.
--- --
--- function get_filesystem_method( args = array(), context = "", allow_relaxed_file_ownership = false ) then
+   --
+   -- Determines which method to use for reading, writing, modifying, or deleting
+   -- files on the filesystem.
+   --
+   -- The priority of the transports are: Direct, SSH2, FTP PHP Extension, FTP Sockets
+   -- (Via Sockets class, or `fsockopen()`). Valid values for these are: "direct",
+   -- "ssh2", "ftpext" or "ftpsockets".
+   --
+   -- The return value can be overridden by defining the `FS_METHOD` constant in
+   -- `wp-config.php`, or filtering via {@see "filesystem_method"}.
+   --
+   -- @link
+   -- https://wordpress.org/support/article/editing-wp-config-php/#wordpress-upgrade-constants
+   --
+   -- Plugins may define a custom transport handler, See WP_Filesystem().
+   --
+   -- @since 2.5.0
+   --
+   -- @global callable _wp_filesystem_direct_method
+   --
+   -- @param array  args                         Optional. Connection details. Default
+   --                                            empty array.
+   -- @param string context                      Optional. Full path to the directory
+   --                                            that is tested for being writable.
+   --                                            Default empty.
+   -- @param bool   allow_relaxed_file_ownership Optional. Whether to allow
+   --                                            Group/World writable. Default false.
+   -- @return string The transport to use, see description for valid return values.
+   --
+   function Get_Filesystem_Method (Args    : Array_Type := Empty_Array;
+                                   Context : String     := "";
+                                   Allow_Relaxed_File_Ownership : Boolean := False)
+                                   return String
+   is (raise Program_Error with "not implemented");
 --         // Please ensure that this is either "direct", "ssh2", "ftpext", or "ftpsockets".
 --         method = defined( "FS_METHOD" ) ? FS_METHOD : false;
 
@@ -2135,37 +2131,55 @@ is
 --         return apply_filters( "filesystem_method", method, args, context, allow_relaxed_file_ownership );
 -- end;
 
--- --
--- -- Displays a form to the user to request for their FTP/SSH details in order
--- -- to connect to the filesystem.
--- --
--- -- All chosen/entered details are saved, excluding the password.
--- --
--- -- Hostnames may be in the form of hostname:portnumber (eg: wordpress.org:2467)
--- -- to specify an alternate FTP/SSH port.
--- --
--- -- Plugins may override this form by returning true|false via the then@see "request_filesystem_credentials"end; filter.
--- --
--- -- @since 2.5.0
--- -- @since 4.6.0 The `context` parameter default changed from `false` to an empty string.
--- --
--- -- @global string pagenow The filename of the current screen.
--- --
--- -- @param string        form_post                    The URL to post the form to.
--- -- @param string        type                         Optional. Chosen type of filesystem. Default empty.
--- -- @param bool|WP_Error error                        Optional. Whether the current request has failed
--- --                                                    to connect, or an error object. Default false.
--- -- @param string        context                      Optional. Full path to the directory that is tested
--- --                                                    for being writable. Default empty.
--- -- @param array         extra_fields                 Optional. Extra `POST` fields to be checked
--- --                                                    for inclusion in the post. Default null.
--- -- @param bool          allow_relaxed_file_ownership Optional. Whether to allow Group/World writable.
--- --                                                    Default false.
--- -- @return bool|array True if no filesystem credentials are required,
--- --                    false if they are required but have not been provided,
--- --                    array of credentials if they are required and have been provided.
--- --
--- function request_filesystem_credentials( form_post, type = "", error = false, context = "", extra_fields = null, allow_relaxed_file_ownership = false ) then
+   --
+   -- Displays a form to the user to request for their FTP/SSH details in order
+   -- to connect to the filesystem.
+   --
+   -- All chosen/entered details are saved, excluding the password.
+   --
+   -- Hostnames may be in the form of hostname:portnumber (eg: wordpress.org:2467)
+   -- to specify an alternate FTP/SSH port.
+   --
+   -- Plugins may override this form by returning true|false via the {@see
+   -- "request_filesystem_credentials"} filter.
+   --
+   -- @since 2.5.0
+   -- @since 4.6.0 The `context` parameter default changed from `false` to an empty
+   --              string.
+   --
+   -- @global string pagenow The filename of the current screen.
+   --
+   -- @param string        form_post                    The URL to post the form to.
+   -- @param string        type                         Optional. Chosen type of
+   --                                                   filesystem. Default empty.
+   -- @param bool|WP_Error error                        Optional. Whether the current
+   --                                                   request has failed to connect,
+   --                                                   or an error object. Default
+   --                                                   false.
+   -- @param string        context                      Optional. Full path to the
+   --                                                   directory that is tested
+   --                                                   for being writable. Default
+   --                                                   empty.
+   -- @param array         extra_fields                 Optional. Extra `POST` fields
+   --                                                   to be checked for inclusion in
+   --                                                   the post. Default null.
+   -- @param bool          allow_relaxed_file_ownership Optional. Whether to allow
+   --                                                    Group/World writable.
+   --                                                    Default false.
+   -- @return bool|array True if no filesystem credentials are required,
+   --                    false if they are required but have not been provided,
+   --                    array of credentials if they are required and have been
+   --                    provided.
+   --
+   function Request_Filesystem_Credentials
+     (Form_Post : String;
+      Typ       : String  := "";
+      Error     : Boolean := False;
+      Context   : String  := "";
+      Extra_Fields : Array_Type := Empty_Array; -- = null,
+      Allow_Relaxed_File_Ownership : Boolean := False)
+      return Boolean
+   is (raise Program_Error with "not implemented");
 --         global pagenow;
 
 --         --
@@ -2458,33 +2472,12 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Prints the filesystem credentials modal when needed.
--- --
--- -- @since 4.2.0
--- --
--- function wp_print_request_filesystem_credentials_modal() then
---         filesystem_method = get_filesystem_method();
-
---         ob_start();
---         filesystem_credentials_are_stored = request_filesystem_credentials( self_admin_url() );
---         ob_end_clean();
-
---         request_filesystem_credentials = ( "direct" !== filesystem_method && ! filesystem_credentials_are_stored );
---         if ( ! request_filesystem_credentials ) then
---                 return;
---         end;
---         ?>
---         <div id="request-filesystem-credentials-dialog" class="notification-dialog-wrap request-filesystem-credentials-dialog">
---                 <div class="notification-dialog-background"></div>
---                 <div class="notification-dialog" role="dialog" aria-labelledby="request-filesystem-credentials-title" tabindex="0">
---                         <div class="request-filesystem-credentials-dialog-content">
---                                 <?php request_filesystem_credentials( site_url() ); ?>
---                         </div>
---                 </div>
---         </div>
---         <?php
--- end;
+   --
+   -- Prints the filesystem credentials modal when needed.
+   --
+   -- @since 4.2.0
+   --
+   procedure Wp_Print_Request_Filesystem_Credentials_Modal;
 
 -- --
 -- -- Attempts to clear the opcode cache for an individual PHP file.

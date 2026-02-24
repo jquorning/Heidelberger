@@ -2,19 +2,27 @@
 
 ### Compatability
 
-Keep compatability if JavaScript and Locales, usage, GFX.
+- URL: Keep `.php` extensions.
+- JavaScript scripts.
+- Locales: Keep texts in printout.
+- CSS.
+- GFX looks.
 
-### Differences
+### Symbol Differences
 Differeces from WordPress originals.
 
-Symbols starting with `_` replaced with `X_`.
+- Symbols starting with `_` replaced with `X_`.
+- `XX_Get` was `_Get`.
+- Ending in `__` is `_XX`.
 
 ### File organization
 
 - `base/` -
 - `base/admin/` - Prefix `Adm_`
 - `base/admin/include/` - Prefix `Adi_`
-- `base/include/` - Prefic `Inc_`
+- `base/admin/class/` - Prefix `Class_`
+- `base/include/` - Prefix `Inc_`
+- `base/class/` - Prefix `Class_`
 
 ### Translation
 
@@ -40,19 +48,16 @@ Function return values can not be ignored.
 - Remove `is_array`, `is_string` etc. They are known at compile time.
 - Remove `instanceof`. They are known at compile time.
 - Initialize global variables. Remove check of type and run-time initialization.
-- Add subtypes of String and Array_Type with predicates.
+- Add subtypes of `String` and `Array_Type` with predicates.
 - Move protected function declarations to private parts.
 - Find out what to do with protected and private member variables.
 
 ### Not working
 
-`Natural'Image` adds leading space. Use `Helper.Image`.
-
-`Apply_Filters`
-
-Callbacks
-
-Modifying `As_Array` referenced
+- `Natural'Image` adds leading space. Use `Helper.Image`.
+- `Apply_Filters`
+- Callbacks
+- Modifying `As_Array` referenced
 
 ### Optimizations
 
@@ -60,7 +65,7 @@ There are som low-hanging fruits:
 - Build with release profile. (done)
 - Add flag for stubbing of Logging. (done)
 - Preallocate echoing buffer. (done)
-- Return ustring from echoing buffer (`Get_Echo`).
+- Return `UString` from echoing buffer (`Get_Echo`).
 - Look at `Array_Type` and copying
 - Use variant record in `Array_Type`.
 - Switch off container checks. (done)

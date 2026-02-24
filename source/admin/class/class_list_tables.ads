@@ -305,7 +305,7 @@ is
    --
    -- @return int
    --
-   function Get_Column_Count (This : in out Wp_List_Table)
+   function Get_Column_Count (This : in out Wp_List_Table'Class)
                               return Natural;
 
    --
@@ -315,7 +315,7 @@ is
    --
    -- @param bool with_id Whether to set the ID attribute or not
    --
-   procedure Print_Column_Headers (This    : in out Wp_List_Table;
+   procedure Print_Column_Headers (This    : in out Wp_List_Table'Class;
                                    With_Id : Boolean := True);
 
    --
@@ -331,6 +331,22 @@ is
                            Which : String := "");
 
    --
+   -- Generates the required HTML for a list of row action links.
+   --
+   -- @since 3.1.0
+   --
+   -- @param string[] actions        An array of action links.
+   -- @param bool     always_visible Whether the actions should be always visible.
+   -- @return string The HTML for the row actions.
+   --
+   -- protected
+   function Row_Actions (This           : Wp_List_Table;
+                         Actions        : Array_Type; -- List_Type;
+                         Always_Visible : Boolean := False)
+                         return String
+   is (raise Program_Error with "not implemented");
+
+   --
    -- Gets the name of the default primary column.
    --
    -- @since 4.3.0
@@ -338,7 +354,7 @@ is
    -- @return string Name of the default primary column, in this case, an empty string.
    --
    -- protected
-   function Get_Default_Primary_Column_Name (This : Wp_List_Table)
+   function Get_Default_Primary_Column_Name (This : Wp_List_Table'Class)
                                              return String;
 
    --
@@ -349,7 +365,7 @@ is
    -- @return string The name of the primary column.
    --
    -- protected
-   function Get_Primary_Column_Name (This : Wp_List_Table)
+   function Get_Primary_Column_Name (This : Wp_List_Table'Class)
                                      return String;
 
    --
@@ -360,7 +376,7 @@ is
    -- @return array
    --
    -- protected
-   function Get_Column_Info (This : in out Wp_List_Table)
+   function Get_Column_Info (This : in out Wp_List_Table'Class)
                              return Columns_Type; -- Array_Type;
 
    --
@@ -368,7 +384,7 @@ is
    --
    -- @since 3.1.0
    --
-   procedure Display (This : in out Wp_List_Table);
+   procedure Display (This : in out Wp_List_Table'Class);
 
    --
    -- Gets a list of CSS classes for the WP_List_Table table tag.

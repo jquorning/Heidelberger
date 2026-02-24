@@ -341,6 +341,7 @@ is
    -- @since 2.5.0
    --
    procedure Update_Right_Now_Message;
+
 --         theme_name = wp_get_theme();
 --         if ( current_user_can( "switch_themes" ) ) then
 --                 theme_name = sprintf( "<a href="themes.php">%1s</a>", theme_name );
@@ -872,23 +873,25 @@ is
 --         echo "<div class="update-nag notice notice-warning inline">msg</div>";
 -- end;
 
--- --
--- -- Prints the JavaScript templates for update admin notices.
--- --
--- -- @since 4.6.0
--- --
--- -- Template takes one argument with four values:
--- --
--- --     param thenobjectend; data then
--- --         Arguments for admin notice.
--- --
--- --         @type string id        ID of the notice.
--- --         @type string className Class names for the notice.
--- --         @type string message   The notice"s message.
--- --         @type string type      The type of update the notice is for. Either "plugin" or "theme".
--- --     end;
--- --
--- function wp_print_admin_notice_templates() then
+   --
+   -- Prints the JavaScript templates for update admin notices.
+   --
+   -- @since 4.6.0
+   --
+   -- Template takes one argument with four values:
+   --
+   --     param {object} data {
+   --         Arguments for admin notice.
+   --
+   --         @type string id        ID of the notice.
+   --         @type string className Class names for the notice.
+   --         @type string message   The notice"s message.
+   --         @type string type      The type of update the notice is for. Either
+   --                                "plugin" or "theme".
+   --     }
+   --
+   procedure Wp_Print_Admin_Notice_Templates
+   is null;
 --         ?>
 --         <script id="tmpl-wp-updates-admin-notice" type="text/html">
 --                 <div <# if ( data.id ) then #>id="thenthen data.id end;end;"<# end; #> class="notice thenthen data.className end;end;"><p>thenthenthen data.message end;end;end;</p></div>
@@ -953,34 +956,35 @@ is
 --         <?php
 -- end;
 
--- --
--- -- Prints the JavaScript templates for update and deletion rows in list tables.
--- --
--- -- @since 4.6.0
--- --
--- -- The update template takes one argument with four values:
--- --
--- --     param thenobjectend; data then
--- --         Arguments for the update row
--- --
--- --         @type string slug    Plugin slug.
--- --         @type string plugin  Plugin base name.
--- --         @type string colspan The number of table columns this row spans.
--- --         @type string content The row content.
--- --     end;
--- --
--- -- The delete template takes one argument with four values:
--- --
--- --     param thenobjectend; data then
--- --         Arguments for the update row
--- --
--- --         @type string slug    Plugin slug.
--- --         @type string plugin  Plugin base name.
--- --         @type string name    Plugin name.
--- --         @type string colspan The number of table columns this row spans.
--- --     end;
--- --
--- function wp_print_update_row_templates() then
+   --
+   -- Prints the JavaScript templates for update and deletion rows in list tables.
+   --
+   -- @since 4.6.0
+   --
+   -- The update template takes one argument with four values:
+   --
+   --     param thenobjectend; data then
+   --         Arguments for the update row
+   --
+   --         @type string slug    Plugin slug.
+   --         @type string plugin  Plugin base name.
+   --         @type string colspan The number of table columns this row spans.
+   --         @type string content The row content.
+   --     end;
+   --
+   -- The delete template takes one argument with four values:
+   --
+   --     param thenobjectend; data then
+   --         Arguments for the update row
+   --
+   --         @type string slug    Plugin slug.
+   --         @type string plugin  Plugin base name.
+   --         @type string name    Plugin name.
+   --         @type string colspan The number of table columns this row spans.
+   --     end;
+   --
+   procedure Wp_Print_Update_Row_Templates
+   is null;
 --         ?>
 --         <script id="tmpl-item-update-row" type="text/template">
 --                 <tr class="plugin-update-tr update" id="thenthen data.slug end;end;-update" data-slug="thenthen data.slug end;end;" <# if ( data.plugin ) then #>data-plugin="thenthen data.plugin end;end;"<# end; #>>
@@ -1044,45 +1048,16 @@ is
 --         <?php
 -- end;
 
--- --
--- -- Checks whether auto-updates are enabled.
--- --
--- -- @since 5.5.0
--- --
--- -- @param string type The type of update being checked: "theme" or "plugin".
--- -- @return bool True if auto-updates are enabled for `type`, false otherwise.
--- --
--- function wp_is_auto_update_enabled_for_type( type ) then
---         if ( ! class_exists( "WP_Automatic_Updater" ) ) then
---                 require_once ABSPATH . "wp-admin/includes/class-wp-automatic-updater.php";
---         end;
-
---         updater = new WP_Automatic_Updater();
---         enabled = ! updater.is_disabled();
-
---         switch ( type ) then
---                 case "plugin":
---                         --
---                         -- Filters whether plugins auto-update is enabled.
---                         --
---                         -- @since 5.5.0
---                         --
---                         -- @param bool enabled True if plugins auto-update is enabled, false otherwise.
---                         --
---                         return apply_filters( "plugins_auto_update_enabled", enabled );
---                 case "theme":
---                         --
---                         -- Filters whether themes auto-update is enabled.
---                         --
---                         -- @since 5.5.0
---                         --
---                         -- @param bool enabled True if themes auto-update is enabled, false otherwise.
---                         --
---                         return apply_filters( "themes_auto_update_enabled", enabled );
---         end;
-
---         return false;
--- end;
+   --
+   -- Checks whether auto-updates are enabled.
+   --
+   -- @since 5.5.0
+   --
+   -- @param string type The type of update being checked: "theme" or "plugin".
+   -- @return bool True if auto-updates are enabled for `type`, false otherwise.
+   --
+   function Wp_Is_Auto_Update_Enabled_For_Type (Typ : String)
+                                                return Boolean;
 
 -- --
 -- -- Checks whether auto-updates are forced for an item.
@@ -1100,14 +1075,16 @@ is
 --         return apply_filters( "auto_update_thentypeend;", update, item );
 -- end;
 
--- --
--- -- Determines the appropriate auto-update message to be displayed.
--- --
--- -- @since 5.5.0
--- --
--- -- @return string The update message to be shown.
--- --
--- function wp_get_auto_update_message() then
+   --
+   -- Determines the appropriate auto-update message to be displayed.
+   --
+   -- @since 5.5.0
+   --
+   -- @return string The update message to be shown.
+   --
+   function Wp_Get_Auto_Update_Message
+            return String
+   is (raise Program_Error with "not implemented");
 --         next_update_time = wp_next_scheduled( "wp_version_check" );
 
 --         // Check if the event exists.

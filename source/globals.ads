@@ -96,8 +96,11 @@ is
 
    Login_Grace_Period : Integer := 0;
 
-   Global_Page  : Natural;
-   Global_Paged : Natural;
+   Global_Status : UStrings.UString;
+   Global_Page   : Natural;
+   Global_Paged  : Natural;
+   Global_S      : UStrings.UString;
+   Global_Totals : Array_Type;
 
    --
    --

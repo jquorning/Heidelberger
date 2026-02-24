@@ -5,11 +5,14 @@
 -- @since 5.2.0
 --
 
+with Lists;
+
 with Class_Paused_Extensions_Storages;
 with Class_Recovery_Mode;
 
 package Inc_Error_Protection
 is
+   use Lists;
 
 -- --
 -- -- Get the instance for storing paused plugins.
@@ -34,15 +37,17 @@ is
    function Wp_Paused_Themes
             return Class_Paused_Extensions_Storages.Wp_Paused_Extensions_Storage;
 
--- --
--- -- Get a human readable description of an extension"s error.
--- --
--- -- @since 5.2.0
--- --
--- -- @param array error Error details from `error_get_last()`.
--- -- @return string Formatted error description.
--- --
--- function wp_get_extension_error_description( error ) then
+   --
+   -- Get a human readable description of an extension"s error.
+   --
+   -- @since 5.2.0
+   --
+   -- @param array error Error details from `error_get_last()`.
+   -- @return string Formatted error description.
+   --
+   function Wp_Get_Extension_Error_Description (Error : List_Type)
+                                                return String
+   is (raise Program_Error with "not implemented");
 --         constants   = get_defined_constants( true );
 --         constants   = isset( constants["Core"] ) ? constants["Core"] : constants["internal"];
 --         core_errors = array();

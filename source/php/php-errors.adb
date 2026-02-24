@@ -18,7 +18,7 @@ is
       use Php.Echoing;
    begin
       Echo (Reason);
-      raise Program_Termination;
+      raise PHP_Program_Termination;
    end Die;
 
    ---------------------

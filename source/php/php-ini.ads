@@ -17,4 +17,8 @@ is
                      return Boolean
                      is (True);
 
+   procedure Ini_Set (Option : String;
+                      Value  : Boolean)
+   is null;
+
 end Php.Ini;

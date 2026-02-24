@@ -6,6 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with AWS.URL;
 
+with Logging;
 with UStrings;
 
 package body Php.HTML
@@ -22,10 +23,13 @@ is
             return String
    is
       use UStrings;
+
+      Header : constant String := -Static_Header;
    begin
-      Put_Line ("get_header:");
-      Put_Line ("  " & (-Static_Header));
-      return -Static_Header;
+      Logging.Log ("get_header", "");
+      Logging.Log ("get_header", Header);
+      Static_Header := +"";
+      return Header;
    end Get_Header;
 
    ------------
@@ -38,7 +42,8 @@ is
    is
       use UStrings;
    begin
-      Static_Header := +Header;
+      Append (Static_Header, Header);
+      Append (Static_Header, LF);
    end Header;
 
    ---------------

@@ -5,6 +5,8 @@
 -- @subpackage Administration
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
+
 with Arrays;
 with Array_Lists;
 with Lists;
@@ -490,6 +492,114 @@ is
                Markup      : Boolean := True;
                Translate   : Boolean := True)
                return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Removes directory and files of a plugin for a list of plugins.
+   --
+   -- @since 2.6.0
+   --
+   -- @global WP_Filesystem_Base wp_filesystem WordPress filesystem subclass.
+   --
+   -- @param string[] plugins    List of plugin paths to delete, relative to the
+   --                            plugins directory.
+   -- @param string   deprecated Not used.
+   -- @return bool|null|WP_Error True on success, false if `plugins` is empty,
+   --                            `WP_Error` on failure. `null` if filesystem
+   --                            credentials are required to proceed.
+   --
+   function Delete_Plugins (Plugins    : List_Type;
+                            Deprecated : String := "")
+                            return Boolean
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Tries to resume a single plugin.
+   --
+   -- If a redirect was provided, we first ensure the plugin does not throw fatal
+   -- errors anymore.
+   --
+   -- The way it works is by setting the redirection to the error before trying to
+   -- include the plugin file. If the plugin fails, then the redirection will not
+   -- be overwritten with the success message and the plugin will not be resumed.
+   --
+   -- @since 5.2.0
+   --
+   -- @param string plugin   Single plugin to resume.
+   -- @param string redirect Optional. URL to redirect to. Default empty string.
+   -- @return bool|WP_Error True on success, false if `plugin` was not paused,
+   --                       `WP_Error` on failure.
+   --
+   function Resume_Plugin (Plugin   : String;
+                           Redirect : String := "")
+                           return Bool_Error_Type
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Validates active plugins.
+   --
+   -- Validate all active plugins, deactivates invalid and
+   -- returns an array of deactivated ones.
+   --
+   -- @since 2.5.0
+   -- @return WP_Error[] Array of plugin errors keyed by plugin file name.
+   --
+
+   package Error_Maps is
+      new Ada.Containers.Indefinite_Ordered_Maps
+            (Key_Type     => String,
+             Element_Type => Class_Errors.Wp_Error,
+             "="          => Class_Errors."=");
+
+   subtype Error_List is Error_Maps.Map;
+
+   function Validate_Active_Plugins
+            return Error_List
+   is (Error_Maps.Empty_Map);
+-- is (raise Program_Error with "not implemented");
+
+   --
+   -- Returns drop-ins that WordPress uses.
+   --
+   -- Includes Multisite drop-ins only when is_multisite()
+   --
+   -- @since 3.0.0
+   -- @return array[] Key is file name. The value is an array, with the first value the
+   --  purpose of the drop-in and the second value the name of the constant that must
+   --  be true for the drop-in to be used, or true if no constant is required.
+   --
+   function X_Get_Dropins
+            return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Determines whether a plugin is technically active but was paused while
+   -- loading.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 5.2.0
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return bool True, if in the list of paused plugins. False, if not in the list.
+   --
+   function Is_Plugin_Paused (Plugin : String)
+                              return Boolean
+   is (raise Program_Error with "not implemented");
+
+   --
+   -- Gets the error that was recorded for a paused plugin.
+   --
+   -- @since 5.2.0
+   --
+   -- @param string plugin Path to the plugin file relative to the plugins directory.
+   -- @return array|false Array of error information as returned by `error_get_last()`,
+   --                     or false if none was recorded.
+   --
+   function Wp_Get_Plugin_Error (Plugin : String)
+                                 return List_Type  -- Array_Type;
    is (raise Program_Error with "not implemented");
 
 end Adi_Plugins;

@@ -1137,6 +1137,17 @@ is
 --         return result;
 -- end;
 
+   ----------------------
+   -- Delete_Transient --
+   ----------------------
+
+   procedure Delete_Transient (Transient : String)
+   is
+      Unused : constant Boolean := Delete_Transient (Transient);
+   begin
+      null;
+   end Delete_Transient;
+
    -------------------
    -- Get_Transient --
    -------------------

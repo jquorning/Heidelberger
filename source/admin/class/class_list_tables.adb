@@ -6,6 +6,8 @@
 -- @since 3.1.0
 --
 
+with Ada.Tags;
+
 with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
@@ -16,6 +18,7 @@ with Php.Strings;
 with Array_Lists;
 with Binder;
 with Helpers;
+with Logging;
 with Wp_Common;
 
 with Adi_Screens;
@@ -1139,7 +1142,7 @@ is
    -- Get_Default_Primary_Column_Name --
    -------------------------------------
 
-   function Get_Default_Primary_Column_Name (This : Wp_List_Table)
+   function Get_Default_Primary_Column_Name (This : Wp_List_Table'Class)
                                              return String
    is
       use UStrings;
@@ -1187,7 +1190,7 @@ is
    -- Get_Primary_Column_Name --
    -----------------------------
 
-   function Get_Primary_Column_Name (This : Wp_List_Table)
+   function Get_Primary_Column_Name (This : Wp_List_Table'Class)
                                      return String
    is
       use Php.Strings;
@@ -1228,12 +1231,14 @@ is
    -- Get_Column_Info --
    ---------------------
 
-   function Get_Column_Info (This : in out Wp_List_Table)
+   function Get_Column_Info (This : in out Wp_List_Table'Class)
                              return Columns_Type
    is
+      use Ada.Tags;
       use UStrings;
       use Wp_Common;
    begin
+      Logging.Log ("get_column_info", Expanded_Name (This'Tag));
       -- _column_headers is already set / cached.
 --       if
 --         Isset (This.X_Column_Headers) and then
@@ -1330,7 +1335,7 @@ is
    -- Get_Column_Count --
    ----------------------
 
-   function Get_Column_Count (This : in out Wp_List_Table)
+   function Get_Column_Count (This : in out Wp_List_Table'Class)
                               return Natural
    is
       use Php.Arrays;
@@ -1343,21 +1348,22 @@ is
       Hidden_2 : constant Array_Type := Column_Info.Hidden;
 
       Hidden   : constant List_Type :=
-        List_Intersect (Array_Keys (Columns), Array_Filter (Hidden_2));
+        List_Intersect (Array_Keys (Columns), Empty_List); -- Array_Filter (Hidden_2)); -- XXX
    begin
       return Columns.Length - Natural (Hidden.Length);
 --    return Natural (Array_Maps.Length (Columns) - List_Vectors.Length (Hidden));
    end Get_Column_Count;
 
-   Static_CB_Counter : Positive := 1;
-
    --------------------------
    -- Print_Column_Headers --
    --------------------------
 
-   procedure Print_Column_Headers (This    : in out Wp_List_Table;
+   Static_CB_Counter : Positive := 1;
+
+   procedure Print_Column_Headers (This    : in out Wp_List_Table'Class;
                                    With_Id : Boolean := True)
    is
+      use Ada.Tags;
       use Php.Arrays;
       use Php.Echoing;
       use Php.Lists;
@@ -1397,6 +1403,8 @@ is
          else "asc");
 
    begin
+      Logging.Log ("print_column_headers", Expanded_Name (This'Tag));
+
       if Isset (Columns, "cb") then
 --       static cb_counter = 1;
          Set (Columns, "cb",
@@ -1502,24 +1510,28 @@ is
    -- Display --
    -------------
 
-   procedure Display (This : in out Wp_List_Table)
+   procedure Display (This : in out Wp_List_Table'Class)
    is
+      use Ada.Tags;
       use Php.Echoing;
       use Php.Strings;
       use UStrings;
 
       Singular : constant String := Get_As_String (This.X_Args, "singular");
    begin
+      Logging.Log ("display", Expanded_Name (This'Tag));
+
       This.Display_Tablenav ("top");
       This.Screen.Render_Screen_Reader_Content ("heading_list");
 
       Echo ("<table class=""wp-list-table " &
-            Implode (" ", This.Get_Table_Classes) & ">" & NL);
+            Implode (" ", This.Get_Table_Classes) & """>" & NL);
       Echo ("  <thead>" & NL);
       Echo ("  <tr>" & NL);
       Echo ("    ");
 
-      This.Print_Column_Headers;
+      Print_Column_Headers (Wp_List_Table (This));
+--    This.Print_Column_Headers;
 
       Echo ("  </tr>" & NL);
       Echo ("  </thead>" & NL);

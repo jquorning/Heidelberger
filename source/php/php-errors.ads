@@ -12,24 +12,22 @@ is
             return Array_Type
             is (Empty_Array);
 
-   Program_Termination : exception;
+   PHP_Program_Termination : exception;
 
    procedure Die (Reason : String := "");
 
    type Error_Level_Type is
      record
-        User_Notice  : Boolean;
---      User_Warning : Boolean;
-        Warning      : Boolean;
-        CORE_ERROR : Boolean;
-        CORE_WARNING : Boolean;
-        COMPILE_ERROR : Boolean;
-        ERROR : Boolean;
---      WARNING : Boolean;
-        PARSE : Boolean;
-        USER_ERROR : Boolean;
-        USER_WARNING : Boolean;
-        RECOVERABLE_ERROR : Boolean;
+        User_Notice   : Boolean;
+        Warning       : Boolean;
+        Core_Error    : Boolean;
+        Core_Warning  : Boolean;
+        Compile_Error : Boolean;
+        Error         : Boolean;
+        Parse         : Boolean;
+        User_Error    : Boolean;
+        User_Warning  : Boolean;
+        Recoverable_Error : Boolean;
      end record;
 
    ERROR_ALL      : constant Error_Level_Type := (others => True);

@@ -10,9 +10,9 @@
 -- @since 2.3.0
 --
 
+with Php.Echoing;
 with Php.Strings;
 
-with Arrays;
 with Binder;
 with Constants;
 with UStrings;
@@ -23,7 +23,6 @@ with Inc_Options;
 
 package body Adi_Files
 is
-   use Arrays;
 
    -------------------
    -- Get_Home_Path --
@@ -70,5 +69,44 @@ is
 
       return Str_Replace ("\\", "/", -Home_Path);
    end Get_Home_Path;
+
+   ---------------------------------------------------
+   -- Wp_Print_Request_Filesystem_Credentials_Modal --
+   ---------------------------------------------------
+
+   procedure Wp_Print_Request_Filesystem_Credentials_Modal
+   is
+      use Php.Echoing;
+      use Inc_Link_Templates;
+
+      Filesystem_Method : String := Get_Filesystem_Method;
+      Filesystem_Credentials_Are_Stored : Boolean;
+      Request_Filesystem_Credentials_2  : Boolean;
+   begin
+      OB_Start;
+
+      Filesystem_Credentials_Are_Stored :=
+        Request_Filesystem_Credentials (Self_Admin_URL);
+
+      OB_End_Clean;
+
+      Request_Filesystem_Credentials_2 :=
+        ("direct" /= Filesystem_Method and then
+         not Filesystem_Credentials_Are_Stored);
+
+      if not Request_Filesystem_Credentials_2 then
+         return;
+      end if;
+
+      Echo ("<div id=""request-filesystem-credentials-dialog"" class=""notification-dialog-wrap request-filesystem-credentials-dialog"">");
+      Echo ("  <div class=""notification-dialog-background""></div>");
+      Echo ("  <div class=""notification-dialog"" role=""dialog"" aria-labelledby=""request-filesystem-credentials-title"" tabindex=""0"">");
+      Echo ("    <div class=""request-filesystem-credentials-dialog-content"">");
+      Echo ("      " & Boolean'Image (Request_Filesystem_Credentials (Site_URL)));
+      Echo ("    </div>");
+      Echo ("  </div>");
+      Echo ("</div>");
+
+   end Wp_Print_Request_Filesystem_Credentials_Modal;
 
 end Adi_Files;
