@@ -36,8 +36,15 @@ is
    is
       use Ada.Strings.Fixed;
 
-      Pos : constant Natural := Index (Needle, Haystack);
+      Haystack_2 : constant String :=
+        (if Haystack = "" then "(uri)" else Haystack);
+
+      Pos : constant Natural := Index (Needle, Haystack_2); -- XXX
    begin
+      if Haystack = "" then
+         Logging.Log ("strstr", "Haystack can not be empty - replaced - warning");
+      end if;
+
       if Pos = 0 then
          return Haystack;
       else

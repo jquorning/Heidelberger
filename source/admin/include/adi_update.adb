@@ -5,6 +5,8 @@
 -- @subpackage Administration
 --
 
+with Wp_Common;
+
 package body Adi_Update
 is
 
@@ -56,5 +58,44 @@ is
 
 --         echo "<p id="wp-version-message">msg</p>";
 -- end;
+
+   ----------------------------------------
+   -- Wp_Is_Auto_Update_Enabled_For_Type --
+   ----------------------------------------
+
+   function Wp_Is_Auto_Update_Enabled_For_Type (Typ : String)
+                                                return Boolean
+   is
+      use Wp_Common;
+
+      -- if ( ! class_exists( "WP_Automatic_Updater" ) ) then
+      --    require_once ABSPATH . "wp-admin/includes/class-wp-automatic-updater.php";
+      -- end if;
+
+--    updater = new WP_Automatic_Updater();
+      Enabled : Boolean := not False; -- updater.is_disabled();
+   begin
+      if  Typ in "plugin" then
+         --
+         -- Filters whether plugins auto-update is enabled.
+         --
+         -- @since 5.5.0
+         --
+         -- @param bool enabled True if plugins auto-update is enabled, false otherwise.
+         --
+         return Apply_Filters ("plugins_auto_update_enabled", Enabled);
+      elsif Typ in "theme" then
+         --
+         -- Filters whether themes auto-update is enabled.
+         --
+         -- @since 5.5.0
+         --
+         -- @param bool enabled True if themes auto-update is enabled, false otherwise.
+         --
+         return Apply_Filters ("themes_auto_update_enabled", Enabled);
+      end if;
+
+      return False;
+   end Wp_Is_Auto_Update_Enabled_For_Type;
 
 end Adi_Update;

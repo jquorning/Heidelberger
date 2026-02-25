@@ -68,8 +68,7 @@ project Heidelberger is
             "-gnatwaCJ",
             "-gnatef",
             "-gnatf",
-            "-gnatyyduxCM0S-0lr" -- 0-r
---          "-gnatyyduxCM0S" -- 0-r
+            "-gnatyyduxCM0S"
          );
 
       when "release" =>

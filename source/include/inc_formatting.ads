@@ -1192,4 +1192,8 @@ is
    function Wp_Unslash (Value : String)
                         return String;
 
+   function Wp_Unslash (Value : String)
+                        return List_Type
+   is (raise Program_Error with "not implemented");
+
 end Inc_Formatting;

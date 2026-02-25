@@ -495,8 +495,15 @@ package body Inc_L10n is
 -- -- @return string Translated text.
 -- --
 -- function esc_html_x( text, context, domain = "default" ) then
---         return esc_html( translate_with_gettext_context( text, context, domain ) );
--- end;
+   function ESC_HTML_X (Text    : String;
+                        Context : String;
+                        Domain  : String := "default")
+                        return String
+   is
+      use Inc_Formatting;
+   begin
+      return ESC_HTML (Translate_With_Gettext_Context (Text, Context, Domain));
+   end ESC_HTML_X;
 
 -- --
 -- -- Translates and retrieves the singular or plural form based on the supplied number.

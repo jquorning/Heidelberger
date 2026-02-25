@@ -19,6 +19,7 @@ with Adm_Index;
 with Adm_Install;
 with Adm_Load_Scripts;
 with Adm_Load_Styles;
+with Adm_Plugins;
 with Adm_Post;
 with Adm_Privacy;
 with Adm_Upgrade;
@@ -79,6 +80,9 @@ is
       elsif Index (URL, "/wp-admin/install.php") /= 0 then
          Adm_Install.Run;
 
+      elsif Index (URL, "/wp-admin/plugins.php") /= 0 then
+         Adm_Plugins.Render;
+
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;
 
@@ -110,8 +114,8 @@ is
       return AWS.Response.Build ("text/html", Payload);
 
    exception
-      when Php.Errors.Program_Termination =>
-         Logging.Log ("binder", "program_termination");
+      when Php.Errors.PHP_Program_Termination =>
+         Logging.Log ("binder", "php_program_termination");
          Logging.Log ("binder", "doing redirect");
          declare
             use Php.HTML;
@@ -120,13 +124,15 @@ is
             Position : constant Natural := Index (Header, " ");
             Location : constant String  := Header (Position + 1 .. Header'Last);
          begin
-            Logging.Log ("binder", "redirect:");
-            Logging.Log ("binder", "  header: " & Header);
-            Logging.Log ("binder", "  locati: " & Location);
-
+            Logging.Log ("binder", "header: " & Header);
+            Logging.Log ("binder", "locati: " & Location);
+            if Location /= "Location:" then
+               Logging.Log ("binder", "location not found -- baffeled!");
+               return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+            end if;
             return AWS.Response.URL (Location => Location);
          end;
-         return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+--       return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
 
       when Redirect_Signal =>
          Logging.Log ("binder", "redirect");

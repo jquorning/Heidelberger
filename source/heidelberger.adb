@@ -11,7 +11,7 @@ begin
    Logging.Silence ("preg_replace");
    Logging.Silence ("preg_replace_callback");
 -- Logging.Silence ("preg_split");
--- Logging.Silence ("inc_plugins.apply_filters");
+   Logging.Silence ("inc_plugins.apply_filters");
    Logging.Silence ("apply_filters");
    Logging.Silence ("x_do_query");
    Logging.Silence ("ado.fetch_object");

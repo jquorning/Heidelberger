@@ -159,6 +159,20 @@ is
    procedure Delete_Option (Option : String);
 
    --
+   -- Deletes a transient.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string transient Transient name. Expected to not be SQL-escaped.
+   -- @return bool True if the transient was deleted, false otherwise.
+   --
+   function Delete_Transient (Transient : String)
+                              return Boolean
+   is (raise Program_Error with "not implemented");
+
+   procedure Delete_Transient (Transient : String);
+
+   --
    -- Saves and restores user interface settings stored in a cookie.
    --
    -- Checks if the current user-settings cookie is updated and stores it. When no

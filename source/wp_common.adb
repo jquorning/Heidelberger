@@ -1517,6 +1517,40 @@ is
       return Value;
    end Apply_Filters;
 
+   function Apply_Filters
+              (Hook_Name   : String;
+               Value       : Array_Type;
+               Plugin_File : String;
+               Plugin_Data : Array_Type;
+               Context     : String)
+               return Array_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+              (Hook_Name   : String;
+               Value       : String;
+               Plugin_File : String;
+               Plugin_Data : Array_Type;
+               Status      : String)
+               return String
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String := "";
                         Arg_3     : String := "")
@@ -1897,6 +1931,28 @@ is
    procedure Do_Action (Hook_Name  : String;
                         Is_Comment : Boolean;
                         Feed       : String)
+   is
+      use Arrayable_Arrays;
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
+   end Do_Action;
+
+   procedure Do_Action (Hook_Name   : String;
+                        Column      : String;
+                        Plugin_File : String;
+                        Plugin_Data : Array_Type)
+   is
+      use Arrayable_Arrays;
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
+   end Do_Action;
+
+   procedure Do_Action (Hook_Name   : String;
+                        Plugin_File : String;
+                        Plugin_Data : Array_Type;
+                        Status      : String)
    is
       use Arrayable_Arrays;
    begin

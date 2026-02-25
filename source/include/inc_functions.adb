@@ -1297,8 +1297,10 @@ is
 
       Query_2 : UString := +Query;
    begin
+      Logging.Log ("remove_query_arg", Query);
       for K of Key loop
-         Query_2 := +Add_Query_Arg (K, "", -Query_2); -- "" was False
+         Logging.Log ("remove_query_arg", "key: " & K);
+         Query_2 := +Add_Query_Arg (K, "(false)", -Query_2); -- "" was False
       end loop;
       return -Query_2;
    end Remove_Query_Arg;
@@ -6258,6 +6260,12 @@ is
 
 --         return 0;
 -- end;
+   function Validate_File (File : String)
+                           return Boolean
+   is
+   begin
+      return Validate_File (File, Allowed_Files => Empty_Array) /= 0;
+   end Validate_File;
 
    ---------------------
    -- Force_SSL_Admin --

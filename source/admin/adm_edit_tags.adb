@@ -1123,9 +1123,9 @@ is
          end;
       end Label_1;
 
-   exception
-      when Php.Errors.Program_Termination =>
-         null;
+-- exception
+--    when Php.Errors.PHP_Program_Termination =>
+--       null;
    end Render;
 
    ------------------

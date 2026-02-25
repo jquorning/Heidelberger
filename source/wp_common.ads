@@ -635,6 +635,22 @@ is
                Old       : Multi_Type)
                return Multi_Type;
 
+   function Apply_Filters
+              (Hook_Name   : String;
+               Value       : Array_Type;
+               Plugin_File : String;
+               Plugin_Data : Array_Type;
+               Context     : String)
+               return Array_Type;
+
+   function Apply_Filters
+              (Hook_Name   : String;
+               Value       : String;
+               Plugin_File : String;
+               Plugin_Data : Array_Type;
+               Status      : String)
+               return String;
+
    function Apply_Filters_Deprecated
               (Hook_Name : String;
                Value     : Array_Type;
@@ -832,5 +848,15 @@ is
    procedure Do_Action (Hook_Name  : String;
                         Is_Comment : Boolean;
                         Feed       : String);
+
+   procedure Do_Action (Hook_Name   : String;
+                        Column      : String;
+                        Plugin_File : String;
+                        Plugin_Data : Array_Type);
+
+   procedure Do_Action (Hook_Name   : String;
+                        Plugin_File : String;
+                        Plugin_Data : Array_Type;
+                        Status      : String);
 
 end Wp_Common;

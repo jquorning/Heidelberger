@@ -1191,6 +1191,9 @@ is
                            Allowed_Files : Array_Type := Empty_Array)
                            return Integer;
 
+   function Validate_File (File : String)
+                           return Boolean;
+
    --
    -- Kills WordPress execution and displays HTML page with an error message.
    --
@@ -1601,6 +1604,32 @@ is
    -- @since 5.1.1
    --
    procedure Wp_Direct_PHP_Update_Button;
+
+   --
+   -- Checks compatibility with the current PHP version.
+   --
+   -- @since 5.2.0
+   --
+   -- @param string required Minimum required PHP version.
+   -- @return bool True if required version is compatible or empty, false if not.
+   --
+   function Is_PHP_Version_Compatible (Required : String)
+                                       return Boolean
+   is (raise Program_Error with "not implementations");
+
+   --
+   -- Checks compatibility with the current WordPress version.
+   --
+   -- @since 5.2.0
+   --
+   -- @global string wp_version The WordPress version string.
+   --
+   -- @param string required Minimum required WordPress version.
+   -- @return bool True if required version is compatible or empty, false if not.
+   --
+   function Is_Wp_Version_Compatible (Required : String)
+                                      return Boolean
+   is (raise Program_Error with "not implementations");
 
    --
    -- Prints the default annotation for the web host altering the "Update PHP" page

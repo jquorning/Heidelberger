@@ -6,29 +6,25 @@
 -- @since 3.1.0
 --
 
+with Logging;
+
 with Class_Terms_List_Tables;
+with Class_Plugins_List_Tables;
 with Class_Posts_List_Tables;
 
 package body Adi_List_Tables
 is
 
--- --
--- -- Fetches an instance of a WP_List_Table class.
--- --
--- -- @since 3.1.0
--- --
--- -- @global string hook_suffix
--- --
--- -- @param string class_name The type of the list table, which is the class name.
--- -- @param array  args       Optional. Arguments to pass to the class. Accepts "screen".
--- -- @return WP_List_Table|false List table object on success, false if the class does not exist.
--- --
--- function _get_list_table( class_name, args = array() ) then
+   ----------------------
+   -- X_Get_List_Table --
+   ----------------------
+
    function X_Get_List_Table (Class_Name : String;
                               Args       : Array_Type := Empty_Array)
                               return Class_List_Tables.Wp_List_Table'Class
    is
    begin
+      Logging.Log ("x_get_list_table", Class_Name);
 
       if Class_Name = "Wp_Posts_List_Table" then
          return Class_Posts_List_Tables.X_Construct;
@@ -36,8 +32,11 @@ is
       elsif Class_Name = "Wp_Terms_List_Table" then
          return Class_Terms_List_Tables.X_Construct;
 
+      elsif Class_Name = "Wp_Plugins_List_Table" then
+         return Class_Plugins_List_Tables.X_Construct;
+
       end if;
-      raise Program_Error;
+      raise Program_Error with "no class_name " & Class_Name;
    end X_Get_List_Table;
 --         core_classes = array(
 --                 -- Site Admin.
