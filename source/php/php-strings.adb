@@ -428,6 +428,24 @@ is
       return Copy;
    end UC_First;
 
+   ------------
+   -- Strcmp --
+   ------------
+
+   function Strcmp (Left  : String;
+                    Right : String)
+                    return Integer
+   is
+   begin
+      if Left < Right then
+         return -1;
+      elsif Right > Left then
+         return 1;
+      else
+         return 0;
+      end if;
+   end Strcmp;
+
    -------------
    -- Strncmp --
    -------------

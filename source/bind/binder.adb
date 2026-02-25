@@ -22,6 +22,7 @@ with Adm_Load_Styles;
 with Adm_Plugins;
 with Adm_Post;
 with Adm_Privacy;
+with Adm_Themes;
 with Adm_Upgrade;
 
 with Wp_Index;
@@ -85,6 +86,9 @@ is
 
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;
+
+      elsif Index (URL, "/wp-admin/themes.php") /= 0 then
+         Adm_Themes.Render;
 
       elsif Index (URL, "/wp-admin/load-scripts.php") /= 0 then
          Adm_Load_Scripts.Run;

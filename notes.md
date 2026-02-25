@@ -48,9 +48,12 @@ Function return values can not be ignored.
 - Remove `is_array`, `is_string` etc. They are known at compile time.
 - Remove `instanceof`. They are known at compile time.
 - Initialize global variables. Remove check of type and run-time initialization.
-- Add subtypes of `String` and `Array_Type` with predicates.
+- Add subtypes of `String` and `Array_Type` with static / dynamic predicates.
 - Move protected function declarations to private parts.
 - Find out what to do with protected and private member variables.
+- Make work with Apache web server.
+- Find out how many exceptions are raised in `Php-Preg`.
+- Get rid of double URL comparisons in `Binder` and `HB_Common`.
 
 ### Not working
 
