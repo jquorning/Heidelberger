@@ -55,7 +55,7 @@ is
                --
                -- Unset the item from the to_do array.
                --
-               if This.Do_Item (Handle, Group) then
+               if Wp_Dependencies'Class (This).Do_Item (Handle, Group) then
                   This.Done.Append (Handle); -- ()
                end if;
 
@@ -164,12 +164,6 @@ is
 
                if not Has_Element (This.Registered.Find (Handle_2)) then
                   Keep_Going := False; -- Item doesn't exist.
-               elsif
-                 not This.Registered (Handle_2).Deps.Is_Empty and then
-                 List_Diff (This.Registered (Handle_2).Deps,
-                            Array_Keys (This.Registered)).Is_Empty
-               then
-                  Keep_Going := False; -- Item requires dependencies that don't exist.
                elsif
                  not This.Registered (Handle_2).Deps.Is_Empty and then
                  not All_Deps (Wp_Dependencies'Class (This),

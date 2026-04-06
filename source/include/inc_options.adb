@@ -296,7 +296,15 @@ is
 
       -- XXX development jq
       if In_List (Option, List_Type'["siteurl", "home"], True) then
-         Value := new Multi_Type'(From_String (As_String (Value.all) & ":8080"));
+         declare
+            Base : constant String := As_String (Value.all);
+         begin
+            if Base /= "" and then Base /= "(null)" then
+               Value := new Multi_Type'(From_String (Base & ":8080"));
+            else
+               Value := new Multi_Type'(From_String ("http://localhost:8080"));
+            end if;
+         end;
       end if;
 
       if

@@ -15,6 +15,7 @@
 -- @package WordPress
 --
 
+
 with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
@@ -1952,7 +1953,7 @@ is
       Styles.Text_Direction  := +(if Is_RTL then "rtl" else "ltr");
 --    Styles.Text_Direction  := function_exists( "is_rtl" ) && (if is_rtl then "rtl" else "ltr");
       Styles.Default_Dirs :=
-        ["/wp-admin/", "/ wp-includes/css/"];
+        ["/wp-admin/", "/wp-includes/css/"];
 
       -- Open Sans is no longer used by core, but may be relied upon by themes
       -- and plugins.

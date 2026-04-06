@@ -87,29 +87,44 @@ is
       use GNAT.Regpat;
       use UStrings;
 
-      Buffer : UString;
-      Index  : Natural := Replacement'First;
+      Repl  : UString;
+      Index : Natural := Replacement'First;
    begin
+      -- Build substitution string from Replacement, expanding $N references
       while Index <= Replacement'Last loop
          if Replacement (Index) = '$' then
             declare
                M : constant Natural :=
                  Natural'Value (Replacement (Index + 1 .. Index + 1));
             begin
-               if Matches (M) = No_Match then
-                  null;
-               else
-                  Append (Buffer,
+               if Matches (M) /= No_Match then
+                  Append (Repl,
                           Subject (Matches (M).First .. Matches (M).Last));
                end if;
             end;
             Index := Index + 2;
          else
-            Append (Buffer, Replacement (Index));
+            Append (Repl, Replacement (Index));
             Index := Index + 1;
          end if;
       end loop;
-      return -Buffer;
+
+      -- Return: text before match + substitution + text after match
+      if Matches (0) = No_Match then
+         return Subject;
+      end if;
+      declare
+         Before : constant String :=
+           (if Matches (0).First > Subject'First
+            then Subject (Subject'First .. Matches (0).First - 1)
+            else "");
+         After  : constant String :=
+           (if Matches (0).Last < Subject'Last
+            then Subject (Matches (0).Last + 1 .. Subject'Last)
+            else "");
+      begin
+         return Before & (-Repl) & After;
+      end;
    end Replace;
 
    ------------------
@@ -342,7 +357,6 @@ is
 
       Marks : constant Marks_Type := Find_Marks (Pattern);
    begin
-      Logging.Log ("preg_split", "");
       Logging.Log ("preg_split", "  pattern: " & Pattern);
       Logging.Log ("preg_split", "    pyned: " & Pattern (Marks.First .. Marks.Last));
       Logging.Log ("preg_split", "  subject: " & Subject);

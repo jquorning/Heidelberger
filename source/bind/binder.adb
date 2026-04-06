@@ -7,6 +7,8 @@ with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
 
+with Templates_Parser;
+
 with Logging;
 with UStrings;
 
@@ -55,6 +57,7 @@ is
       use Ada.Strings.Fixed;
       use UStrings;
 
+      URI     : constant String := AWS.Status.URI (Request);
       URL     : constant String := AWS.Status.URL (Request);
       Payload : UString;
    begin
@@ -98,6 +101,27 @@ is
 
       elsif Index (URL, "/wp-admin/upgrade.php") /= 0 then
          Adm_Upgrade.Render;
+
+      elsif Index (URI, "/wp-admin/images") /= 0 then
+         declare
+            use Templates_Parser;
+
+            Payload : constant String := Parse (Filename => "page/" & URI);
+         begin
+            return AWS.Response.Build ("image/svg", Payload);
+         end;
+
+      elsif Index (URI, "/wp-includes/css") /= 0
+        or else Index (URI, "/wp-admin/css") /= 0
+      then
+         declare
+            use Templates_Parser;
+
+            Payload : constant String := Parse (Filename => "page/" & URI);
+         begin
+            Logging.Log ("Render", URI);
+            return AWS.Response.Build ("text/css", Payload);
+         end;
 
       elsif Index (URL, "/wp-admin") /= 0 then
          Adm_Index.Render;

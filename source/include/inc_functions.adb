@@ -1091,13 +1091,12 @@ is
                                 URLencode : Boolean := True)
                                 return String
    is
-      use Php.Arrays;
       use Php.Ini;
       use Php.Strings;
       use Php.Types;
       use UStrings;
 
-      Ret : Array_Type;
+      Ret : List_Type;
    begin
       for A in Data.Iterate loop
          declare
@@ -1128,14 +1127,14 @@ is
 
             if Kind_Of (V) = Kind_Array then -- (V) or else Is_Object (V) then
 --          if Is_Array (V) or else Is_Object (V) then
-               Array_Push (Ret, X_HTTP_Build_Query
+               Lists.Append (Ret, X_HTTP_Build_Query
                   (As_Array (V), "", Sep, -K, URLencode));
 
             elsif URLencode then
-               Array_Push (Ret, -(K & "=" & Php.HTML.URL_Encode (-V_2)));
+               Lists.Append (Ret, -(K & "=" & Php.HTML.URL_Encode (-V_2)));
 
             else
-               Array_Push (Ret, -(K & "=" & (-V_2)));
+               Lists.Append (Ret, -(K & "=" & (-V_2)));
             end if;
          end;
          << Continue >>
@@ -1208,8 +1207,6 @@ is
          Protocol := Null_UString;
       end if;
 
-      Logging.Log ("add_query_arg", "uri_2: " & (-URI_2));
-
       declare
          URI_3 : constant String := -URI_2;
          Query : UString;
@@ -1263,7 +1260,7 @@ is
       declare
          Ret_6 : constant String := Build_Query (Querys);
          Ret_5 : constant String := Trim (Ret_6, "?");
-         Ret_4 : constant String := Preg_Replace ("#=(&|)#", "$1", Ret_5);
+         Ret_4 : constant String := Preg_Replace ("#=(&|$)#", "$1", Ret_5);
          Ret_3 : constant String := (-Protocol) & (-Base) & Ret_4 & (-Frag);
          Ret_2 : constant String := Rtrim (Ret_3, "?");
          Ret_1 : constant String := Str_Replace ("?#", "#", Ret_2);

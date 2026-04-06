@@ -4342,11 +4342,10 @@ is
          URL_2 : constant String := Str_Replace (" ", "%20", Ltrim (URL));
 
          URL_3 : constant String :=
-           Preg_Replace ("|[^a-z0-9-~+_.?#=!&;,/:%@\|*\'()\[\]\\x80-\\xff]|i", "",
-                         URL_2);
+           Preg_Replace
+             ("|[^a-z0-9-~+_.?#=!&;,/:%@\|*\'()\[\]\\x80-\\xff]|i", "", URL_2);
 
-         Strip : constant List_Type :=
-           ["%0d", "%0a", "%0D", "%0A"];
+         Strip : constant List_Type := ["%0d", "%0a", "%0D", "%0A"];
 
          URL_4 : constant String :=
            (if 0 /= Stripos (URL_3, "mailto:")
@@ -4359,10 +4358,12 @@ is
          -- it needs http:// prepended (unless it's a relative link
          -- starting with /, # or ?, or a PHP file).
          Cond : constant Boolean :=
-           Strpos (URL_5, ":") = 0 and then
-           not In_List (URL_5 (URL_5'First) & "",
-                        List_Type'["/", "#", "?"], True) and then
-           not Preg_Match ("/^[a-z0-9-]+?\.php/i", URL_5);
+           Strpos (URL_5, ":") = 0
+           and then not In_List
+                          (URL_5 (URL_5'First) & "",
+                           List_Type'["/", "#", "?"],
+                           True)
+           and then not Preg_Match ("/^[a-z0-9-]+?\.php/i", URL_5);
 
          URL_6 : constant String :=
            (if Cond then "http://" & URL_5 else URL_5);
@@ -4371,23 +4372,22 @@ is
          URL_7 : constant String :=
            (if "display" = X_Context then Display (URL_6) else URL_6);
 
-         URL_8 : UString;
+         URL_8 : UString := +URL_7;
       begin
-         if "" = URL_3 then  -- Yes, URL_3
+         if "" = URL_3 then
+            -- Yes, URL_3
             return URL_3;
          end if;
 
-         if
-           0 /= Strpos (URL_7, "[") or else
-           0 /= Strpos (URL_7, "]")
-         then
+         if 0 /= Strpos (URL_7, "[") or else 0 /= Strpos (URL_7, "]") then
             declare
                Parsed : constant Array_Type := Wp_Parse_URL (URL_7);
                Front  : UString;
             begin
                if Isset (Parsed, "scheme") then
                   Append (Front, Get_As_String (Parsed, "scheme") & "://");
-               elsif '/' = URL_7 (URL_7'First) then -- [0]
+               elsif '/' = URL_7 (URL_7'First) then
+                  -- [0]
                   Append (Front, "//");
                end if;
 
@@ -4412,10 +4412,13 @@ is
                end if;
 
                declare
-                  End_Dirty : constant String := Str_Replace (-Front, "", URL_7);
+                  End_Dirty : constant String :=
+                    Str_Replace (-Front, "", URL_7);
                   End_Clean : constant String :=
-                    Str_Replace (List_Type'["[", "]"],
-                                 List_Type'["%5B", "%5D"], End_Dirty);
+                    Str_Replace
+                      (List_Type'["[", "]"],
+                       List_Type'["%5B", "%5D"],
+                       End_Dirty);
                begin
                   URL_8 := +Str_Replace (End_Dirty, End_Clean, URL_7);
                end;
@@ -4423,7 +4426,7 @@ is
          end if;
 
          declare
-            URL_9 : constant String := -URL_8;
+            URL_9             : constant String := -URL_8;
             Good_Protocol_URL : UString;
          begin
             if URL_9'Length >= 1 and then '/' = URL_9 (URL_9'First) then
@@ -4432,10 +4435,12 @@ is
                declare
                   Protocols_2 : constant List_Type :=
                     (if Protocols in [] -- not Is_Array (Protocols)
-                     then Wp_Allowed_Protocols
+                     then
+                       Wp_Allowed_Protocols
                      else Protocols);
                begin
-                  Good_Protocol_URL := +Wp_KSES_Bad_Protocol (URL_9, Protocols_2);
+                  Good_Protocol_URL :=
+                    +Wp_KSES_Bad_Protocol (URL_9, Protocols_2);
                   if Strtolower (-Good_Protocol_URL) /= Strtolower (URL_9) then
                      return "";
                   end if;
@@ -4452,8 +4457,9 @@ is
             -- @param string _context          If "display", replace ampersands
             --                                  and single quotes only.
             --
-            return Apply_Filters ("clean_url", -Good_Protocol_URL,
-                                  Original_URL, X_Context);
+            return
+              Apply_Filters
+                ("clean_url", -Good_Protocol_URL, Original_URL, X_Context);
          end;
       end;
    end ESC_URL;

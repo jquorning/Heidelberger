@@ -25,24 +25,29 @@ package body HB_Server is
    is
       use AWS.Services.Dispatchers.URI;
    begin
-      Register (Dispatcher, "/wp-admin/credits.php",      Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/privacy.php",      Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/about.php",        Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/freedoms.php",     Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/edit.php",         Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/edit-tags.php",    Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/install.php",      Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/load-scripts.php", Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/load-styles.php",  Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/plugins.php",      Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/post.php",         Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/themes.php",       Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/upgrade.php",      Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin",                  Binder.Render'Access);
-      Register (Dispatcher, "/wp-admin/",                 Binder.Render'Access);
-      Register (Dispatcher, "/wp-login.php",              Binder.Render'Access);
-      Register (Dispatcher, "",                           Binder.Render'Access);
-      Register (Dispatcher, "/",                          Binder.Render'Access);
+      Register_Regexp (Dispatcher, "/wp-admin/images/.*", Binder.Render'Access);
+      Register_Regexp (Dispatcher, "/wp-admin/css/.*", Binder.Render'Access);
+      Register_Regexp
+        (Dispatcher, "/wp-includes/css/.*", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/credits.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/privacy.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/about.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/freedoms.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit-tags.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/install.php", Binder.Render'Access);
+      Register
+        (Dispatcher, "/wp-admin/load-scripts.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/load-styles.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/plugins.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/post.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/themes.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/upgrade.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/", Binder.Render'Access);
+      Register (Dispatcher, "/wp-login.php", Binder.Render'Access);
+      Register (Dispatcher, "", Binder.Render'Access);
+      Register (Dispatcher, "/", Binder.Render'Access);
    end Register_Dispatcher;
 
    -----------

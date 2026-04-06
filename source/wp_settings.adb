@@ -415,9 +415,6 @@ is
 
 --    $GLOBALS['wp_plugin_paths'] = array();
 
-      -- Added by jq
-      Globals.Initialize;
-
       -- Load must-use plugins.
 --    for Mu_Plugin of Wp_Get_Mu_Plugins loop
 --       X_Wp_Plugin_File := Mu_Plugin;
