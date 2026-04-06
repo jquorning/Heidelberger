@@ -51,9 +51,7 @@ is
    -- Render --
    ------------
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data
-   is
+   function Render (Request : in AWS.Status.Data) return AWS.Response.Data is
       use Ada.Strings.Fixed;
       use UStrings;
 
@@ -61,6 +59,8 @@ is
       URL     : constant String := AWS.Status.URL (Request);
       Payload : UString;
    begin
+      Php.Echoing.Clear_Echo;
+
       Web_Server_To_PHP (Status => Request);
 
       if Index (URL, "/wp-admin/credits.php") /= 0 then
@@ -136,7 +136,7 @@ is
 
       PHP_To_Web_Server;
 
---    Inc_Plugins.Dump_Hooks;
+      --    Inc_Plugins.Dump_Hooks;
 
       Payload := +Php.Echoing.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);
@@ -148,9 +148,9 @@ is
          declare
             use Php.HTML;
 
-            Header   : constant String  := Get_Header;
+            Header   : constant String := Get_Header;
             Position : constant Natural := Index (Header, " ");
-            Location : constant String  := Header (Position + 1 .. Header'Last);
+            Location : constant String := Header (Position + 1 .. Header'Last);
          begin
             Logging.Log ("binder", "header: " & Header);
             Logging.Log ("binder", "locati: " & Location);
@@ -160,16 +160,16 @@ is
             end if;
             return AWS.Response.URL (Location => Location);
          end;
---       return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+         --       return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
 
       when Redirect_Signal =>
          Logging.Log ("binder", "redirect");
          declare
             use Php.HTML;
 
-            Header   : constant String  := Get_Header;
+            Header   : constant String := Get_Header;
             Position : constant Natural := Index (Header, " ");
-            Location : constant String  := Header (Position + 1 .. Header'Last);
+            Location : constant String := Header (Position + 1 .. Header'Last);
          begin
             Logging.Log ("binder", "redirect:");
             Logging.Log ("binder", "  header: " & Header);
