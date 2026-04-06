@@ -298,25 +298,28 @@ is
             else Empty_List);
       begin
          -- Used in the HTML title tag.
-         Globals.Title              := +abs "Update Plugins";
+         Globals.Global_Title := +abs "Update Plugins";
          Globals.Global_Parent_File := +"plugins.php";
 
          Wp_Enqueue_Script ("updates");
          Adm_Admin_Header.Run;
 
          Echo ("<div class=""wrap"">");
-         Echo ("<h1>" & ESC_HTML (-Globals.Title) & "</h1>");
+         Echo ("<h1>" & ESC_HTML (-Globals.Global_Title) & "</h1>");
 
          declare
             URL_2 : constant String :=
-              Self_Admin_URL ("update.php?action=update-selected&amp;plugins=" &
-                              URL_Encode (Implode (",", Plugins)));
+              Self_Admin_URL
+                ("update.php?action=update-selected&amp;plugins="
+                 & URL_Encode (Implode (",", Plugins)));
 
-            URL : constant String := Wp_Nonce_URL (URL_2, "bulk-update-plugins");
+            URL : constant String :=
+              Wp_Nonce_URL (URL_2, "bulk-update-plugins");
          begin
-            Echo (
-              "<iframe src=""" & URL &
-              """ style=""width: 100%; height:100%; min-height:850px;""></iframe>");
+            Echo
+              ("<iframe src="""
+               & URL
+               & """ style=""width: 100%; height:100%; min-height:850px;""></iframe>");
          end;
          Echo ("</div>");
       end;
@@ -1079,9 +1082,13 @@ is
              "_error_nonce"
           ];
       begin
-         Set (X_SERVER, "REQUEST_URI", From_String (
-           Remove_Query_Arg (Query_Args_To_Remove,
-                             Get_As_String (X_SERVER, "REQUEST_URI"))));
+         Set
+           (X_SERVER,
+            "REQUEST_URI",
+            From_String
+              (Remove_Query_Arg
+                 (Query_Args_To_Remove,
+                  Get_As_String (X_SERVER, "REQUEST_URI"))));
 
          Wp_Enqueue_Script ("updates");
 
@@ -1114,17 +1121,19 @@ is
             elsif Action in "resume" then
                Action_Resume (Plugin => Plugin);
 
-            elsif Action in "enable-auto-update" |
-                "disable-auto-update" |
-                "enable-auto-update-selected" |
-                "disable-auto-update-selected"
+            elsif Action
+                  in "enable-auto-update"
+                   | "disable-auto-update"
+                   | "enable-auto-update-selected"
+                   | "disable-auto-update-selected"
             then
-               Action_Auto_Update (Plugin => Plugin,
-                                   Action => Action);
+               Action_Auto_Update (Plugin => Plugin, Action => Action);
 
-            else -- Action
+            else
+               -- Action
                Action_Default (Action => Action);
             end if;  -- Switch
+
          end if;  -- Action
 
          List_Table.Prepare_Items;
@@ -1134,72 +1143,92 @@ is
 
          Add_Screen_Option ("per_page", Build ("default", 999));
 
-         Get_Current_Screen.Add_Help_Tab (
-           To_Array_Type ([
-             Build ("id",      "overview"),
-             Build ("title",   abs "Overview"),
-             Build ("content",
-                    "<p>" & abs "Plugins extend and expand the functionality of WordPress. Once a plugin is installed, you may activate it or deactivate it here." & "</p>" &
-                    "<p>" & abs "The search for installed plugins will search for terms in their name, description, or author." & " <span id=""live-search-desc"" class=""hide-if-no-js"">" & abs "The search results will be updated as you type." & "</span></p>" &
-                    "<p>" & Sprintf (
-                      -- translators: %s: WordPress Plugin Directory URL.
-                      abs "If you would like to see more plugins to choose from, click on the &#8220;Add New&#8221; button and you will be able to browse or search for additional plugins from the <a href=""%s"">WordPress Plugin Directory</a>. Plugins in the WordPress Plugin Directory are designed and developed by third parties, and are compatible with the license WordPress uses. Oh, and they&#8217;re free!",
-                      [abs "https://wordpress.org/plugins/"]
-                    ) & "</p>")
-           ])
-         );
+         Get_Current_Screen.Add_Help_Tab
+           (To_Array_Type
+              ([Build ("id", "overview"),
+                Build ("title", abs "Overview"),
+                Build
+                  ("content",
+                   "<p>"
+                   & abs "Plugins extend and expand the functionality of WordPress. Once a plugin is installed, you may activate it or deactivate it here."
+                   & "</p>"
+                   & "<p>"
+                   & abs "The search for installed plugins will search for terms in their name, description, or author."
+                   & " <span id=""live-search-desc"" class=""hide-if-no-js"">"
+                   & abs "The search results will be updated as you type."
+                   & "</span></p>"
+                   & "<p>"
+                   & Sprintf
+                       (
+                        -- translators: %s: WordPress Plugin Directory URL.
+                        abs "If you would like to see more plugins to choose from, click on the &#8220;Add New&#8221; button and you will be able to browse or search for additional plugins from the <a href=""%s"">WordPress Plugin Directory</a>. Plugins in the WordPress Plugin Directory are designed and developed by third parties, and are compatible with the license WordPress uses. Oh, and they&#8217;re free!",
+                        [abs "https://wordpress.org/plugins/"])
+                   & "</p>")]));
 
-         Get_Current_Screen.Add_Help_Tab (
-           To_Array_Type ([
-             Build ("id",      "compatibility-problems"),
-             Build ("title",   abs "Troubleshooting"),
-             Build ("content",
-                    "<p>" & abs "Most of the time, plugins play nicely with the core of WordPress and with other plugins. Sometimes, though, a plugin&#8217;s code will get in the way of another plugin, causing compatibility issues. If your site starts doing strange things, this may be the problem. Try deactivating all your plugins and re-activating them in various combinations until you isolate which one(s) caused the issue." & "</p>" &
-                    "<p>" & Sprintf (
-                      -- translators: %s: WP_PLUGIN_DIR constant value.
-                      abs "If something goes wrong with a plugin and you cannot use WordPress, delete or rename that file in the %s directory and it will be automatically deactivated.",
-                      ["<code>" & (-Constants.WP_PLUGIN_DIR) & "</code>"]
-                 ) & "</p>")
-           ])
-         );
+         Get_Current_Screen.Add_Help_Tab
+           (To_Array_Type
+              ([Build ("id", "compatibility-problems"),
+                Build ("title", abs "Troubleshooting"),
+                Build
+                  ("content",
+                   "<p>"
+                   & abs "Most of the time, plugins play nicely with the core of WordPress and with other plugins. Sometimes, though, a plugin&#8217;s code will get in the way of another plugin, causing compatibility issues. If your site starts doing strange things, this may be the problem. Try deactivating all your plugins and re-activating them in various combinations until you isolate which one(s) caused the issue."
+                   & "</p>"
+                   & "<p>"
+                   & Sprintf
+                       (
+                        -- translators: %s: WP_PLUGIN_DIR constant value.
+                        abs "If something goes wrong with a plugin and you cannot use WordPress, delete or rename that file in the %s directory and it will be automatically deactivated.",
+                        ["<code>" & (-Constants.WP_PLUGIN_DIR) & "</code>"])
+                   & "</p>")]));
 
          Help_Sidebar_Autoupdates := +"";
 
-         if
-           Current_User_Can ("update_plugins") and then
-           Wp_Is_Auto_Update_Enabled_For_Type ("plugin")
+         if Current_User_Can ("update_plugins")
+           and then Wp_Is_Auto_Update_Enabled_For_Type ("plugin")
          then
-            Get_Current_Screen.Add_Help_Tab (
-              To_Array_Type ([
-                Build ("id",      "plugins-themes-auto-updates"),
-                Build ("title",   abs "Auto-updates"),
-                Build ("content",
-                       "<p>" & abs "Auto-updates can be enabled or disabled for each individual plugin. Plugins with auto-updates enabled will display the estimated date of the next auto-update. Auto-updates depends on the WP-Cron task scheduling system." & "</p>" &
-                       "<p>" & abs "Auto-updates are only available for plugins recognized by WordPress.org, or that include a compatible update system." & "</p>" &
-                       "<p>" & abs "Please note: Third-party themes and plugins, or custom code, may override WordPress scheduling." & "</p>")
-              ])
-            );
+            Get_Current_Screen.Add_Help_Tab
+              (To_Array_Type
+                 ([Build ("id", "plugins-themes-auto-updates"),
+                   Build ("title", abs "Auto-updates"),
+                   Build
+                     ("content",
+                      "<p>"
+                      & abs "Auto-updates can be enabled or disabled for each individual plugin. Plugins with auto-updates enabled will display the estimated date of the next auto-update. Auto-updates depends on the WP-Cron task scheduling system."
+                      & "</p>"
+                      & "<p>"
+                      & abs "Auto-updates are only available for plugins recognized by WordPress.org, or that include a compatible update system."
+                      & "</p>"
+                      & "<p>"
+                      & abs "Please note: Third-party themes and plugins, or custom code, may override WordPress scheduling."
+                      & "</p>")]));
 
-            Help_Sidebar_Autoupdates := +"<p>" & abs "<a href=""https://wordpress.org/support/article/plugins-themes-auto-updates/"">Learn more: Auto-updates documentation</a>" & "</p>";
+            Help_Sidebar_Autoupdates :=
+              +"<p>"
+              & abs "<a href=""https://wordpress.org/support/article/plugins-themes-auto-updates/"">Learn more: Auto-updates documentation</a>"
+              & "</p>";
          end if;
 
-         Get_Current_Screen.Set_Help_Sidebar (
-           "<p><strong>" & abs "For more information:" & "</strong></p>" &
-           "<p>" & abs "<a href=""https://wordpress.org/support/article/managing-plugins/"">Documentation on Managing Plugins</a>" & "</p>" &
-           (-Help_Sidebar_Autoupdates) &
-           "<p>" & abs "<a href=""https://wordpress.org/support/"">Support</a>" & "</p>"
-         );
+         Get_Current_Screen.Set_Help_Sidebar
+           ("<p><strong>"
+            & abs "For more information:"
+            & "</strong></p>"
+            & "<p>"
+            & abs "<a href=""https://wordpress.org/support/article/managing-plugins/"">Documentation on Managing Plugins</a>"
+            & "</p>"
+            & (-Help_Sidebar_Autoupdates)
+            & "<p>"
+            & abs "<a href=""https://wordpress.org/support/"">Support</a>"
+            & "</p>");
 
-         Get_Current_Screen.Set_Screen_Reader_Content (
-           To_Array_Type ([
-             Build ("heading_views",      abs "Filter plugins list"),
-             Build ("heading_pagination", abs "Plugins list navigation"),
-             Build ("heading_list",       abs "Plugins list")
-           ])
-         );
+         Get_Current_Screen.Set_Screen_Reader_Content
+           (To_Array_Type
+              ([Build ("heading_views", abs "Filter plugins list"),
+                Build ("heading_pagination", abs "Plugins list navigation"),
+                Build ("heading_list", abs "Plugins list")]));
 
          -- Used in the HTML title tag.
-         Title       := +abs "Plugins";
+         Global_Title := +abs "Plugins";
          Parent_File := +"plugins.php";
 
          Adm_Admin_Header.Run;
@@ -1208,19 +1237,19 @@ is
             Invalid : constant Error_List := Validate_Active_Plugins;
          begin
             if not Invalid.Is_Empty then
---             for A of Invalid loop
+               --             for A of Invalid loop
                for A in Invalid.Iterate loop
                   declare
-                     Plugin_File : constant String   := Error_Maps.Key     (A);
+                     Plugin_File : constant String := Error_Maps.Key (A);
                      Error       : constant Wp_Error := Error_Maps.Element (A);
                   begin
                      Echo ("<div id=""message"" class=""error""><p>");
-                     Printf (
-                       -- translators: 1: Plugin file, 2: Error message.
-                       abs "The plugin %1s has been deactivated due to an error: %2s",
-                       ["<code>" & ESC_HTML (Plugin_File) & "</code>",
-                        ESC_HTML (Error.Get_Error_Message)]
-                     );
+                     Printf
+                       (
+                        -- translators: 1: Plugin file, 2: Error message.
+                        abs "The plugin %1s has been deactivated due to an error: %2s",
+                        ["<code>" & ESC_HTML (Plugin_File) & "</code>",
+                         ESC_HTML (Error.Get_Error_Message)]);
                   end;
                   Echo ("</p></div>");
                end loop;
@@ -1230,47 +1259,58 @@ is
          if Isset (XX_GET, "error") then
 
             if Isset (XX_GET, "main") then
-               Errmsg := +abs "You cannot delete a plugin while it is active on the main site.";
+               Errmsg :=
+                 +abs "You cannot delete a plugin while it is active on the main site.";
             elsif Isset (XX_GET, "charsout") then
-               Errmsg := +Sprintf (
-                 -- translators: %d: Number of characters.
-                 X_N (
-                   "The plugin generated %d character of <strong>unexpected output</strong> during activation.",
-                   "The plugin generated %d characters of <strong>unexpected output</strong> during activation.",
-                   As_Integer (Get (XX_GET, "charsout"))
-                 ),
-                 [Helpers.Image (As_Integer (Get (XX_GET, "charsout")))]
-               );
-               Append (Errmsg, " " & abs "If you notice &#8220;headers already sent&#8221; messages, problems with syndication feeds or other issues, try deactivating or removing this plugin.");
+               Errmsg :=
+                 +Sprintf
+                    (
+                     -- translators: %d: Number of characters.
+                     X_N
+                       ("The plugin generated %d character of <strong>unexpected output</strong> during activation.",
+                        "The plugin generated %d characters of <strong>unexpected output</strong> during activation.",
+                        As_Integer (Get (XX_GET, "charsout"))),
+                     [Helpers.Image (As_Integer (Get (XX_GET, "charsout")))]);
+               Append
+                 (Errmsg,
+                  " "
+                  & abs "If you notice &#8220;headers already sent&#8221; messages, problems with syndication feeds or other issues, try deactivating or removing this plugin.");
             elsif "resuming" = Get_As_String (XX_GET, "error") then
-               Errmsg := +abs "Plugin could not be resumed because it triggered a <strong>fatal error</strong>.";
+               Errmsg :=
+                 +abs "Plugin could not be resumed because it triggered a <strong>fatal error</strong>.";
             else
-               Errmsg := +abs "Plugin could not be activated because it triggered a <strong>fatal error</strong>.";
+               Errmsg :=
+                 +abs "Plugin could not be activated because it triggered a <strong>fatal error</strong>.";
             end if;
 
-            Echo ("<div id=""message"" class=""error""><p>" & (-Errmsg) & "</p>");
+            Echo
+              ("<div id=""message"" class=""error""><p>" & (-Errmsg) & "</p>");
 
-            if
-              not Isset (XX_GET, "main") and then
-              not Isset (XX_GET, "charsout") and then
-              Isset (XX_GET, "_error_nonce") and then
-              0 /= Wp_Verify_Nonce (Get_As_String (XX_GET, "_error_nonce"),
-                                    "plugin-activation-error_" & Plugin)
+            if not Isset (XX_GET, "main")
+              and then not Isset (XX_GET, "charsout")
+              and then Isset (XX_GET, "_error_nonce")
+              and then 0
+                       /= Wp_Verify_Nonce
+                            (Get_As_String (XX_GET, "_error_nonce"),
+                             "plugin-activation-error_" & Plugin)
             then
                declare
-                  IFrame_URL : constant String := Add_Query_Arg (
-                    To_Array_Type ([
-                      Build ("action",   "error_scrape"),
-                      Build ("plugin",   URL_Encode (Plugin)),
-                      Build ("_wpnonce",
-                             URL_Encode (Get_As_String (XX_GET, "_error_nonce")))
-                    ]),
-                    Admin_URL ("plugins.php")
-                  );
+                  IFrame_URL : constant String :=
+                    Add_Query_Arg
+                      (To_Array_Type
+                         ([Build ("action", "error_scrape"),
+                           Build ("plugin", URL_Encode (Plugin)),
+                           Build
+                             ("_wpnonce",
+                              URL_Encode
+                                (Get_As_String (XX_GET, "_error_nonce")))]),
+                       Admin_URL ("plugins.php"));
                begin
-                  Echo (
-                    "<iframe style=""border:0"" width=""100%"" height=""70px"" " &
-                    "src=""" & ESC_URL (IFrame_URL) & """></iframe>");
+                  Echo
+                    ("<iframe style=""border:0"" width=""100%"" height=""70px"" "
+                     & "src="""
+                     & ESC_URL (IFrame_URL)
+                     & """></iframe>");
                end;
             end if;
 
@@ -1284,23 +1324,26 @@ is
                -- Delete it once we're done.
                Delete_Transient ("plugins_delete_result_" & User_Id);
 
-               if False then -- Is_Wp_Error (Delete_Result) then -- XXX
+               if False then
+                  -- Is_Wp_Error (Delete_Result) then -- XXX
 
-                  Echo ("<div id=""message"" class=""error notice is-dismissible"">");
+                  Echo
+                    ("<div id=""message"" class=""error notice is-dismissible"">");
                   Echo ("        <p>");
 
-                  Printf (
-                    -- translators: %s: Error message.
-                    abs "Plugin could not be deleted due to an error: %s",
-                    [ESC_HTML ("XXX-944")]
---                  [ESC_HTML (Delete_Result.Get_Error_Message)]
-                  );
+                  Printf
+                    (
+                     -- translators: %s: Error message.
+                     abs "Plugin could not be deleted due to an error: %s",
+                     [ESC_HTML ("XXX-944")]
+                     --                  [ESC_HTML (Delete_Result.Get_Error_Message)]
+                    );
 
                   Echo ("        </p>");
                   Echo ("</div>");
                else
-                  Echo (
-                    "<div id=""message"" class=""updated notice is-dismissible"">");
+                  Echo
+                    ("<div id=""message"" class=""updated notice is-dismissible"">");
                   Echo ("        <p>");
 
                   if 1 = As_Integer (Get (XX_GET, "deleted")) then
@@ -1314,43 +1357,62 @@ is
             end;
 
          elsif Isset (XX_GET, "activate") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Plugin activated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Plugin activated.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "activate-multi") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Selected plugins activated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Selected plugins activated.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "deactivate") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Plugin deactivated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Plugin deactivated.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "deactivate-multi") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Selected plugins deactivated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Selected plugins deactivated.");
+            Echo ("</p></div>");
 
          elsif "update-selected" = Action then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("All selected plugins are up to date."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("All selected plugins are up to date.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "resume") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Plugin resumed."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Plugin resumed.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "enabled-auto-update") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Plugin will be auto-updated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Plugin will be auto-updated.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "disabled-auto-update") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Plugin will no longer be auto-updated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Plugin will no longer be auto-updated.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "enabled-auto-update-multi") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
-            X_E ("Selected plugins will be auto-updated."); Echo ("</p></div>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            X_E ("Selected plugins will be auto-updated.");
+            Echo ("</p></div>");
 
          elsif Isset (XX_GET, "disabled-auto-update-multi") then
-            Echo ("<div id=""message"" class=""updated notice is-dismissible""><p>");
+            Echo
+              ("<div id=""message"" class=""updated notice is-dismissible""><p>");
             X_E ("Selected plugins will no longer be auto-updated.");
             Echo ("</p></div>");
          end if;
@@ -1358,26 +1420,28 @@ is
          Echo ("<div class=""wrap"">");
          Echo ("<h1 class=""wp-heading-inline"">");
 
-         Echo (ESC_HTML (-Title));
+         Echo (ESC_HTML (-Global_Title));
 
          Echo ("</h1>");
 
-         if
-           (not Is_Multisite or else Is_Network_Admin) and then
-           Current_User_Can ("install_plugins")
+         if (not Is_Multisite or else Is_Network_Admin)
+           and then Current_User_Can ("install_plugins")
          then
-            Echo ("<a href=""" & ESC_URL (Self_Admin_URL ("plugin-install.php")) &
-            """ class=""page-title-action"">" & ESC_HTML_X ("Add New", "plugin") &
-            "</a>");
+            Echo
+              ("<a href="""
+               & ESC_URL (Self_Admin_URL ("plugin-install.php"))
+               & """ class=""page-title-action"">"
+               & ESC_HTML_X ("Add New", "plugin")
+               & "</a>");
          end if;
 
          if Strlen (S) /= 0 then
             Echo ("<span class=""subtitle"">");
-            Printf (
-              -- translators: %s: Search query.
-              abs "Search results for: %s",
-              ["<strong>" & ESC_HTML (URL_Decode (S)) & "</strong>"]
-            );
+            Printf
+              (
+               -- translators: %s: Search query.
+               abs "Search results for: %s",
+               ["<strong>" & ESC_HTML (URL_Decode (S)) & "</strong>"]);
             Echo ("</span>");
          end if;
 
@@ -1401,7 +1465,8 @@ is
          declare
             Plugins : Array_Type;
          begin
-            Do_Action ("pre_current_active_plugins", Get_As_String (Plugins, "all"));
+            Do_Action
+              ("pre_current_active_plugins", Get_As_String (Plugins, "all"));
          end;
 
          List_Table.Views;
@@ -1412,10 +1477,14 @@ is
 
          Echo ("<form method=""post"" id=""bulk-action-form"">");
 
-         Echo ("<input type=""hidden"" name=""plugin_status"" value=""" &
-               ESC_Attr (-Globals.Global_Status) & """ />");
-         Echo ("<input type=""hidden"" name=""paged"" value=""" &
-               ESC_Attr (Helpers.Image (Globals.Global_Page)) & """ />");
+         Echo
+           ("<input type=""hidden"" name=""plugin_status"" value="""
+            & ESC_Attr (-Globals.Global_Status)
+            & """ />");
+         Echo
+           ("<input type=""hidden"" name=""paged"" value="""
+            & ESC_Attr (Helpers.Image (Globals.Global_Page))
+            & """ />");
 
          List_Table.Display;
          Echo ("</form>");
@@ -1423,9 +1492,9 @@ is
          Echo ("  <span class=""spinner""></span>");
          Echo ("</div>");
 
---         Wp_Print_Request_Filesystem_Credentials_Modal;
---         Wp_Print_Admin_Notice_Templates;
---         Wp_Print_Update_Row_Templates;
+         --         Wp_Print_Request_Filesystem_Credentials_Modal;
+         --         Wp_Print_Admin_Notice_Templates;
+         --         Wp_Print_Update_Row_Templates;
 
          Adm_Admin_Footer.Run;
       end;

@@ -232,7 +232,7 @@ is
                      Aria_Hidden := +" aria-hidden=""true""";
                   end if;
 
-                  Echo ("\n\t<li" & Class_2 & Id & (-Aria_Hidden) & ">");
+                  Echo (NL_TAB & "<li" & Class_2 & Id & (-Aria_Hidden) & ">");
 
                   if Is_Separator then
                      Echo ("<div class=""separator""></div>");
@@ -278,7 +278,7 @@ is
                                  "</div><div class=""wp-menu-name"">" & Title &
                                  "</div></a>");
                         else
-                           Echo ("\n\t<a href=""" & String (Menu_File) & """" &
+                           Echo (NL_TAB & "<a href=""" & String (Menu_File) & """" &
                                  Class_2 & " " & (-Aria_Attributes) & ">" & Arrow &
                                  "<div class=""wp-menu-image" & (-Img_Class) & """" &
                                  (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
@@ -310,7 +310,7 @@ is
                            not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
-                           Echo ("\n\t<a href=""admin.php?page=" &
+                           Echo (NL_TAB & "<a href=""admin.php?page=" &
                                  String (-Item.Menu_Slug) & """" & Class_2 & " " &
                                  (-Aria_Attributes) & ">" & Arrow &
                                  "<div class=""wp-menu-image" & (-Img_Class) & """" &
@@ -318,7 +318,7 @@ is
                                  "</div><div class=""wp-menu-name"">" &
                                  (-Item.Menu_Title) & "</div></a>");
                         else
-                           Echo ("\n\t<a href=""" & String (-Item.Menu_Slug) &
+                           Echo (NL_TAB & "<a href=""" & String (-Item.Menu_Slug) &
                                  """" & Class_2 & " " & (-Aria_Attributes) & ">" &
                                  Arrow & "<div class=""wp-menu-image" & (-Img_Class) &
                                  """" & (-Img_Style) & " aria-hidden=""true"">" &
@@ -330,7 +330,7 @@ is
 
                   if Submenu_Items.Length /= 0 then
 --                if not Empty (Submenu_Items) then
-                     Echo ("\n\t<ul class=""wp-submenu wp-submenu-wrap"">");
+                     Echo (NL_TAB & "<ul class=""wp-submenu wp-submenu-wrap"">");
                      Echo ("<li class=""wp-submenu-head"" aria-hidden=""true"">" &
                            (-Item.Menu_Title) & "</li>");
 
@@ -480,7 +480,7 @@ is
             "<button type=""button"" id=""collapse-button"" aria-label=""" &
             ESC_Attr_XX ("Collapse Main menu") & """ aria-expanded=""true"">" &
             "<span class=""collapse-button-icon"" aria-hidden=""true""></span>" &
-            "<span class=""collapse-button-label"">"" " & abs "Collapse menu" &
+            "<span class=""collapse-button-label"">" & abs "Collapse menu" &
             "</span></button></li>");
    end X_Wp_Menu_Output;
 

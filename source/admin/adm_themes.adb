@@ -309,7 +309,7 @@ is
       end if;
 
       -- Used in the HTML title tag.
-      Globals.Title := +abs "Themes";
+      Globals.Global_Title := +abs "Themes";
       Parent_File   := +Slug_Type'("themes.php");
 
       Build_Help_Tabs;

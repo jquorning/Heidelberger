@@ -241,7 +241,7 @@ is
          Before_Handle : constant String :=
            (if Before_Handle_2 /= "" then
               Sprintf (
-                "<script%s id=""%s-js-before"">\n%s\n</script>\n",
+                "<script%s id=""%s-js-before"">" & NL & "%s" & NL & "</script>" & NL,
                 [
                   1 => -This.Type_Attr,
                   2 => ESC_Attr (Handle),
@@ -252,7 +252,7 @@ is
          After_Handle : constant String :=
            (if After_Handle_2 /= "" then
               Sprintf (
-                "<script%s id=""%s-js-after"">\n%s\n</script>\n",
+                "<script%s id=""%s-js-after"">" & NL & "%s" & NL & "</script>" & NL,
                 [
                   1 => -This.Type_Attr,
                   2 => ESC_Attr (Handle),
@@ -276,7 +276,7 @@ is
          Translations : constant String :=
            (if Translations_2 /= "" then
               Sprintf (
-                "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
+                "<script%s id=""%s-js-translations"">" & NL & "%s" & NL & "</script>" & NL,
                 [
                   1 => -This.Type_Attr,
                   2 => ESC_Attr (Handle),
@@ -384,7 +384,7 @@ is
 
                Tag_3 : constant String := Tag_4 &
                  Sprintf (
-                   "<script%s src=""%s"" id=""%s-js""></script>\n",
+                   "<script%s src=""%s"" id=""%s-js""></script>" & NL,
                    [
                      1 => -This.Type_Attr,
                      2 => Src_4,
