@@ -114,6 +114,10 @@ is
    function Strtolower (Item : String) return String;
    function UC_First   (Item : String) return String;
 
+   function Strcmp (Left  : String;
+                    Right : String)
+                    return Integer;
+
    function Strncmp (Left   : String;
                      Right  : String;
                      Length : Integer)

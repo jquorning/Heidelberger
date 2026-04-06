@@ -3,6 +3,7 @@
 --
 
 with HB_Server;
+with Globals;
 with Logging;
 
 procedure Heidelberger is
@@ -25,6 +26,8 @@ begin
    Logging.Silence ("get_results_base");
    Logging.Silence ("get_table_charset");
    -- Logging.Silence ("do_action");
+
+   Globals.Initialize;
 
    HB_Server.Start;
    HB_Server.Wait;

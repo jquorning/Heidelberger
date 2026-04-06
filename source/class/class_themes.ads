@@ -618,37 +618,25 @@ is
 --                 return this->headers_sanitized[ header ];
 --         end;
 
---         --
---         -- Gets a theme header, formatted and translated for display.
---         --
---         -- @since 3.4.0
---         --
---         -- @param string header    Theme header. Name, Description, Author, Version, ThemeURI, AuthorURI, Status, Tags.
---         -- @param bool   markup    Optional. Whether to mark up the header. Defaults to true.
---         -- @param bool   translate Optional. Whether to translate the header. Defaults to true.
---         -- @return string|array|false Processed header. An array for Tags if `markup` is false, string otherwise.
---         --                            False on failure.
---         --
---         public function display( header, markup = true, translate = true ) then
---                 value = this->get( header );
---                 if ( false === value ) then
---                         return false;
---                 end;
-
---                 if ( translate && ( empty( value ) || ! this->load_textdomain() ) ) then
---                         translate = false;
---                 end;
-
---                 if ( translate ) then
---                         value = this->translate_header( header, value );
---                 end;
-
---                 if ( markup ) then
---                         value = this->markup_header( header, value, translate );
---                 end;
-
---                 return value;
---         end;
+   --
+   -- Gets a theme header, formatted and translated for display.
+   --
+   -- @since 3.4.0
+   --
+   -- @param string header    Theme header. Name, Description, Author, Version,
+   --                         ThemeURI, AuthorURI, Status, Tags.
+   -- @param bool   markup    Optional. Whether to mark up the header. Defaults to
+   --                         true.
+   -- @param bool   translate Optional. Whether to translate the header. Defaults
+   --                         to true.
+   -- @return string|array|false Processed header. An array for Tags if `markup` is
+   --                            false, string otherwise. False on failure.
+   --
+   function Display (This      : Wp_Theme;
+                     Header    : String;
+                     Markup    : Boolean := True;
+                     Translate : Boolean := True)
+                     return String;
 
    --
    -- Sanitizes a theme header.
@@ -1250,37 +1238,23 @@ is
 --                 return this->textdomain_loaded;
 --         end;
 
---         --
---         -- Determines whether the theme is allowed (multisite only).
---         --
---         -- @since 3.4.0
---         --
---         -- @param string check   Optional. Whether to check only the 'network'-wide settings, the 'site'
---         --                        settings, or 'both'. Defaults to 'both'.
---         -- @param int    blog_id Optional. Ignored if only network-wide settings are checked. Defaults to current site.
---         -- @return bool Whether the theme is allowed for the network. Returns true in single-site.
---         --
---         public function is_allowed( check = 'both', blog_id = null ) then
---                 if ( ! is_multisite() ) then
---                         return true;
---                 end;
-
---                 if ( 'both' === check || 'network' === check ) then
---                         allowed = self::get_allowed_on_network();
---                         if ( ! empty( allowed[ this->get_stylesheet() ] ) ) then
---                                 return true;
---                         end;
---                 end;
-
---                 if ( 'both' === check || 'site' === check ) then
---                         allowed = self::get_allowed_on_site( blog_id );
---                         if ( ! empty( allowed[ this->get_stylesheet() ] ) ) then
---                                 return true;
---                         end;
---                 end;
-
---                 return false;
---         end;
+   --
+   -- Determines whether the theme is allowed (multisite only).
+   --
+   -- @since 3.4.0
+   --
+   -- @param string check   Optional. Whether to check only the 'network'-wide
+   --                       settings, the 'site' settings, or 'both'. Defaults to
+   --                       'both'.
+   -- @param int    blog_id Optional. Ignored if only network-wide settings are
+   --                       checked. Defaults to current site.
+   -- @return bool Whether the theme is allowed for the network. Returns true in
+   --              single-site.
+   --
+   function Is_Allowed (This    : Wp_Theme;
+                        Check   : String := "both";
+                        Blog_Id : Integer := 0) -- null
+                        return Boolean;
 
    --
    -- Returns whether this theme is a block-based theme or not.

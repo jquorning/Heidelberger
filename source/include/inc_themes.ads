@@ -5,6 +5,8 @@
 -- @subpackage Theme
 --
 
+with Ada.Containers.Vectors;
+
 with Arrays;
 with Helpers_2;
 with Lists;
@@ -18,11 +20,49 @@ is
    use Arrays;
    use Lists;
 
+   type Theme_Index is new Positive;
+
+   package Theme_Lists is
+     new Ada.Containers.Vectors (Index_Type   => Theme_Index,
+                                 Element_Type => Class_Themes.Wp_Theme,
+                                 "="          => Class_Themes."=");
+
+   subtype Theme_List is Theme_Lists.Vector;
+
 --   package String_Maps is new
 --      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
 --                                              Element_Type => String);
 
    Wp_Theme_Directories : List_Type;
+
+   --
+   -- Returns an array of WP_Theme objects based on the arguments.
+   --
+   -- Despite advances over get_themes(), this function is quite expensive, and grows
+   -- linearly with additional themes. Stick to wp_get_theme() if possible.
+   --
+   -- @since 3.4.0
+   --
+   -- @global array wp_theme_directories
+   --
+   -- @param array args {
+   --     Optional. The search arguments.
+   --
+   --     @type mixed errors  True to return themes with errors, false to return
+   --                          themes without errors, null to return all themes.
+   --                          Default false.
+   --     @type mixed allowed (Multisite) True to return only allowed themes for a
+   --                          site. False to return only disallowed themes for a
+   --                          site. "site" to return only site-allowed themes.
+   --                          "network" to return only network-allowed themes.
+   --                          Null to return all themes. Default null.
+   --     @type int   blog_id (Multisite) The blog ID used to calculate which themes
+   --                          are allowed. Default 0, synonymous for the current blog.
+   -- }
+   -- @return WP_Theme[] Array of WP_Theme objects.
+   --
+   function Wp_Get_Themes (Args : Array_Type := Empty_Array)
+                           return Array_Type; -- Theme_List;
 
    --
    -- Gets a WP_Theme object for a theme.
@@ -269,6 +309,50 @@ is
 
    function Locale_Stylesheet
      is new Helpers_2.Generic_Call_Procedure (Locale_Stylesheet);
+
+   --
+   -- Switches the theme.
+   --
+   -- Accepts one argument: stylesheet of the theme. It also accepts an additional
+   -- function signature of two arguments: template then stylesheet. This is for
+   -- backward compatibility.
+   --
+   -- @since 2.5.0
+   --
+   -- @global array                wp_theme_directories
+   -- @global WP_Customize_Manager wp_customize
+   -- @global array                sidebars_widgets
+   --
+   -- @param string stylesheet Stylesheet name.
+   --
+   procedure Switch_Theme (Stylesheet : String);
+
+   --
+   -- Checks that the active theme has the required files.
+   --
+   -- Standalone themes need to have a `templates/index.html` or `index.php` template
+   -- file. Child themes need to have a `Template` header in the `style.css`
+   -- stylesheet.
+   --
+   -- Does not initially check the default theme, which is the fallback and should
+   -- always exist. But if it doesn't exist, it'll fall back to the latest core
+   -- default theme that does exist. Will switch theme to the fallback theme if
+   -- active theme does not validate.
+   --
+   -- You can use the {@see "validate_current_theme"} filter to return false to disable
+   -- this functionality.
+   --
+   -- @since 1.5.0
+   -- @since 6.0.0 Removed the requirement for block themes to have an `index.php`
+   --              template.
+   --
+   -- @see WP_DEFAULT_THEME
+   --
+   -- @return bool
+   --
+   function Validate_Current_Theme
+            return Boolean
+   is (raise Program_Error with "not implemented");
 
    --
    -- Checks whether a header video is set or not.

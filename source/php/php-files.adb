@@ -26,12 +26,13 @@ is
    -- Is_Dir --
    ------------
 
-   function Is_Dir (Filename : String)
-                    return Boolean
-   is
+   function Is_Dir (Filename : String) return Boolean is
       use Ada.Directories;
    begin
-      return Exists (Filename) and then Kind (Filename) = Directory;
+      return
+        Filename /= ""
+        and then Exists (Filename)
+        and then Kind (Filename) = Directory;
    end Is_Dir;
 
    -------------

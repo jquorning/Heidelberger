@@ -7,6 +7,8 @@ with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
 
+with Templates_Parser;
+
 with Logging;
 with UStrings;
 
@@ -22,6 +24,7 @@ with Adm_Load_Styles;
 with Adm_Plugins;
 with Adm_Post;
 with Adm_Privacy;
+with Adm_Themes;
 with Adm_Upgrade;
 
 with Wp_Index;
@@ -48,15 +51,16 @@ is
    -- Render --
    ------------
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data
-   is
+   function Render (Request : in AWS.Status.Data) return AWS.Response.Data is
       use Ada.Strings.Fixed;
       use UStrings;
 
+      URI     : constant String := AWS.Status.URI (Request);
       URL     : constant String := AWS.Status.URL (Request);
       Payload : UString;
    begin
+      Php.Echoing.Clear_Echo;
+
       Web_Server_To_PHP (Status => Request);
 
       if Index (URL, "/wp-admin/credits.php") /= 0 then
@@ -86,6 +90,9 @@ is
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;
 
+      elsif Index (URL, "/wp-admin/themes.php") /= 0 then
+         Adm_Themes.Render;
+
       elsif Index (URL, "/wp-admin/load-scripts.php") /= 0 then
          Adm_Load_Scripts.Run;
 
@@ -94,6 +101,27 @@ is
 
       elsif Index (URL, "/wp-admin/upgrade.php") /= 0 then
          Adm_Upgrade.Render;
+
+      elsif Index (URI, "/wp-admin/images") /= 0 then
+         declare
+            use Templates_Parser;
+
+            Payload : constant String := Parse (Filename => "page/" & URI);
+         begin
+            return AWS.Response.Build ("image/svg", Payload);
+         end;
+
+      elsif Index (URI, "/wp-includes/css") /= 0
+        or else Index (URI, "/wp-admin/css") /= 0
+      then
+         declare
+            use Templates_Parser;
+
+            Payload : constant String := Parse (Filename => "page/" & URI);
+         begin
+            Logging.Log ("Render", URI);
+            return AWS.Response.Build ("text/css", Payload);
+         end;
 
       elsif Index (URL, "/wp-admin") /= 0 then
          Adm_Index.Render;
@@ -108,7 +136,7 @@ is
 
       PHP_To_Web_Server;
 
---    Inc_Plugins.Dump_Hooks;
+      --    Inc_Plugins.Dump_Hooks;
 
       Payload := +Php.Echoing.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);
@@ -120,9 +148,9 @@ is
          declare
             use Php.HTML;
 
-            Header   : constant String  := Get_Header;
+            Header   : constant String := Get_Header;
             Position : constant Natural := Index (Header, " ");
-            Location : constant String  := Header (Position + 1 .. Header'Last);
+            Location : constant String := Header (Position + 1 .. Header'Last);
          begin
             Logging.Log ("binder", "header: " & Header);
             Logging.Log ("binder", "locati: " & Location);
@@ -132,16 +160,16 @@ is
             end if;
             return AWS.Response.URL (Location => Location);
          end;
---       return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+         --       return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
 
       when Redirect_Signal =>
          Logging.Log ("binder", "redirect");
          declare
             use Php.HTML;
 
-            Header   : constant String  := Get_Header;
+            Header   : constant String := Get_Header;
             Position : constant Natural := Index (Header, " ");
-            Location : constant String  := Header (Position + 1 .. Header'Last);
+            Location : constant String := Header (Position + 1 .. Header'Last);
          begin
             Logging.Log ("binder", "redirect:");
             Logging.Log ("binder", "  header: " & Header);

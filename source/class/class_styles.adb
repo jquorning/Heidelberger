@@ -77,7 +77,7 @@ is
       use Class_Dependency;
       use Inc_Formatting;
    begin
-      if not Do_Item (Wp_Dependencies'Class (This), Handle) then
+      if not Do_Item (Wp_Dependencies (This), Handle) then
          return False;
       end if;
 
@@ -85,12 +85,13 @@ is
          Obj : constant X_Wp_Dependency := This.Registered (Handle);
 
          Ver_2 : constant String :=
-           (if "" = Obj.Ver -- null
-            then ""
-            else (if Obj.Ver /= "" then -Obj.Ver else -This.Default_Version));
+           (if Obj.Ver /= "" then -Obj.Ver else -This.Default_Version);
+
+         Has_Arg : constant Boolean :=
+           This.Args.Contains (Handle) and then This.Args (Handle) /= "";
 
          Ver : constant String :=
-           (if Isset (This.Args (Handle))
+           (if Has_Arg
             then (if Ver_2 /= ""
                   then Ver_2 & "&amp;" & This.Args (Handle)
                   else This.Args (Handle))

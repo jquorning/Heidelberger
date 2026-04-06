@@ -541,6 +541,36 @@ is
       return Get_As_String (This.Headers_Sanitized, Header);
    end Get;
 
+   -------------
+   -- Display --
+   -------------
+
+   function Display (This      : Wp_Theme;
+                     Header    : String;
+                     Markup    : Boolean := True;
+                     Translate : Boolean := True)
+                     return String
+   is (raise Program_Error with "not implemented");
+--                 value = this->get( header );
+--                 if ( false === value ) then
+--                         return false;
+--                 end;
+
+--                 if ( translate && ( empty( value ) || ! this->load_textdomain() ) ) then
+--                         translate = false;
+--                 end;
+
+--                 if ( translate ) then
+--                         value = this->translate_header( header, value );
+--                 end;
+
+--                 if ( markup ) then
+--                         value = this->markup_header( header, value, translate );
+--                 end;
+
+--                 return value;
+--         end;
+
    ---------------------
    -- Sanitize_Header --
    ---------------------
@@ -678,6 +708,36 @@ is
    begin
       return -(Theme_Root & "/" & This.Template);
    end Get_Template_Directory;
+
+   ----------------
+   -- Is_Allowed --
+   ----------------
+
+   function Is_Allowed (This    : Wp_Theme;
+                        Check   : String := "both";
+                        Blog_Id : Integer := 0) -- null
+                        return Boolean
+   is (raise Program_Error with "not implemented");
+--                 if ( ! is_multisite() ) then
+--                         return true;
+--                 end;
+
+--                 if ( 'both' === check || 'network' === check ) then
+--                         allowed = self::get_allowed_on_network();
+--                         if ( ! empty( allowed[ this->get_stylesheet() ] ) ) then
+--                                 return true;
+--                         end;
+--                 end;
+
+--                 if ( 'both' === check || 'site' === check ) then
+--                         allowed = self::get_allowed_on_site( blog_id );
+--                         if ( ! empty( allowed[ this->get_stylesheet() ] ) ) then
+--                                 return true;
+--                         end;
+--                 end;
+
+--                 return false;
+--         end;
 
    --------------------
    -- Is_Block_Theme --
