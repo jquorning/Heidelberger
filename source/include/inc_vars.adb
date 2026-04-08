@@ -20,6 +20,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Globals;
 with Lists;
 with Wp_Common;
 
@@ -51,12 +52,12 @@ is
       if Is_Admin then
          -- wp-admin pages are checked more carefully.
          if Is_Network_Admin then
-            Unused := Preg_Match ("#/wp-admin/network/?(.*?)#i",
+            Unused := Preg_Match ("#/wp-admin/network/?(.*?)$#i",
                                   Php_Self, Self_Matches);
          elsif Is_User_Admin then
-            Unused := Preg_Match ("#/wp-admin/user/?(.*?)#i", Php_Self, Self_Matches);
+            Unused := Preg_Match ("#/wp-admin/user/?(.*?)$#i", Php_Self, Self_Matches);
          else
-            Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
+            Unused := Preg_Match ("#/wp-admin/?(.*?)$#i", Php_Self, Self_Matches);
          end if;
 
          Pagenow := +(if Self_Matches.Length in 1
@@ -67,7 +68,7 @@ is
          if -Pagenow in "" | "index" | "index.php" then
             Pagenow := +"index.php";
          else
-            Unused  := Preg_Match ("#(.*?)(/|)#", -Pagenow, Self_Matches);
+            Unused  := Preg_Match ("#(.*?)(/|)$#", -Pagenow, Self_Matches);
             Pagenow := +Strtolower (Self_Matches (1));
 
             if ".php" /= Substr (-Pagenow, -4, 4) then
@@ -86,6 +87,8 @@ is
          end if;
       end if;
 --    Unset (Self_Matches);
+
+      Globals.Global_Pagenow := Pagenow;
 
       -- Simple browser detection.
       Is_Lynx   := False;
