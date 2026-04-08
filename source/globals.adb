@@ -19,6 +19,9 @@ is
 
       Global_Wp_Styles := Class_Styles.X_Construct;
       Inc_Script_Loader.Wp_Default_Styles (Global_Wp_Styles);
+
+      Set (Wp_Locale.Number_Format, "thousands_sep", From_String (","));
+      Set (Wp_Locale.Number_Format, "decimal_point", From_String ("."));
    end Initialize;
 
 end Globals;

@@ -200,7 +200,7 @@ is
       Admin_Body_Class := +Preg_Replace ("/[^a-z0-9_-]+/i", "-", -Globals.Hook_Suffix);
 
       Echo ("<script type=""text/javascript"">" & NL);
-      Echo ("addLoadEvent = function(func){if(typeof jQuery!=='undefined')jQuery(function(){func();});else if(typeof wpOnload!=='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}}" & NL);
+      Echo ("addLoadEvent = function(func){if(typeof jQuery!=='undefined')jQuery(function(){func();});else if(typeof wpOnload!=='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};" & NL);
       Echo ("var ajaxurl = '" &
             ESC_JS (Admin_URL ("admin-ajax.php", "relative")) &
             "'," & NL);
@@ -209,10 +209,12 @@ is
       Echo ("        typenow = '" &
             ESC_JS (-Globals.Current_Screen.Post_Type) & "'," & NL);
       Echo ("        adminpage = '" & ESC_JS (-Admin_Body_Class) & "'," & NL);
---    Echo ("        thousandsSeparator = '" &
---          ESC_JS (Globals.Wp_Locale.Number_Format ("thousands_sep")) & "'," & NL);
---    Echo ("        decimalPoint = '" &
---          ESC_JS (Globals.Wp_Locale.Number_Format ("decimal_point")) & "'," & NL);
+      Echo ("        thousandsSeparator = '" &
+            ESC_JS (Get_As_String (Globals.Wp_Locale.Number_Format, "thousands_sep")) &
+            "'," & NL);
+      Echo ("        decimalPoint = '" &
+            ESC_JS (Get_As_String (Globals.Wp_Locale.Number_Format, "decimal_point")) &
+            "'," & NL);
       Echo ("        isRtl = " & RTL_To_String (Is_RTL) & ";" & NL); -- (int)
       Echo ("</script>" & NL);
 
