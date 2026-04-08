@@ -330,7 +330,29 @@ is
    is
    begin
       if Offset < 0 then
-         return "XXX-931";
+         declare
+            Start : constant Integer := Item'Last + 1 + Offset;
+         begin
+            if Start < Item'First then
+               return "";
+            end if;
+            if Length = Integer'First then
+               return Item (Start .. Item'Last);
+            elsif Length > 0 then
+               declare
+                  Last : constant Natural :=
+                    Natural'Min (Start + Length - 1, Item'Last);
+               begin
+                  if Start > Item'Last then
+                     return "";
+                  else
+                     return Item (Start .. Last);
+                  end if;
+               end;
+            else
+               return "";
+            end if;
+         end;
       end if;
 
       if Length = 0 then
@@ -680,13 +702,18 @@ is
       use UStrings;
 
       Result : UString;
+      Index  : Natural := Item'First;
    begin
-      for A of Item loop
-         if A = '/' then
-            null;
+      while Index <= Item'Last loop
+         if Item (Index) = '\' and then Index < Item'Last then
+            Index := Index + 1;
+            Append (Result, Item (Index));
+         elsif Item (Index) = '\' then
+            null; -- trailing backslash — drop it
          else
-            Append (Result, A);
+            Append (Result, Item (Index));
          end if;
+         Index := Index + 1;
       end loop;
       return -Result;
    end Strip_Slashes;
