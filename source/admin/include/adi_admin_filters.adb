@@ -76,11 +76,13 @@ is
       end if;
 
 -- add_action( "admin_print_scripts", "print_emoji_detection_script" );
--- add_action( "admin_print_scripts", "print_head_scripts", 20 );
+      Add_Action ("admin_print_scripts",
+                  Inc_Script_Loader.Wp_Print_Head_Scripts'Access, 20);
       Add_Action ("admin_print_footer_scripts",
                   Inc_Script_Loader.X_Wp_Footer_Scripts'Access);
 -- add_action( "admin_print_styles", "print_emoji_styles" );
--- add_action( "admin_print_styles", "print_admin_styles", 20 );
+      Add_Action ("admin_print_styles",
+                  Inc_Script_Loader.Print_Admin_Styles'Access, 20);
 
 -- add_action( "admin_print_scripts-index.php", "wp_localize_community_events" );
 -- add_action( "admin_print_scripts-post.php", "wp_page_reload_on_back_button_js" );

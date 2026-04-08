@@ -21,6 +21,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_Functions_Wp_Scripts;
+with Inc_General_Templates;
 with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Load;
@@ -629,7 +630,14 @@ is
    procedure X_Render (This : Wp_Admin_Bar;
                        Root : Node_Args) -- Array_Type)
    is
+      use Php.Echoing;
       use UStrings;
+      use Inc_Formatting;
+      use Inc_General_Templates;
+      use Inc_L10n;
+      use Inc_Load;
+      use Inc_Pluggables;
+      use Inc_Plugins;
 
       Class : UString := +"nojq nojs";
    begin
@@ -638,23 +646,37 @@ is
       if Inc_Vars.Wp_Is_Mobile then
          Class := Class & " mobile";
       end if;
-           -- ?>
-           -- <div id="wpadminbar" class="<?php echo class; ?>">
-           --         <?php if (! is_admin() && ! did_action("wp_body_open")) then ?>
-           --                 <a class="screen-reader-shortcut" href="#wp-toolbar" tabindex="1"><?php _e("Skip to toolbar"); ?></a>
-           --         <?php end; ?>
-           --         <div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="<?php esc_attr_e("Toolbar"); ?>">
-           --                 <?php
-         for Group of Root.Children.all loop
-            This.X_Render_Group (Group);
-         end loop;
-           --                 ?>
-           --         </div>
-           --         <?php if (is_user_logged_in()) : ?>
-           --         <a class="screen-reader-shortcut" href="<?php echo esc_url(wp_logout_url()); ?>"><?php _e("Log Out"); ?></a>
-           --         <?php endif; ?>
-           -- </div>
-           -- <?php
+
+      Echo ("<div id=""wpadminbar"" class=""" & (-Class) & """>");
+
+      if not Is_Admin and then not Did_Action ("wp_body_open") then
+         Echo
+           ("<a class=""screen-reader-shortcut"" href=""#wp-toolbar"" tabindex=""1"">"
+            & (abs "Skip to toolbar")
+            & "</a>");
+      end if;
+
+      Echo
+        ("<div class=""quicklinks"" id=""wp-toolbar"" role=""navigation"" aria-label="""
+         & ESC_Attr (abs "Toolbar")
+         & """>");
+
+      for Group of Root.Children.all loop
+         This.X_Render_Group (Group);
+      end loop;
+
+      Echo ("</div>");
+
+      if Is_User_Logged_In then
+         Echo
+           ("<a class=""screen-reader-shortcut"" href="""
+            & ESC_URL (Wp_Logout_URL)
+            & """>"
+            & (abs "Log Out")
+            & "</a>");
+      end if;
+
+      Echo ("</div>");
    end X_Render;
 
    ------------------------

@@ -2755,7 +2755,6 @@ is
       pragma Unreferenced (Arry);
       Unused : constant List_Type := Wp_Print_Head_Scripts;
    begin
-      raise Program_Error with "not implemented";
       return Empty_Array;
    end Wp_Print_Head_Scripts;
 
