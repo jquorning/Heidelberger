@@ -8,10 +8,10 @@
 with Php.Lists;
 with Php.Types;
 
+with Globals;
 with UStrings;
 with Wp_Common;
 
-with Inc_Plugins;
 with Inc_Users;
 
 package body Adi_Screens
@@ -29,7 +29,6 @@ is
    is
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 --    static column_headers = array();
    begin
       -- if ( is_string( screen ) ) then
@@ -264,5 +263,28 @@ is
 -- function set_current_screen( hook_name = '' ) then
 --         WP_Screen::get( hook_name ).set_current_screen();
 -- end;
+
+   ------------------------
+   -- Set_Current_Screen --
+   ------------------------
+
+   procedure Set_Current_Screen (Hook_Name : String := "")
+   is
+      use UStrings;
+
+      Hook : constant String :=
+        (if Hook_Name /= "" then Hook_Name else -Globals.Hook_Suffix);
+
+      Id : constant String :=
+        (if Hook'Length > 4 and then Hook (Hook'Last - 3 .. Hook'Last) = ".php"
+         then Hook (Hook'First .. Hook'Last - 4)
+         else Hook);
+
+      Base : constant String :=
+        (if Id = "index" then "dashboard" else Id);
+   begin
+      Globals.Current_Screen.Id   := +Base;
+      Globals.Current_Screen.Base := +Base;
+   end Set_Current_Screen;
 
 end Adi_Screens;

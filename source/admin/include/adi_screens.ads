@@ -81,6 +81,6 @@ is
    --                                    hook suffix) used to determine the screen,
    --                                    or an existing screen object.
    --
-   procedure Set_Current_Screen (Hook_Name : String := "") is null;
+   procedure Set_Current_Screen (Hook_Name : String := "");
 
 end Adi_Screens;
