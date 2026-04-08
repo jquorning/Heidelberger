@@ -8,8 +8,7 @@
 
 with Php.Files;
 
-package body Adi_Noop
-is
+package body Adi_Noop is
 
    -- --
    -- -- @ignore
@@ -98,18 +97,20 @@ is
    -- --
    -- function wp_guess_url() {}
 
-   function Get_File (Path : String)
-            return String
-   is
+   --------------
+   -- Get_File --
+   --------------
+
+   function Get_File (Path : String) return String is
       use Php.Files;
 
       Path_2 : constant String := Realpath (Path);
    begin
-      if Path_2 = "" or else not Is_File (Path_2) then -- @
+      if Path_2 = "" or else not Is_File (Path_2) then
          return "";
       end if;
 
-      return File_Get_Contents (Path); -- @
+      return File_Get_Contents (Path);
    end Get_File;
 
 end Adi_Noop;

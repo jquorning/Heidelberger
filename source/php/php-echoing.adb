@@ -11,7 +11,7 @@ is
    use Lists;
 
    package Bounded_Strings is
-     new Ada.Strings.Bounded.Generic_Bounded_Length (Max => 200_000);
+     new Ada.Strings.Bounded.Generic_Bounded_Length (Max => 500_000);
    use Bounded_Strings;
 
    Echo_Buffer : Bounded_String;

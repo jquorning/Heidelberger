@@ -131,10 +131,9 @@ is
 
    type Unique_Flags is (Sort_String);
 
-   function List_Unique (Arry  : List_Type;
+   function List_Unique (List  : List_Type;
                          Flags : Unique_Flags := Sort_String)
-                         return List_Type
-                         is (Empty_List);
+                         return List_Type;
 
    function Get (List : List_Type;
                  Key  : String)

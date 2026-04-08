@@ -85,8 +85,7 @@ is
                             return String;
 
    function URL_Decode (Item : String)
-                        return String
-                        is ("XXX-976");
+                        return String;
 
    procedure Set_Cookie (Name      : String;
                          Value     : String  := "";

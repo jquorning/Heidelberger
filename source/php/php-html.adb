@@ -99,6 +99,15 @@ is
    end Raw_URL_Encode;
 
    ----------------
+   -- URL_Decode --
+   ----------------
+
+   function URL_Decode (Item : String) return String is
+   begin
+      return Item;
+   end URL_Decode;
+
+   ----------------
    -- URL_Encode --
    ----------------
 

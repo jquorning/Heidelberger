@@ -815,7 +815,7 @@ is
          if not First then
             Append (Ret, Separator);
          end if;
-         Append (Ret, Key (A));
+         Append (Ret, As_String (Element (A)));
          First := False;
       end loop;
       return -Ret;

@@ -300,6 +300,23 @@ is
       return Result;
    end List_Reverse;
 
+   -----------------
+   -- List_Unique --
+   -----------------
+
+   function List_Unique
+     (List : List_Type; Flags : Unique_Flags := Sort_String) return List_Type
+   is
+      Result : List_Type;
+   begin
+      for E of List loop
+         if not In_List (E, Result, True) then
+            Append (Result, E);
+         end if;
+      end loop;
+      return Result;
+   end List_Unique;
+
    -----------
    -- Isset --
    -----------

@@ -3,6 +3,7 @@
 --
 
 with Ada.Directories;
+with Ada.Text_IO;
 
 with Dir_Iterators.Recursive;
 with Logging;
@@ -109,6 +110,16 @@ is
       return -Path_2;
    end Dirname;
 
+   --------------
+   -- Realpath --
+   --------------
+
+   function Realpath (Path : String) return String is
+      use Ada.Directories;
+   begin
+      return Full_Name (Path);
+   end Realpath;
+
    ----------
    -- Glob --
    ----------
@@ -157,5 +168,31 @@ is
       end loop;
       return Result;
    end Glob_2;
+
+   -----------------------
+   -- File_Get_Contents --
+   -----------------------
+
+   function File_Get_Contents
+     (Filename         : String;
+      Use_Include_Path : Boolean := False;
+      Context          : Resource := null;
+      Offset           : Integer := 0;
+      Length           : Integer := 0) return String
+   is
+      use Ada.Text_IO;
+      use UStrings;
+
+      File   : Ada.Text_IO.File_Type;
+      Buffer : UString;
+   begin
+      Open (File, In_File, Filename);
+      while not End_Of_File (File) loop
+         Append (Buffer, Get_Line (File));
+         Append (Buffer, NL);
+      end loop;
+      Close (File);
+      return -Buffer;
+   end File_Get_Contents;
 
 end Php.Files;

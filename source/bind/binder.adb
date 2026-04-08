@@ -106,7 +106,7 @@ is
          declare
             use Templates_Parser;
 
-            Payload : constant String := Parse (Filename => "page/" & URI);
+            Payload : constant String := Parse (Filename => URI);
          begin
             return AWS.Response.Build ("image/svg", Payload);
          end;
@@ -117,7 +117,7 @@ is
          declare
             use Templates_Parser;
 
-            Payload : constant String := Parse (Filename => "page/" & URI);
+            Payload : constant String := Parse (Filename => URI);
          begin
             Logging.Log ("Render", URI);
             return AWS.Response.Build ("text/css", Payload);

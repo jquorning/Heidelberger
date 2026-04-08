@@ -64,8 +64,7 @@ is
    is null;
 
    function Realpath (Path : String)
-            return String
-   is (raise Program_Error with "not implemented");
+            return String;
 
    --
    --
@@ -88,8 +87,7 @@ is
                                Context          : Resource := null;
                                Offset           : Integer  := 0;
                                Length           : Integer  := 0)
-            return String
-            is ("XXX-780");
+            return String;
 
    function Sys_Get_Temp_Dir
             return String

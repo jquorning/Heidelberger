@@ -8,7 +8,7 @@ package Constants
 is
 
    X_DIR_X         : constant String := "";
-   ABSPATH         : constant String := "/home/jq/GitHub/Heidelberger/source/";
+   ABSPATH         : constant String := "/home/jq/GitHub/Heidelberger/"; -- source/;
    WP_PLUGIN_DIR   : UStrings.UString;
    WPMU_PLUGIN_DIR : UStrings.UString;
    WP_TEMP_DIR     : UStrings.UString;
