@@ -452,7 +452,7 @@ is
       end if;
 
       for Test of This.Default_Dirs loop -- (array)
-         if 0 = Strpos (Src, Test) then
+         if 1 = Strpos (Src, Test) then
             return True;
          end if;
       end loop;

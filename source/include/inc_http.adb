@@ -14,6 +14,7 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Lists;
 with UStrings;
 
 with Class_HTTP;
@@ -22,6 +23,7 @@ with Inc_Load;
 
 package body Inc_HTTP
 is
+   use Lists;
 
    subtype Wp_Http is Class_HTTP.Wp_Http;
 
@@ -707,18 +709,18 @@ is
       To_Unset : List_Type;
       URL_2 : UString := +URL;
    begin
-      if "//" = Substr (-URL_2, 0, 2) then
+      if Str_Starts_With (-URL_2, "//") then
          To_Unset.Append ("scheme");
          URL_2 := "placeholder:" & URL_2;
 
-      elsif "/" = Substr (URL, 0, 1) then
+      elsif Str_Starts_With (-URL_2, "/") then
          To_Unset.Append ("scheme");
          To_Unset.Append ("host");
          URL_2 := "placeholder://placeholder" & URL_2;
       end if;
 
       declare
-         Parts : constant Array_Type := Parse_URL (-URL_2);
+         Parts : Array_Type := Parse_URL (-URL_2);
       begin
          if Parts = Empty_Array then -- false
             -- Parsing failure.
@@ -727,7 +729,7 @@ is
 
          -- Remove the placeholder values.
          for Key of To_Unset loop
-            Delete (Ref (Parts, Key));
+            Delete (Parts, Key);
          end loop;
 
          return X_Get_Component_From_Parsed_URL_Array (Parts, Component);

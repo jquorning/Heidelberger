@@ -12,12 +12,10 @@
 with Php.HTML;
 
 with Arrays;
-with Lists;
 
 package Inc_HTTP
 is
    use Arrays;
-   use Lists;
 
    --
    -- Returns the initialized WP_Http Object

@@ -2911,7 +2911,9 @@ is
         Globals.Global_Wp_Styles;
 
       Zip : constant String :=
-        (if Compress_CSS and then Constants.ENFORCE_GZIP then "gzip" else "");
+        (if not Compress_CSS then "0"
+         elsif Constants.ENFORCE_GZIP then "gzip"
+         else "1");
 
       Concat : constant String := Trim (-Styles.Concat, ", ");
 

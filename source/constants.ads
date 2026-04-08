@@ -24,10 +24,10 @@ is
    WP_POST_REVISIONS    : Boolean;
    WP_CRON_LOCK_TIMEOUT : Natural;
    WP_RUN_CORE_TESTS    : Boolean;
-   ENFORCE_GZIP         : Boolean;
-   CONCATENATE_SCRIPTS  : Boolean;
-   COMPRESS_SCRIPTS     : Boolean;
-   COMPRESS_CSS         : Boolean;
+   ENFORCE_GZIP         : Boolean := False;
+   CONCATENATE_SCRIPTS  : Boolean := True;
+   COMPRESS_SCRIPTS     : Boolean := False;
+   COMPRESS_CSS         : Boolean := False;
    MULTISITE            : constant Boolean := False;
 
    TEMPLATEPATH     : UStrings.UString;
@@ -87,7 +87,7 @@ is
 
    WP_DEBUG         : Boolean := True;
    WP_DEBUG_DISPLAY : Boolean;
-   SCRIPT_DEBUG     : Boolean := True;
+   SCRIPT_DEBUG     : Boolean := False;
    REST_REQUEST     : Boolean := False;
 
    WP_HTTP_BLOCK_EXTERNAL : Boolean := False;

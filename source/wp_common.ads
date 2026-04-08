@@ -247,6 +247,11 @@ is
                            return List_Type;
 
    function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           Screen    : Class_Screens.Wp_Screen)
+                           return Boolean;
+
+   function Apply_Filters (Hook_Name : String;
                            Value     : Class_Terms.Wp_Term;
                            Cats      : Class_Terms.Wp_Term_Array;
                            Post      : Class_Posts.Wp_Post)

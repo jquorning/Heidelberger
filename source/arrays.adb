@@ -80,6 +80,11 @@ is
                      Key   : String)
    is
    begin
+      if not Array_Maps.Contains (Array_Maps.Map (Arry), Key) then
+         Logging.Log ("delete", "warning: key not in array");
+         return;
+      end if;
+
       Array_Maps.Delete (Array_Maps.Map (Arry), Key);
    end Delete;
 

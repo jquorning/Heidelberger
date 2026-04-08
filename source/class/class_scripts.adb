@@ -839,12 +839,12 @@ is
          return True;
       end if;
 
-      if 0 = Strpos (Src, "/" & (-WPINC) & "/js/l10n") then
+      if 1 = Strpos (Src, "/" & (-WPINC) & "/js/l10n") then
          return False;
       end if;
 
       for Test of This.Default_Dirs loop
-         if 0 = Strpos (Src, Test) then
+         if 1 = Strpos (Src, Test) then
             return True;
          end if;
       end loop;

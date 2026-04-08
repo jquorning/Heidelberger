@@ -3938,7 +3938,7 @@ is
                            if not Is_String (Attr) then
                               Append (HTML, " " & Value_2);
                            else
-                              Append (HTML, " attr=""" & Value_2 & """");
+                              Append (HTML, " " & Attr & "=""" & Value_2 & """");
                            end if;
                         end;
                      end;
@@ -5474,7 +5474,6 @@ is
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Load;
-      use Inc_Plugins;
    begin
       Wp_Enqueue_Script ("thickbox");
       Wp_Enqueue_Style ("thickbox");

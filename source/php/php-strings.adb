@@ -9,6 +9,7 @@ with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
 
+with Helpers;
 with Logging;
 
 package body Php.Strings
@@ -622,7 +623,26 @@ is
    function Str_Split (Item   : String;
                        Length : Natural := 1)
                        return Array_Type
-   is (Empty_Array);
+   is
+      Result : Array_Type;
+      Index  : Natural := Item'First;
+      Chunk  : Natural := 0;
+   begin
+      if Length = 0 or else Item'Length = 0 then
+         return Result;
+      end if;
+      while Index <= Item'Last loop
+         declare
+            Last : constant Natural :=
+              Natural'Min (Index + Length - 1, Item'Last);
+         begin
+            Set (Result, Helpers.Image (Chunk), From_String (Item (Index .. Last)));
+            Index := Last + 1;
+            Chunk := Chunk + 1;
+         end;
+      end loop;
+      return Result;
+   end Str_Split;
 
    -------------
    -- Stristr --

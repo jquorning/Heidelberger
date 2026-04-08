@@ -5,6 +5,7 @@
 with Php.Calendar;
 
 with Arrays;
+with Helpers_2;
 with Lists;
 
 with Class_Errors;
@@ -38,9 +39,9 @@ is
    -- @param int|bool gmt  Optional. Whether to use GMT timezone. Default false.
    -- @return int|string Integer if `type` is "timestamp" or "U", string otherwise.
    --
-   function Current_Time (Typ : String;
-                          GMT : Boolean := False) -- 0
-                          return String;
+   function Current_Time
+     (Typ : String; GMT : Boolean := False) -- 0
+      return String;
 
    --
    -- Retrieves the current time as an object using the site"s timezone.
@@ -49,8 +50,7 @@ is
    --
    -- @return DateTimeImmutable Date and time object.
    --
-   function Current_Datetime
-            return Php.Calendar.Date_Time_Immutable;
+   function Current_Datetime return Php.Calendar.Date_Time_Immutable;
 
    --
    -- Retrieves the timezone of the site as a string.
@@ -71,8 +71,7 @@ is
    --
    -- @return string PHP timezone name or a ±HH:MM offset.
    --
-   function Wp_Timezone_String
-            return String;
+   function Wp_Timezone_String return String;
 
    --
    -- Retrieves the timezone of the site as a `DateTimeZone` object.
@@ -83,8 +82,7 @@ is
    --
    -- @return DateTimeZone Timezone object.
    --
-   function Wp_Timezone
-            return Php.Calendar.Date_Time_Zone;
+   function Wp_Timezone return Php.Calendar.Date_Time_Zone;
 
    --
    -- Retrieves the date in localized format, based on a sum of Unix timestamp and
@@ -112,10 +110,11 @@ is
    --                                       Default false.
    -- @return string The date, translated if locale specifies it.
    --
-   function Date_I18n (Format                : String;
-                       Timestamp_With_Offset : Integer := 0; -- Boolean := False;
-                       GMT                   : Boolean := False)
-                       return String;
+   function Date_I18n
+     (Format                : String;
+      Timestamp_With_Offset : Integer := 0;
+      -- Boolean := False;
+      GMT                   : Boolean := False) return String;
 
    --
    -- Retrieves the date, in localized format.
@@ -137,10 +136,12 @@ is
    -- @return string|false The date, translated if locale specifies it. False on
    --                      invalid timestamp input.
    --
-   function Wp_Date (Format    : String;
-                     Timestamp : Php.Calendar.Time_Type; -- null
-                     Timezone  : Php.Calendar.Date_Time_Zone) -- = null
-                     return String;
+   function Wp_Date
+     (Format    : String;
+      Timestamp : Php.Calendar.Time_Type;
+      -- null
+      Timezone  : Php.Calendar.Date_Time_Zone) -- = null
+      return String;
 
    --
    -- Plucks a certain field out of each object or array in an array.
@@ -162,15 +163,15 @@ is
    --               is null, array keys from the original `$list` will be preserved
    --               in the results.
    --
-   function Wp_List_Pluck (List      : Array_Type;
-                           Field     : String;
-                           Index_Key : String := "")  -- null)
-                           return Array_Type;
+   function Wp_List_Pluck
+     (List : Array_Type; Field : String; Index_Key : String := "")  -- null)
+      return Array_Type;
 
-   function Wp_List_Pluck (List      : Class_Terms.Wp_Term_Array;
-                           Field     : String;
-                           Index_Key : String := "")  -- null)
-                           return Array_Type
+   function Wp_List_Pluck
+     (List      : Class_Terms.Wp_Term_Array;
+      Field     : String;
+      Index_Key : String := "")  -- null)
+      return Array_Type
    is (raise Program_Error with "not implemented");
 
    --
@@ -208,11 +209,12 @@ is
    --                                    false.
    -- @return array The sorted array.
    --
-   function Wp_List_Sort (List          : List_Type;
-                          Orderby       : String := ""; -- = array(),
-                          Order         : String := "ASC";
-                          Preserve_Keys : Boolean := False)
-                          return List_Type;
+   function Wp_List_Sort
+     (List          : List_Type;
+      Orderby       : String := "";
+      -- = array(),
+      Order         : String := "ASC";
+      Preserve_Keys : Boolean := False) return List_Type;
 
    --
    -- Filters/validates a variable as a boolean.
@@ -224,8 +226,7 @@ is
    -- @param mixed var Boolean value to validate.
    -- @return bool Whether the value is validated.
    --
-   function Wp_Validate_Boolean (Var : Multi_Type)
-                                 return Boolean;
+   function Wp_Validate_Boolean (Var : Multi_Type) return Boolean;
 
    --
    -- Serializes data, if needed.
@@ -235,8 +236,7 @@ is
    -- @param string|array|object data Data that might be serialized.
    -- @return mixed A scalar data.
    --
-   function Maybe_Serialize (Data : String)
-                             return Multi_Type;
+   function Maybe_Serialize (Data : String) return Multi_Type;
 
    --
    -- Unserializes data only if it was serialized.
@@ -246,8 +246,7 @@ is
    -- @param string data Data that might be unserialized.
    -- @return mixed Unserialized data can be any type.
    --
-   function Maybe_Unserialize (Data : String)
-                               return Multi_Type;
+   function Maybe_Unserialize (Data : String) return Multi_Type;
 
    --
    -- Checks value to find if it was serialized.
@@ -263,9 +262,8 @@ is
    --                        Default true.
    -- @return bool False if not serialized and true if it was.
    --
-   function Is_Serialized (Data   : String;
-                           Strict : Boolean := True)
-                           return Boolean;
+   function Is_Serialized
+     (Data : String; Strict : Boolean := True) return Boolean;
 
    --
    -- Builds URL query based on an associative and, or indexed array.
@@ -282,8 +280,7 @@ is
    -- @param array $data URL-encode key/value pairs.
    -- @return string URL-encoded string.
    --
-   function Build_Query (Data : Array_Type)
-                         return String;
+   function Build_Query (Data : Array_Type) return String;
 
    --
    -- From php.net (modified by Mark Jaquith to behave like the native PHP5 function).
@@ -303,12 +300,14 @@ is
    --                                result. Default true.
    -- @return string The query string.
    --
-   function X_HTTP_Build_Query (Data      : Array_Type;
-                                Prefix    : String := ""; -- null
-                                Sep       : String := ""; -- null
-                                Key       : String := "";
-                                URLencode : Boolean := True)
-                                return String;
+   function X_HTTP_Build_Query
+     (Data      : Array_Type;
+      Prefix    : String := "";
+      -- null
+      Sep       : String := "";
+      -- null
+      Key       : String := "";
+      URLencode : Boolean := True) return String;
 
    --
    -- Retrieves a modified URL query string.
@@ -352,14 +351,10 @@ is
    -- @param string       $url   Optional. A URL to act upon.
    -- @return string New URL query string (unescaped).
    --
-   function Add_Query_Arg (Key   : Array_Type;
-                           URL   : String := "")
-                           return String;
+   function Add_Query_Arg (Key : Array_Type; URL : String := "") return String;
 
-   function Add_Query_Arg (Key   : String;
-                           Value : String;
-                           URL   : String := "")
-                           return String;
+   function Add_Query_Arg
+     (Key : String; Value : String; URL : String := "") return String;
 
    --
    -- Walks the array while sanitizing the contents.
@@ -370,8 +365,7 @@ is
    -- @param array $array Array to walk while sanitizing contents.
    -- @return array Sanitized $array.
    --
-   function Add_Magic_Quotes (Arry : Array_Type)
-            return Array_Type;
+   function Add_Magic_Quotes (Arry : Array_Type) return Array_Type;
 
    --
    -- Sets up the WordPress query.
@@ -399,8 +393,7 @@ is
    -- @param int code HTTP status code.
    -- @return string Status description if found, an empty string otherwise.
    --
-   function Get_Status_Header_Desc (Code : Integer)
-                                    return String;
+   function Get_Status_Header_Desc (Code : Integer) return String;
 
    --
    -- Sets HTTP status header.
@@ -413,8 +406,7 @@ is
    -- @param int    code        HTTP status code.
    -- @param string description Optional. A custom description for the HTTP status.
    --
-   procedure Status_Header (Code        : Integer;
-                            Description : String := "");
+   procedure Status_Header (Code : Integer; Description : String := "");
 
    --
    -- Gets the header information to prevent caching.
@@ -426,8 +418,7 @@ is
    --
    -- @return array The associative array of header names and field values.
    --
-   function Wp_Get_Nocache_Headers
-            return Array_Type;
+   function Wp_Get_Nocache_Headers return Array_Type;
 
    --
    -- Determines whether WordPress is already installed.
@@ -448,8 +439,7 @@ is
    --
    -- @return bool Whether the site is already installed.
    --
-   function Is_Blog_Installed
-            return Boolean;
+   function Is_Blog_Installed return Boolean;
 
    --
    -- Marks a function as deprecated and inform when it has been used.
@@ -472,9 +462,8 @@ is
    -- @param string $replacement Optional. The function that should have been called.
    --                            Default empty.
    --
-   procedure X_Deprecated_Function (Funct       : String;
-                                    Version     : String;
-                                    Replacement : String := "");
+   procedure X_Deprecated_Function
+     (Funct : String; Version : String; Replacement : String := "");
 
    --
    -- Sets the headers to prevent caching for the different browsers.
@@ -513,10 +502,10 @@ is
    -- @param string     $name      Optional. Nonce name. Default '_wpnonce'.
    -- @return string Escaped URL with nonce action added.
    --
-   function Wp_Nonce_URL (Action_URL : String;
-                          Action     : String := "-1";
-                          Name       : String := "_wpnonce")
-                          return String;
+   function Wp_Nonce_URL
+     (Action_URL : String;
+      Action     : String := "-1";
+      Name       : String := "_wpnonce") return String;
 
    --
    -- Retrieves or display nonce hidden field for forms.
@@ -546,16 +535,19 @@ is
    --                             field. Default true.
    -- @return string Nonce field HTML markup.
    --
-   function Wp_Nonce_Field (Action  : String  := "-1"; -- = -1
-                            Name    : String  := "_wpnonce";
-                            Referer : Boolean := True;
-                            Echo    : Boolean := True)
-                            return String;
+   function Wp_Nonce_Field
+     (Action  : String := "-1";
+      -- = -1
+      Name    : String := "_wpnonce";
+      Referer : Boolean := True;
+      Echo    : Boolean := True) return String;
 
-   procedure Wp_Nonce_Field (Action  : String  := "-1"; -- = -1
-                             Name    : String  := "_wpnonce";
-                             Referer : Boolean := True;
-                             Echo    : Boolean := True);
+   procedure Wp_Nonce_Field
+     (Action  : String := "-1";
+      -- = -1
+      Name    : String := "_wpnonce";
+      Referer : Boolean := True;
+      Echo    : Boolean := True);
 
    --
    -- Retrieves or displays referer hidden field for forms.
@@ -569,8 +561,7 @@ is
    --                              true.
    -- @return string Referer field HTML markup.
    --
-   function Wp_Referer_Field (Echo : Boolean := True)
-                              return String;
+   function Wp_Referer_Field (Echo : Boolean := True) return String;
 
    --
    -- Marks a function argument as deprecated and inform when it has been used.
@@ -600,9 +591,8 @@ is
    --                         used.
    -- @param string $message  Optional. A message regarding the change. Default empty.
    --
-   procedure X_Deprecated_Argument (Funct   : String;
-                                    Version : String;
-                                    Message : String := "");
+   procedure X_Deprecated_Argument
+     (Funct : String; Version : String; Message : String := "");
 
    --
    -- Retrieves referer from '_wp_http_referer' or HTTP referer.
@@ -613,8 +603,7 @@ is
    --
    -- @return string|false Referer URL on success, false on failure.
    --
-   function Wp_Get_Referer
-            return String;
+   function Wp_Get_Referer return String;
 
    --
    -- Retrieves unvalidated referer from "_wp_http_referer" or HTTP referer.
@@ -625,8 +614,7 @@ is
    --
    -- @return string|false Referer URL on success, false on failure.
    --
-   function Wp_Get_Raw_Referer
-            return String;
+   function Wp_Get_Raw_Referer return String;
 
    --
    -- Recursive directory creation based on full path.
@@ -638,8 +626,7 @@ is
    -- @param string target Full path to attempt to create.
    -- @return bool Whether the path was created. True if path already exists.
    --
-   function Wp_Mkdir_P (Target : String)
-                        return Boolean;
+   function Wp_Mkdir_P (Target : String) return Boolean;
 
    --
    -- Tests if a given filesystem path is absolute.
@@ -651,8 +638,7 @@ is
    -- @param string path File path.
    -- @return bool True if path is absolute, false is not absolute.
    --
-   function Path_Is_Absolute (Path : String)
-                              return Boolean;
+   function Path_Is_Absolute (Path : String) return Boolean;
 
    --
    -- Joins two filesystem paths together.
@@ -666,9 +652,7 @@ is
    -- @param string path Path relative to base.
    -- @return string The path with the base or absolute path.
    --
-   function Path_Join (Base : String;
-                       Path : String)
-                       return String;
+   function Path_Join (Base : String; Path : String) return String;
 
    --
    -- Normalizes a filesystem path.
@@ -686,8 +670,7 @@ is
    -- @param string $path Path to normalize.
    -- @return string Normalized path.
    --
-   function Wp_Normalize_Path (Path : String)
-                               return String;
+   function Wp_Normalize_Path (Path : String) return String;
 
    --
    -- Determines a writable directory for temporary files.
@@ -703,8 +686,7 @@ is
    --
    -- @return string Writable temporary directory.
    --
-   function Get_Temp_Dir
-            return String;
+   function Get_Temp_Dir return String;
 
    --
    -- Determines if a directory is writable.
@@ -719,8 +701,7 @@ is
    -- @param string path Path to check for write-ability.
    -- @return bool Whether the path is writable.
    --
-   function Wp_Is_Writable (Path : String)
-                            return Boolean;
+   function Wp_Is_Writable (Path : String) return Boolean;
 
    --
    -- Retrieves uploads directory information.
@@ -735,8 +716,7 @@ is
    --
    -- @return array See wp_upload_dir() for description.
    --
-   function Wp_Get_Upload_Dir
-            return Array_Type;
+   function Wp_Get_Upload_Dir return Array_Type;
 
    --
    -- Returns an array containing the current upload directory"s path and URL.
@@ -779,10 +759,11 @@ is
    --     @type string|false error   False or error message.
    -- }
    --
-   function Wp_Upload_Dir (Time          : String  := ""; -- null
-                           Create_Dir    : Boolean := True;
-                           Refresh_Cache : Boolean := False)
-                           return Array_Type;
+   function Wp_Upload_Dir
+     (Time          : String := "";
+      -- null
+      Create_Dir    : Boolean := True;
+      Refresh_Cache : Boolean := False) return Array_Type;
 
    --
    -- A non-filtered, non-cached version of wp_upload_dir() that doesn't check
@@ -794,8 +775,9 @@ is
    -- @param string time Optional. Time formatted in "yyyy/mm". Default null.
    -- @return array See wp_upload_dir()
    --
-   function X_Wp_Upload_Dir (Time : String := "") -- null
-                             return Array_Type;
+   function X_Wp_Upload_Dir
+     (Time : String := "") -- null
+      return Array_Type;
 
    --
    -- Retrieves the list of mime types and file extensions.
@@ -808,8 +790,7 @@ is
    -- @return string[] Array of mime types keyed by the file extension regex
    --                   corresponding to those types.
    --
-   function Wp_Get_MIME_Types
-            return Array_Type;
+   function Wp_Get_MIME_Types return Array_Type;
 
    --
    -- Retrieves the list of allowed mime types and file extensions.
@@ -821,8 +802,7 @@ is
    --                  corresponding to those types.
    --
    function Get_Allowed_MIME_Types
-     (User : Class_Users.Wp_User := Class_Users.Null_User)
-      return Array_Type;
+     (User : Class_Users.Wp_User := Class_Users.Null_User) return Array_Type;
 
    --
    -- Displays "Are You Sure" message to confirm the action being taken.
@@ -860,10 +840,11 @@ is
    -- @param string message     Optional. A message regarding the change. Default
    --                           empty.
    --
-   procedure X_Deprecated_Hook (Hook        : String;
-                                Version     : String;
-                                Replacement : String := "";
-                                Message     : String := "");
+   procedure X_Deprecated_Hook
+     (Hook        : String;
+      Version     : String;
+      Replacement : String := "";
+      Message     : String := "");
 
    --
    -- Marks something as being incorrectly called.
@@ -881,9 +862,8 @@ is
    -- @param string $message  A message explaining what has been done incorrectly.
    -- @param string $version  The version of WordPress where the message was added.
    --
-   procedure X_Doing_It_Wrong (Funct   : String;
-                               Message : String;
-                               Version : String);
+   procedure X_Doing_It_Wrong
+     (Funct : String; Message : String; Version : String);
 
    --
    -- Merges user defined arguments into defaults array.
@@ -899,17 +879,15 @@ is
    --                                      Default empty array.
    -- @return array Merged user defined values with defaults.
    --
-   function Wp_Parse_Args (Args     : String;
-                           Defaults : Array_Type := Empty_Array)
-                           return Array_Type;
+   function Wp_Parse_Args
+     (Args : String; Defaults : Array_Type := Empty_Array) return Array_Type;
 
-   function Wp_Parse_Args (Args     : Array_Type;
-                           Defaults : Array_Type := Empty_Array)
-                           return Array_Type;
+   function Wp_Parse_Args
+     (Args : Array_Type; Defaults : Array_Type := Empty_Array)
+      return Array_Type;
 
-   function Wp_Parse_Args (Args     : Boolean;
-                           Defaults : Array_Type := Empty_Array)
-                           return Array_Type;
+   function Wp_Parse_Args
+     (Args : Boolean; Defaults : Array_Type := Empty_Array) return Array_Type;
 
    --
    -- Converts a comma- or space-separated list of scalar values to an array.
@@ -919,8 +897,7 @@ is
    -- @param array|string list List of values.
    -- @return array Array of values.
    --
-   function Wp_Parse_List (List : List_Type)
-                           return List_Type;
+   function Wp_Parse_List (List : List_Type) return List_Type;
 
    --
    -- Cleans up an array, comma- or space-separated list of IDs.
@@ -931,8 +908,7 @@ is
    -- @param array|string list List of IDs.
    -- @return int[] Sanitized array of IDs.
    --
-   function Wp_Parse_Id_List (List : List_Type)
-                              return List_Type;
+   function Wp_Parse_Id_List (List : List_Type) return List_Type;
 
    --
    -- Extracts a slice of an array, given a list of keys.
@@ -943,9 +919,8 @@ is
    -- @param array keys  The list of keys.
    -- @return array The array slice.
    --
-   function Wp_Array_Slice_Assoc (Arry : Array_Type;
-                                  Keys : List_Type)
-                                  return Array_Type;
+   function Wp_Array_Slice_Assoc
+     (Arry : Array_Type; Keys : List_Type) return Array_Type;
 
    --
    -- Accesses an array in depth based on a path of keys.
@@ -993,10 +968,11 @@ is
    --                          Default : String := "") -- null
    --                          return Array_Type;
 
-   function X_Wp_Array_Get (Arry    : Array_Type;
-                            Path    : List_Type;
-                            Default : Multi_Type := From_Null) -- Null_Multi_Type)
-                            return Multi_Type;
+   function X_Wp_Array_Get
+     (Arry    : Array_Type;
+      Path    : List_Type;
+      Default : Multi_Type := From_Null) -- Null_Multi_Type)
+      return Multi_Type;
 
    --
    -- Sets an array in depth based on a path of keys.
@@ -1028,9 +1004,8 @@ is
    -- @param array $path  An array of keys describing the path that we want to mutate.
    -- @param mixed $value The value that will be set.
    --
-   procedure X_Wp_Array_Set (Arry  : in out Array_Type;
-                             Path  : List_Type;
-                             Value : Multi_Type);
+   procedure X_Wp_Array_Set
+     (Arry : in out Array_Type; Path : List_Type; Value : Multi_Type);
 
    --
    -- This function is trying to replicate what
@@ -1057,8 +1032,7 @@ is
    --
    -- @return string kebab-cased-string.
    --
-   function X_Wp_To_Kebab_Case (Item : String)
-                                return String;
+   function X_Wp_To_Kebab_Case (Item : String) return String;
 
    --
    -- Filters a list of objects, based on a set of key => value arguments.
@@ -1088,11 +1062,11 @@ is
    --                             of the entire object. Default false.
    -- @return array A list of objects or object fields.
    --
-   function Wp_Filter_Object_List (List     : Array_Type;
-                                   Args     : Array_Type := Empty_Array;
-                                   Operator : String := "and";
-                                   Field    : String := "(false)")
-                                   return Array_Type;
+   function Wp_Filter_Object_List
+     (List     : Array_Type;
+      Args     : Array_Type := Empty_Array;
+      Operator : String := "and";
+      Field    : String := "(false)") return Array_Type;
 
    --
    -- Returns an array of single-use query variable names that can be removed from a
@@ -1106,9 +1080,8 @@ is
    --          return String_Array
    --          is (Empty_String_Array);
 
-   function Wp_Removable_Query_Args
-            return List_Type
-            is (Empty_List);
+   function Wp_Removable_Query_Args return List_Type
+   is (Empty_List);
 
    --
    -- Determines whether a site is the main site of the current network.
@@ -1122,9 +1095,11 @@ is
    -- @return bool True if $site_id is the main site of the network, or if not
    --              running Multisite.
    --
-   function Is_Main_Site (Site_Id    : Integer := 0; -- = null,
-                          Network_Id : Integer := 0) -- = null
-                          return Boolean;
+   function Is_Main_Site
+     (Site_Id    : Integer := 0;
+      -- = null,
+      Network_Id : Integer := 0) -- = null
+      return Boolean;
 
    --
    -- Gets the main site ID.
@@ -1135,8 +1110,9 @@ is
    --                        main site. Defaults to the current network.
    -- @return int The ID of the main site.
    --
-   function Get_Main_Site_Id (Network_Id : Integer := 0) -- null
-                              return Integer;
+   function Get_Main_Site_Id
+     (Network_Id : Integer := 0) -- null
+      return Integer;
 
    --
    -- Converts float number to format based on the locale.
@@ -1150,9 +1126,8 @@ is
    --                        Default 0.
    -- @return string Converted number in string format.
    --
-   function Number_Format_I18n (Number   : Float;
-                                Decimals : Integer := 0)
-                                return String;
+   function Number_Format_I18n
+     (Number : Float; Decimals : Integer := 0) return String;
 
    --
    -- Removes an item or items from a query string.
@@ -1164,13 +1139,12 @@ is
    --                               false.
    -- @return string New URL query string.
    --
-   function Remove_Query_Arg (Key   : String;
-                              Query : String := "") -- False)
-                              return String;
+   function Remove_Query_Arg
+     (Key : String; Query : String := "") -- False)
+      return String;
 
-   function Remove_Query_Arg (Key   : List_Type;
-                              Query : String := "")
-                              return String;
+   function Remove_Query_Arg
+     (Key : List_Type; Query : String := "") return String;
 
    --
    -- Validates a file name and path against an allowed set of rules.
@@ -1187,12 +1161,10 @@ is
    -- @param string[] $allowed_files Optional. Array of allowed files.
    -- @return int 0 means nothing is wrong, greater than 0 means something was wrong.
    --
-   function Validate_File (File          : String;
-                           Allowed_Files : Array_Type := Empty_Array)
-                           return Integer;
+   function Validate_File
+     (File : String; Allowed_Files : Array_Type := Empty_Array) return Integer;
 
-   function Validate_File (File : String)
-                           return Boolean;
+   function Validate_File (File : String) return Boolean;
 
    --
    -- Kills WordPress execution and displays HTML page with an error message.
@@ -1251,12 +1223,12 @@ is
    --                                  Default true.
    -- }
    --
-   procedure Wp_Die (Message : String  := "";
-                     Title   : String  := "";
-                     Code    : Integer := 0); -- , $args = array()
+   procedure Wp_Die
+     (Message : String := "";
+      Title   : String := "";
+      Code    : Integer := 0); -- , $args = array()
 
-   procedure Wp_Die (Error : Class_Errors.Wp_Error)
-   is null;
+   procedure Wp_Die (Error : Class_Errors.Wp_Error) is null;
 
    --
    -- Reads and decodes a JSON file.
@@ -1275,9 +1247,9 @@ is
    -- @return mixed Returns the value encoded in JSON in appropriate PHP type.
    --               `null` is returned if the file is not found, or its content can't be decoded.
    --
-   function Wp_JSON_File_Decode (Filename : String;
-                                 Options  : Array_Type := Empty_Array)
-                                 return Array_Type;
+   function Wp_JSON_File_Decode
+     (Filename : String; Options : Array_Type := Empty_Array)
+      return Array_Type;
 
    --
    -- Determines whether to force SSL used for the Administration Screens.
@@ -1288,8 +1260,9 @@ is
    --                           Default null.
    -- @return bool True if forced, false if not forced.
    --
-   function Force_SSL_Admin (Force : Boolean := False) -- = null )
-                             return Boolean;
+   function Force_SSL_Admin
+     (Force : Boolean := False) -- = null )
+      return Boolean;
 
    procedure Force_SSL_Admin (Force : Boolean := False);
 
@@ -1303,8 +1276,7 @@ is
    --
    -- @return string The guessed URL.
    --
-   function Wp_Guess_URL
-            return String;
+   function Wp_Guess_URL return String;
 
    --
    -- Temporarily suspends cache additions.
@@ -1322,8 +1294,8 @@ is
    --                     false.
    -- @return bool The current suspend setting
    --
-   function Wp_Suspend_Cache_Addition (Suspend : Boolean := False)
-                                       return Boolean;
+   function Wp_Suspend_Cache_Addition
+     (Suspend : Boolean := False) return Boolean;
 
    --
    -- Determines whether a network is the main network of the Multisite installation.
@@ -1333,8 +1305,7 @@ is
    -- @param int network_id Optional. Network ID to test. Defaults to current network.
    -- @return bool True if network_id is the main network, or if not running Multisite.
    --
-   function Is_Main_Network (Network_Id : Integer := 0)
-                             return Boolean;
+   function Is_Main_Network (Network_Id : Integer := 0) return Boolean;
 
    --
    -- Gets the main network ID.
@@ -1343,8 +1314,7 @@ is
    --
    -- @return int The ID of the main network.
    --
-   function Get_Main_Network_Id
-            return Integer;
+   function Get_Main_Network_Id return Integer;
 
    --
    -- Retrieves a list of protocols to allow in HTML attributes.
@@ -1365,8 +1335,7 @@ is
    --                  This covers all common link protocols, except for 'javascript'
    --                  which should not be allowed for untrusted users.
    --
-   function Wp_Allowed_Protocols
-            return List_Type;
+   function Wp_Allowed_Protocols return List_Type;
 
    --
    -- Attempts to raise the PHP memory limit for memory intensive processes.
@@ -1382,8 +1351,7 @@ is
    --                        invoked. Default 'admin'.
    -- @return int|string|false The limit that was set or false on failure.
    --
-   function Wp_Raise_Memory_Limit (Context : String := "admin")
-                                   return Integer;
+   function Wp_Raise_Memory_Limit (Context : String := "admin") return Integer;
 
    --
    -- Encodes a variable into JSON, with some sanity checks.
@@ -1397,10 +1365,9 @@ is
    --                       greater than 0. Default 512.
    -- @return string|false The JSON encoded string, or false if it cannot be encoded.
    --
-   function Wp_JSON_Encode (Data    : Multi_Type;
-                            Options : Integer := 0;
-                            Depth   : Integer := 512)
-                            return String;
+   function Wp_JSON_Encode
+     (Data : Multi_Type; Options : Integer := 0; Depth : Integer := 512)
+      return String;
 
    --
    -- Performs sanity checks on data that shall be encoded to JSON.
@@ -1417,9 +1384,8 @@ is
    -- @param int   depth Maximum depth to walk through data. Must be greater than 0.
    -- @return mixed The sanitized data that shall be encoded to JSON.
    --
-   function X_Wp_JSON_Sanity_Check (Data  : Multi_Type;
-                                    Depth : Integer)
-                                    return Multi_Type;
+   function X_Wp_JSON_Sanity_Check
+     (Data : Multi_Type; Depth : Integer) return Multi_Type;
 
    --
    -- Converts a string to UTF-8, so that it can be safely encoded to JSON.
@@ -1433,8 +1399,7 @@ is
    -- @param string string The string which is to be converted.
    -- @return string The checked string.
    --
-   function X_Wp_JSON_Convert_String (Item : String)
-                                      return String;
+   function X_Wp_JSON_Convert_String (Item : String) return String;
 
    --
    -- Gets last changed date for the specified cache group.
@@ -1445,8 +1410,7 @@ is
    -- @return string UNIX timestamp with microseconds representing when the group
    --                was last changed.
    --
-   function Wp_Cache_Get_Last_Changed (Group : String)
-                                       return String;
+   function Wp_Cache_Get_Last_Changed (Group : String) return String;
 
    --
    -- Tests if a given path is a stream URL
@@ -1456,8 +1420,33 @@ is
    -- @param string $path The resource path or URL.
    -- @return bool True if the path is a stream URL.
    --
-   function Wp_Is_Stream (Path : String)
-                          return Boolean;
+   function Wp_Is_Stream (Path : String) return Boolean;
+
+   --
+   -- Loads the auth check for monitoring whether the user is still logged in.
+   --
+   -- Can be disabled with remove_action( "admin_enqueue_scripts", "wp_auth_check_load" );
+   --
+   -- This is disabled for certain screens where a login screen could cause an
+   -- inconvenient interruption. A filter called {@see "wp_auth_check_load"} can be used
+   -- for fine-grained control.
+   --
+   -- @since 3.6.0
+   --
+   procedure Wp_Auth_Check_Load;
+
+   function Wp_Auth_Check_Load is new
+     Helpers_2.Generic_Call_Procedure (Wp_Auth_Check_Load);
+
+   --
+   -- Outputs the HTML that shows the wp-login dialog when the user is no longer logged in.
+   --
+   -- @since 3.6.0
+   --
+   procedure Wp_Auth_Check_HTML;
+
+   function Wp_Auth_Check_HTML is new
+     Helpers_2.Generic_Call_Procedure (Wp_Auth_Check_HTML);
 
    --
    -- Sets the mbstring internal encoding to a binary safe encoding when func_overload
@@ -1500,8 +1489,7 @@ is
    --
    -- @return string UUID.
    --
-   function Wp_Generate_UUID4
-            return String;
+   function Wp_Generate_UUID4 return String;
 
    --
    -- Validates that a UUID is valid.
@@ -1514,9 +1502,9 @@ is
    --                       allowed is `4`.
    -- @return bool The string is a valid UUID or false on failure.
    --
-   function Wp_Is_UUID (UUID    : String;
-                        Version : Integer := 0) -- null
-                        return Boolean;
+   function Wp_Is_UUID
+     (UUID : String; Version : Integer := 0) -- null
+      return Boolean;
 
    --
    -- Strips close comment and close php tags from file headers used by WP.
@@ -1529,8 +1517,7 @@ is
    -- @param string $str Header comment to clean up.
    -- @return string
    --
-   function X_Cleanup_Header_Comment (Str : String)
-                                      return String;
+   function X_Cleanup_Header_Comment (Str : String) return String;
 
    --
    -- Retrieves metadata from a file.
@@ -1554,10 +1541,9 @@ is
    --                                Default empty.
    -- @return string[] Array of file header values keyed by header name.
    --
-   function Get_File_Data (File            : String;
-                           Default_Headers : Array_Type;
-                           Context         : String := "")
-                           return Array_Type;
+   function Get_File_Data
+     (File : String; Default_Headers : Array_Type; Context : String := "")
+      return Array_Type;
 
    --
    -- Gets the URL to learn more about updating the PHP version the site is running on.
@@ -1572,8 +1558,7 @@ is
    --
    -- @return string URL to learn more about updating PHP.
    --
-   function Wp_Get_Update_PHP_URL
-            return String;
+   function Wp_Get_Update_PHP_URL return String;
 
    --
    -- Gets the default URL to learn more about updating the PHP version the site is
@@ -1589,8 +1574,7 @@ is
    --
    -- @return string Default URL to learn more about updating PHP.
    --
-   function Wp_Get_Default_Update_PHP_URL
-            return String;
+   function Wp_Get_Default_Update_PHP_URL return String;
 
    --
    -- Displays a button directly linking to a PHP update process.
@@ -1613,8 +1597,7 @@ is
    -- @param string required Minimum required PHP version.
    -- @return bool True if required version is compatible or empty, false if not.
    --
-   function Is_PHP_Version_Compatible (Required : String)
-                                       return Boolean
+   function Is_PHP_Version_Compatible (Required : String) return Boolean
    is (raise Program_Error with "not implementations");
 
    --
@@ -1627,8 +1610,7 @@ is
    -- @param string required Minimum required WordPress version.
    -- @return bool True if required version is compatible or empty, false if not.
    --
-   function Is_Wp_Version_Compatible (Required : String)
-                                      return Boolean
+   function Is_Wp_Version_Compatible (Required : String) return Boolean
    is (raise Program_Error with "not implementations");
 
    --
@@ -1647,8 +1629,8 @@ is
    -- @param string after  Markup to output after the annotation. Default `</p>`.
    --
    procedure Wp_Update_PHP_Annotation
-               (Before : String := "<p class=""description"">";
-                After  : String := "</p>");
+     (Before : String := "<p class=""description"">";
+      After  : String := "</p>");
 
    --
    -- Returns the default annotation for the web hosting altering the "Update PHP"
@@ -1663,8 +1645,7 @@ is
    -- @return string Update PHP page annotation. An empty string if no custom URLs
    --                 are provided.
    --
-   function Wp_Get_Update_PHP_Annotation
-            return String;
+   function Wp_Get_Update_PHP_Annotation return String;
 
    --
    -- Gets the URL for directly updating the PHP version the site is running on.
@@ -1678,8 +1659,7 @@ is
    --
    -- @return string URL for directly updating PHP or empty string.
    --
-   function Wp_Get_Direct_PHP_Update_URL
-            return String;
+   function Wp_Get_Direct_PHP_Update_URL return String;
 
    --
    -- Returns true.
@@ -1692,8 +1672,7 @@ is
    --
    -- @return true True.
    --
-   function X_Return_True
-            return Boolean;
+   function X_Return_True return Boolean;
 
    --
    -- Returns false.
@@ -1706,8 +1685,7 @@ is
    --
    -- @return false False.
    --
-   function X_Return_False
-            return Boolean;
+   function X_Return_False return Boolean;
 
    --
    -- Returns 0.
@@ -1718,8 +1696,7 @@ is
    --
    -- @return int 0.
    --
-   function X_Return_Zero
-            return Integer;
+   function X_Return_Zero return Integer;
 
    --
    -- Returns an empty array.
@@ -1730,7 +1707,6 @@ is
    --
    -- @return array Empty array.
    --
-   function X_Return_Empty_Array
-            return Array_Type;
+   function X_Return_Empty_Array return Array_Type;
 
 end Inc_Functions;

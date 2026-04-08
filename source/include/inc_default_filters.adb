@@ -22,6 +22,7 @@ with Constants;
 with Lists;
 
 with Inc_Admin_Bar;
+with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
 with Inc_Load;
@@ -591,7 +592,7 @@ is
 --    Add_Filter ("heartbeat_settings", "wp_heartbeat_settings");
 
       -- Check if the user is logged out.
---    Add_Action ("admin_enqueue_scripts", Wp_Auth_Check_Load'Access);
+      Add_Action ("admin_enqueue_scripts", Inc_Functions.Wp_Auth_Check_Load'Access);
 --    Add_Filter ("heartbeat_send", "wp_auth_check");
 --    Add_Filter ("heartbeat_nopriv_send", "wp_auth_check");
 

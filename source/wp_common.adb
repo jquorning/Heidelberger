@@ -540,6 +540,20 @@ is
       return Value;
    end Apply_Filters;
 
+   function Apply_Filters
+     (Hook_Name : String; Value : Boolean; Screen : Class_Screens.Wp_Screen)
+      return Boolean
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused :=
+        Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
    function Apply_Filters (Hook_Name : String;
                            Value     : Class_Terms.Wp_Term;
                            Cats      : Class_Terms.Wp_Term_Array;
