@@ -46,6 +46,19 @@ is
       Append (Static_Header, LF);
    end Header;
 
+   -------------------------
+   -- HTML_Entitiy_Decode --
+   -------------------------
+
+   function HTML_Entity_Decode
+     (Item     : String;
+      Flags    : Flag_Type := ENT_QUOTES + ENT_SUBSTITUTE + ENT_HTML404;
+      Encoding : String := "") return String is
+   begin
+      Logging.Log ("html_entity_decode", Item);
+      return Item;
+   end HTML_Entity_Decode;
+
    ---------------
    -- Parse_URL --
    ---------------

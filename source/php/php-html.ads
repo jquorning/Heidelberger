@@ -23,8 +23,7 @@ is
               (Item     : String;
                Flags    : Flag_Type := ENT_QUOTES + ENT_SUBSTITUTE + ENT_HTML404;
                Encoding : String    := "")
-               return String
-               is ("XXX-312");
+               return String;
 
    function HTML_Entities (Item          : String;
                            Flags         : Flag_Type := ENT_QUOTES;
