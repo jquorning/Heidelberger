@@ -30,7 +30,6 @@ is
    function MB_Convert_Encoding (Item          : String;
                                  To_Encoding   : String;
                                  From_Encoding : String := "")
-                                 return String
-                                 is ("XXX-962");
+                                 return String;
 
 end Php.Multibyte;

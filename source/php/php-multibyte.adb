@@ -46,4 +46,17 @@ is
       return -Global_Internal_Encoding;
    end MB_Internal_Encoding;
 
+   -------------------------
+   -- MB_Convert_Encoding --
+   -------------------------
+
+   function MB_Convert_Encoding
+     (Item : String; To_Encoding : String; From_Encoding : String := "")
+      return String is
+   begin
+      Logging.Log ("mb_convert_encoding", "to  : " & To_Encoding);
+      Logging.Log ("mb_convert_encoding", "from: " & From_Encoding);
+      return Item;
+   end MB_Convert_Encoding;
+
 end Php.Multibyte;
