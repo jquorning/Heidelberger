@@ -34,7 +34,6 @@ with Adm_Admin_Footer;
 with Adm_Admin_Header;
 with Adm_Update;
 
-with Adi_Files;
 with Adi_List_Tables;
 with Adi_Plugins;
 with Adi_Screens;
@@ -1018,7 +1017,6 @@ is
       use Class_Errors;
       use Class_List_Tables;
       use Class_Plugins_List_Tables;
-      use Adi_Files;
       use Adi_List_Tables;
       use Adi_Plugins;
       use Adi_Screens;

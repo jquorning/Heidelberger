@@ -9,7 +9,6 @@ with Ada.Containers;
 
 with Php.Arrays;
 with Php.Echoing;
-with Php.Errors;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;

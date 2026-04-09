@@ -9,7 +9,7 @@
 with Wp_Common;
 
 with Class_Roles;
-with Inc_Plugins;
+
 with Inc_Roles;
 
 package body Class_Role
@@ -72,7 +72,6 @@ is
    is
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       --
       -- Filters which capabilities a role has.
