@@ -39,6 +39,19 @@ is
                            is null;
 
    --
+   -- Removes single-use URL parameters and create canonical link based on new URL.
+   --
+   -- Removes specific query string parameters from a URL, create the canonical link,
+   -- put it in the admin header, and change the current URL to match.
+   --
+   -- @since 4.2.0
+   --
+   procedure Wp_Admin_Canonical_URL;
+
+   function Wp_Admin_Canonical_URL
+     is new Helpers_2.Generic_Call_Procedure (Wp_Admin_Canonical_URL);
+
+   --
    -- Sends a referrer policy header so referrers are not sent externally from
    -- administration screens.
    --

@@ -11,6 +11,7 @@ with Php.JSON;
 with Php.Misc;
 with Php.Strings;
 
+with Binder;
 with Constants;
 with Wp_Common;
 with UStrings;
@@ -1390,33 +1391,46 @@ is
 --         return response;
 -- end;
 
--- --
--- -- Removes single-use URL parameters and create canonical link based on new URL.
--- --
--- -- Removes specific query string parameters from a URL, create the canonical link,
--- -- put it in the admin header, and change the current URL to match.
--- --
--- -- @since 4.2.0
--- --
--- function wp_admin_canonical_url() then
---         removable_query_args = wp_removable_query_args();
+   ----------------------------
+   -- Wp_Admin_Canonical_URL --
+   ----------------------------
 
---         if ( empty( removable_query_args ) ) then
---                 return;
---         end;
+   procedure Wp_Admin_Canonical_URL is
+      use Php.Echoing;
+      use Binder;
+      use Inc_Link_Templates;
+      use Inc_Formatting;
+      use Inc_Functions;
 
---         -- Ensure we"re using an absolute URL.
---         current_url  = set_url_scheme( "http://" . _SERVER["HTTP_HOST"] . _SERVER["REQUEST_URI"] );
---         filtered_url = remove_query_arg( removable_query_args, current_url );
---         ?>
---         <link id="wp-admin-canonical" rel="canonical" href="<?php echo esc_url( filtered_url ); ?>" />
---         <script>
---                 if ( window.history.replaceState ) then
---                         window.history.replaceState( null, null, document.getElementById( "wp-admin-canonical" ).href + window.location.hash );
---                 end;
---         </script>
---         <?php
--- end;
+      Removable_Query_Args : constant List_Type := Wp_Removable_Query_Args;
+   begin
+      if Removable_Query_Args.Is_Empty then
+         return;
+      end if;
+
+      declare
+         -- Ensure we're using an absolute URL.
+         Current_URL : constant String :=
+           Set_URL_Scheme
+             ("http://"
+              & Get_As_String (X_SERVER, "HTTP_HOST")
+              & Get_As_String (X_SERVER, "REQUEST_URI"));
+
+         Filtered_URL : constant String :=
+           Remove_Query_Arg (Removable_Query_Args, Current_URL);
+      begin
+         Echo
+           ("<link id=""wp-admin-canonical"" rel=""canonical"" href="""
+            & ESC_URL (Filtered_URL)
+            & """ />");
+         Echo ("<script>");
+         Echo ("        if ( window.history.replaceState ) {");
+         Echo
+           ("                window.history.replaceState( null, null, document.getElementById( 'wp-admin-canonical' ).href + window.location.hash );");
+         Echo ("        }");
+         Echo ("</script>");
+      end;
+   end Wp_Admin_Canonical_URL;
 
    ----------------------
    -- Wp_Admin_Headers --
