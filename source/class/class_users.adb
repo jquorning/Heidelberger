@@ -15,6 +15,7 @@ with Php.Types;
 with Array_Lists;
 with Globals;
 with Helpers;
+with Logging;
 with Wp_Common;
 
 with Inc_Caches;
@@ -454,31 +455,46 @@ is
 --    return not Empty (This.Id);
    end Exists;
 
---         --
---         -- Retrieves the value of a property or meta key.
---         --
---         -- Retrieves from the users and usermeta table.
---         --
---         -- @since 3.3.0
---         --
---         -- @param string key Property
---         -- @return mixed
---         --
---         public function get( key ) then
+   ---------
+   -- Get --
+   ---------
+
+   function Get (This : Wp_User; Key : String) return Multi_Type is
+      use UStrings;
+   begin
+      Logging.Log ("class_users.get", Key);
+      if Key = "user_level" then
+         return From_Integer (This.Prop.User_Level);
+      elsif Key = "nickname" then
+         return From_String (-This.Prop.Nickname);
+      else
+         Logging.Log ("class_users.get", "not implemented");
+         return From_Null;
+      end if;
+   -- User_Description : UStrings.UString;
+   -- User_Firstname   : UStrings.UString;
+   -- User_Lastname    : UStrings.UString;
+   -- User_Login       : UStrings.UString;
+   -- User_Pass        : UStrings.UString;
+   -- User_Nicename    : UStrings.UString;
+   -- User_Email       : UStrings.UString;
+   -- User_URL         : UStrings.UString;
+   -- Display_Name     : UStrings.UString;
+   -- User_Level       : Natural;
+   end Get;
 --                 return this->__get( key );
 --         end;
 
---         --
---         -- Determines whether a property or meta key is set.
---         --
---         -- Consults the users and usermeta tables.
---         --
---         -- @since 3.3.0
---         --
---         -- @param string key Property.
---         -- @return bool
---         --
---         public function has_prop( key ) then
+   --------------
+   -- Has_Prop --
+   --------------
+
+   function Has_Prop (This : Wp_User; Key : String) return Boolean is
+      Value : constant Multi_Type := This.Get (Key);
+   begin
+      return Kind_Of (Value) /= Kind_Null;
+   end Has_Prop;
+
 --                 return this->__isset( key );
 --         end;
 

@@ -148,34 +148,34 @@ is
    -- @return mixed User option value on success, false on failure.
    --
    function Get_User_Option (Option     : String;
-                             User       : Class_Users.User_Id_Type := 0;
-                             Deprecated : String                   := "")
-                             return Boolean
-                             is (True);
+                             User       : Class_Users.User_Id_Type := 0)
+--                           Deprecated : String                   := "")
+                             return Multi_Type;
 
    function Get_User_Option (Option     : String;
-                             User       : Class_Users.User_Id_Type := 0;
-                             Deprecated : String       := "")
-                             return String
-                             is ("XXX-601");
+                             User       : Class_Users.User_Id_Type := 0)
+--                           Deprecated : String                   := "")
+                             return Boolean;
 
    function Get_User_Option (Option     : String;
-                             User       : Class_Users.User_Id_Type := 0;
-                             Deprecated : String       := "")
-                             return Natural
-                             is (999);
+                             User       : Class_Users.User_Id_Type := 0)
+--                           Deprecated : String       := "")
+                             return String;
 
    function Get_User_Option (Option     : String;
-                             User       : Class_Users.User_Id_Type := 0;
-                             Deprecated : String       := "")
-                             return Array_Type
-                             is (Empty_Array);
+                             User       : Class_Users.User_Id_Type := 0)
+--                           Deprecated : String       := "")
+                             return Natural;
 
    function Get_User_Option (Option     : String;
-                             User       : Class_Users.User_Id_Type := 0;
-                             Deprecated : String       := "")
-                             return List_Type
-                             is (Empty_List);
+                             User       : Class_Users.User_Id_Type := 0)
+--                           Deprecated : String       := "")
+                             return Array_Type;
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0)
+--                           Deprecated : String       := "")
+                             return List_Type;
 
    --
    -- Updates user option with global blog capability.

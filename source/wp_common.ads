@@ -453,6 +453,12 @@ is
                            User       : Class_Users.Wp_User)
                            return String;
 
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Multi_Type;
+                           Option     : String;
+                           User       : Class_Users.Wp_User)
+                           return Multi_Type;
+
    function Apply_Filters (Hook_Name   : String;
                            Value       : Class_Errors.Wp_Error;
                            Redirect_To : String)

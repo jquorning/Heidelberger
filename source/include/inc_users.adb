@@ -796,63 +796,87 @@ is
 --         return ( isset( user->ID ) ? (int) user->ID : 0 );
 -- end;
 
--- --
--- -- Retrieves user option that can be either per Site or per Network.
--- --
--- -- If the user ID is not given, then the current user will be used instead. If
--- -- the user ID is given, then the user data will be retrieved. The filter for
--- -- the result, will also pass the original option name and finally the user data
--- -- object as the third parameter.
--- --
--- -- The option will first check for the per site name and then the per Network name.
--- --
--- -- @since 2.0.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string option     User option name.
--- -- @param int    user       Optional. User ID.
--- -- @param string deprecated Use get_option() to check for an option in the options table.
--- -- @return mixed User option value on success, false on failure.
--- --
--- function get_user_option( option, user = 0, deprecated = "" ) then
---         global wpdb;
+   ----------------------
+   -- Get_User_Option --
+   ---------------------
 
---         if ( ! empty( deprecated ) ) then
---                 _deprecated_argument( __FUNCTION__, "3.0.0" );
---         end;
+   function Get_User_Option
+     (Option : String; User : Class_Users.User_Id_Type := 0) return Multi_Type
+   is
+      use Wp_Common;
+      use Class_Users;
+      use Inc_Pluggables;
 
---         if ( empty( user ) ) then
---                 user = get_current_user_id();
---         end;
+      --        global wpdb;
+      -- if not Empty (Deprecated)) then
+      --         X_Deprecated_Argument ("__FUNCTION__", "3.0.0");
+      -- end if;
+      User_2 : constant User_Id_Type :=
+        (if User = 0 then Get_Current_User_Id else User);
 
---         user = get_userdata( user );
---         if ( ! user ) then
---                 return false;
---         end;
+      Usr : constant Wp_User := Get_Userdata (User_2);
+   begin
+      if Usr = Null_User then
+         return From_Null; -- False;
+      end if;
 
---         prefix = wpdb->get_blog_prefix();
---         if ( user->has_prop( prefix . option ) ) then -- Blog-specific.
---                 result = user->get( prefix . option );
---         end; elseif ( user->has_prop( option ) ) then -- User-specific and cross-blog.
---                 result = user->get( option );
---         end; else then
---                 result = false;
---         end;
+      declare
+         Prefix : constant String := Globals.WpDB.Get_Blog_Prefix;
 
---         --
---         -- Filters a specific user option value.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the user option name.
---         --
---         -- @since 2.5.0
---         --
---         -- @param mixed   result Value for the user"s option.
---         -- @param string  option Name of the option being retrieved.
---         -- @param WP_User user   WP_User object of the user whose option is being retrieved.
---         --
---         return apply_filters( "get_user_option_thenoptionend;", result, option, user );
--- end;
+         Result : constant Multi_Type :=
+           (if Usr.Has_Prop (Prefix & Option)
+            then Usr.Get (Prefix & Option)     -- Blog-specific.
+            elsif Usr.Has_Prop (Option)
+            then Usr.Get (Option)              -- User-specific and cross-blog.
+            else From_Null); -- False
+      begin
+         --
+         -- Filters a specific user option value.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the user option name.
+         --
+         -- @since 2.5.0
+         --
+         -- @param mixed   result Value for the user's option.
+         -- @param string  option Name of the option being retrieved.
+         -- @param WP_User user   WP_User object of the user whose option is being retrieved.
+         --
+         return
+           Apply_Filters ("get_user_option_" & Option, Result, Option, Usr);
+      end;
+   end Get_User_Option;
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0)
+                             return Boolean
+   is (As_Boolean (Get_User_Option (Option, User)));
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0)
+                             return String
+   is
+      V : constant Multi_Type := Get_User_Option (Option, User);
+   begin
+      -- Hack: PHP false (not found) coerces to "" in string context; Kind_Null
+      -- must map to "" here so callers like Sanitize_HTML_Class can use their
+      -- fallback parameter instead of seeing "(null)".
+      return (if Kind_Of (V) = Kind_Null then "" else As_String (V));
+   end Get_User_Option;
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0)
+                             return Natural
+   is (As_Integer (Get_User_Option (Option, User)));
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0)
+                             return Array_Type
+   is (As_Array (Get_User_Option (Option, User)));
+
+   function Get_User_Option (Option     : String;
+                             User       : Class_Users.User_Id_Type := 0)
+                             return List_Type
+   is (As_List (Get_User_Option (Option, User)));
 
 -- --
 -- -- Updates user option with global blog capability.

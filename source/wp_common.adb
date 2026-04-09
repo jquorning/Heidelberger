@@ -1055,6 +1055,21 @@ is
       return Value;
    end Apply_Filters;
 
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Multi_Type;
+                           Option     : String;
+                           User       : Class_Users.Wp_User)
+                           return Multi_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
    function Apply_Filters (Hook_Name   : String;
                            Value       : Class_Errors.Wp_Error;
                            Redirect_To : String)

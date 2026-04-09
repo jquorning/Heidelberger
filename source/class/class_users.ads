@@ -214,6 +214,30 @@ is
                     return Boolean;
 
    --
+   -- Retrieves the value of a property or meta key.
+   --
+   -- Retrieves from the users and usermeta table.
+   --
+   -- @since 3.3.0
+   --
+   -- @param string key Property
+   -- @return mixed
+   --
+   function Get (This : Wp_User; Key : String) return Multi_Type;
+
+   --
+   -- Determines whether a property or meta key is set.
+   --
+   -- Consults the users and usermeta tables.
+   --
+   -- @since 3.3.0
+   --
+   -- @param string key Property.
+   -- @return bool
+   --
+   function Has_Prop (This : Wp_User; Key : String) return Boolean;
+
+   --
    -- Retrieves all of the capabilities of the user's roles, and merges them with
    -- individual user capabilities.
    --
