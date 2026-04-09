@@ -3,8 +3,7 @@
 --
 
 --
---  Set environment variable LOGGING_STUB to "no" to enable logging
---  information.
+--  Set environment variable LOGGING_STUB to "yes" to diable logging.
 --
 
 with "config/heidelberger_config.gpr";
@@ -34,7 +33,7 @@ project Heidelberger is
    for Main use ("heidelberger.adb");
 
    type Yes_No is ("yes", "no");
-   Logging_Stub : Yes_No := External ("LOGGING_STUB", "yes");
+   Logging_Stub : Yes_No := External ("LOGGING_STUB", "no");
 
    package Naming is
       case Logging_Stub is
