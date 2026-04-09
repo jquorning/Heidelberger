@@ -6,10 +6,12 @@
 -- @package WordPress
 --
 
-with Arrays;
-with Lists;
 with Php;
 with Php.HTML;
+
+with Arrays;
+with Helpers_2;
+with Lists;
 
 package Inc_Formatting
 is
@@ -1161,6 +1163,35 @@ is
    --
    function Wp_Spaces_Regexp
             return String;
+
+   --
+   -- Prints the important emoji-related styles.
+   --
+   -- @since 4.2.0
+   --
+   procedure Print_Emoji_Styles;
+
+   function Print_Emoji_Styles
+     is new Helpers_2.Generic_Call_Procedure (Print_Emoji_Styles);
+
+   --
+   -- Prints the inline Emoji detection script if it is not already printed.
+   --
+   -- @since 4.2.0
+   --
+   procedure Print_Emoji_Detection_Script;
+
+   function Print_Emoji_Detection_Script
+     is new Helpers_2.Generic_Call_Procedure (Print_Emoji_Detection_Script);
+
+   --
+   -- Prints inline Emoji detection script.
+   --
+   -- @ignore
+   -- @since 4.6.0
+   -- @access private
+   --
+   procedure X_Print_Emoji_Detection_Script;
 
    --
    -- Adds slashes to a string or recursively adds slashes to strings within an array.

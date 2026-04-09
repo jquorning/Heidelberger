@@ -9,6 +9,7 @@
 with Ada.Text_IO;
 
 with Php.Arrays;
+with Php.Echoing;
 with Php.Files;
 with Php.Lists;
 with Php.Misc;
@@ -25,10 +26,14 @@ with UStrings;
 with Wp_Common;
 
 with Inc_Functions;
+with Inc_General_Templates;
 with Inc_HTTP;
 with Inc_KSES;
+with Inc_Link_Templates;
 with Inc_L10n;
 with Inc_Options;
+with Inc_Script_Loader;
+with Inc_Themes;
 
 package body Inc_Formatting
 is
@@ -5730,123 +5735,179 @@ is
       return -Static_Spaces;
    end Wp_Spaces_Regexp;
 
--- --
--- -- Prints the important emoji-related styles.
--- --
--- -- @since 4.2.0
--- --
--- function print_emoji_styles() then
---         static printed = false;
+   ------------------------
+   -- Print_Emoji_Styles --
+   ------------------------
 
---         if ( printed ) then
---                 return;
---         end;
+   Static_Printed : Boolean := False;
 
---         printed = true;
+   procedure Print_Emoji_Styles is
+      use Php.Echoing;
+      use UStrings;
+      use Inc_Themes;
+   begin
+      if Static_Printed then
+         return;
+      end if;
+      Static_Printed := True;
 
---         type_attr = current_theme_supports( "html5", "style" ) ? "" : " type="text/css"";
---         ?>
--- <style<?php echo type_attr; ?>>
--- img.wp-smiley,
--- img.emoji then
---         display: inline !important;
---         border: none !important;
---         box-shadow: none !important;
---         height: 1em !important;
---         width: 1em !important;
---         margin: 0 0.07em !important;
---         vertical-align: -0.1em !important;
---         background: none !important;
---         padding: 0 !important;
--- end;
--- </style>
---         <?php
--- end;
+      declare
+         Type_Attr : constant String :=
+           (if Current_Theme_Supports ("html5", "style")
+            then ""
+            else " type=""text/css""");
+      begin
+         Echo ("<style" & Type_Attr & ">" & NL);
+         Echo ("img.wp-smiley," & NL);
+         Echo ("img.emoji {" & NL);
+         Echo ("        display: inline !important;" & NL);
+         Echo ("        border: none !important;" & NL);
+         Echo ("        box-shadow: none !important;" & NL);
+         Echo ("        height: 1em !important;" & NL);
+         Echo ("        width: 1em !important;" & NL);
+         Echo ("        margin: 0 0.07em !important;" & NL);
+         Echo ("        vertical-align: -0.1em !important;" & NL);
+         Echo ("        background: none !important;" & NL);
+         Echo ("        padding: 0 !important;" & NL);
+         Echo ("}" & NL);
+         Echo ("</style>" & NL);
+      end;
+   end Print_Emoji_Styles;
 
--- --
--- -- Prints the inline Emoji detection script if it is not already printed.
--- --
--- -- @since 4.2.0
--- --
--- function print_emoji_detection_script() then
---         static printed = false;
+   ----------------------------------
+   -- Print_Emoji_Detection_Script --
+   ----------------------------------
 
---         if ( printed ) then
---                 return;
---         end;
+   Static_Emoji_Detection_Printed : Boolean := False;
 
---         printed = true;
+   procedure Print_Emoji_Detection_Script is
+   begin
+      if Static_Emoji_Detection_Printed then
+         return;
+      end if;
 
---         _print_emoji_detection_script();
--- end;
+      Static_Emoji_Detection_Printed := True;
 
--- --
--- -- Prints inline Emoji detection script.
--- --
--- -- @ignore
--- -- @since 4.6.0
--- -- @access private
--- --
--- function _print_emoji_detection_script() then
---         settings = array(
---                 --
---                 -- Filters the URL where emoji png images are hosted.
---                 --
---                 -- @since 4.2.0
---                 --
---                 -- @param string url The emoji base URL for png images.
---                 --
---                 "baseUrl" => apply_filters( "emoji_url", "https://s.w.org/images/core/emoji/14.0.0/72x72/" ),
+      X_Print_Emoji_Detection_Script;
+   end Print_Emoji_Detection_Script;
 
---                 --
---                 -- Filters the extension of the emoji png files.
---                 --
---                 -- @since 4.2.0
---                 --
---                 -- @param string extension The emoji extension for png files. Default .png.
---                 --
---                 "ext"     => apply_filters( "emoji_ext", ".png" ),
+   ------------------------------------
+   -- X_Print_Emoji_Detection_Script --
+   ------------------------------------
 
---                 --
---                 -- Filters the URL where emoji SVG images are hosted.
---                 --
---                 -- @since 4.6.0
---                 --
---                 -- @param string url The emoji base URL for svg images.
---                 --
---                 "svgUrl"  => apply_filters( "emoji_svg_url", "https://s.w.org/images/core/emoji/14.0.0/svg/" ),
+   procedure X_Print_Emoji_Detection_Script is
+      use Php.Files;
+      use Php.Strings;
+      use Array_Lists;
+      use Constants;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Functions;
+      use Inc_General_Templates;
+      use Inc_Link_Templates;
+      use Inc_Script_Loader;
 
---                 --
---                 -- Filters the extension of the emoji SVG files.
---                 --
---                 -- @since 4.6.0
---                 --
---                 -- @param string extension The emoji extension for svg files. Default .svg.
---                 --
---                 "svgExt"  => apply_filters( "emoji_svg_ext", ".svg" ),
---         );
+      Settings : Array_Type :=
+        To_Array_Type
+          ([
+            --
+            -- Filters the URL where emoji png images are hosted.
+            --
+            -- @since 4.2.0
+            --
+            -- @param string url The emoji base URL for png images.
+            --
+            Build
+              ("baseUrl",
+               Apply_Filters
+                 ("emoji_url",
+                  "https://s.w.org/images/core/emoji/14.0.0/72x72/")),
 
---         version = "ver=" . get_bloginfo( "version" );
+            --
+            -- Filters the extension of the emoji png files.
+            --
+            -- @since 4.2.0
+            --
+            -- @param string extension The emoji extension for png files. Default .png.
+            --
+            Build ("ext", Apply_Filters ("emoji_ext", ".png")),
 
---         if ( SCRIPT_DEBUG ) then
---                 settings["source"] = array(
---                         -- This filter is documented in wp-includes/class-wp-scripts.php--
---                         "wpemoji" => apply_filters( "script_loader_src", includes_url( "js/wp-emoji.js?version" ), "wpemoji" ),
---                         -- This filter is documented in wp-includes/class-wp-scripts.php--
---                         "twemoji" => apply_filters( "script_loader_src", includes_url( "js/twemoji.js?version" ), "twemoji" ),
---                 );
---         end; else then
---                 settings["source"] = array(
---                         -- This filter is documented in wp-includes/class-wp-scripts.php--
---                         "concatemoji" => apply_filters( "script_loader_src", includes_url( "js/wp-emoji-release.min.js?version" ), "concatemoji" ),
---                 );
---         end;
+            --
+            -- Filters the URL where emoji SVG images are hosted.
+            --
+            -- @since 4.6.0
+            --
+            -- @param string url The emoji base URL for svg images.
+            --
+            Build
+              ("svgUrl",
+               Apply_Filters
+                 ("emoji_svg_url",
+                  "https://s.w.org/images/core/emoji/14.0.0/svg/")),
 
---         wp_print_inline_script_tag(
---                 sprintf( "window._wpemojiSettings = %s;", wp_json_encode( settings ) ) . "\n" .
---                         file_get_contents( sprintf( ABSPATH . WPINC . "/js/wp-emoji-loader" . wp_scripts_get_suffix() . ".js" ) )
---         );
--- end;
+            --
+            -- Filters the extension of the emoji SVG files.
+            --
+            -- @since 4.6.0
+            --
+            -- @param string extension The emoji extension for svg files. Default .svg.
+            --
+            Build ("svgExt", Apply_Filters ("emoji_svg_ext", ".svg"))]);
+
+      Version : constant String := "ver=" & Get_Bloginfo ("version");
+   begin
+      if SCRIPT_DEBUG then
+         Set
+           (Settings,
+            "source",
+            From_Array
+              (To_Array_Type
+                 ([
+                   -- This filter is documented in wp-includes/class-wp-scripts.php
+                   Build
+                     ("wpemoji",
+                      Apply_Filters
+                        ("script_loader_src",
+                         Includes_URL ("js/wp-emoji.js?" & Version),
+                         "wpemoji")),
+                   -- This filter is documented in wp-includes/class-wp-scripts.php
+                   Build
+                     ("twemoji",
+                      Apply_Filters
+                        ("script_loader_src",
+                         Includes_URL ("js/twemoji.js?" & Version),
+                         "twemoji"))])));
+      else
+         Set
+           (Settings,
+            "source",
+            From_Array
+              (To_Array_Type
+                 ([
+                   -- This filter is documented in wp-includes/class-wp-scripts.php
+                   Build
+                     ("concatemoji",
+                      Apply_Filters
+                        ("script_loader_src",
+                         Includes_URL
+                           ("js/wp-emoji-release.min.js?" & Version),
+                         "concatemoji"))])));
+      end if;
+
+      Wp_Print_Inline_Script_Tag
+        (Sprintf
+           ("window._wpemojiSettings = %s;",
+            [Wp_JSON_Encode (From_Array (Settings))])
+         & "\n"
+         & File_Get_Contents
+             (Sprintf
+                (ABSPATH
+                 & (-Globals.WPINC)
+                 & "/js/wp-emoji-loader"
+                 & Wp_Scripts_Get_Suffix
+                 & ".js",
+                 [])));
+   end X_Print_Emoji_Detection_Script;
 
 -- --
 -- -- Converts emoji characters to their equivalent HTML entity.
