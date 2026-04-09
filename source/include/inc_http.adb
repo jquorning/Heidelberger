@@ -801,6 +801,7 @@ is
       when PHP_URL_SCHEME => return "scheme";
       when PHP_URL_PATH   => return "path";
       when PHP_URL_QUERY  => return "query";
+      when PHP_URL_HOST   => return "host";
       when PHP_URL_ALL    => raise Program_Error with "not implemented";
       end case;
       --   if ( isset( translation[ constant ] ) ) then

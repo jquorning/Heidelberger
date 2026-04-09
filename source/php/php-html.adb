@@ -95,6 +95,7 @@ is
       when PHP_URL_SCHEME => return Get_As_String (Result, "scheme");
       when PHP_URL_PATH   => return Get_As_String (Result, "path");
       when PHP_URL_QUERY  => return Get_As_String (Result, "query");
+      when PHP_URL_HOST   => return Get_As_String (Result, "host");
       when PHP_URL_ALL    => raise Program_Error with "not implemented";
       end case;
    end Parse_URL;
