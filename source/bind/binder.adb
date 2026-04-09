@@ -3,6 +3,8 @@
 --
 with Ada.Strings.Fixed;
 
+with AWS.MIME;
+
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
@@ -41,11 +43,35 @@ is
    is separate;
 
    -----------------------
-   -- PHH_To_Web_Server --
+   -- PHP_To_Web_Server --
    -----------------------
 
    procedure PHP_To_Web_Server
    is separate;
+
+   ----------------
+   -- Serializer --
+   ----------------
+
+   protected Serializer is
+      entry Aquire;
+      entry Release;
+   private
+      Busy : Boolean := False;
+   end Serializer;
+
+   protected body Serializer is
+
+      entry Aquire when not Busy is
+      begin
+         Busy := True;
+      end Aquire;
+
+      entry Release when True is
+      begin
+         Busy := False;
+      end Release;
+   end Serializer;
 
    ------------
    -- Render --
@@ -53,12 +79,40 @@ is
 
    function Render (Request : in AWS.Status.Data) return AWS.Response.Data is
       use Ada.Strings.Fixed;
+      use AWS.MIME;
       use UStrings;
+
+      type MIME_Type is (HTML, CSS, SVG, Javascript);
+      MIME : MIME_Type := HTML;
+
+      function To_MIME (MIME : MIME_Type) return String;
+      procedure Release;
+
+      function To_MIME (MIME : MIME_Type) return String is
+      begin
+         return
+           (case MIME is
+              when HTML       => Text_HTML,
+              when CSS        => Text_CSS,
+              when SVG        => Image_SVG,
+              when Javascript => Text_Javascript);
+      end To_MIME;
+
+      procedure Release is
+      begin
+         Logging.Log ("release", "before");
+         Serializer.Release;
+         Logging.Log ("release", "after");
+      end Release;
 
       URI     : constant String := AWS.Status.URI (Request);
       URL     : constant String := AWS.Status.URL (Request);
       Payload : UString;
    begin
+      Logging.Log ("aquire", "before");
+      Serializer.Aquire;
+      Logging.Log ("aquire", "after");
+
       Php.Echoing.Clear_Echo;
 
       Web_Server_To_PHP (Status => Request);
@@ -94,21 +148,26 @@ is
          Adm_Themes.Render;
 
       elsif Index (URL, "/wp-admin/load-scripts.php") /= 0 then
+         MIME := Javascript;
          Adm_Load_Scripts.Run;
 
       elsif Index (URL, "/wp-admin/load-styles.php") /= 0 then
+         MIME := CSS;
          Adm_Load_Styles.Run;
 
       elsif Index (URL, "/wp-admin/upgrade.php") /= 0 then
          Adm_Upgrade.Render;
 
       elsif Index (URI, "/wp-admin/images") /= 0 then
+         Logging.Log ("render", URI);
+         MIME := SVG;
          declare
             use Templates_Parser;
 
-            Payload : constant String := Parse (Filename => URI);
+            Payload : constant String := Parse (Filename => "./" & URI);
          begin
-            return AWS.Response.Build ("image/svg", Payload);
+            Release;
+            return AWS.Response.Build (To_MIME (SVG), Payload);
          end;
 
       elsif Index (URI, "/wp-includes/css") /= 0
@@ -120,7 +179,9 @@ is
             Payload : constant String := Parse (Filename => URI);
          begin
             Logging.Log ("Render", URI);
-            return AWS.Response.Build ("text/css", Payload);
+
+            Release;
+            return AWS.Response.Build (To_MIME (CSS), Payload);
          end;
 
       elsif Index (URL, "/wp-admin") /= 0 then
@@ -136,10 +197,9 @@ is
 
       PHP_To_Web_Server;
 
-      --    Inc_Plugins.Dump_Hooks;
-
       Payload := +Php.Echoing.Get_Echo;
-      return AWS.Response.Build ("text/html", Payload);
+      Release;
+      return AWS.Response.Build (To_MIME (MIME), Payload);
 
    exception
       when Php.Errors.PHP_Program_Termination =>
@@ -156,8 +216,12 @@ is
             Logging.Log ("binder", "locati: " & Location);
             if Location /= "Location:" then
                Logging.Log ("binder", "location not found -- baffeled!");
-               return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+
+               Release;
+               return AWS.Response.Build (To_MIME (HTML), Php.Echoing.Get_Echo);
             end if;
+
+            Release;
             return AWS.Response.URL (Location => Location);
          end;
          --       return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
@@ -175,6 +239,7 @@ is
             Logging.Log ("binder", "  header: " & Header);
             Logging.Log ("binder", "  locati: " & Location);
 
+            Release;
             return AWS.Response.URL (Location => Location);
          end;
 
