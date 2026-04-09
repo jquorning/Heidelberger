@@ -22,6 +22,7 @@ with Constants;
 with Lists;
 
 with Inc_Admin_Bar;
+with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
@@ -426,7 +427,7 @@ is
                   Inc_Themes.Locale_Stylesheet'Access);
 --    Add_Action ("publish_future_post", Check_And_Publish_Future_Post'Access, 10, 1);
       Add_Action ("wp_head", Inc_Robots_Templates.Wp_Robots'Access, 1);
---    Add_Action ("wp_head", Print_Emoji_Detection_Script'Access, 7);
+      Add_Action ("wp_head", Inc_Formatting.Print_Emoji_Detection_Script'Access, 7);
       Add_Action ("wp_head",
                   Inc_Functions_Wp_Styles.Wp_Print_Styles'Access, 8);
       Add_Action ("wp_head",
@@ -450,7 +451,7 @@ is
 
 --    Add_Action ("after_switch_theme", X_Wp_Menus_Changed'Access);
 --    Add_Action ("after_switch_theme", X_Wp_Sidebars_Changed'Access);
---    Add_Action ("wp_print_styles", Print_Emoji_Styles'Access);
+      Add_Action ("wp_print_styles", Inc_Formatting.Print_Emoji_Styles'Access);
 --    Add_Action ("plugins_loaded", X_Wp_Theme_Json_Webfonts_Handler'Access);
 
       if Isset (Binder.XX_GET, "replytocom") then
@@ -811,7 +812,7 @@ is
 --    Add_Filter ("embed_oembed_html", "wp_maybe_enqueue_oembed_host_js");
 
 --    Add_Action ("embed_head", Enqueue_Embed_Scripts'Access, 1);
---    Add_Action ("embed_head", Print_Emoji_Detection_Script'Access);
+      Add_Action ("embed_head", Inc_Formatting.Print_Emoji_Detection_Script'Access);
 --    Add_Action ("embed_head", Print_Embed_Styles'Access);
 --    Add_Action ("embed_head", Wp_Print_Head_Scripts'Access, 20);
 --    Add_Action ("embed_head", Wp_Print_Styles'Access, 20);

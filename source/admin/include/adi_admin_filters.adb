@@ -7,6 +7,8 @@
 --
 
 with Adi_Misc;
+
+with Inc_Formatting;
 with Inc_General_Templates;
 with Inc_Plugins;
 with Inc_Script_Loader;
@@ -61,7 +63,7 @@ is
       Add_Action ("admin_init", Adi_Misc.Wp_Admin_Headers'Access);
       Add_Action ("login_init", Adi_Misc.Wp_Admin_Headers'Access);
 -- add_action( "admin_init", "send_frame_options_header", 10, 0 );
--- add_action( "admin_head", "wp_admin_canonical_url" );
+      Add_Action ("admin_head", Adi_Misc.Wp_Admin_Canonical_URL'Access);
 -- add_action( "admin_head", "wp_site_icon" );
       Add_Action ("admin_head",
                   Adi_Misc.Wp_Admin_Viewport_Meta'Access);
@@ -75,12 +77,14 @@ is
                      Inc_General_Templates.Wp_Resource_Hints'Access, 1);
       end if;
 
--- add_action( "admin_print_scripts", "print_emoji_detection_script" );
+      Add_Action ("admin_print_scripts",
+                  Inc_Formatting.Print_Emoji_Detection_Script'Access);
       Add_Action ("admin_print_scripts",
                   Inc_Script_Loader.Wp_Print_Head_Scripts'Access, 20);
       Add_Action ("admin_print_footer_scripts",
                   Inc_Script_Loader.X_Wp_Footer_Scripts'Access);
--- add_action( "admin_print_styles", "print_emoji_styles" );
+      Add_Action ("admin_print_styles",
+                  Inc_Formatting.Print_Emoji_Styles'Access);
       Add_Action ("admin_print_styles",
                   Inc_Script_Loader.Print_Admin_Styles'Access, 20);
 
