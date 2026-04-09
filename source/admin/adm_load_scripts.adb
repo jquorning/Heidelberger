@@ -76,11 +76,13 @@ is
          Protocol := +"HTTP/1.0";
       end if;
 
-      Load := +Get_As_String (XX_GET, "load");
--- if ( is_array( load ) ) then
---         ksort( load );
---         load = implode( "", load );
--- end;
+      if Isset (XX_GET, "load") and then
+         Kind_Of (Get (XX_GET, "load")) = Kind_Array
+      then
+         Load := +Implode ("", As_Array (Get (XX_GET, "load")));
+      else
+         Load := +Get_As_String (XX_GET, "load");
+      end if;
 
       Load   := +Preg_Replace ("/[^a-z0-9,_-]+/i", "", -Load);
       Load_2 := List_Unique (Explode (",", -Load));
