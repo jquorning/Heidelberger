@@ -407,6 +407,19 @@ is
             return Boolean;
 
    --
+   -- Sanitizes an attributes array into an attributes string to be placed inside a `<script>` tag.
+   --
+   -- Automatically injects type attribute if needed.
+   -- Used by {@see wp_get_script_tag()} and {@see wp_get_inline_script_tag()}.
+   --
+   -- @since 5.7.0
+   --
+   -- @param array attributes Key-value pairs representing `<script>` tag attributes.
+   -- @return string String made of sanitized `<script>` tag attributes.
+   --
+   function Wp_Sanitize_Script_Attributes (Attributes : Array_Type) return String;
+
+   --
    -- Allows small styles to be inlined.
    --
    -- This improves performance and sustainability, and is opt-in. Stylesheets can
@@ -423,6 +436,34 @@ is
 
    function Wp_Maybe_Inline_Styles
      is new Helpers_2.Generic_Call_Procedure (Wp_Maybe_Inline_Styles);
+
+   --
+   -- Wraps inline JavaScript in `<script>` tag.
+   --
+   -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
+   -- Automatically injects type attribute if needed.
+   --
+   -- @since 5.7.0
+   --
+   -- @param string javascript Inline JavaScript code.
+   -- @param array  attributes Optional. Key-value pairs representing `<script>` tag attributes.
+   -- @return string String containing inline JavaScript code wrapped around `<script>` tag.
+   --
+   function Wp_Get_Inline_Script_Tag (Javascript : String; Attributes : Array_Type := Empty_Array) return String;
+
+   --
+   -- Prints inline JavaScript wrapped in `<script>` tag.
+   --
+   -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
+   -- Automatically injects type attribute if needed.
+   --
+   -- @since 5.7.0
+   --
+   -- @param string javascript Inline JavaScript code.
+   -- @param array  attributes Optional. Key-value pairs representing `<script>` tag attributes.
+   --
+   procedure Wp_Print_Inline_Script_Tag
+     (Javascript : String; Attributes : Array_Type := Empty_Array);
 
    --
    -- Makes URLs relative to the WordPress installation.

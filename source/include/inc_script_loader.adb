@@ -3439,35 +3439,51 @@ is
 --         wp_enqueue_style( "wp-format-library");
 -- end;
 
--- --
--- -- Sanitizes an attributes array into an attributes string to be placed inside a `<script>` tag.
--- --
--- -- Automatically injects type attribute if needed.
--- -- Used by {@see wp_get_script_tag()} and {@see wp_get_inline_script_tag()}.
--- --
--- -- @since 5.7.0
--- --
--- -- @param array attributes Key-value pairs representing `<script>` tag attributes.
--- -- @return string String made of sanitized `<script>` tag attributes.
--- --
--- function wp_sanitize_script_attributes( attributes ) {
---         html5_script_support = ! is_admin() && ! current_theme_supports( "html5", "script");
---         attributes_string    = "";
+   -----------------------------------
+   -- Wp_Sanitize_Script_Attributes --
+   -----------------------------------
 
---         -- If HTML5 script tag is supported, only the attribute name is added
---         -- to attributes_string for entries with a boolean value, and that are true.
---         foreach ( attributes as attribute_name => attribute_value ) then
---                 if ( is_bool( attribute_value ) ) then
---                         if ( attribute_value ) then
---                                 attributes_string .= html5_script_support ? sprintf( " %1s="%2s"", esc_attr( attribute_name), esc_attr( attribute_name ) ) : " " . esc_attr( attribute_name);
---                         }
---                 end; else then
---                         attributes_string .= sprintf( " %1s="%2s"", esc_attr( attribute_name), esc_attr( attribute_value ));
---                 end;
---         end;
+   function Wp_Sanitize_Script_Attributes (Attributes : Array_Type) return String is
+      use Php.Strings;
+      use UStrings;
+      use Inc_Formatting;
+      use Inc_Load;
+      use Inc_Themes;
 
---         return attributes_string;
--- end;
+      HTML5_Script_Support : constant Boolean := not Is_Admin and then not Current_Theme_Supports ("html5", "script");
+      Attributes_String : UString;
+   begin
+      -- If HTML5 script tag is supported, only the attribute name is added
+      -- to attributes_string for entries with a boolean value, and that are true.
+      for A in Attributes.Iterate loop
+         declare
+            Attribute_Name  : String := Key (A);
+            Attribute_Value : Multi_Type := Element (A);
+         begin
+            if Kind_Of (Attribute_Value) = Kind_Boolean then
+               if As_Boolean (Attribute_Value) then
+                  Append (Attributes_String,
+                          (if HTML5_Script_Support
+                           then Sprintf (" %1s=""%2s""",
+                                         [
+                                           1 => ESC_Attr (Attribute_Name),
+                                           2 => ESC_Attr (Attribute_Name)
+                                         ])
+                           else " " & ESC_Attr (Attribute_Name)));
+               else
+                  Append (Attributes_String,
+                          Sprintf (" %1s=""%2s""",
+                                                [
+                                                  1 => ESC_Attr (Attribute_Name),
+                                                  2 => ESC_Attr (As_String (Attribute_Value))
+                                                ]));
+               end if;
+            end if;
+         end;
+      end loop;
+
+      return -Attributes_String;
+   end Wp_Sanitize_Script_Attributes;
 
 -- --
 -- -- Formats `<script>` loader tags.
@@ -3512,53 +3528,58 @@ is
 --         echo wp_get_script_tag( attributes);
 -- end;
 
--- --
--- -- Wraps inline JavaScript in `<script>` tag.
--- --
--- -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
--- -- Automatically injects type attribute if needed.
--- --
--- -- @since 5.7.0
--- --
--- -- @param string javascript Inline JavaScript code.
--- -- @param array  attributes Optional. Key-value pairs representing `<script>` tag attributes.
--- -- @return string String containing inline JavaScript code wrapped around `<script>` tag.
--- --
--- function wp_get_inline_script_tag( javascript, attributes = array() ) then
---         if ( ! isset( attributes["type"] ) && ! is_admin() && ! current_theme_supports( "html5", "script" ) ) then
---                 attributes["type"] = "text/javascript";
---         end;
---         --
---         -- Filters attributes to be added to a script tag.
---         --
---         -- @since 5.7.0
---         --
---         -- @param array  attributes Key-value pairs representing `<script>` tag attributes.
---         --                           Only the attribute name is added to the `<script>` tag for
---         --                           entries with a boolean value, and that are true.
---         -- @param string javascript Inline JavaScript code.
---         --
---         attributes = apply_filters( "wp_inline_script_attributes", attributes, javascript);
+   ------------------------------
+   -- Wp_Get_Inline_Script_Tag --
+   ------------------------------
 
---         javascript = "\n" . trim( javascript, "\n\r " ) . "\n";
+   function Wp_Get_Inline_Script_Tag (Javascript : String; Attributes : Array_Type := Empty_Array) return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Load;
+      use Inc_Themes;
 
---         return sprintf( "<script%s>%s</script>\n", wp_sanitize_script_attributes( attributes), javascript);
--- end;
+      Attributes_2 : Array_Type := Attributes;
+   begin
+      if not Isset (Attributes_2, "type") and then not Is_Admin and then not Current_Theme_Supports ("html5", "script") then
+         Set (Attributes_2, "type", From_String ("text/javascript"));
+      end if;
 
--- --
--- -- Prints inline JavaScript wrapped in `<script>` tag.
--- --
--- -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
--- -- Automatically injects type attribute if needed.
--- --
--- -- @since 5.7.0
--- --
--- -- @param string javascript Inline JavaScript code.
--- -- @param array  attributes Optional. Key-value pairs representing `<script>` tag attributes.
--- --
--- function wp_print_inline_script_tag( javascript, attributes = array() ) then
---         echo wp_get_inline_script_tag( javascript, attributes);
--- end;
+      --
+      -- Filters attributes to be added to a script tag.
+      --
+      -- @since 5.7.0
+      --
+      -- @param array  attributes Key-value pairs representing `<script>` tag attributes.
+      --                           Only the attribute name is added to the `<script>` tag for
+      --                           entries with a boolean value, and that are true.
+      -- @param string javascript Inline JavaScript code.
+      --
+      Attributes_2 := Apply_Filters ("wp_inline_script_attributes", Attributes_2, Javascript);
+
+      declare
+         Javascript_2 : constant String := NL & Trim (Javascript, "\n\r ") & NL;
+      begin
+         return Sprintf ("<script%s>%s</script>" & NL,
+                         [
+                           1 => Wp_Sanitize_Script_Attributes (Attributes_2),
+                           2 => Javascript_2
+                         ]);
+      end;
+   end Wp_Get_Inline_Script_Tag;
+
+   --------------------------------
+   -- Wp_Print_Inline_Script_Tag --
+   --------------------------------
+
+   procedure Wp_Print_Inline_Script_Tag
+     (Javascript : String; Attributes : Array_Type := Empty_Array)
+   is
+      use Php.Echoing;
+   begin
+      Echo (Wp_Get_Inline_Script_Tag (Javascript, Attributes));
+   end Wp_Print_Inline_Script_Tag;
 
    ----------------------------
    -- Wp_Maybe_Inline_Styles --
