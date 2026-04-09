@@ -11,7 +11,7 @@ begin
    Logging.Silence ("preg_match");
    Logging.Silence ("preg_replace");
    Logging.Silence ("preg_replace_callback");
--- Logging.Silence ("preg_split");
+   -- Logging.Silence ("preg_split");
    Logging.Silence ("inc_plugins.apply_filters");
    Logging.Silence ("apply_filters");
    Logging.Silence ("x_do_query");
@@ -25,7 +25,9 @@ begin
    Logging.Silence ("get_results");
    Logging.Silence ("get_results_base");
    Logging.Silence ("get_table_charset");
-   -- Logging.Silence ("do_action");
+   Logging.Silence ("html_entity_decode");
+   Logging.Silence ("mb_convert_encoding");
+   Logging.Silence ("json_encode");
 
    Globals.Initialize;
 
