@@ -32,7 +32,7 @@ is
       This.Src    := +Src;
       This.Deps   := Deps;
       This.Ver    := +Ver;
---      this.Args   := Args;
+      This.Args   := +Args;
 --      if not Is_Array (This.Deps) then
 --         This.Deps := Empty_Array;
 --      end if;

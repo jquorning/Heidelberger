@@ -66,7 +66,7 @@ is
    overriding
    function Do_Item (This   : in out Wp_Styles;
                      Handle : String;
-                     Group  : Integer := 0)
+                     Group  : Group_Type := No_Group)
                      return Boolean
    is
       use Php.Echoing;
@@ -368,8 +368,8 @@ is
    overriding
    function All_Deps (This      : in out Wp_Styles;
                       Handles   : List_Type;
-                      Recursion : Boolean := False;
-                      Group     : Integer := 0) -- false
+                      Recursion : Boolean    := False;
+                      Group     : Group_Type := No_Group)
                       return Boolean
    is
       use Wp_Common;

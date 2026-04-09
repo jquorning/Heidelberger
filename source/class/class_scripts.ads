@@ -18,6 +18,9 @@ is
    use Arrays;
    use Lists;
 
+   subtype Group_Type is Class_Dependencies.Group_Type;
+   No_Group : Group_Type renames Class_Dependencies.No_Group;
+
    --
    -- Core class used to register scripts.
    --
@@ -181,8 +184,8 @@ is
    -- @return string[] Handles of scripts that have been printed.
    --
    function Print_Scripts (This    : in out Wp_Scripts;
-                           Handles : List_Type := Empty_List;
-                           Group   : Integer   := 0) -- False
+                           Handles : List_Type  := Empty_List;
+                           Group   : Group_Type := No_Group)
                            return List_Type
                            with Side_Effects;
 
@@ -238,7 +241,7 @@ is
    overriding
    function Do_Item (This   : in out Wp_Scripts;
                      Handle : String;
-                     Group  : Integer := 0) -- Boolean := False)
+                     Group  : Group_Type := No_Group)
                      return Boolean;
 
    --
@@ -323,7 +326,7 @@ is
    function Set_Group (This      : in out Wp_Scripts;
                        Handle    : String;
                        Recursion : Boolean;
-                       Group     : Integer := 0) -- Boolean := False)
+                       Group     : Group_Type := No_Group)
                        return Boolean
                        with Side_Effects;
 
@@ -385,8 +388,8 @@ is
    overriding
    function All_Deps (This      : in out Wp_Scripts;
                       Handles   : List_Type; -- String;
-                      Recursion : Boolean := False;
-                      Group     : Integer := 0) -- False
+                      Recursion : Boolean    := False;
+                      Group     : Group_Type := No_Group)
                       return Boolean
                       with Side_Effects;
 

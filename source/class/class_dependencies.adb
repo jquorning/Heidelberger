@@ -22,8 +22,8 @@ is
    --------------
 
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := Empty_List;
-                      Group   : Integer   := 0)
+                      Handles : List_Type  := Empty_List;
+                      Group   : Group_Type := No_Group)
                       return List_Type
    is
       use Php.Lists;
@@ -73,7 +73,7 @@ is
 
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : Boolean;
-                      Group   : Integer := 0) --  = false
+                      Group   : Group_Type := No_Group)
                       return List_Type
    is
    begin
@@ -86,7 +86,7 @@ is
 
    procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : List_Type;
-                       Group   : Integer := 0)
+                       Group   : Group_Type := No_Group)
    is
       Unused : constant List_Type := Do_Items (This, Handles, Group);
    begin
@@ -99,7 +99,7 @@ is
 
    procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : Boolean;
-                       Group   : Integer := 0)
+                       Group   : Group_Type := No_Group)
    is
       Unused : constant List_Type :=
         Do_Items (Wp_Dependencies'Class (This), Handles, Group);
@@ -113,7 +113,7 @@ is
 
    function Do_Item (This   : in out Wp_Dependencies;
                      Handle : String;
-                     Group  : Integer := 0) -- false
+                     Group  : Group_Type := No_Group)
                      return Boolean
    is
       use Class_Dependency.Dependency_Maps;
@@ -127,8 +127,8 @@ is
 
    function All_Deps (This      : in out Wp_Dependencies;
                       Handles   : List_Type;
-                      Recursion : Boolean := False;
-                      Group     : Integer := 0)
+                      Recursion : Boolean    := False;
+                      Group     : Group_Type := No_Group)
                       return Boolean
    is
       use Php.Lists;
@@ -155,7 +155,7 @@ is
 
             declare
                Moved : constant Boolean := This.Set_Group (Handle_2, Recursion, Group);
-               New_Group  : constant Integer := This.Groups (Handle_2);
+               New_Group  : constant Group_Type := This.Groups (Handle_2);
                Keep_Going : Boolean := True;
             begin
                if Queued and not Moved then -- Already queued and in the right group.
@@ -291,7 +291,7 @@ is
                   Args   : Integer   := 0)
    is
       Unused : constant Boolean :=
-        Add (This, Handle, Boolean'Image (Src), Deps, Ver, Helpers.Image (Args));
+        Add (This, Handle, (if Src then "true" else ""), Deps, Ver, Helpers.Image (Args));
    begin
       null;
    end Add;
@@ -590,10 +590,10 @@ is
    function Set_Group (This      : in out Wp_Dependencies;
                        Handle    : String;
                        Recursion : Boolean;
-                       Group     : Integer)
+                       Group     : Group_Type)
                        return Boolean
    is
-      use Class_Dependencies.Integer_Maps;
+      use Class_Dependencies.Group_Maps;
    begin
       if
         Has_Element (This.Groups.Find (Handle)) and then
@@ -602,9 +602,8 @@ is
          return False;
       end if;
 
---    Ada.Text_IO.Put_Line (This'Image);
-      This.Groups.Insert (Key      => Handle,
-                          New_Item => Group);
+      This.Groups.Include (Key      => Handle,
+                           New_Item => Group);
 
       return True;
    end Set_Group;

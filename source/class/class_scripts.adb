@@ -98,9 +98,9 @@ is
    -------------------
 
    function Print_Scripts (This    : in out Wp_Scripts;
-                           Handles : List_Type := Empty_List;
-                           Group   : Integer   := 0) -- False)
-                           return List_Type -- String_Array
+                           Handles : List_Type  := Empty_List;
+                           Group   : Group_Type := No_Group)
+                           return List_Type
    is
    begin
       return This.Do_Items (Handles, Group);
@@ -174,7 +174,7 @@ is
    overriding
    function Do_Item (This   : in out Wp_Scripts;
                      Handle : String;
-                     Group  : Integer := 0)
+                     Group  : Group_Type := No_Group)
                      return Boolean
    is
       use Php.Echoing;
@@ -297,24 +297,21 @@ is
                Srce : constant String :=
                   Apply_Filters ("script_loader_src", Src, Handle);
             begin
-               if
-                 This.In_Default_Dir (Srce) and then
-                 (Before_Handle /= "" or else After_Handle /= "" or else
-                 Translations_Stop_Concat)
+               if This.In_Default_Dir (Srce)
+                 and then (Before_Handle /= ""
+                           or else After_Handle /= ""
+                           or else Translations_Stop_Concat)
                then
                   This.Do_Concat := False;
 
                   -- Have to print the so-far concatenated scripts right
                   -- away to maintain the right order.
-                  Inc_Script_Loader.X_Print_Scripts; -- ();
-                  This.Reset; -- ();
-               elsif
-                 This.In_Default_Dir (Srce) and then
-                 Conditional /= ""
-               then
-                  Append (This.Print_Code,
-                          This.Print_Extra_Script (Handle, False));
-                  Append (This.Concat,         Handle & ",");
+                  Inc_Script_Loader.X_Print_Scripts;
+                  This.Reset;
+               elsif This.In_Default_Dir (Srce) and then Conditional = "" then
+                  Append
+                    (This.Print_Code, This.Print_Extra_Script (Handle, False));
+                  Append (This.Concat, Handle & ",");
                   Append (This.Concat_Version, Handle & Ver);
                   return True;
                else
@@ -611,25 +608,18 @@ is
    function Set_Group (This      : in out Wp_Scripts;
                        Handle    : String;
                        Recursion : Boolean;
-                       Group     : Integer := 0) -- Boolean := False)
+                       Group     : Group_Type := No_Group)
                        return Boolean
    is
       use Php.Strings;
       use UStrings;
       use Class_Dependencies;
 
-      Grp : Integer;
+      Grp : Group_Type;
    begin
-      if
-        not Empty (This.Registered (Handle).Args) and then
-        Length (This.Registered (Handle).Args) = 1
-      then
-         Grp := 1;
-      else
-         Grp := 1; -- Integer'Value (This.Get_Data (Handle, "group"));
-      end if;
+      Grp := (if -This.Registered (Handle).Args = "1" then 1 else 0);
 
-      if 0 /= Group and then Grp > Group then
+      if No_Group /= Group and then Grp > Group then
          Grp := Group;
       end if;
 
@@ -750,9 +740,9 @@ is
    --------------
 
    function All_Deps (This      : in out Wp_Scripts;
-                      Handles   : List_Type; -- String;
-                      Recursion : Boolean := False;
-                      Group     : Integer := 0)
+                      Handles   : List_Type;
+                      Recursion : Boolean    := False;
+                      Group     : Group_Type := No_Group)
                       return Boolean
    is
       use Wp_Common;

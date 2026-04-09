@@ -20,10 +20,13 @@ package Class_Dependencies
 is
    use Lists;
 
-   package Integer_Maps is new
+   type Group_Type is new Integer range -1 .. Integer'Last;
+   No_Group : constant Group_Type := -1;
+
+   package Group_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => Integer);
-   subtype Integer_Map is Integer_Maps.Map;
+                                              Element_Type => Group_Type);
+   subtype Group_Map is Group_Maps.Map;
 
    --
    -- Core base class extended to register items.
@@ -93,7 +96,7 @@ is
         --
         -- @var (int|false)[]
         --
-        Groups : Integer_Map;
+        Groups : Group_Map;
 
         --
         -- A handle group to enqueue.
@@ -103,7 +106,7 @@ is
         -- @deprecated 4.5.0
         -- @var int
         --
-        Group : Integer := 0;
+--        Group : Integer := 0;
 
         --
         -- Cached lookup array of flattened queued items and dependencies.
@@ -144,25 +147,25 @@ is
    -- @return string[] Array of handles of items that have been processed.
    --
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := Empty_List; -- = false,
-                      Group   : Integer   := 0) --  = false
+                      Handles : List_Type  := Empty_List; -- = false,
+                      Group   : Group_Type := No_Group)
                       return List_Type
                       with Side_Effects;
 
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : Boolean;
-                      Group   : Integer := 0) --  = false
+                      Group   : Group_Type := No_Group)
                       return List_Type
                       with Side_Effects;
 --                    is ([]);
 
    procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : List_Type;
-                       Group   : Integer := 0); --  = false
+                       Group   : Group_Type := No_Group);
 
    procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : Boolean;
-                       Group   : Integer := 0); --  = false
+                       Group   : Group_Type := No_Group);
 
    --
    -- Processes a dependency.
@@ -177,7 +180,7 @@ is
    --
    function Do_Item (This   : in out Wp_Dependencies;
                      Handle : String;
-                     Group  : Integer := 0) -- False
+                     Group  : Group_Type := No_Group)
                      return Boolean;
 
    --
@@ -201,8 +204,8 @@ is
    --
    function All_Deps (This      : in out Wp_Dependencies;
                       Handles   : List_Type; -- String_Array;
-                      Recursion : Boolean := False;
-                      Group     : Integer := 0) -- = false
+                      Recursion : Boolean    := False;
+                      Group     : Group_Type := No_Group)
                       return Boolean
                       with Side_Effects;
 
@@ -414,7 +417,7 @@ is
    function Set_Group (This      : in out Wp_Dependencies;
                        Handle    : String;
                        Recursion : Boolean;
-                       Group     : Integer)
+                       Group     : Group_Type)
                        return Boolean
                        with Side_Effects;
 
