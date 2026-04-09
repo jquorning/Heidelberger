@@ -13,6 +13,15 @@ is
    use Arrays;
 
    --
+   -- Retrieves the URL prefix for any API resource.
+   --
+   -- @since 4.4.0
+   --
+   -- @return string Prefix.
+   --
+   function REST_Get_URL_Prefix return String;
+
+   --
    -- Retrieves the URL to a REST endpoint on a site.
    --
    -- Note: The returned URL is NOT escaped.
@@ -31,8 +40,7 @@ is
    function Get_REST_URL (Blog_Id : Integer := 0; -- null
                           Path    : String  := "/";
                           Scheme  : String  := "rest")
-                          return String
-                          is ("XXX-781");
+                          return String;
 
    --
    -- Sets the "additionalProperties" to false by default for all object definitions

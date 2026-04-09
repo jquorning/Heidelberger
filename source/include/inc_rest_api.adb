@@ -7,6 +7,19 @@
 --
 
 with Php.Arrays;
+with Php.HTML;
+with Php.Strings;
+
+with Binder;
+with UStrings;
+with Wp_Common;
+
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Link_Templates;
+with Inc_Load;
+with Inc_Ms_Blogs;
+with Inc_Options;
 
 package body Inc_REST_API
 is
@@ -417,97 +430,110 @@ is
 --         die();
 -- end;
 
--- --
--- -- Retrieves the URL prefix for any API resource.
--- --
--- -- @since 4.4.0
--- --
--- -- @return string Prefix.
--- --
--- function rest_get_url_prefix() then
---         --
---         -- Filters the REST URL prefix.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string prefix URL prefix. Default "wp-json".
---         --
---         return apply_filters( "rest_url_prefix", "wp-json" );
--- end;
+   -------------------------
+   -- REST_Get_URL_Prefix --
+   -------------------------
 
--- --
--- -- Retrieves the URL to a REST endpoint on a site.
--- --
--- -- Note: The returned URL is NOT escaped.
--- --
--- -- @since 4.4.0
--- --
--- -- @todo Check if this is even necessary
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param int|null blog_id Optional. Blog ID. Default of null returns URL for current blog.
--- -- @param string   path    Optional. REST route. Default "/".
--- -- @param string   scheme  Optional. Sanitization scheme. Default "rest".
--- -- @return string Full URL to the endpoint.
--- --
--- function get_rest_url( blog_id = null, path = "/", scheme = "rest" ) then
---         if ( empty( path ) ) then
---                 path = "/";
---         end;
+   function REST_Get_URL_Prefix return String is
+      use Wp_Common;
+   begin
+      --
+      -- Filters the REST URL prefix.
+      --
+      -- @since 4.4.0
+      --
+      -- @param string prefix URL prefix. Default "wp-json".
+      --
+      return Apply_Filters ("rest_url_prefix", "wp-json");
+   end REST_Get_URL_Prefix;
 
---         path = "/" . ltrim( path, "/" );
+   ------------------
+   -- Get_REST_URL --
+   ------------------
 
---         if ( is_multisite() && get_blog_option( blog_id, "permalink_structure" ) || get_option( "permalink_structure" ) ) then
---                 global wp_rewrite;
+   function Get_REST_URL
+     (Blog_Id : Integer := 0; Path : String := "/"; Scheme : String := "rest")
+      return String
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Binder;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
+      use Inc_Options;
 
---                 if ( wp_rewrite.using_index_permalinks() ) then
---                         url = get_home_url( blog_id, wp_rewrite.index . "/" . rest_get_url_prefix(), scheme );
---                 end; else then
---                         url = get_home_url( blog_id, rest_get_url_prefix(), scheme );
---                 end;
+      Path_2 : constant String := (if Empty (Path) then "/" else Path);
 
---                 url .= path;
---         end; else then
---                 url = trailingslashit( get_home_url( blog_id, "", scheme ) );
---                 // nginx only allows HTTP/1.0 methods when redirecting from / to /index.php.
---                 // To work around this, we manually add index.php to the URL, avoiding the redirect.
---                 if ( "index.php" !== substr( url, 9 ) ) then
---                         url .= "index.php";
---                 end;
+      Path_3 : constant String := "/" & Ltrim (Path_2, "/");
 
---                 url = add_query_arg( "rest_route", path, url );
---         end;
+      URL : UString;
+   begin
+      if Is_Multisite
+        and then (Get_Blog_Option (Blog_Id, "permalink_structure")
+                  = Empty_Array
+                  or else Get_Option ("permalink_structure"))
+      then
+         --                global wp_rewrite;
 
---         if ( is_ssl() && isset( _SERVER["SERVER_NAME"] ) ) then
---                 // If the current host is the same as the REST URL host, force the REST URL scheme to HTTPS.
---                 if ( parse_url( get_home_url( blog_id ), PHP_URL_HOST ) === _SERVER["SERVER_NAME"] ) then
---                         url = set_url_scheme( url, "https" );
---                 end;
---         end;
+         if Global_Wp_Rewrite.Using_Index_Permalinks then
+            URL :=
+              +Get_Home_URL
+                 (Blog_Id,
+                  (-Global_Wp_Rewrite.Index) & "/" & REST_Get_URL_Prefix,
+                  Scheme);
+         else
+            URL := +Get_Home_URL (Blog_Id, REST_Get_URL_Prefix, Scheme);
+         end if;
 
---         if ( is_admin() && force_ssl_admin() ) then
---                 /*
---                 -- In this situation the home URL may be http:, and `is_ssl()` may be false,
---                 -- but the admin is served over https: (one way or another), so REST API usage
---                 -- will be blocked by browsers unless it is also served over HTTPS.
---                 --
---                 url = set_url_scheme( url, "https" );
---         end;
+         Append (URL, Path_3);
+      else
+         URL := +Trailing_Slash_It (Get_Home_URL (Blog_Id, "", Scheme));
+         -- nginx only allows HTTP/1.0 methods when redirecting from / to /index.php.
+         -- To work around this, we manually add index.php to the URL, avoiding the redirect.
+         if "index.php" /= Substr (-URL, 9) then
+            Append (URL, "index.php");
+         end if;
 
---         --
---         -- Filters the REST URL.
---         --
---         -- Use this filter to adjust the url returned by the get_rest_url() function.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string   url     REST URL.
---         -- @param string   path    REST route.
---         -- @param int|null blog_id Blog ID.
---         -- @param string   scheme  Sanitization scheme.
---         --
---         return apply_filters( "rest_url", url, path, blog_id, scheme );
--- end;
+         URL := +Add_Query_Arg ("rest_route", Path_3, -URL);
+      end if;
+
+      if Is_SSL and then Isset (X_SERVER, "SERVER_NAME") then
+         -- If the current host is the same as the REST URL host, force the REST URL scheme to HTTPS.
+         if Parse_URL (Get_Home_URL (Blog_Id), PHP_URL_HOST)
+           = Get_As_String (X_SERVER, "SERVER_NAME")
+         then
+            URL := +Set_URL_Scheme (-URL, "https");
+         end if;
+      end if;
+
+      if Is_Admin and then Force_SSL_Admin then
+         --
+         -- In this situation the home URL may be http:, and `is_ssl()` may be false,
+         -- but the admin is served over https: (one way or another), so REST API usage
+         -- will be blocked by browsers unless it is also served over HTTPS.
+         --
+         URL := +Set_URL_Scheme (-URL, "https");
+      end if;
+
+      --
+      -- Filters the REST URL.
+      --
+      -- Use this filter to adjust the url returned by the get_rest_url() function.
+      --
+      -- @since 4.4.0
+      --
+      -- @param string   url     REST URL.
+      -- @param string   path    REST route.
+      -- @param int|null blog_id Blog ID.
+      -- @param string   scheme  Sanitization scheme.
+      --
+      return Apply_Filters ("rest_url", -URL, Path_3, Blog_Id, Scheme);
+   end Get_REST_URL;
 
 -- --
 -- -- Retrieves the URL to a REST endpoint.
