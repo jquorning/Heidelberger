@@ -7,26 +7,71 @@ with GNATCOLL.JSON;
 with Php.Arrays;
 
 with Helpers;
+with Lists;
 with Logging;
 
 package body Php.JSON
 is
+   use Lists;
 
    -----------------
    -- JSON_Encode --
    -----------------
 
-   function JSON_Encode (Value : Multi_Type;
-                         Flags : Integer := 0;
-                         Depth : Integer := 512)
-                         return String
+   function JSON_Encode
+     (Value : Multi_Type; Flags : Integer := 0; Depth : Integer := 512)
+      return String
    is
       use GNATCOLL.JSON;
 
-      JSON : JSON_Value;
+      function To_JSON (Value : Multi_Type) return JSON_Value;
+
+      function To_JSON (Value : Multi_Type) return JSON_Value is
+      begin
+         case Kind_Of (Value) is
+            when Kind_Array                =>
+               declare
+                  A   : Array_Type renames As_Array (Value);
+                  Obj : constant JSON_Value := Create_Object;
+               begin
+                  for B in A.Iterate loop
+                     Obj.Set_Field (Key (B), To_JSON (Element (B)));
+                  end loop;
+
+                  return Obj;
+               end;
+
+            when Kind_String               =>
+               return Create (As_String (Value));
+
+            when Kind_Integer              =>
+               return Create (As_Integer (Value));
+
+            when Kind_List                 =>
+               declare
+                  A    : List_Type renames As_List (Value);
+                  Arry : JSON_Array := GNATCOLL.JSON.Empty_Array;
+               begin
+                  for B of A loop
+                     Append (Arry, Create (B));
+                  end loop;
+
+                  return Create (Arry);
+               end;
+
+            when Kind_Boolean              =>
+               return Create (As_Boolean (Value));
+
+            when Kind_Null | Kind_Callable =>
+               return Create ("XXX-A04");
+         end case;
+      end To_JSON;
+
+      JSON   : constant JSON_Value := To_JSON (Value);
+      Result : constant String := Write (JSON, Compact => True);
    begin
-      Logging.Log ("json_encode", "not implemented");
-      return Write (JSON, Compact => True);
+      Logging.Log ("json_encode", Result);
+      return Result;
    end JSON_Encode;
 
    -----------------
