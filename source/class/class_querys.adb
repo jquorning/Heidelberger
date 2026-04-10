@@ -11,7 +11,6 @@ with Ada.Containers;
 with Php.Lists;
 with Php.Strings;
 
-with Globals;
 with Helpers;
 with Lists;
 

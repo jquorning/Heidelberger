@@ -73,7 +73,7 @@ is
       -- end if;
 
 --    updater = new WP_Automatic_Updater();
-      Enabled : Boolean := not False; -- updater.is_disabled();
+      Enabled : constant Boolean := not False; -- updater.is_disabled();
    begin
       if  Typ in "plugin" then
          --

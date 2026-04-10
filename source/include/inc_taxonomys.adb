@@ -3853,16 +3853,13 @@ is
    ---------------------------
    -- Get_Object_Term_Cache --
    ---------------------------
--- function get_object_term_cache (id, taxonomy) then
 
    function Get_Object_Term_Cache (Id       : Integer;
                                    Taxonomy : String)
                                    return Class_Terms.Wp_Term_Array
    is
-      use Ada.Containers;
       use Adi_Caches;
       use Class_Terms;
---    use Array_Maps;
 
       Unused_Hit : Boolean;
       X_Term_Ids : Array_Type;

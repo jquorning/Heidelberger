@@ -13,7 +13,6 @@ with Wp_Common;
 
 with Class_Locales;
 with Inc_L10n;
-with Inc_Plugins;
 
 package body Class_Locale_Switchers
 is
@@ -31,7 +30,6 @@ is
       use Php.Lists;
       use Wp_Common;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Current_Locale : constant String := Determine_Locale; -- ()
    begin
@@ -70,7 +68,6 @@ is
       use Php.Misc;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Previous_Locale : constant String := List_Pop (This.Locales);
    begin
@@ -142,7 +139,6 @@ is
                             Locale : String)
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       This.Load_Translations (Locale);
 

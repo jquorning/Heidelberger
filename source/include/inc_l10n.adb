@@ -13,11 +13,9 @@ with Php.Strings;
 with Php.Types;
 
 with Array_Lists;
-with Arrays.IO;
 with Binder;
 with Constants;
 with Globals;
-with Logging;
 with Wp_Common;
 
 with Adi_Translation_Install;

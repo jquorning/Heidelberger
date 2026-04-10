@@ -8,7 +8,6 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Arrays;
-with Array_Lists;
 with Lists;
 
 with Class_Errors;

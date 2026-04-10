@@ -16,7 +16,6 @@ with Php.Strings;
 
 with Array_Lists;
 with Lists;
-with Logging;
 
 package body Class_Requests
 is

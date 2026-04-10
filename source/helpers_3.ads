@@ -6,7 +6,6 @@ with Arrays;
 with Lists;
 
 with Class_Admin_Bar;
-with Class_Dependency;
 with Class_Posts;
 with Class_Post_Type;
 with Class_Taxonomy;

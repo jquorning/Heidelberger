@@ -6,14 +6,12 @@
 -- @since 4.3.0
 --
 
-with Arrays;
 with Integer_Vectors;
 
 limited with Class_Customize_Managers;
 
 package Class_Customize_Nav_Menus
 is
-   use Arrays;
 
    --
    -- Customize Nav Menus class.
