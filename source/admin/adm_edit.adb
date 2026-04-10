@@ -884,13 +884,15 @@ is
 
             if "trashed" = Message and then Isset (X_REQUEST, "ids") then
                declare
-                  Ids : constant Integer :=
-                    Preg_Replace ("/[^0-9,]/", "",
-                      As_Array (Get (X_REQUEST, "ids")));
+                  Ids : constant String :=
+                    Preg_Replace
+                      (Pattern     => "/[^0-9,]/",
+                       Replacement => "",
+                       Subject     => Get_As_String (X_REQUEST, "ids"));
 
                   URL_2 : constant String :=
                      """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
-                     Helpers.Image (Ids) & """";
+                     Ids & """";
 
                   URL : constant String :=
                     ESC_URL (Wp_Nonce_URL (URL_2, "bulk-posts"));

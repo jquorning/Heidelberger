@@ -1404,10 +1404,6 @@ is
 
       Removable_Query_Args : constant List_Type := Wp_Removable_Query_Args;
    begin
-      if Removable_Query_Args.Is_Empty then
-         return;
-      end if;
-
       declare
          -- Ensure we're using an absolute URL.
          Current_URL : constant String :=

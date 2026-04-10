@@ -299,20 +299,30 @@ is
          Append (Admin_Body_Class, " taxonomy-" & Globals.Current_Screen.Taxonomy);
       end if;
 
-      Append (Admin_Body_Class, " branch-" &
-        Str_Replace (List_Type'[".", ","], "-", Get_Bloginfo ("version")));
+      Append
+        (Admin_Body_Class,
+         " branch-"
+         & Str_Replace (List_Type'[".", ","], "-", Get_Bloginfo ("version")));
 
-      Append (Admin_Body_Class, " version-" &
-         Str_Replace (".", "-", Preg_Replace ("/^([.0-9]+).*/", "$1",
-                                              Get_Bloginfo ("version"))));
+      Append
+        (Admin_Body_Class,
+         " version-"
+         & Str_Replace
+             (".",
+              "-",
+              Preg_Replace
+                ("/^([.0-9]+).*/", "$1", Get_Bloginfo ("version"))));
 
-      Append (Admin_Body_Class, " admin-color-" &
-                               Sanitize_HTML_Class (
-                                 Get_User_Option ("admin_color"), "fresh"));
+      Append
+        (Admin_Body_Class,
+         " admin-color-"
+         & Sanitize_HTML_Class (Get_User_Option ("admin_color"), "fresh"));
 
-      Append (Admin_Body_Class, " locale-" &
-                               Sanitize_HTML_Class (Strtolower (
-                                 Str_Replace ("_", "-", Get_User_Locale))));
+      Append
+        (Admin_Body_Class,
+         " locale-"
+         & Sanitize_HTML_Class
+             (Strtolower (Str_Replace ("_", "-", Get_User_Locale))));
 
       if Inc_Vars.Wp_Is_Mobile then
          Append (Admin_Body_Class, " mobile");
@@ -336,14 +346,15 @@ is
          Error_Get_Last : constant Array_Type := Php.Errors.Error_Get_Last; --()
       begin
          -- Print a CSS class to make PHP errors visible.
-         if
-           Error_Get_Last.Is_Empty and then Constants.WP_DEBUG and then
-           Constants.WP_DEBUG_DISPLAY and then "" /= Ini_Get ("display_errors")
+         if Error_Get_Last.Is_Empty
+           and then Constants.WP_DEBUG
+           and then Constants.WP_DEBUG_DISPLAY
+           and then "" /= Ini_Get ("display_errors")
            -- Don't print the class for PHP notices in wp-config.php, as they happen
            -- before WP_DEBUG takes effect, and should not be displayed with the
            -- `error_reporting` level previously set in wp-load.php.
---           and then ( -- E_NOTICE /= Error_Get_Last ("type") or else
---                     "wp-config.php" /= Inc_Formatting.Wp_Basename (Error_Get_Last ("file").First_Element.Key))
+           --           and then ( -- E_NOTICE /= Error_Get_Last ("type") or else
+           --                     "wp-config.php" /= Inc_Formatting.Wp_Basename (Error_Get_Last ("file").First_Element.Key))
          then
             Append (Admin_Body_Class, " php-error");
          end if;

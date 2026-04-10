@@ -132,7 +132,7 @@ is
       end if;
 
       -- Set up static variables. Run once only.
-      if Reset or else not Static_Characters.Is_Empty then -- isset
+      if Reset or else Static_Characters.Is_Empty then -- not isset
          --
          -- Filters whether to skip running wptexturize().
          --
@@ -356,14 +356,14 @@ is
             Regex : constant String :=
               X_Get_Wptexturize_Split_Regex (Shortcode_Regex);
 
-            Textarr : constant List_Type := Empty_List; -- XXX
---            Preg_Split (Regex, Text, -1,
---                        PREG_SPLIT_DELIM_CAPTURE + PREG_SPLIT_NO_EMPTY);
+            Textarr : List_Type := -- constant List_Type :=
+              Preg_Split (Regex, Text, No_Limit,
+                          (PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY => True));
          begin
-            for Curl_0 of Textarr loop -- &
+            for Curl of Textarr loop -- &
                -- Only call _wptexturize_pushpop_element if curl is a delimiter.
                declare
-                  Curl  : String := Curl_0;
+--                  Curl  : String := Curl_0;
                   First : constant Character := Curl (1);
                begin
 
@@ -436,11 +436,15 @@ is
                         Curl := Str_Replace (Open_Q_Flag, Opening_Quote, Curl);
                      end if;
 
-                     if 0 /= Strpos (Curl, "-") then  -- false
+                     if 0 /= Strpos (Curl, "-") then
+                        -- false
                         Curl :=
-                          Preg_Replace (Get_As_String (Dynamic_Characters, "dash"),
-                                        Get_As_String (Dynamic_Replacements, "dash"),
-                                        Curl);
+                          Preg_Replace
+                            (Pattern     =>
+                               As_List (Get (Dynamic_Characters, "dash")),
+                             Replacement =>
+                               As_List (Get (Dynamic_Replacements, "dash")),
+                             Subject     => Curl);
                      end if;
 
                      -- 9x9 (times), but never 0x9999.
@@ -506,7 +510,7 @@ is
                declare
                   Count      : Natural;
                   Sentence_2 : constant String :=
-                    Preg_Replace (Quote_Pattern, Flag, Sentence, -1, Count);
+                    Preg_Replace (Quote_Pattern, Flag, Sentence, No_Limit, Count);
                begin
                   if Count > 1 then
                      -- This sentence appears to have multiple closing quotes.
@@ -515,7 +519,7 @@ is
                         Count_2    : Natural;
                         Sentence_3 : UString :=
                           +Preg_Replace (Flag_No_Digit, Close_Quote,
-                                         Sentence_2, -1, Count_2);
+                                         Sentence_2, No_Limit, Count_2);
                      begin
                         if 0 = Count_2 then
                            -- Try looking for a quote followed by a period.

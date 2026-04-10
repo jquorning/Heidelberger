@@ -119,7 +119,7 @@ is
                      "SELECT COUNT( 1 )"     &
                      " FROM " & Posts        &
                      " WHERE post_type = %s" &
-                     " AND post_status NOT IN (""trash"", ""auto-draft"")" &
+                     " AND post_status NOT IN ('trash', 'auto-draft')" &
                      " AND ID IN (" & Sticky_Posts_2 & ")",
                      [1 => -Globals.Global_Post_Type]
                  )));

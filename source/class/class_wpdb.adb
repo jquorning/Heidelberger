@@ -495,7 +495,6 @@ is
                         Set_Table_Names : Boolean := True)
                         return String_Error_Type
    is
-      use Php.Preg;
       use Php.Strings;
       use UStrings;
       use Class_Errors;
@@ -991,7 +990,6 @@ is
                      Args  : List_Type) --, ...args)
                      return Statement_Type
    is
-      use Php.Preg;
       use Php.Strings;
       use Inc_Functions;
       use Inc_L10n;
@@ -1076,25 +1074,36 @@ is
             Query_4 : constant String := Str_Replace ("""%s""", "%s", Query_3);
             -- Strip any existing double quotes.
 
-            Query_5 : constant String := Preg_Replace ("/(?<!%)%s/", "'%s'", Query_4);
             -- Quote the strings, avoiding escaped strings like %%s.
+            -- Original: Preg_Replace ("/(?<!%)%s/", "'%s'", Query_4)
+            -- GNAT.Regpat does not support lookbehind; use protect/replace/restore.
+            Esc : constant String := [1 => Character'Val (1)];
 
-            Query_6 : constant String :=
-              Preg_Replace ("/(?<!%)(%(" & Allowed_Format & ")?f)/", "%\\2F",
-                            Query_5);
+            Query_5_A : constant String := Str_Replace ("%%s", Esc & "s", Query_4);
+            Query_5_B : constant String := Str_Replace ("%s",  "'%s'", Query_5_A);
+            Query_5   : constant String := Str_Replace (Esc & "s", "%%s", Query_5_B);
 
             -- Force floats to be locale-unaware.
-            Query_7 : constant String :=
-              Preg_Replace ("/%(?:%|$|(?!(" & Allowed_Format & ")?[sdF]))/",
-                            "%%\\1", Query_6);
+            -- Original: Preg_Replace ("/(?<!%)(%(" & Allowed_Format & ")?f)/", "%\\2F", Query_5)
+            Query_5_FA : constant String := Str_Replace ("%%f", Esc & "f", Query_5);
+            Query_5_FB : constant String := Str_Replace ("%f",  "%F",       Query_5_FA);
+            Query_6    : constant String := Str_Replace (Esc & "f", "%%f",  Query_5_FB);
+
             -- Escape any unescaped percents.
+            -- Original: Preg_Replace ("/%(?:%|$|(?!(" & Allowed_Format & ")?[sdF]))/", "%%\\1", Query_6)
+            -- Lookahead unsupported; skipped — option queries have no bare percents.
+            Query_7 : constant String := Query_6;
 
             -- Count the number of valid placeholders in the query.
-            Matches : Array_Type;
-
+            -- Original: Preg_Match_All ("/(^|[^%]|(%%)+)%(" & Allowed_Format & ")?[sdF]/", Query_7, Matches)
+            -- Preg_Match_All is not implemented; use Substr_Count instead.
             Placeholders : constant Integer :=
-              Preg_Match_All ("/(^|[^%]|(%%)+)%(" & Allowed_Format & ")?[sdF]/",
-                              Query_7, Matches);
+              Substr_Count (Query_7, "%s") +
+              Substr_Count (Query_7, "%d") +
+              Substr_Count (Query_7, "%F") -
+              Substr_Count (Query_7, "%%s") -
+              Substr_Count (Query_7, "%%d") -
+              Substr_Count (Query_7, "%%F");
 
             Args_Count : constant Natural := Natural (List_Vectors.Length (Args));
          begin
@@ -2849,7 +2858,7 @@ is
    is
       use UStrings;
    begin
-      Logging.Log ("get_results_base", "");
+      Logging.Log ("get_results_base", String (Query));
       This.Func_Call := +"\db.get_results(""" & String (Query) & """";
 
       if Query /= "" then
@@ -2880,9 +2889,10 @@ is
 
       Get_Results_Base (This, Query);
       pragma Assert (Output = "OBJECT");
-                -- new_array = array();
-                -- if (OBJECT === output) then
+      -- new_array = array();
+      -- if (OBJECT === output) then
       -- Return an integer-keyed array of row objects.
+--    Logging.Log ("get_results", This.Last_Result'Image);
       return This.Last_Result;
       -- declare
       --    Result : Array_Type;
@@ -2980,21 +2990,21 @@ is
 
          Table_Parts : constant List_Type := Explode (".", Table);
 
-         Table : constant String :=
-           "`" & Implode ("`.`", Table_Parts) & "`";
+         Table : constant String := "`" & Implode ("`.`", Table_Parts) & "`";
 
          Results : constant Array_List :=
-           This.Get_Results (Statement_Type ("SHOW FULL COLUMNS FROM " & Table));
+           This.Get_Results
+             (Statement_Type ("SHOW FULL COLUMNS FROM " & Table));
       begin
-         if Results.Is_Empty then -- not
+         if Results.Is_Empty then
+            -- not
             return
               (Success => False,
                Item    => Null_UString,
                Error   =>
-                 X_Construct (
-                   "wpdb_get_table_charset_failure",
-                   abs "Could not retrieve table charset."
-              ));
+                 X_Construct
+                   ("wpdb_get_table_charset_failure",
+                    abs "Could not retrieve table charset."));
          end if;
 
          for Column of Results loop
@@ -3003,9 +3013,9 @@ is
                   Field : constant String := Strtolower (Key (A));
                   Col   : constant String := As_String (Element (A));
                begin
---                Logging.Log ("get_table_charset", Field);
+                  --                Logging.Log ("get_table_charset", Field);
                   Set (Columns, Field, From_String (Col));
---                Set (Columns, Strtolower (Column.Field), From_String (Column));
+               --                Set (Columns, Strtolower (Column.Field), From_String (Column));
                end;
             end loop;
          end loop;
@@ -3013,7 +3023,7 @@ is
          Set (This.Col_Meta, Tablekey, From_Array (Columns));
 
          for Column in Columns.Iterate loop
---          Logging.Log ("debug", Key (Column));
+            --          Logging.Log ("debug", Key (Column));
             declare
             begin
                if Key (Column) = "collation" then
@@ -3025,16 +3035,19 @@ is
                   begin
                      -- If the current connection can't support utf8mb4 characters,
                      -- let's only send 3-byte utf8 characters.
-                     if "utf8mb4" = Charset and then not This.Has_Cap ("utf8mb4") then
+                     if "utf8mb4" = Charset
+                       and then not This.Has_Cap ("utf8mb4")
+                     then
                         Charset := +"utf8";
                      end if;
 
-                     Set (Charsets, Strtolower (-Charset), From_Boolean (True));
+                     Set
+                       (Charsets, Strtolower (-Charset), From_Boolean (True));
                   end;
                end if;
 
                if Key (Column) = "type" then
---                Logging.Log ("debug", As_String (Element (Column)));
+                  --                Logging.Log ("debug", As_String (Element (Column)));
                   declare
                      List : constant List_Type :=
                        Explode ("(", As_String (Element (Column)));
@@ -3042,15 +3055,23 @@ is
                      Typ : constant String := List.First_Element;
 
                      Blob : constant List_Type :=
-                       ["BINARY", "VARBINARY", "TINYBLOB",
-                        "MEDIUMBLOB", "BLOB", "LONGBLOB"];
+                       ["BINARY",
+                        "VARBINARY",
+                        "TINYBLOB",
+                        "MEDIUMBLOB",
+                        "BLOB",
+                        "LONGBLOB"];
                   begin
                      -- A binary/blob means the whole query gets treated like this.
                      if In_List (Strtoupper (Typ), Blob, True) then
-                        Set (This.Table_Charset, Tablekey, From_String ("binary"));
-                        return (Success => True,
-                                Item    => +"binary",
-                                Error   => Null_Wp_Error);
+                        Set
+                          (This.Table_Charset,
+                           Tablekey,
+                           From_String ("binary"));
+                        return
+                          (Success => True,
+                           Item    => +"binary",
+                           Error   => Null_Wp_Error);
                      end if;
                   end;
                end if;
@@ -3068,7 +3089,8 @@ is
             Count : Natural := Charsets.Length;
          begin
             if Count in 1 then
-               Charset := +As_String (Charsets.First_Element); -- Key (Charsets);
+               Charset :=
+                 +As_String (Charsets.First_Element); -- Key (Charsets);
             elsif Count in 0 then
                -- No charsets, assume this table can store whatever.
                Charset := Null_UString; -- false;
@@ -3079,11 +3101,11 @@ is
 
                if 1 = Count then
                   -- Only one charset (besides latin1).
-                  Charset := +As_String (Charsets.First_Element); -- Key (Charsets);
-               elsif
-                 Count in 2 and then
-                 Isset (Charsets, "utf8") and then
-                 Isset (Charsets, "utf8mb4")
+                  Charset :=
+                    +As_String (Charsets.First_Element); -- Key (Charsets);
+               elsif Count in 2
+                 and then Isset (Charsets, "utf8")
+                 and then Isset (Charsets, "utf8mb4")
                then
                   -- Two charsets, but they're utf8 and utf8mb4, use utf8.
                   Charset := +"utf8";
@@ -3094,9 +3116,7 @@ is
             end if;
          end;
          Set (This.Table_Charset, Tablekey, From_String (-Charset));
-         return (Success => True,
-                 Item    => Charset,
-                 Error   => Null_Wp_Error);
+         return (Success => True, Item => Charset, Error => Null_Wp_Error);
       end;
    end Get_Table_Charset;
 

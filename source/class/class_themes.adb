@@ -194,8 +194,9 @@ is
       end if;
 
       if
-        This.Template = "" and then
+--      This.Template = "" and then
 --      not This.Template and then
+        This.Template = "(no-template)" and then
         This.Stylesheet = +Get_As_String (This.Headers, "Template")
       then
          This.M_Errors :=

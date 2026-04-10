@@ -221,27 +221,37 @@ is
    begin
       while First <= Subject'Last loop
          declare
-            B : Natural := Natural'Last;
-            I : Natural;
+            B : Natural := Natural'Last;  -- earliest absolute match position
+            I : Natural := Search.First_Index;  -- index of winning search term
             E : Natural;
          begin
             for A in Search.First_Index .. Search.Last_Index loop
                E := Ada.Strings.Unbounded.Index
                       (Source  => +Subject (First .. Subject'Last),
                        Pattern => Search (A));
-               if E /= 0 and then E < B then
-                  B := E;
-                  I := A;
+               if E /= 0 then
+                  declare
+                     Abs_Pos : constant Natural := First + E - 1;
+                  begin
+                     if Abs_Pos < B then
+                        B := Abs_Pos;
+                        I := A;
+                     end if;
+                  end;
                end if;
             end loop;
 
-            if E = Natural'Last then
-               UStrings.Append (Result, Subject);
+            if B = Natural'Last then
+               -- No match found; append the rest and stop.
+               UStrings.Append (Result, Subject (First .. Subject'Last));
                exit;
             else
+               -- Append text before the match, then the replacement.
                UStrings.Append (Result, Subject (First .. B - 1));
-               UStrings.Append (Result, Replace (I));
-               First := First + Ada.Strings.Unbounded.Length (+Search (I));
+               if I <= Replace.Last_Index then
+                  UStrings.Append (Result, Replace (I));
+               end if;
+               First := B + Ada.Strings.Unbounded.Length (+Search (I));
             end if;
          end;
       end loop;

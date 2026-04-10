@@ -611,7 +611,6 @@ is
                        Group     : Group_Type := No_Group)
                        return Boolean
    is
-      use Php.Strings;
       use UStrings;
       use Class_Dependencies;
 

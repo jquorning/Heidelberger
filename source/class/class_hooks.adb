@@ -51,8 +51,12 @@ is
 
       Map : Index_Maps.Map;
    begin
-      Map.Insert (Key => Index, New_Item => Item);
-      This.Callbacks.Include (Key => Priority, New_Item => Map);
+      if Priority_Existed then
+         This.Callbacks (Priority).Include (Key => Index, New_Item => Item);
+      else
+         Map.Insert (Key => Index, New_Item => Item);
+         This.Callbacks.Insert (Key => Priority, New_Item => Map);
+      end if;
 
       -- If we're adding a new priority to the list, put them back in sorted order.
       if not Priority_Existed and then This.Callbacks.Length > 1 then

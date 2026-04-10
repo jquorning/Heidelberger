@@ -138,6 +138,9 @@ is
 
             Submenu_Items : Adm_Menu.Inner_Maps.Map;
          begin
+            if -Item.Capability = "" then
+               goto Continue_Menu;
+            end if;
 
             if First then
                Lists.Append (Class, "wp-first-item");
@@ -146,7 +149,11 @@ is
 
             if Item.Menu_Slug /= "" then
                Lists.Append (Class, "wp-has-submenu");
---             Submenu_Items := Submenu (-Item.Menu_Slug);
+               if Adm_Menu.Submenu_Maps.Has_Element
+                    (Submenu.Find (-Item.Menu_Slug))
+               then
+                  Submenu_Items := Submenu (-Item.Menu_Slug);
+               end if;
             end if;
 
             if
@@ -155,8 +162,7 @@ is
               (Empty (-Global_Typenow) and then
                Unbounded_Slug (Self) = Item.Menu_Slug)
             then
-               if Submenu_Items = Inner_Maps.Empty_Map then
---             if not Empty (Submenu_Items) then
+               if Submenu_Items /= Inner_Maps.Empty_Map then
                   Lists.Append (Class, "wp-has-current-submenu wp-menu-open");
                else
                   Lists.Append (Class, "current");
@@ -164,8 +170,7 @@ is
                end if;
             else
                Lists.Append (Class, "wp-not-current-submenu");
-               if Submenu_Items = Inner_Maps.Empty_Map then
---               if not Empty (Submenu_Items) then
+               if Submenu_Items /= Inner_Maps.Empty_Map then
                   Append (Aria_Attributes, +"aria-haspopup=""true""");
                end if;
             end if;
@@ -178,7 +183,7 @@ is
                use Ada.Containers;
 
                Class_2 : String :=
-                  (if Length (Class) = 0
+                  (if Length (Class) /= 0
                    then " class=""" & Implode (" ", Class) & """" else "");
 
                Id : String :=
@@ -207,14 +212,14 @@ is
 
                   if "none" = Item.Icon_Url or else "div" = Item.Icon_Url then
                      Img := +"<br />";
-                  elsif 0 = Strpos (-Item.Icon_Url, "data:image/svg+xml;base64,") then
+                  elsif 1 = Strpos (-Item.Icon_Url, "data:image/svg+xml;base64,") then
                      Img := +"<br />";
                      -- The value is base64-encoded data, so esc_attr() is used here
                      -- instead of esc_url().
                      Img_Style := +" style=""background-image:url('" &
                                    ESC_Attr (-Item.Icon_Url) & "')""";
                      Img_Class := +" svg";
-                  elsif 0 = Strpos (-Item.Icon_Url, "dashicons-") then
+                  elsif 1 = Strpos (-Item.Icon_Url, "dashicons-") then
                      Img       := +"<br />";
                      Img_Class := +" dashicons-before " &
                                    Inc_Formatting.Sanitize_HTML_Class (-Item.Icon_Url);
@@ -222,8 +227,6 @@ is
                end if;
 
                declare
-                  Arrow : constant String :=
-                     "<div class=""wp-menu-arrow""><div></div></div>";
                   Title : constant String :=
                      Inc_Formatting.Wp_Texturize (-Item.Menu_Title);
                begin
@@ -272,14 +275,14 @@ is
                         then
                            Admin_Is_Parent := True;
                            Echo ("<a href=""admin.php?page=" & String (Menu_File) &
-                                 "" & Class_2 & " " & (-Aria_Attributes) & ">" & Arrow &
+                                 """" & Class_2 & " " & (-Aria_Attributes) & ">" &
                                  "<div class=""wp-menu-image" & (-Img_Class) & """" &
                                  (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
                                  "</div><div class=""wp-menu-name"">" & Title &
                                  "</div></a>");
                         else
                            Echo (NL_TAB & "<a href=""" & String (Menu_File) & """" &
-                                 Class_2 & " " & (-Aria_Attributes) & ">" & Arrow &
+                                 Class_2 & " " & (-Aria_Attributes) & ">" &
                                  "<div class=""wp-menu-image" & (-Img_Class) & """" &
                                  (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
                                  "</div><div class=""wp-menu-name"">" & Title &
@@ -312,7 +315,7 @@ is
                            Admin_Is_Parent := True;
                            Echo (NL_TAB & "<a href=""admin.php?page=" &
                                  String (-Item.Menu_Slug) & """" & Class_2 & " " &
-                                 (-Aria_Attributes) & ">" & Arrow &
+                                 (-Aria_Attributes) & ">" &
                                  "<div class=""wp-menu-image" & (-Img_Class) & """" &
                                  (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
                                  "</div><div class=""wp-menu-name"">" &
@@ -320,7 +323,7 @@ is
                         else
                            Echo (NL_TAB & "<a href=""" & String (-Item.Menu_Slug) &
                                  """" & Class_2 & " " & (-Aria_Attributes) & ">" &
-                                 Arrow & "<div class=""wp-menu-image" & (-Img_Class) &
+                                 "<div class=""wp-menu-image" & (-Img_Class) &
                                  """" & (-Img_Style) & " aria-hidden=""true"">" &
                                  (-Img) & "</div><div class=""wp-menu-name"">" &
                                  (-Item.Menu_Title) & "</div></a>");
@@ -344,7 +347,7 @@ is
                            Class           : List_Type;
                            Aria_Attributes : UString;
                         begin
-                           if Current_User_Can (-Sub_Item.Capability) then
+                           if not Current_User_Can (-Sub_Item.Capability) then
                               goto Continue_1;
                            end if;
 
@@ -473,6 +476,7 @@ is
                   Echo ("</li>");
                end;
             end;
+            << Continue_Menu >>
          end;
       end loop;
 

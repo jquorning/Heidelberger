@@ -24,18 +24,19 @@ is
    -- Get_Column_Headers --
    ------------------------
 
-   function Get_Column_Headers (Screen : Class_Screens.Wp_Screen)
-                                return Array_Type
+   function Get_Column_Headers
+     (Screen : Class_Screens.Wp_Screen) return Array_Type
    is
       use UStrings;
       use Wp_Common;
---    static column_headers = array();
+
+      Screen_Id : constant String := -Screen.Id;
    begin
       -- if ( is_string( screen ) ) then
       --         screen = convert_to_screen( screen );
       -- end if;
 
-      if not Isset (Static_Column_Headers, -Screen.Id) then
+      if not Isset (Static_Column_Headers, Screen_Id) then
          --
          -- Filters the column headers for a list table on a specific screen.
          --
@@ -48,12 +49,15 @@ is
          --
          -- @param string[] columns The column header labels keyed by column ID.
          --
-         Set (Static_Column_Headers, -Screen.Id,
-              From_Array (
-                Apply_Filters ("manage_" & (-Screen.Id) & "_columns", Empty_Array)));
+         Set
+           (Static_Column_Headers,
+            Screen_Id,
+            From_Array
+              (Apply_Filters
+                 ("manage_" & Screen_Id & "_columns", Empty_Array)));
       end if;
 
-      return As_Array (Get (Static_Column_Headers, -Screen.Id));
+      return As_Array (Get (Static_Column_Headers, Screen_Id));
    end Get_Column_Headers;
 
    ------------------------
@@ -61,15 +65,16 @@ is
    ------------------------
 
    function Get_Hidden_Columns (Screen : Class_Screens.Wp_Screen)
-                                return Array_Type
+                               return Array_Type
    is
       use Php.Types;
       use UStrings;
       use Wp_Common;
---    use Inc_Plugins;
+
+      Screen_Id : constant String := -Screen.Id;
 
       Hidden : Array_Type :=
-        Inc_Users.Get_User_Option ("manage" & (-Screen.Id) & "columnshidden");
+        Inc_Users.Get_User_Option ("manage" & Screen_Id & "columnshidden");
 
       Use_Defaults : constant Boolean := not Is_Array (Hidden);
    begin
