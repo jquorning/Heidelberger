@@ -368,22 +368,51 @@ is
 
       if Length = 0 then
          return "";
+
+      elsif Length = Integer'First then
+         return Item (Item'First + Offset .. Item'Last);
+
       elsif Length > 0 then
          declare
             First : constant Natural := Item'First + Offset;
             Last  : constant Natural := Item'First + Offset + Length - 1;
          begin
+            Logging.Log ("substr1", "  item: " & Item);
+            Logging.Log ("substr1", "offset: " & Offset'Image);
+            Logging.Log ("substr1", "length: " & Length'Image);
+            Logging.Log ("substr1", " first: " & First'Image);
+            Logging.Log ("substr1", "  last: " & Last'Image);
             if First not in Item'Range or Last not in Item'Range then
                return "";
             else
                return Item (First .. Last);
             end if;
          end;
-      elsif Length = Integer'First then
-         return Item (Item'First + Offset .. Item'Last);
+
+      elsif Length < 0 then
+         declare
+            First : constant Natural := Item'First + Offset;
+            Last  : constant Natural := Item'Last + Length;
+         begin
+            Logging.Log ("substr2", "  item: " & Item);
+            Logging.Log ("substr2", "offset: " & Offset'Image);
+            Logging.Log ("substr2", "length: " & Length'Image);
+            Logging.Log ("substr2", " first: " & First'Image);
+            Logging.Log ("substr2", "  last: " & Last'Image);
+            if First not in Item'Range or Last not in Item'Range then
+               return "";
+            else
+               return Item (First .. Last);
+            end if;
+         end;
+
       else
+         Logging.Log ("substr3", "  item: " & Item);
+         Logging.Log ("substr3", "offset: " & Offset'Image);
+         Logging.Log ("substr3", "length: " & Length'Image);
          raise Program_Error with "not implemented";
       end if;
+
    end Substr;
 
    ------------
