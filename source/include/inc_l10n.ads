@@ -331,8 +331,7 @@ is
                  Plural : String;
                  Number : Integer;
                  Domain : String := "default")
-                 return String
-                 is ("XXX-232");
+                 return String;
 
    --
    -- Translates and retrieves the singular or plural form based on the supplied

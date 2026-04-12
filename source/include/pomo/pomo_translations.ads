@@ -44,6 +44,39 @@ is
                        return String;
 
    --
+   -- Given the number of items, returns the 0-based index of the plural form to use
+   --
+   -- Here, in the base Translations class, the common logic for English is implemented:
+   --  0 if there is one element, 1 otherwise
+   --
+   -- This function should be overridden by the subclasses. For example MO/PO can derive the logic
+   -- from their headers.
+   --
+   -- @param int count number of items
+   --
+   function Select_Plural_Form
+     (This : Translations; Count : Integer) return Integer;
+
+   --
+   -- @return int
+   --
+   function Get_Plural_Forms_Count (This : Translations) return Integer;
+
+   --
+   -- @param string singular
+   -- @param string plural
+   -- @param int    count
+   -- @param string context
+   --
+   function Translate_Plural
+     (This     : Translations;
+      Singular : String;
+      Plural   : String;
+      Count    : Integer;
+      Context  : String := "") -- null
+      return String;
+
+   --
    -- Merge $other in the current object.
    --
    -- @param Object $other Another Translation object, whose translations will be

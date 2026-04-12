@@ -503,60 +503,58 @@ package body Inc_L10n is
       return ESC_HTML (Translate_With_Gettext_Context (Text, Context, Domain));
    end ESC_HTML_X;
 
--- --
--- -- Translates and retrieves the singular or plural form based on the supplied number.
--- --
--- -- Used when you want to use the appropriate form of a string based on whether a
--- -- number is singular or plural.
--- --
--- -- Example:
--- --
--- --     printf( _n( "%s person", "%s people", count, "text-domain" ), number_format_i18n( count ) );
--- --
--- -- @since 2.8.0
--- -- @since 5.5.0 Introduced ngettext-thendomainend; filter.
--- --
--- -- @param string single The text to be used if the number is singular.
--- -- @param string plural The text to be used if the number is plural.
--- -- @param int    number The number to compare against to use either the singular or plural form.
--- -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                       Default "default".
--- -- @return string The translated singular or plural form.
--- --
--- function _n( single, plural, number, domain = "default" ) then
---         translations = get_translations_for_domain( domain );
---         translation  = translations.translate_plural( single, plural, number );
+   ---------
+   -- X_N --
+   ---------
 
---         --
---         -- Filters the singular or plural form of a string.
---         --
---         -- @since 2.2.0
---         --
---         -- @param string translation Translated text.
---         -- @param string single      The text to be used if the number is singular.
---         -- @param string plural      The text to be used if the number is plural.
---         -- @param int    number      The number to compare against to use either the singular or plural form.
---         -- @param string domain      Text domain. Unique identifier for retrieving translated strings.
---         --
---         translation = apply_filters( "ngettext", translation, single, plural, number, domain );
+   function X_N
+     (Single : String;
+      Plural : String;
+      Number : Integer;
+      Domain : String := "default") return String
+   is
+      use Wp_Common;
+      use POMO_Translations;
 
---         --
---         -- Filters the singular or plural form of a string for a domain.
---         --
---         -- The dynamic portion of the hook name, `domain`, refers to the text domain.
---         --
---         -- @since 5.5.0
---         --
---         -- @param string translation Translated text.
---         -- @param string single      The text to be used if the number is singular.
---         -- @param string plural      The text to be used if the number is plural.
---         -- @param int    number      The number to compare against to use either the singular or plural form.
---         -- @param string domain      Text domain. Unique identifier for retrieving translated strings.
---         --
---         translation = apply_filters( "ngettext_thendomainend;", translation, single, plural, number, domain );
+      Trans  : constant Translations := Get_Translations_For_Domain (Domain);
 
---         return translation;
--- end;
+      Translation_3 : constant String :=
+        Trans.Translate_Plural (Single, Plural, Number);
+
+      --
+      -- Filters the singular or plural form of a string.
+      --
+      -- @since 2.2.0
+      --
+      -- @param string translation Translated text.
+      -- @param string single      The text to be used if the number is singular.
+      -- @param string plural      The text to be used if the number is plural.
+      -- @param int    number      The number to compare against to use either the singular or plural form.
+      -- @param string domain      Text domain. Unique identifier for retrieving translated strings.
+      --
+      Translation_2 : constant String :=
+        Apply_Filters
+          ("ngettext", Translation_3, Single, Plural, Number, Domain);
+
+      --
+      -- Filters the singular or plural form of a string for a domain.
+      --
+      -- The dynamic portion of the hook name, `domain`, refers to the text domain.
+      --
+      -- @since 5.5.0
+      --
+      -- @param string translation Translated text.
+      -- @param string single      The text to be used if the number is singular.
+      -- @param string plural      The text to be used if the number is plural.
+      -- @param int    number      The number to compare against to use either the singular or plural form.
+      -- @param string domain      Text domain. Unique identifier for retrieving translated strings.
+      --
+      Translation : constant String :=
+        Apply_Filters
+          ("ngettext_" & Domain, Trans, Single, Plural, Number, Domain);
+   begin
+      return Translation;
+   end X_N;
 
 -- --
 -- -- Translates and retrieves the singular or plural form based on the supplied number, with gettext context.

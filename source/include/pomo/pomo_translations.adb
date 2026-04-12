@@ -8,6 +8,8 @@
 
 with Array_Lists;
 
+-- with POMO_Entrys;
+
 package body POMO_Translations
 is
 
@@ -132,53 +134,62 @@ is
          then As_String (Translated.Translations.First_Element) else Singular);
    end Translate;
 
---                 --
---                 -- Given the number of items, returns the 0-based index of the plural form to use
---                 --
---                 -- Here, in the base Translations class, the common logic for English is implemented:
---                 --  0 if there is one element, 1 otherwise
---                 --
---                 -- This function should be overridden by the subclasses. For example MO/PO can derive the logic
---                 -- from their headers.
---                 --
---                 -- @param int count number of items
---                 --
---                 public function select_plural_form( count ) then
---                         return 1 == count ? 0 : 1;
---                 end;
+   ------------------------
+   -- Select_Plural_Form --
+   ------------------------
 
---                 --
---                 -- @return int
---                 --
---                 public function get_plural_forms_count() then
---                         return 2;
---                 end;
+   function Select_Plural_Form
+     (This : Translations; Count : Integer) return Integer is
+   begin
+      return (if 1 = Count then 0 else 1);
+   end Select_Plural_Form;
 
---                 --
---                 -- @param string singular
---                 -- @param string plural
---                 -- @param int    count
---                 -- @param string context
---                 --
---                 public function translate_plural( singular, plural, count, context = null ) then
---                         entry              = new Translation_Entry(
---                                 array(
---                                         "singular" => singular,
---                                         "plural"   => plural,
---                                         "context"  => context,
---                                 )
---                         );
---                         translated         = this->translate_entry( entry );
---                         index              = this->select_plural_form( count );
---                         total_plural_forms = this->get_plural_forms_count();
---                         if ( translated && 0 <= index && index < total_plural_forms &&
---                                 is_array( translated->translations ) &&
---                                 isset( translated->translations[ index ] ) ) then
---                                 return translated->translations[ index ];
---                         end; else then
---                                 return 1 == count ? singular : plural;
---                         end;
---                 end;
+   ----------------------------
+   -- Get_Plural_Forms_Count --
+   ----------------------------
+
+   function Get_Plural_Forms_Count (This : Translations) return Integer is
+   begin
+      return 2;
+   end Get_Plural_Forms_Count;
+
+   ----------------------
+   -- Translate_Plural --
+   ----------------------
+
+   function Translate_Plural
+     (This     : Translations;
+      Singular : String;
+      Plural   : String;
+      Count    : Integer;
+      Context  : String := "") -- null
+      return String
+   is
+      use Array_Lists;
+      use POMO_Entries;
+
+      Entryy : constant Translation_Entry :=
+        X_Construct
+          ( -- new
+           To_Array_Type
+             ([Build ("singular", Singular),
+               Build ("plural", Plural),
+               Build ("context", Context)]));
+
+      Translated         : constant Translation_Entry := This.Translate_Entry (Entryy);
+      Index              : constant Integer := This.Select_Plural_Form (Count);
+      Total_Plural_Forms : constant Integer := This.Get_Plural_Forms_Count;
+   begin
+--       if Translated /= Null_Translation_Entry
+--         and then Index in 0 .. Total_Plural_Forms - 1
+-- --      and then Is_Array (Translated.Translations)
+--         and then Isset (Translated.Translations (Index))
+--       then
+--          return Translated.Translations (Index);
+--       else
+      return (if 1 = Count then Singular else Plural);
+--       end if;
+   end Translate_Plural;
 
 --                 --
 --                 -- Merge other in the current object.

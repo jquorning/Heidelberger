@@ -29,11 +29,28 @@ with Inc_Comments;
 with Inc_Media;
 with Inc_Posts;
 with Inc_Users;
+with POMO_Translations;
 
 package Wp_Common
 is
    use Arrays;
    use Lists;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : String;
+      Single    : String;
+      Plural    : String;
+      Number    : Integer;
+      Domain    : String) return String;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : POMO_Translations.Translations;
+      Single    : String;
+      Plural    : String;
+      Number    : Integer;
+      Domain    : String) return String;
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
