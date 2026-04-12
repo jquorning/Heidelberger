@@ -15,6 +15,7 @@ with Logging;
 with UStrings;
 
 with Adm_About;
+with Adm_Contribute;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
@@ -122,6 +123,9 @@ is
 
       elsif Index (URL, "/wp-admin/privacy.php") /= 0 then
          Adm_Privacy.Run;
+
+      elsif Index (URL, "/wp-admin/contribute.php") /= 0 then
+         Adm_Contribute.Render;
 
       elsif Index (URL, "/wp-admin/about.php") /= 0 then
          Adm_About.Render;
