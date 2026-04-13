@@ -6,29 +6,22 @@
 --
 
 with Php.Echoing;
-with Php.Strings;
 
 with Globals;
 with UStrings;
-with Lists;
 
 with GNATCOLL.JSON;
-with Templates_Parser;
 
 with Adi_Credits;
 with Adm_Admin;
 with Adm_Admin_Header;
-with Inc_General_Templates;
+with Adm_Admin_Footer;
+
+with Inc_Formatting;
 with Inc_L10n;
 
 package body Adm_Credits
 is
-   use Lists;
-
-   subtype JSON_Value is GNATCOLL.JSON.JSON_Value;
-
-   function Translation
-      return Templates_Parser.Translate_Table;
 
    ------------
    -- Render --
@@ -37,209 +30,140 @@ is
    procedure Render
    is
       use Php.Echoing;
-      use Php.Strings;
       use UStrings;
+      use GNATCOLL.JSON;
+      use Adi_Credits;
+      use Inc_Formatting;
       use Inc_L10n;
 
-      Admin_Header    : UString;
+      Credits : constant JSON_Value := Wp_Credits;
    begin
+      -- WordPress Administration Bootstrap
+      Adm_Admin.Run;
+
+      -- Used in the HTML title tag.
       Globals.Global_Title := +abs "Credits";
 
-      Adm_Admin.Run;
-      Clear_Echo;
       Adm_Admin_Header.Run;
-      Admin_Header := +Get_Echo;
+
+      Echo ("<div class=""wrap about__container"">");
+
+      Echo ("<div class=""about__header"">");
+      Echo ("    <div class=""about__header-title"">");
+      Echo ("        <h1>");
+      X_E ("Contributors");
+      Echo ("        </h1>");
+      Echo ("    </div>");
+      Echo ("    <div class=""about__header-text"">");
+      X_E ("Created by a worldwide team of passionate individuals");
+      Echo ("    </div>");
+      Echo ("</div>");
+
+      Echo ("<nav class=""about__header-navigation nav-tab-wrapper wp-clearfix"" aria-label=""");
+      ESC_Attr_E ("Secondary menu");
+      Echo (""">");
+      Echo ("<a href=""about.php"" class=""nav-tab"">"); X_E ("What&#8217;s New"); Echo ("</a>");
+      Echo ("<a href=""credits.php"" class=""nav-tab nav-tab-active"" aria-current=""page"">"); X_E ("Credits"); Echo ("</a>");
+      Echo ("<a href=""freedoms.php"" class=""nav-tab"">"); X_E ("Freedoms"); Echo ("</a>");
+      Echo ("<a href=""privacy.php"" class=""nav-tab"">"); X_E ("Privacy"); Echo ("</a>");
+      Echo ("<a href=""contribute.php"" class=""nav-tab"">"); X_E ("Get Involved"); Echo ("</a>");
+      Echo ("</nav>");
+
+      Echo ("<div class=""about__section has-1-column has-gutters"">");
+      Echo ("    <div class=""column aligncenter"">");
+      if Credits.Is_Empty then
+         Echo ("        <p>");
+         Printf (
+           -- translators: 1: https://wordpress.org/about/
+           abs "WordPress is created by a <a href=""%1$s"">worldwide team</a> of passionate individuals.",
+           [1 => abs "https://wordpress.org/about/"]
+         );
+         Echo ("<br />");
+         Echo ("        <a href=""");
+         Echo (ESC_URL (abs "https://make.wordpress.org/contribute/"));
+         Echo (""">"); X_E ("Get involved in WordPress."); Echo ("</a>");
+         Echo ("        </p>");
+      else
+         Echo ("        <p>");
+         X_E ("Want to see your name in lights on this page?");
+         Echo ("<br />");
+         Echo ("        <a href=""");
+         Echo (ESC_URL (abs "https://make.wordpress.org/contribute/"));
+         Echo (""">"); X_E ("Get involved in WordPress."); Echo ("</a>");
+         Echo ("        </p>");
+      end if;
+      Echo ("    </div>");
+      Echo ("</div>");
+
+      if Credits.Is_Empty then
+         Echo ("</div>");
+         Adm_Admin_Footer.Run;
+         return;
+      end if;
+
+      Echo ("<hr class=""is-large"" />");
+
+      Echo ("<div class=""about__section"">");
+      Echo ("    <div class=""column is-edge-to-edge"">");
+      declare
+         Groups    : constant JSON_Value := Credits.Get ("groups");
+         Core_Devs : constant JSON_Value := Groups.Get ("core-developers");
+      begin
+         Wp_Credits_Section_Title (Core_Devs);
+         Wp_Credits_Section_List (Credits, "core-developers");
+         Wp_Credits_Section_List (Credits, "contributing-developers");
+      end;
+      Echo ("    </div>");
+      Echo ("</div>");
+
+      Echo ("<hr />");
+
+      Echo ("<div class=""about__section"">");
+      Echo ("    <div class=""column"">");
+      declare
+         Groups : constant JSON_Value := Credits.Get ("groups");
+         Props  : constant JSON_Value := Groups.Get ("props");
+      begin
+         Wp_Credits_Section_Title (Props);
+         Wp_Credits_Section_List (Credits, "props");
+      end;
+      Echo ("    </div>");
+      Echo ("</div>");
+
+      Echo ("<hr />");
 
       declare
-         List : constant List_Type :=
-           Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
-
-         Display_Version : constant String     := List.First_Element;
-         Credits         : constant JSON_Value := Adi_Credits.Wp_Credits;
-
-         use Templates_Parser;
-
-         type My_Lazy is new Dynamic.Lazy_Tag with null record;
-
-         overriding
-         procedure Value (Lazy_Tag     : access My_Lazy;
-                          Var_Name     : in     String;
-                          Translations : in out Translate_Set);
-
-         overriding
-         procedure Value (Lazy_Tag     : access My_Lazy;
-                          Var_Name     : in     String;
-                          Translations : in out Translate_Set)
-         is
-            procedure Set (Var : String; Value : String);
-            procedure Set (Var : String; Value : Boolean);
-
-            procedure Set (Var : String; Value : String) is
-            begin
-               Insert (Translations, Assoc (Var, Value));
-            end Set;
-
-            procedure Set (Var : String; Value : Boolean) is
-            begin
-               Insert (Translations, Assoc (Var, Value));
-            end Set;
-
-            use Adi_Credits;
-         begin
-            if Var_Name = "VAR_credits_contributors" then
-               Clear_Echo;
-               X_E ("Contributors");
-               Set ("VAR_credits_contributors", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_header" then
-               Clear_Echo;
-               Printf (
-                  -- translators: %s: Version number.
-                  abs "WordPress %s was created by a worldwide team of passionate individuals",
-                  [Display_Version]);
-               Set ("VAR_credits_header", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_secondary_menu" then
-               Clear_Echo;
-               ESC_Attr_E ("Secondary menu");
-               Set ("VAR_credits_secondary_menu", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_about" then
-               Clear_Echo;
-               X_E ("What&#8217;s New");
-               Set ("VAR_credits_about", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_credits" then
-               Clear_Echo;
-               X_E ("Credits");
-               Set ("VAR_credits_credits", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_freedoms" then
-               Clear_Echo;
-               X_E ("Freedoms");
-               Set ("VAR_credits_freedoms", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_privacy" then
-               Clear_Echo;
-               X_E ("Privacy");
-               Set ("VAR_credits_privacy", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_not_credits" then
-               Set ("VAR_credits_not_credits", Credits.Is_Empty);
-
-            elsif Var_Name = "VAR_credits_created" then
-               Clear_Echo;
-               Printf (
-                  -- translators: 1: https://wordpress.org/about/
-                  abs "WordPress is created by a <a href=""%1$s"">worldwide team</a> of passionate individuals.",
-                  [abs "https://wordpress.org/about/"]);
-               Set ("VAR_credits_created", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_get_involved_1" then
-               Clear_Echo;
-               X_E ("Get involved in WordPress.");
-               Set ("VAR_credits_get_involved_1", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_see_your_name" then
-               Clear_Echo;
-               X_E ("Want to see your name in lights on this page?");
-               Set ("VAR_credits_see_your_name", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_get_involved_2" then
-               Clear_Echo;
-               X_E ("Get involved in WordPress.");
-               Set ("VAR_credits_get_involved_2", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_core_developers" then
-               Clear_Echo;
-               declare
-                  Groups    : constant JSON_Value := Credits.Get ("groups");
-                  Core_Devs : constant JSON_Value := Groups. Get ("core-developers");
-               begin
-                  Wp_Credits_Section_Title (Core_Devs);
-                  Wp_Credits_Section_List  (Credits, "core-developers");
-                  Wp_Credits_Section_List  (Credits, "contributing-developers");
-               end;
-               Set ("VAR_credits_core_developers", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_props" then
-               Clear_Echo;
-
-               declare
-                  Groups : constant JSON_Value := Credits.Get ("groups");
-                  Props  : constant JSON_Value := Groups. Get ("props");
-               begin
-                  Wp_Credits_Section_Title (Props);
-                  Wp_Credits_Section_List  (Credits, "props");
-               end;
-               Set ("VAR_credits_props", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_cond_validators" then
-               declare
-                  Cond : constant Boolean := True; -- ???
---                  Isset_2 (Credits, "groups", "translators") or else
---                  Isset_2 (Credits, "groups", "validators");
-               begin
-                  Set ("VAR_credits_cond_validators", Cond);
-               end;
-
-            elsif Var_Name = "VAR_credits_validators" then
-               Clear_Echo;
-
-               declare
-                  Groups     : constant JSON_Value := Credits.Get ("groups");
-                  Validators : constant JSON_Value := Groups. Get ("validators");
-               begin
-                  Wp_Credits_Section_Title (Validators);
-                  Wp_Credits_Section_List  (Credits, "validators");
-                  Wp_Credits_Section_List  (Credits, "translators");
-               end;
-               Set ("VAR_credits_validators", Get_Echo);
-
-            elsif Var_Name = "VAR_credits_libraries" then
-               Clear_Echo;
-
-               declare
-                  Group     : constant JSON_Value := Credits.Get ("groups");
-                  Libraries : constant JSON_Value := Group.Get ("libraries");
-               begin
-                  Wp_Credits_Section_Title (Libraries);
-                  Wp_Credits_Section_List  (Credits, "libraries");
-               end;
-               Set ("VAR_credits_validators", Get_Echo);
-
-            else
-               raise Program_Error with "Unhandled var name: " & Var_Name;
-            end if;
-         end Value;
-
-         Lazy    : aliased My_Lazy;
-         Payload : constant UString :=
-            Templates_Parser.Parse ("page/admin/credits.thtml",
-                                    Translation,
-                                    Lazy_Tag => Lazy'Unchecked_Access);
+         Groups          : constant JSON_Value := Credits.Get ("groups");
+         Has_Translators : constant Boolean    := Groups.Has_Field ("translators");
+         Has_Validators  : constant Boolean    := Groups.Has_Field ("validators");
       begin
-         Clear_Echo;
-         Echo (-Admin_Header);
-         Echo (-Payload);
+         if Has_Translators or else Has_Validators then
+            Echo ("<div class=""about__section"">");
+            Echo ("    <div class=""column"">");
+            Wp_Credits_Section_Title (Groups.Get ("validators"));
+            Wp_Credits_Section_List (Credits, "validators");
+            Wp_Credits_Section_List (Credits, "translators");
+            Echo ("    </div>");
+            Echo ("</div>");
+            Echo ("<hr />");
+         end if;
       end;
+
+      Echo ("<div class=""about__section"">");
+      Echo ("    <div class=""column"">");
+      declare
+         Groups    : constant JSON_Value := Credits.Get ("groups");
+         Libraries : constant JSON_Value := Groups.Get ("libraries");
+      begin
+         Wp_Credits_Section_Title (Libraries);
+         Wp_Credits_Section_List (Credits, "libraries");
+      end;
+      Echo ("    </div>");
+      Echo ("</div>");
+
+      Echo ("</div>");
+
+      Adm_Admin_Footer.Run;
    end Render;
-
-   ------------------
-   -- Translations --
-   ------------------
-
-   function Translation
-      return Templates_Parser.Translate_Table
-   is
-      use Templates_Parser;
-
-      Table : constant Translate_Table :=
-         (Assoc ("MANUAL_TOC",         "TOC"),
-          Assoc ("MANUAL_INDEX",       "INDEX"),
-          Assoc ("MANUAL_AUTH_SEARCH", "SEARCH"));
-   begin
-      return Table;
-   end Translation;
 
 end Adm_Credits;
