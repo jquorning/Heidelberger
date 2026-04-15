@@ -7,10 +7,9 @@
 
 with Php.Echoing;
 
+with Arrays;
 with Globals;
 with UStrings;
-
-with GNATCOLL.JSON;
 
 with Adi_Credits;
 with Adm_Admin;
@@ -22,6 +21,7 @@ with Inc_L10n;
 
 package body Adm_Credits
 is
+   use Arrays;
 
    ------------
    -- Render --
@@ -31,12 +31,11 @@ is
    is
       use Php.Echoing;
       use UStrings;
-      use GNATCOLL.JSON;
       use Adi_Credits;
       use Inc_Formatting;
       use Inc_L10n;
 
-      Credits : constant JSON_Value := Wp_Credits;
+      Credits : constant Credits_Type := Wp_Credits;
    begin
       -- WordPress Administration Bootstrap
       Adm_Admin.Run;
@@ -71,7 +70,7 @@ is
 
       Echo ("<div class=""about__section has-1-column has-gutters"">");
       Echo ("    <div class=""column aligncenter"">");
-      if Credits.Is_Empty then
+      if Is_Null (Credits) then
          Echo ("        <p>");
          Printf (
            -- translators: 1: https://wordpress.org/about/
@@ -95,7 +94,7 @@ is
       Echo ("    </div>");
       Echo ("</div>");
 
-      if Credits.Is_Empty then
+      if Is_Null (Credits) then
          Echo ("</div>");
          Adm_Admin_Footer.Run;
          return;
@@ -106,12 +105,16 @@ is
       Echo ("<div class=""about__section"">");
       Echo ("    <div class=""column is-edge-to-edge"">");
       declare
-         Groups    : constant JSON_Value := Credits.Get ("groups");
-         Core_Devs : constant JSON_Value := Groups.Get ("core-developers");
+         Groups : constant Array_Type :=
+           As_Array (Get (As_Array (Credits), "groups"));
+
+         Core_Devs : constant Array_Type :=
+           As_Array (Get (Groups, "core-developers"));
       begin
          Wp_Credits_Section_Title (Core_Devs);
-         Wp_Credits_Section_List (Credits, "core-developers");
-         Wp_Credits_Section_List (Credits, "contributing-developers");
+         Wp_Credits_Section_List (As_Array (Credits), "core-developers");
+         Wp_Credits_Section_List
+           (As_Array (Credits), "contributing-developers");
       end;
       Echo ("    </div>");
       Echo ("</div>");
@@ -121,11 +124,13 @@ is
       Echo ("<div class=""about__section"">");
       Echo ("    <div class=""column"">");
       declare
-         Groups : constant JSON_Value := Credits.Get ("groups");
-         Props  : constant JSON_Value := Groups.Get ("props");
+         Groups : constant Array_Type :=
+           As_Array (Get (As_Array (Credits), "groups"));
+
+         Props : constant Array_Type := As_Array (Get (Groups, "props"));
       begin
          Wp_Credits_Section_Title (Props);
-         Wp_Credits_Section_List (Credits, "props");
+         Wp_Credits_Section_List (As_Array (Credits), "props");
       end;
       Echo ("    </div>");
       Echo ("</div>");
@@ -133,16 +138,19 @@ is
       Echo ("<hr />");
 
       declare
-         Groups          : constant JSON_Value := Credits.Get ("groups");
-         Has_Translators : constant Boolean    := Groups.Has_Field ("translators");
-         Has_Validators  : constant Boolean    := Groups.Has_Field ("validators");
+         Groups : constant Array_Type :=
+           As_Array (Get (As_Array (Credits), "groups"));
+
+         Has_Translators : constant Boolean := Isset (Groups, "translators");
+
+         Has_Validators : constant Boolean := Isset (Groups, "validators");
       begin
          if Has_Translators or else Has_Validators then
             Echo ("<div class=""about__section"">");
             Echo ("    <div class=""column"">");
-            Wp_Credits_Section_Title (Groups.Get ("validators"));
-            Wp_Credits_Section_List (Credits, "validators");
-            Wp_Credits_Section_List (Credits, "translators");
+            Wp_Credits_Section_Title (As_Array (Get (Groups, "validators")));
+            Wp_Credits_Section_List (As_Array (Credits), "validators");
+            Wp_Credits_Section_List (As_Array (Credits), "translators");
             Echo ("    </div>");
             Echo ("</div>");
             Echo ("<hr />");
@@ -152,11 +160,14 @@ is
       Echo ("<div class=""about__section"">");
       Echo ("    <div class=""column"">");
       declare
-         Groups    : constant JSON_Value := Credits.Get ("groups");
-         Libraries : constant JSON_Value := Groups.Get ("libraries");
+         Groups : constant Array_Type :=
+           As_Array (Get (As_Array (Credits), "groups"));
+
+         Libraries : constant Array_Type :=
+           As_Array (Get (Groups, "libraries"));
       begin
          Wp_Credits_Section_Title (Libraries);
-         Wp_Credits_Section_List (Credits, "libraries");
+         Wp_Credits_Section_List (As_Array (Credits), "libraries");
       end;
       Echo ("    </div>");
       Echo ("</div>");

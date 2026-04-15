@@ -1598,9 +1598,7 @@ is
    -- Wp_Check_PHP_Version --
    --------------------------
 
-   function Wp_Check_PHP_Version
-            return Array_Type
-   is
+   function Wp_Check_PHP_Version return Array_Type is
       use Php.JSON;
       use Php.Misc;
       use Wp_Common;
@@ -1615,9 +1613,11 @@ is
       Key     : constant String := Php.Misc.MD5 (Version);
 
       Response_2 : Array_Type;
-      Response : constant String_Maps.Map := Get_Site_Transient ("php_check_" & Key);
+
+      Response : constant Multi_Type :=
+        Get_Site_Transient ("php_check_" & Key);
    begin
-      if Response.Is_Empty then
+      if Kind_Of (Response) = Kind_Null then
          declare
             URL : UString := +"http://api.wordpress.org/core/serve-happy/1.0/";
          begin
@@ -1629,11 +1629,11 @@ is
 
             Response_2 := Wp_Remote_Get (-URL);
 
-            if
-              Is_Wp_Error (Response_2) or else
-              200 /= Wp_Remote_Retrieve_Response_Code (Response_2)
+            if Is_Wp_Error (Response_2)
+              or else 200 /= Wp_Remote_Retrieve_Response_Code (Response_2)
             then
                return Empty_Array; -- False
+
             end if;
 
             --
@@ -1655,13 +1655,12 @@ is
             --    return false;
             -- end if;
 
-            Set_Site_Transient ("php_check_" & Key, Response_2,
-                                Constants.WEEK_IN_SECONDS);
+            Set_Site_Transient
+              ("php_check_" & Key, Response_2, Constants.WEEK_IN_SECONDS);
          end;
 
-         if
-           Isset (Response_2, "is_acceptable") and then
-           As_Boolean (Get (Response_2, "is_acceptable"))
+         if Isset (Response_2, "is_acceptable")
+           and then As_Boolean (Get (Response_2, "is_acceptable"))
          then
             --
             -- Filters whether the active PHP version is considered acceptable by
@@ -1680,16 +1679,24 @@ is
             --                             acceptable. Default true.
             -- @param string version       PHP version checked.
             --
-            Set (Response_2, "is_acceptable", From_Boolean (
-                 Apply_Filters ("wp_is_php_version_acceptable", True, Version)));
+            Set
+              (Response_2,
+               "is_acceptable",
+               From_Boolean
+                 (Apply_Filters
+                    ("wp_is_php_version_acceptable", True, Version)));
          end if;
 
-         Set (Response_2, "is_lower_than_future_minimum", From_Boolean (False));
+         Set
+           (Response_2, "is_lower_than_future_minimum", From_Boolean (False));
 
          -- The minimum supported PHP version will be updated to 7.2. Check if the
          -- current version is lower.
          if Version_Compare (Version, "7.2", "<") then
-            Set (Response_2, "is_lower_than_future_minimum", From_Boolean (True));
+            Set
+              (Response_2,
+               "is_lower_than_future_minimum",
+               From_Boolean (True));
 
             -- Force showing of warnings.
             Set (Response_2, "is_acceptable", From_Boolean (False));

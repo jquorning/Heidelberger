@@ -13,7 +13,6 @@ with Lists;
 
 with Class_Posts;
 with Class_Themes;
-with Inc_Options;
 
 package Inc_Themes
 is
@@ -136,7 +135,7 @@ is
    --                      or a single theme root if all themes have the same root.
    --
    function Get_Theme_Roots
-            return Inc_Options.String_Maps.Map;
+            return Array_Type; -- Inc_Options.String_Maps.Map;
 
    --
    -- Registers a directory that contains themes.

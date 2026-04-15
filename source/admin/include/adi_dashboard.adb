@@ -2322,10 +2322,10 @@ is
          Key : constant String :=
            MD5 (Get_As_String (X_SERVER, "HTTP_USER_AGENT"));
 
-         Response : constant String_Maps.Map :=
+         Response : constant Multi_Type :=
            Get_Site_Transient ("browser_" & Key);
       begin
-         if Response.Is_Empty then
+         if Kind_Of (Response) = Kind_Null then
 --       if False = Response then
                 -- Include an unmodified wp_version.
                 -- require ABSPATH . WPINC . "/version.php";

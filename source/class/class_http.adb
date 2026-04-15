@@ -38,7 +38,7 @@ is
    -- Request --
    -------------
 
-   function Request (This : Wp_Http;
+   function Request (This : Wp_HTTP;
                      URL  : String;
                      Args : Array_Type := Empty_Array)
                      return Response_Result -- Array_Type
@@ -452,7 +452,7 @@ is
    -- X_Get_First_Available_Transport --
    -------------------------------------
 
-   function X_Get_First_Available_Transport (This : Wp_Http;
+   function X_Get_First_Available_Transport (This : Wp_HTTP;
                                              Args : Array_Type;
                                              URL  : String := "") -- null
                                              return String
@@ -512,7 +512,7 @@ is
    -- Post --
    ----------
 
-   function Post (This : Wp_Http;
+   function Post (This : Wp_HTTP;
                   URL  : String;
                   Args : Array_Type := Empty_Array)
                   return Array_Type
@@ -530,6 +530,29 @@ is
    begin
       return This.Request (URL, Parsed_Args).Arry; -- arry added
    end Post;
+
+   ---------
+   -- Get --
+   ---------
+
+   function Get (This : Wp_HTTP;
+                 URL  : String;
+                 Args : Array_Type := Empty_Array)
+                 return Array_Type
+   is
+      use Array_Lists;
+      use Inc_Functions;
+
+      Defaults : constant Array_Type :=
+        To_Array_Type ([
+          Build ("method", "GET")
+        ]);
+
+      Parsed_Args : constant Array_Type :=
+        Wp_Parse_Args (Args, Defaults);
+   begin
+      return This.Request (URL, Parsed_Args).Arry; -- arry added
+   end Get;
 
    ---------------------
    -- Process_Headers --
@@ -648,7 +671,7 @@ is
    Static_Accessible_Hosts : List_Type; -- null;
    Static_Wildcard_Regex   : UStrings.UString; -- array();
 
-   function Block_Request (This : Wp_Http;
+   function Block_Request (This : Wp_HTTP;
                            URI  : String)
                            return Boolean
    is

@@ -2536,42 +2536,68 @@ is
 --    return Result;
    end Delete_Site_Transient;
 
--- --
--- -- Retrieves the value of a site transient.
--- --
--- -- If the transient does not exist, does not have a value, or has expired,
--- -- then the return value will be false.
--- --
--- -- @since 2.9.0
--- --
--- -- @see get_transient()
--- --
--- -- @param string transient Transient name. Expected to not be SQL-escaped.
--- -- @return mixed Value of transient.
--- --
--- function get_site_transient( transient ) then
-   function Get_Site_Transient (Transient : String)
-                                return String_Maps.Map
-   is
+   ------------------------
+   -- Get_Site_Transient --
+   ------------------------
+
+   function Get_Site_Transient (Transient : String) return Multi_Type is
       use Php.Lists;
       use Php.Misc;
-      use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Caches;
       use Inc_Load;
 
-      Found : Boolean;
-      Value : UString; -- Array_Type;
+      function Helper (Transient : String) return Multi_Type;
+
+      ------------
+      -- Helper --
+      ------------
+
+      function Helper (Transient : String) return Multi_Type is
+         -- Core transients that do not have a timeout. Listed here so querying
+         -- timeouts can be avoided.
+         No_Timeout : constant List_Type :=
+           ["update_core", "update_plugins", "update_themes"];
+
+         Transient_Option : constant String := "_site_transient_" & Transient;
+
+         Value : Boolean := True;
+      begin
+         if not In_List (Transient, No_Timeout, True) then
+            declare
+               Transient_Timeout : constant String :=
+                 "_site_transient_timeout_" & Transient;
+
+               Timeout : constant Natural := 0; -- ???
+               -- As_Integer (Get_Site_Option (Transient_Timeout));
+            begin
+               if 0 /= Timeout and then Timeout < Time then
+                  -- false =
+                  Delete_Site_Option (Transient_Option);
+                  Delete_Site_Option (Transient_Timeout);
+                  Value := False;
+               end if;
+            end;
+         end if;
+
+         if Value then
+            -- if not Isset (Value) then
+            return Get_Site_Option (Transient_Option);
+         else
+            return From_Boolean (Value);
+         end if;
+      end Helper;
+
    begin
       --
-      -- Filters the value of an existing site transient before it is retrieved.
+      -- Filters the value of an existing site transient before it is
+      -- retrieved.
       --
-      -- The dynamic portion of the hook name, `transient`, refers to the transient
-      --  name.
+      -- The dynamic portion of the hook name, `transient`, refers to the
+      -- transient name.
       --
-      -- Returning a value other than boolean false will short-circuit retrieval and
-      -- return that value instead.
+      -- Returning a value other than boolean false will short-circuit
+      -- retrieval and return that value instead.
       --
       -- @since 2.9.0
       -- @since 4.4.0 The `transient` parameter was added.
@@ -2582,67 +2608,42 @@ is
       --                                  of the transient, and return that value.
       -- @param string transient          Transient name.
       --
---    Pre := Apply_Filters ("pre_site_transient_" & Transient, False, Transient);
-
-      -- -- if False /= Pre then
-      -- --    return Pre;
-      -- -- end if;
-
-      if
-        Wp_Using_Ext_Object_Cache -- or else
---      Wp_Installing
-      then
-         Value := +Wp_Cache_Get (Transient, "site-transient", Found => Found);
-      else
-         -- Core transients that do not have a timeout. Listed here so querying
-         -- timeouts can be avoided.
-         declare
-            No_Timeout : constant List_Type :=
-              ["update_core", "update_plugins", "update_themes"];
-
-            Transient_Option : constant String := "_site_transient_" & Transient;
-         begin
-            if not In_List (Transient, No_Timeout, True) then
-               declare
-                  Transient_Timeout : constant String :=
-                    "_site_transient_timeout_" & Transient;
-
-                  Timeout : constant Natural := 0; -- ???
---                  As_Integer (Get_Site_Option (Transient_Timeout));
-               begin
-                  if 0 /= Timeout and then Timeout < Time then -- false =
-                     Delete_Site_Option (Transient_Option);
-                     Delete_Site_Option (Transient_Timeout);
-                     Value := Null_UString; -- False;
-                  end if;
-               end;
-            end if;
-
-            if not Isset (-Value) then
-               Value := +As_String (Get_Site_Option (Transient_Option));
-            end if;
-         end;
-      end if;
-
-      --
-      -- Filters the value of an existing site transient.
-      --
-      -- The dynamic portion of the hook name, `transient`, refers to the transient
-      --  name.
-      --
-      -- @since 2.9.0
-      -- @since 4.4.0 The `transient` parameter was added.
-      --
-      -- @param mixed  value     Value of site transient.
-      -- @param string transient Transient name.
-      --
       declare
-         M : String_Maps.Map;
-         R : constant String :=
-           Apply_Filters ("site_transient_" & Transient, -Value, Transient);
+         Pre : constant Multi_Type :=
+           Apply_Filters
+             ("pre_site_transient_" & Transient,
+              From_Boolean (False),
+              Transient);
       begin
-         M.Include (R, R);
-         return M;
+         if Kind_Of (Pre) = Kind_Boolean and then False = As_Boolean (Pre) then
+            null;
+         else
+            return Pre;
+         end if;
+      end;
+
+      declare
+         Unused : Boolean;
+
+         Value : constant Multi_Type :=
+           (if Wp_Using_Ext_Object_Cache or else Wp_Installing
+            then Wp_Cache_Get (Transient, "site-transient", Found => Unused)
+            else Helper (Transient));
+      begin
+         --
+         -- Filters the value of an existing site transient.
+         --
+         -- The dynamic portion of the hook name, `transient`, refers to the
+         -- transient name.
+         --
+         -- @since 2.9.0
+         -- @since 4.4.0 The `transient` parameter was added.
+         --
+         -- @param mixed  value     Value of site transient.
+         -- @param string transient Transient name.
+         --
+         return
+           Apply_Filters ("site_transient_" & Transient, Value, Transient);
       end;
    end Get_Site_Transient;
 

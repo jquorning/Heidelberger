@@ -32,6 +32,7 @@ with Inc_L10n;
 with Inc_Plugins;
 with Inc_Posts;
 with Inc_Post_Formats;
+with Inc_Options;
 with Inc_REST_API;
 
 package body Inc_Themes
@@ -426,37 +427,30 @@ is
    -- Get_Theme_Roots --
    ---------------------
 
-   function Get_Theme_Roots
-            return Inc_Options.String_Maps.Map
-   is
+   function Get_Theme_Roots return Array_Type is
       use Ada.Containers;
       use Php.Types;
       use Inc_Options;
 
---         global wp_theme_directories;
-      Theme_Roots : String_Maps.Map;
-      Unused      : Array_Type;
+      -- global wp_theme_directories;
    begin
-      if
-        not Is_Array (Wp_Theme_Directories) or else
-        Wp_Theme_Directories.Length <= 1
+      if not Is_Array (Wp_Theme_Directories)
+        or else Wp_Theme_Directories.Length <= 1
       then
-         declare
-            M : String_Maps.Map;
-         begin
-            M.Include ("/themes", "/themes");
-            return M; -- "/themes";
-         end;
+         return Build ("/themes", "/themes"); -- "/themes";
       end if;
 
-      Theme_Roots := Get_Site_Transient ("theme_roots");
-      if Theme_Roots.Is_Empty then
---    if ( false === theme_roots ) then
-         Unused := Search_Theme_Directories (Force => True);
-         -- Regenerate the transient.
-         Theme_Roots := Get_Site_Transient ("theme_roots");
-      end if;
-      return Theme_Roots;
+      declare
+         Theme_Roots : Multi_Type := Get_Site_Transient ("theme_roots");
+         Unused : Array_Type;
+      begin
+         if False = As_Boolean (Theme_Roots) then
+            Unused := Search_Theme_Directories (Force => True);
+            -- Regenerate the transient.
+            Theme_Roots := Get_Site_Transient ("theme_roots");
+         end if;
+         return As_Array (Theme_Roots);
+      end;
    end Get_Theme_Roots;
 
    ------------------------------
@@ -748,19 +742,10 @@ is
                             Stylesheet_Or_Template);
    end Get_Theme_Root_URI;
 
--- --
--- -- Gets the raw theme root relative to the content directory with no filters applied.
--- --
--- -- @since 3.1.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @param string stylesheet_or_template The stylesheet or template name of the theme.
--- -- @param bool   skip_cache             Optional. Whether to skip the cache.
--- --                                       Defaults to false, meaning the cache is used.
--- -- @return string Theme root.
--- --
--- function get_raw_theme_root( stylesheet_or_template, skip_cache = false ) then
+   ------------------------
+   -- Get_Raw_Theme_Root --
+   ------------------------
+
    function Get_Raw_Theme_Root (Stylesheet_Or_Template : String;
                                 Skip_Cache             : Boolean := False)
                                 return String
@@ -777,7 +762,6 @@ is
       if
         not Is_Array (Wp_Theme_Directories) or else
         Wp_Theme_Directories.Length <= 1
---      Count (Wp_Theme_Directories) <= 1
       then
          return "/themes";
       end if;
@@ -796,10 +780,12 @@ is
 
       if Empty (Theme_Root) then
          declare
-            Theme_Roots : constant String_Maps.Map := Get_Theme_Roots; -- ()
+            Theme_Roots : constant Array_Type := Get_Theme_Roots;
          begin
-            if not Empty (Theme_Roots (Stylesheet_Or_Template)) then
-               Theme_Root := +Theme_Roots (Stylesheet_Or_Template);
+            if not Empty (Get_As_String (Theme_Roots, Stylesheet_Or_Template))
+            then
+               Theme_Root :=
+                 +Get_As_String (Theme_Roots, Stylesheet_Or_Template);
             end if;
          end;
       end if;

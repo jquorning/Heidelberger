@@ -113,6 +113,7 @@ is
       Logging.Log ("aquire", "before");
       Serializer.Aquire;
       Logging.Log ("aquire", "after");
+      Logging.Add_Time;
 
       Php.Echoing.Clear_Echo;
 

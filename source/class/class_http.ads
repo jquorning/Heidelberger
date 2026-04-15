@@ -34,7 +34,7 @@ is
    -- @since 2.7.0
    --
    -- #[AllowDynamicProperties]
-   type Wp_Http is tagged
+   type Wp_HTTP is tagged
      record
         null;
      end record;
@@ -191,7 +191,7 @@ is
       Error   : Class_Errors.Wp_Error;
    end record;
 
-   function Request (This : Wp_Http;
+   function Request (This : Wp_HTTP;
                      URL  : String;
                      Args : Array_Type := Empty_Array)
                      return Response_Result; -- Array_Type;
@@ -271,7 +271,7 @@ is
    --                      the request. False if no transport claims to support the
    --                      request.
    --
-   function X_Get_First_Available_Transport (This : Wp_Http;
+   function X_Get_First_Available_Transport (This : Wp_HTTP;
                                              Args : Array_Type;
                                              URL  : String := "") -- null
                                              return String;
@@ -332,28 +332,27 @@ is
    --                        "cookies", "filename".
    --                        A WP_Error instance upon error.
    --
-   function Post (This : Wp_Http;
+   function Post (This : Wp_HTTP;
                   URL  : String;
                   Args : Array_Type := Empty_Array)
                   return Array_Type;
 
-        -- --
-        -- -- Uses the GET HTTP method.
-        -- --
-        -- -- Used for sending data that is expected to be in the body.
-        -- --
-        -- -- @since 2.7.0
-        -- --
-        -- -- @param string       url  The request URL.
-        -- -- @param string|array args Optional. Override the defaults.
-        -- -- @return array|WP_Error Array containing "headers", "body", "response", "cookies", "filename".
-        -- --                        A WP_Error instance upon error.
-        -- --
-        -- public function get( url, args = array() ) then
-        --         defaults    = array( "method" => "GET" );
-        --         parsed_args = wp_parse_args( args, defaults );
-        --         return this.request( url, parsed_args );
-        -- end;
+   --
+   -- Uses the GET HTTP method.
+   --
+   -- Used for sending data that is expected to be in the body.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string       url  The request URL.
+   -- @param string|array args Optional. Override the defaults.
+   -- @return array|WP_Error Array containing "headers", "body", "response", "cookies", "filename".
+   --                        A WP_Error instance upon error.
+   --
+   function Get (This : Wp_HTTP;
+                 URL  : String;
+                 Args : Array_Type := Empty_Array)
+                 return Array_Type;
 
         -- --
         -- -- Uses the HEAD HTTP method.
@@ -531,7 +530,7 @@ is
    -- @param string uri URI of url.
    -- @return bool True to block, false to allow.
    --
-   function Block_Request (This : Wp_Http;
+   function Block_Request (This : Wp_HTTP;
                            URI  : String)
                            return Boolean;
 

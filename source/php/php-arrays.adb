@@ -273,6 +273,26 @@ is
 --    raise Program_Error with "not implemented";
    end Array_Unshift;
 
+   ----------------
+   -- Array_Walk --
+   ----------------
+
+   procedure Array_Walk
+     (Arry     : in out Array_Type;
+      Callback : Alter_Function;
+      Arg      : Multi_Type := From_Null)
+   is
+   begin
+      for Item in Arry.Iterate loop
+         declare
+            K : constant String     := Key (Item);
+            V : constant Multi_Type := Element (Item);
+         begin
+            Callback (Arry, K, V, Arg);
+         end;
+      end loop;
+   end Array_Walk;
+
    -----------
    -- Isset --
    -----------

@@ -40,10 +40,9 @@ is
    -- @param array  args Optional. Request arguments. Default empty array.
    -- @return array|WP_Error The response or WP_Error on failure.
    --
-   function Wp_Remote_Get (Url  : String;
+   function Wp_Remote_Get (URL  : String;
                            Args : Array_Type := Empty_Array)
-                           return Array_Type
-                           is (Empty_Array);
+                           return Array_Type;
 
    --
    -- Performs an HTTP request using the POST method and returns its response.
@@ -178,8 +177,8 @@ is
    -- @since 2.7.0
    --
    -- @param array|WP_Error response HTTP response.
-   -- @return string The body of the response. Empty string if no body or incorrect
-   --                 parameter given.
+   -- @return string The body of the response. Empty string if no body or
+   --                incorrect parameter given.
    --
    function Wp_Remote_Retrieve_Body (Response : Array_Type)
                                      return String;

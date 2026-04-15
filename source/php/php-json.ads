@@ -17,6 +17,8 @@ is
                          Associative : Boolean := False)
                          return Array_Type;
 
+   function JSON_Decode (JSON : String) return Multi_Type;
+
    JSON_ERROR_NONE : constant Integer := 0; -- Arbitrary value
 
    function JSON_Last_Error

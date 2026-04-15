@@ -25,9 +25,9 @@ package body Inc_HTTP
 is
    use Lists;
 
-   subtype Wp_Http is Class_HTTP.Wp_Http;
+   subtype Wp_HTTP is Class_HTTP.Wp_HTTP;
 
-   Static_HTTP : Wp_Http; -- = null;
+   Static_HTTP : Wp_HTTP; -- = null;
 
    --------------------------
    -- X_Wp_HTTP_Get_Object --
@@ -43,7 +43,7 @@ is
    --      end;
    --      return http;
    -- end X_Wp_HTTP_Get_Object;
-   X_Wp_HTTP_Get_Object : Wp_Http
+   X_Wp_HTTP_Get_Object : Wp_HTTP
      renames Static_HTTP;
 
 -- --
@@ -165,22 +165,18 @@ is
 --         return http.request( url, args );
 -- end;
 
--- --
--- -- Performs an HTTP request using the GET method and returns its response.
--- --
--- -- @since 2.7.0
--- --
--- -- @see wp_remote_request() For more information on the response array format.
--- -- @see WP_Http::request() For default arguments information.
--- --
--- -- @param string url  URL to retrieve.
--- -- @param array  args Optional. Request arguments. Default empty array.
--- -- @return array|WP_Error The response or WP_Error on failure.
--- --
--- function wp_remote_get( url, args = array() ) then
---         http = _wp_http_get_object();
---         return http.get( url, args );
--- end;
+   -------------------
+   -- Wp_Remove_Get --
+   -------------------
+
+   function Wp_Remote_Get (URL  : String;
+                           Args : Array_Type := Empty_Array)
+                           return Array_Type
+   is
+      HTTP : constant Wp_HTTP := X_Wp_HTTP_Get_Object;
+   begin
+      return HTTP.Get (URL, Args);
+   end Wp_Remote_Get;
 
    --------------------
    -- Wp_Remove_Post --
@@ -190,7 +186,7 @@ is
                             Args : Array_Type := Empty_Array)
                             return Array_Type
    is
-      HTTP : constant Wp_Http := X_Wp_HTTP_Get_Object;
+      HTTP : constant Wp_HTTP := X_Wp_HTTP_Get_Object;
    begin
       return HTTP.Post (URL, Args);
    end Wp_Remote_Post;
@@ -263,15 +259,14 @@ is
    is
       use Inc_Load;
    begin
-      if
-        Is_Wp_Error (Response) or else
-        not Isset (Response, "response") or else
-        Kind_Of (Get (Response, "response")) /= Kind_Array
+      if Is_Wp_Error (Response)
+        or else not Isset (Response, "response")
+        or else not Is_Array (Get (Response, "response"))
       then
-         return 0; -- ""
+         return 0;
       end if;
 
-      return As_Integer (Get (Ref_2 (Response, "response", "code")));
+      return As_Integer (Get (As_Array (Get (Response, "response")), "code"));
    end Wp_Remote_Retrieve_Response_Code;
 
 -- --
@@ -388,7 +383,7 @@ is
       use Php.Types;
       use Inc_Functions;
 
-      HTTP : constant Wp_Http := X_Wp_HTTP_Get_Object;
+      HTTP : constant Wp_HTTP := X_Wp_HTTP_Get_Object;
 
       Capabilities_2 : Array_Type := Wp_Parse_Args (Capabilities);
 

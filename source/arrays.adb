@@ -265,6 +265,24 @@ is
       return Arry.Kind;
    end Kind_Of;
 
+   -------------
+   -- Is_Null --
+   -------------
+
+   function Is_Null (Multi : Multi_Type) return Boolean is
+   begin
+      return Kind_Of (Multi) = Kind_Null;
+   end Is_Null;
+
+   --------------
+   -- Is_Array --
+   --------------
+
+   function Is_Array (Multi : Multi_Type) return Boolean is
+   begin
+      return Kind_Of (Multi) = Kind_Array;
+   end Is_Array;
+
    -----------
    -- Empty --
    -----------
@@ -389,17 +407,6 @@ is
 
       return Arry.Func;
    end As_Callable;
-
-   -------------
-   -- Is_Null --
-   -------------
-
-   function Is_Null (Arry : Multi_Type)
-                     return Boolean
-   is
-   begin
-      return Kind_Of (Arry) = Kind_Null;
-   end Is_Null;
 
    ----------------
    -- From_Array --

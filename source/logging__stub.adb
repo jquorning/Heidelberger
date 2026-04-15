@@ -20,4 +20,11 @@ is
    procedure Silence (Channel : String)
    is null;
 
+   --------------
+   -- Add_Time --
+   --------------
+
+   procedure Add_Time
+   is null;
+
 end Logging;

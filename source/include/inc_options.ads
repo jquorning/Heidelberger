@@ -604,7 +604,7 @@ is
    -- @return mixed Value of transient.
    --
    function Get_Site_Transient (Transient : String)
-                                return String_Maps.Map;
+                                return Multi_Type; -- String_Maps.Map;
 
    --
    -- Sets/updates the value of a site transient.

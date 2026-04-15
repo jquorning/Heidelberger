@@ -1080,8 +1080,8 @@ is
    -- WordPress implementation of PHP sprintf() with filters.
    --
    -- @since 2.5.0
-   -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
-   --              by adding it to the function signature.
+   -- @since 5.3.0 Formalized the existing and already documented `...args`
+   --              parameter by adding it to the function signature.
    --
    -- @link https://www.php.net/sprintf
    --
@@ -1089,11 +1089,9 @@ is
    -- @param mixed  ...args Arguments to be formatted into the pattern string.
    -- @return string The formatted string.
    --
-   -- function wp_sprintf( pattern, ...args ) then
    function Wp_Sprintf (Pattern : String;
-                        Arg_1   : String)
-                        return String
-                        is (Pattern);
+                        Arg_1   : List_Type)
+                        return String;
 
    --
    -- Properly strips all HTML tags including script and style

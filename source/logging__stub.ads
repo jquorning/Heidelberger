@@ -18,4 +18,10 @@ is
    procedure Silence (Channel : String)
      with Inline_Always;
 
+   --
+   --
+   --
+   procedure Add_Time
+     with Inline_Always;
+
 end Logging;

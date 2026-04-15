@@ -267,6 +267,18 @@ is
                           Flags : Unique_Flags := Sort_String)
                           return Array_Type;
 
+   type Alter_Function is
+     not null access procedure
+       (Container : in out Array_Type;
+        Key       : String;
+        Value     : Multi_Type;
+        Arg       : Multi_Type);
+
+   procedure Array_Walk
+     (Arry     : in out Array_Type;
+      Callback : Alter_Function;
+      Arg      : Multi_Type := From_Null);
+
    function Isset (Arry : Array_Type;
                    Key  : Integer)
                    return Boolean;

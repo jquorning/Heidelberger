@@ -78,9 +78,18 @@ is
    -- JSON_Decode --
    -----------------
 
-   function JSON_Decode (JSON        : String;
-                         Associative : Boolean := False)
-                         return Array_Type
+   function JSON_Decode
+     (JSON : String; Associative : Boolean := False) return Array_Type is
+   begin
+      return As_Array (JSON_Decode (JSON));
+   end JSON_Decode;
+
+   -----------------
+   -- JSON_Decode --
+   -----------------
+
+   function JSON_Decode (JSON : String)
+                         return Multi_Type
    is
       use GNATCOLL.JSON;
 
@@ -108,8 +117,7 @@ is
       begin
          for A of Arry loop
             Count := Count + 1;
-            Array_Merge (Result, Build (Helpers.Image (Count),
-                                        As_Array (Parse (A))));
+            Array_Merge (Result, Build (Helpers.Image (Count), Parse (A)));
          end loop;
          return From_Array (Result);
       end Parse_Array;
@@ -158,17 +166,21 @@ is
       begin
          case Kind (Value) is
 
-         when JSON_Array_Type =>
-            return Parse_Array (Value);
+            when JSON_Array_Type    =>
+               return Parse_Array (Value);
 
-         when JSON_Object_Type =>
-            return Parse_Object (Value);
+            when JSON_Object_Type   =>
+               return Parse_Object (Value);
 
-         when JSON_String_Type =>
-            return From_String (Get (Value));
+            when JSON_String_Type   =>
+               return From_String (Get (Value));
 
-         when others =>
-            pragma Assert (False);
+            when JSON_Boolean_Type =>
+               return From_Boolean (Get (Value));
+
+            when others             =>
+               Logging.Log ("parse", Kind (Value)'Image);
+               pragma Assert (False);
 
          end case;
       end Parse;
@@ -178,10 +190,10 @@ is
       if not Value.Success then
          Logging.Log ("json_decode",
                       "failed with " & Format_Parsing_Error (Value.Error));
-         return Standard.Arrays.Empty_Array;
+         return From_Null;
       end if;
 
-      return As_Array (Parse (Value.Value));
+      return Parse (Value.Value);
    end JSON_Decode;
 
 end Php.JSON;
