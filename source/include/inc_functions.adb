@@ -8,7 +8,6 @@ with Ada.Containers;
 
 with Php.Arrays;
 with Php.Echoing;
-with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.Ini;
@@ -45,6 +44,7 @@ with Inc_Formatting;
 with Inc_Functions_Wp_Scripts;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
+with Inc_KSES;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
@@ -54,6 +54,7 @@ with Inc_Options;
 with Inc_Plugins;
 with Inc_Pluggables;
 with Inc_Querys;
+with Inc_Versions;
 
 package body Inc_Functions
 is
@@ -1997,8 +1998,9 @@ is
       Referer : Boolean := True;
       Echo    : Boolean := True) return String
    is
-      use Inc_Formatting;
       use UStrings;
+      use Inc_Formatting;
+      use Inc_Pluggables;
 
       Name_2      : constant String := ESC_Attr (Name);
       Nonce_Field : UString :=
@@ -2007,9 +2009,8 @@ is
         & """ name="""
         & Name_2
         & """ value="""
-        & "XXX-864"
+        & Wp_Create_Nonce (Action)
         & """ />";
-      --      """ value=""" & Wp_Create_Nonce (Action) & """ />";
    begin
       if Referer then
          Append (Nonce_Field, Wp_Referer_Field (False));
@@ -6158,6 +6159,66 @@ is
       end if;
    end X_Doing_It_Wrong;
 
+   ----------------------
+   -- Wp_trigger_Error --
+   ----------------------
+
+   procedure Wp_Trigger_Error
+     (Function_Name : String;
+      Message       : String;
+      Error_Level   : Php.Errors.Error_Level_Type := Php.Errors.E_USER_NOTICE)
+   is
+      use Php.Errors;
+      use Php.Strings;
+      use Array_Lists;
+      use Constants;
+      use Wp_Common;
+      use Inc_KSES;
+   begin
+      -- Bail out if WP_DEBUG is not turned on.
+      if not WP_DEBUG then
+         return;
+      end if;
+
+      --
+      -- Fires when the given function triggers a user-level error/warning/notice/deprecation message.
+      --
+      -- Can be used for debug backtracking.
+      --
+      -- @since 6.4.0
+      --
+      -- @param string function_name The function that was called.
+      -- @param string message       A message explaining what has been done incorrectly.
+      -- @param int    error_level   The designated error type for this error.
+      --
+      Do_Action ("wp_trigger_error_run", Function_Name, Message, Error_Level);
+
+      declare
+         Message_2 : constant String :=
+           (if not Empty (Function_Name)
+            then Sprintf ("%s(): %s", [Function_Name, Message])
+            else Message);
+
+         Message_3 : constant String :=
+           Wp_KSES
+             (Message_2,
+              To_Array_Type
+                ([Build ("a", Build ("href", True)),
+                  Build ("br", Empty_Array),
+                  Build ("code", Empty_Array),
+                  Build ("em", Empty_Array),
+                  Build ("strong", Empty_Array)]),
+              List_Type'["http", "https"]);
+      begin
+         if E_USER_ERROR = Error_Level then
+            null; -- throw new WP_Exception( message_3 );
+
+         end if;
+
+         Trigger_Error (Message_3, Error_Level);
+      end;
+   end Wp_Trigger_Error;
+
    --
    -- Determines whether the server is running an earlier than 1.5.0 version of lighttpd.
    --
@@ -8473,339 +8534,521 @@ is
       Echo ("</p>");
    end Wp_Direct_PHP_Update_Button;
 
---
--- Gets the URL to learn more about updating the site to use HTTPS.
---
--- This URL can be overridden by specifying an environment variable `WP_UPDATE_HTTPS_URL` or by using the
--- {@see "wp_update_https_url"} filter. Providing an empty string is not allowed and will result in the
--- default URL being used. Furthermore the page the URL links to should preferably be localized in the
--- site language.
---
--- @since 5.7.0
---
--- @return string URL to learn more about updating to HTTPS.
---
--- function wp_get_update_https_url() then
---         default_url = wp_get_default_update_https_url();
+   --
+   -- Gets the URL to learn more about updating the site to use HTTPS.
+   --
+   -- This URL can be overridden by specifying an environment variable `WP_UPDATE_HTTPS_URL` or by using the
+   -- {@see "wp_update_https_url"} filter. Providing an empty string is not allowed and will result in the
+   -- default URL being used. Furthermore the page the URL links to should preferably be localized in the
+   -- site language.
+   --
+   -- @since 5.7.0
+   --
+   -- @return string URL to learn more about updating to HTTPS.
+   --
+   -- function wp_get_update_https_url() then
+   --         default_url = wp_get_default_update_https_url();
 
---         update_url = default_url;
---         if ( false !== getenv( "WP_UPDATE_HTTPS_URL" ) ) then
---                 update_url = getenv( "WP_UPDATE_HTTPS_URL" );
---         end;
+   --         update_url = default_url;
+   --         if ( false !== getenv( "WP_UPDATE_HTTPS_URL" ) ) then
+   --                 update_url = getenv( "WP_UPDATE_HTTPS_URL" );
+   --         end;
 
---         --
---         -- Filters the URL to learn more about updating the HTTPS version the site is running on.
---         --
---         -- Providing an empty string is not allowed and will result in the default URL being used. Furthermore
---         -- the page the URL links to should preferably be localized in the site language.
---         --
---         -- @since 5.7.0
---         --
---         -- @param string update_url URL to learn more about updating HTTPS.
---         --
---         update_url = apply_filters( "wp_update_https_url", update_url );
---         if ( empty( update_url ) ) then
---                 update_url = default_url;
---         end;
+   --         --
+   --         -- Filters the URL to learn more about updating the HTTPS version the site is running on.
+   --         --
+   --         -- Providing an empty string is not allowed and will result in the default URL being used. Furthermore
+   --         -- the page the URL links to should preferably be localized in the site language.
+   --         --
+   --         -- @since 5.7.0
+   --         --
+   --         -- @param string update_url URL to learn more about updating HTTPS.
+   --         --
+   --         update_url = apply_filters( "wp_update_https_url", update_url );
+   --         if ( empty( update_url ) ) then
+   --                 update_url = default_url;
+   --         end;
 
---         return update_url;
--- end;
+   --         return update_url;
+   -- end;
 
---
--- Gets the default URL to learn more about updating the site to use HTTPS.
---
--- Do not use this function to retrieve this URL. Instead, use {@see wp_get_update_https_url()} when relying on the URL.
--- This function does not allow modifying the returned URL, and is only used to compare the actually used URL with the
--- default one.
---
--- @since 5.7.0
--- @access private
---
--- @return string Default URL to learn more about updating to HTTPS.
---
--- function wp_get_default_update_https_url() then
---         /* translators: Documentation explaining HTTPS and why it should be used.--
---         return __( "https://wordpress.org/support/article/why-should-i-use-https/" );
--- end;
+   --
+   -- Gets the default URL to learn more about updating the site to use HTTPS.
+   --
+   -- Do not use this function to retrieve this URL. Instead, use {@see wp_get_update_https_url()} when relying on the URL.
+   -- This function does not allow modifying the returned URL, and is only used to compare the actually used URL with the
+   -- default one.
+   --
+   -- @since 5.7.0
+   -- @access private
+   --
+   -- @return string Default URL to learn more about updating to HTTPS.
+   --
+   -- function wp_get_default_update_https_url() then
+   --         /* translators: Documentation explaining HTTPS and why it should be used.--
+   --         return __( "https://wordpress.org/support/article/why-should-i-use-https/" );
+   -- end;
 
---
--- Gets the URL for directly updating the site to use HTTPS.
---
--- A URL will only be returned if the `WP_DIRECT_UPDATE_HTTPS_URL` environment variable is specified or
--- by using the {@see "wp_direct_update_https_url"} filter. This allows hosts to send users directly to
--- the page where they can update their site to use HTTPS.
---
--- @since 5.7.0
---
--- @return string URL for directly updating to HTTPS or empty string.
---
--- function wp_get_direct_update_https_url() then
---         direct_update_url = "";
+   --
+   -- Gets the URL for directly updating the site to use HTTPS.
+   --
+   -- A URL will only be returned if the `WP_DIRECT_UPDATE_HTTPS_URL` environment variable is specified or
+   -- by using the {@see "wp_direct_update_https_url"} filter. This allows hosts to send users directly to
+   -- the page where they can update their site to use HTTPS.
+   --
+   -- @since 5.7.0
+   --
+   -- @return string URL for directly updating to HTTPS or empty string.
+   --
+   -- function wp_get_direct_update_https_url() then
+   --         direct_update_url = "";
 
---         if ( false !== getenv( "WP_DIRECT_UPDATE_HTTPS_URL" ) ) then
---                 direct_update_url = getenv( "WP_DIRECT_UPDATE_HTTPS_URL" );
---         end;
+   --         if ( false !== getenv( "WP_DIRECT_UPDATE_HTTPS_URL" ) ) then
+   --                 direct_update_url = getenv( "WP_DIRECT_UPDATE_HTTPS_URL" );
+   --         end;
 
---         --
---         -- Filters the URL for directly updating the PHP version the site is running on from the host.
---         --
---         -- @since 5.7.0
---         --
---         -- @param string direct_update_url URL for directly updating PHP.
---         --
---         direct_update_url = apply_filters( "wp_direct_update_https_url", direct_update_url );
+   --         --
+   --         -- Filters the URL for directly updating the PHP version the site is running on from the host.
+   --         --
+   --         -- @since 5.7.0
+   --         --
+   --         -- @param string direct_update_url URL for directly updating PHP.
+   --         --
+   --         direct_update_url = apply_filters( "wp_direct_update_https_url", direct_update_url );
 
---         return direct_update_url;
--- end;
+   --         return direct_update_url;
+   -- end;
 
---
--- Gets the size of a directory.
---
--- A helper function that is used primarily to check whether
--- a blog has exceeded its allowed upload space.
---
--- @since MU (3.0.0)
--- @since 5.2.0 max_execution_time parameter added.
---
--- @param string directory Full path of a directory.
--- @param int    max_execution_time Maximum time to run before giving up. In seconds.
---                                   The timeout is global and is measured from the moment WordPress started to load.
--- @return int|false|null Size in bytes if a valid directory. False if not. Null if timeout.
---
--- function get_dirsize( directory, max_execution_time = null ) then
+   --
+   -- Gets the size of a directory.
+   --
+   -- A helper function that is used primarily to check whether
+   -- a blog has exceeded its allowed upload space.
+   --
+   -- @since MU (3.0.0)
+   -- @since 5.2.0 max_execution_time parameter added.
+   --
+   -- @param string directory Full path of a directory.
+   -- @param int    max_execution_time Maximum time to run before giving up. In seconds.
+   --                                   The timeout is global and is measured from the moment WordPress started to load.
+   -- @return int|false|null Size in bytes if a valid directory. False if not. Null if timeout.
+   --
+   -- function get_dirsize( directory, max_execution_time = null ) then
 
---         // Exclude individual site directories from the total when checking the main site of a network,
---         // as they are subdirectories and should not be counted.
---         if ( is_multisite() && is_main_site() ) then
---                 size = recurse_dirsize( directory, directory . "/sites", max_execution_time );
---         end; else then
---                 size = recurse_dirsize( directory, null, max_execution_time );
---         end;
+   --         // Exclude individual site directories from the total when checking the main site of a network,
+   --         // as they are subdirectories and should not be counted.
+   --         if ( is_multisite() && is_main_site() ) then
+   --                 size = recurse_dirsize( directory, directory . "/sites", max_execution_time );
+   --         end; else then
+   --                 size = recurse_dirsize( directory, null, max_execution_time );
+   --         end;
 
---         return size;
--- end;
+   --         return size;
+   -- end;
 
---
--- Gets the size of a directory recursively.
---
--- Used by get_dirsize() to get a directory size when it contains other directories.
---
--- @since MU (3.0.0)
--- @since 4.3.0 The `exclude` parameter was added.
--- @since 5.2.0 The `max_execution_time` parameter was added.
--- @since 5.6.0 The `directory_cache` parameter was added.
---
--- @param string          directory          Full path of a directory.
--- @param string|string[] exclude            Optional. Full path of a subdirectory to exclude from the total,
---                                            or array of paths. Expected without trailing slash(es).
--- @param int             max_execution_time Optional. Maximum time to run before giving up. In seconds.
---                                            The timeout is global and is measured from the moment
---                                            WordPress started to load.
--- @param array           directory_cache    Optional. Array of cached directory paths.
--- @return int|false|null Size in bytes if a valid directory. False if not. Null if timeout.
---
--- function recurse_dirsize( directory, exclude = null, max_execution_time = null, &directory_cache = null ) then
---         directory  = untrailingslashit( directory );
---         save_cache = false;
+   --
+   -- Gets the size of a directory recursively.
+   --
+   -- Used by get_dirsize() to get a directory size when it contains other directories.
+   --
+   -- @since MU (3.0.0)
+   -- @since 4.3.0 The `exclude` parameter was added.
+   -- @since 5.2.0 The `max_execution_time` parameter was added.
+   -- @since 5.6.0 The `directory_cache` parameter was added.
+   --
+   -- @param string          directory          Full path of a directory.
+   -- @param string|string[] exclude            Optional. Full path of a subdirectory to exclude from the total,
+   --                                            or array of paths. Expected without trailing slash(es).
+   -- @param int             max_execution_time Optional. Maximum time to run before giving up. In seconds.
+   --                                            The timeout is global and is measured from the moment
+   --                                            WordPress started to load.
+   -- @param array           directory_cache    Optional. Array of cached directory paths.
+   -- @return int|false|null Size in bytes if a valid directory. False if not. Null if timeout.
+   --
+   -- function recurse_dirsize( directory, exclude = null, max_execution_time = null, &directory_cache = null ) then
+   --         directory  = untrailingslashit( directory );
+   --         save_cache = false;
 
---         if ( ! isset( directory_cache ) ) then
---                 directory_cache = get_transient( "dirsize_cache" );
---                 save_cache      = true;
---         end;
+   --         if ( ! isset( directory_cache ) ) then
+   --                 directory_cache = get_transient( "dirsize_cache" );
+   --                 save_cache      = true;
+   --         end;
 
---         if ( isset( directory_cache[ directory ] ) && is_int( directory_cache[ directory ] ) ) then
---                 return directory_cache[ directory ];
---         end;
+   --         if ( isset( directory_cache[ directory ] ) && is_int( directory_cache[ directory ] ) ) then
+   --                 return directory_cache[ directory ];
+   --         end;
 
---         if ( ! file_exists( directory ) || ! is_dir( directory ) || ! is_readable( directory ) ) then
---                 return false;
---         end;
+   --         if ( ! file_exists( directory ) || ! is_dir( directory ) || ! is_readable( directory ) ) then
+   --                 return false;
+   --         end;
 
---         if (
---                 ( is_string( exclude ) && directory === exclude ) ||
---                 ( is_array( exclude ) && in_array( directory, exclude, true ) )
---         ) then
---                 return false;
---         end;
+   --         if (
+   --                 ( is_string( exclude ) && directory === exclude ) ||
+   --                 ( is_array( exclude ) && in_array( directory, exclude, true ) )
+   --         ) then
+   --                 return false;
+   --         end;
 
---         if ( null === max_execution_time ) then
---                 // Keep the previous behavior but attempt to prevent fatal errors from timeout if possible.
---                 if ( function_exists( "ini_get" ) ) then
---                         max_execution_time = ini_get( "max_execution_time" );
---                 end; else then
---                         // Disable...
---                         max_execution_time = 0;
---                 end;
+   --         if ( null === max_execution_time ) then
+   --                 // Keep the previous behavior but attempt to prevent fatal errors from timeout if possible.
+   --                 if ( function_exists( "ini_get" ) ) then
+   --                         max_execution_time = ini_get( "max_execution_time" );
+   --                 end; else then
+   --                         // Disable...
+   --                         max_execution_time = 0;
+   --                 end;
 
---                 // Leave 1 second "buffer" for other operations if max_execution_time has reasonable value.
---                 if ( max_execution_time > 10 ) then
---                         max_execution_time -= 1;
---                 end;
---         end;
+   --                 // Leave 1 second "buffer" for other operations if max_execution_time has reasonable value.
+   --                 if ( max_execution_time > 10 ) then
+   --                         max_execution_time -= 1;
+   --                 end;
+   --         end;
 
---         --
---         -- Filters the amount of storage space used by one directory and all its children, in megabytes.
---         --
---         -- Return the actual used space to short-circuit the recursive PHP file size calculation
---         -- and use something else, like a CDN API or native operating system tools for better performance.
---         --
---         -- @since 5.6.0
---         --
---         -- @param int|false            space_used         The amount of used space, in bytes. Default false.
---         -- @param string               directory          Full path of a directory.
---         -- @param string|string[]|null exclude            Full path of a subdirectory to exclude from the total,
---         --                                                 or array of paths.
---         -- @param int                  max_execution_time Maximum time to run before giving up. In seconds.
---         -- @param array                directory_cache    Array of cached directory paths.
---         --
---         size = apply_filters( "pre_recurse_dirsize", false, directory, exclude, max_execution_time, directory_cache );
+   --         --
+   --         -- Filters the amount of storage space used by one directory and all its children, in megabytes.
+   --         --
+   --         -- Return the actual used space to short-circuit the recursive PHP file size calculation
+   --         -- and use something else, like a CDN API or native operating system tools for better performance.
+   --         --
+   --         -- @since 5.6.0
+   --         --
+   --         -- @param int|false            space_used         The amount of used space, in bytes. Default false.
+   --         -- @param string               directory          Full path of a directory.
+   --         -- @param string|string[]|null exclude            Full path of a subdirectory to exclude from the total,
+   --         --                                                 or array of paths.
+   --         -- @param int                  max_execution_time Maximum time to run before giving up. In seconds.
+   --         -- @param array                directory_cache    Array of cached directory paths.
+   --         --
+   --         size = apply_filters( "pre_recurse_dirsize", false, directory, exclude, max_execution_time, directory_cache );
 
---         if ( false === size ) then
---                 size = 0;
+   --         if ( false === size ) then
+   --                 size = 0;
 
---                 handle = opendir( directory );
---                 if ( handle ) then
---                         while ( ( file = readdir( handle ) ) !== false ) then
---                                 path = directory . "/" . file;
---                                 if ( "." !== file && ".." !== file ) then
---                                         if ( is_file( path ) ) then
---                                                 size += filesize( path );
---                                         end; elseif ( is_dir( path ) ) then
---                                                 handlesize = recurse_dirsize( path, exclude, max_execution_time, directory_cache );
---                                                 if ( handlesize > 0 ) then
---                                                         size += handlesize;
---                                                 end;
---                                         end;
+   --                 handle = opendir( directory );
+   --                 if ( handle ) then
+   --                         while ( ( file = readdir( handle ) ) !== false ) then
+   --                                 path = directory . "/" . file;
+   --                                 if ( "." !== file && ".." !== file ) then
+   --                                         if ( is_file( path ) ) then
+   --                                                 size += filesize( path );
+   --                                         end; elseif ( is_dir( path ) ) then
+   --                                                 handlesize = recurse_dirsize( path, exclude, max_execution_time, directory_cache );
+   --                                                 if ( handlesize > 0 ) then
+   --                                                         size += handlesize;
+   --                                                 end;
+   --                                         end;
 
---                                         if ( max_execution_time > 0 &&
---                                                 ( microtime( true ) - WP_START_TIMESTAMP ) > max_execution_time
---                                         ) then
---                                                 // Time exceeded. Give up instead of risking a fatal timeout.
---                                                 size = null;
---                                                 break;
---                                         end;
---                                 end;
---                         end;
---                         closedir( handle );
---                 end;
---         end;
+   --                                         if ( max_execution_time > 0 &&
+   --                                                 ( microtime( true ) - WP_START_TIMESTAMP ) > max_execution_time
+   --                                         ) then
+   --                                                 // Time exceeded. Give up instead of risking a fatal timeout.
+   --                                                 size = null;
+   --                                                 break;
+   --                                         end;
+   --                                 end;
+   --                         end;
+   --                         closedir( handle );
+   --                 end;
+   --         end;
 
---         if ( ! is_array( directory_cache ) ) then
---                 directory_cache = array();
---         end;
+   --         if ( ! is_array( directory_cache ) ) then
+   --                 directory_cache = array();
+   --         end;
 
---         directory_cache[ directory ] = size;
+   --         directory_cache[ directory ] = size;
 
---         // Only write the transient on the top level call and not on recursive calls.
---         if ( save_cache ) then
---                 set_transient( "dirsize_cache", directory_cache );
---         end;
+   --         // Only write the transient on the top level call and not on recursive calls.
+   --         if ( save_cache ) then
+   --                 set_transient( "dirsize_cache", directory_cache );
+   --         end;
 
---         return size;
--- end;
+   --         return size;
+   -- end;
 
---
--- Cleans directory size cache used by recurse_dirsize().
---
--- Removes the current directory and all parent directories from the `dirsize_cache` transient.
---
--- @since 5.6.0
--- @since 5.9.0 Added input validation with a notice for invalid input.
---
--- @param string path Full path of a directory or file.
---
--- function clean_dirsize_cache( path ) then
---         if ( ! is_string( path ) || empty( path ) ) then
---                 trigger_error(
---                         sprintf(
---                                 /* translators: 1: Function name, 2: A variable type, like "boolean" or "integer".--
---                                 __( "%1s only accepts a non-empty path string, received %2s." ),
---                                 "<code>clean_dirsize_cache()</code>",
---                                 "<code>" . gettype( path ) . "</code>"
---                         )
---                 );
---                 return;
---         end;
+   --
+   -- Cleans directory size cache used by recurse_dirsize().
+   --
+   -- Removes the current directory and all parent directories from the `dirsize_cache` transient.
+   --
+   -- @since 5.6.0
+   -- @since 5.9.0 Added input validation with a notice for invalid input.
+   --
+   -- @param string path Full path of a directory or file.
+   --
+   -- function clean_dirsize_cache( path ) then
+   --         if ( ! is_string( path ) || empty( path ) ) then
+   --                 trigger_error(
+   --                         sprintf(
+   --                                 /* translators: 1: Function name, 2: A variable type, like "boolean" or "integer".--
+   --                                 __( "%1s only accepts a non-empty path string, received %2s." ),
+   --                                 "<code>clean_dirsize_cache()</code>",
+   --                                 "<code>" . gettype( path ) . "</code>"
+   --                         )
+   --                 );
+   --                 return;
+   --         end;
 
---         directory_cache = get_transient( "dirsize_cache" );
+   --         directory_cache = get_transient( "dirsize_cache" );
 
---         if ( empty( directory_cache ) ) then
---                 return;
---         end;
+   --         if ( empty( directory_cache ) ) then
+   --                 return;
+   --         end;
 
---         if (
---                 strpos( path, "/" ) === false &&
---                 strpos( path, "\\" ) === false
---         ) then
---                 unset( directory_cache[ path ] );
---                 set_transient( "dirsize_cache", directory_cache );
---                 return;
---         end;
+   --         if (
+   --                 strpos( path, "/" ) === false &&
+   --                 strpos( path, "\\" ) === false
+   --         ) then
+   --                 unset( directory_cache[ path ] );
+   --                 set_transient( "dirsize_cache", directory_cache );
+   --                 return;
+   --         end;
 
---         last_path = null;
---         path      = untrailingslashit( path );
---         unset( directory_cache[ path ] );
+   --         last_path = null;
+   --         path      = untrailingslashit( path );
+   --         unset( directory_cache[ path ] );
 
---         while (
---                 last_path !== path &&
---                 DIRECTORY_SEPARATOR !== path &&
---                 "." !== path &&
---                 ".." !== path
---         ) then
---                 last_path = path;
---                 path      = dirname( path );
---                 unset( directory_cache[ path ] );
---         end;
+   --         while (
+   --                 last_path !== path &&
+   --                 DIRECTORY_SEPARATOR !== path &&
+   --                 "." !== path &&
+   --                 ".." !== path
+   --         ) then
+   --                 last_path = path;
+   --                 path      = dirname( path );
+   --                 unset( directory_cache[ path ] );
+   --         end;
 
---         set_transient( "dirsize_cache", directory_cache );
--- end;
+   --         set_transient( "dirsize_cache", directory_cache );
+   -- end;
 
---
--- Checks compatibility with the current WordPress version.
---
--- @since 5.2.0
---
--- @global string wp_version The WordPress version string.
---
--- @param string required Minimum required WordPress version.
--- @return bool True if required version is compatible or empty, false if not.
---
--- function is_wp_version_compatible( required ) then
---         global wp_version;
+   -----------------------
+   -- Wp_Get_Wp_Version --
+   -----------------------
 
---         // Strip off any -alpha, -RC, -beta, -src suffixes.
---         list( version ) = explode( "-", wp_version );
+   function Wp_Get_Wp_Version return String is
+      -- static $wp_version;
+      Version : constant String := Inc_Versions.Wp_Version;
+   begin
+      -- if not isset( version ) then
+      --    require ABSPATH . WPINC . '/version.php';
+      -- end if;
 
---         return empty( required ) || version_compare( version, required, ">=" );
--- end;
+      return Version;
+   end Wp_Get_Wp_Version;
 
---
--- Checks compatibility with the current PHP version.
---
--- @since 5.2.0
---
--- @param string required Minimum required PHP version.
--- @return bool True if required version is compatible or empty, false if not.
---
--- function is_php_version_compatible( required ) then
---         return empty( required ) || version_compare( PHP_VERSION, required, ">=" );
--- end;
+   ------------------------------
+   -- Is_WP_Version_Compatible --
+   ------------------------------
 
---
--- Checks if two numbers are nearly the same.
---
--- This is similar to using `round()` but the precision is more fine-grained.
---
--- @since 5.3.0
---
--- @param int|float expected  The expected value.
--- @param int|float actual    The actual number.
--- @param int|float precision The allowed variation.
--- @return bool Whether the numbers match within the specified precision.
---
--- function wp_fuzzy_number_match( expected, actual, precision = 1 ) then
---         return abs( (float) expected - (float) actual ) <= precision;
--- end;
+   function Is_WP_Version_Compatible (Required : String) return Boolean is
+      use Php.Misc;
+      use Php.Strings;
+      -- global wp_version;
+      -- Strip off any -alpha, -RC, -beta, -src suffixes.
+      List    : constant List_Type := Explode ("-", Inc_Versions.Wp_Version);
+      Version : constant String := List (List.First_Index);
+   begin
+      return
+        Empty (Required) or else Version_Compare (Version, Required, ">=");
+   end Is_WP_Version_Compatible;
+
+   -------------------------------
+   -- Is_PHP_Version_Compatible --
+   -------------------------------
+
+   function Is_PHP_Version_Compatible (Required : String) return Boolean is
+      use Php.Misc;
+      use Php.Strings;
+   begin
+      return
+        Empty (Required) or else Version_Compare (PHP_VERSION, Required, ">=");
+   end Is_PHP_Version_Compatible;
+
+   --
+   -- Checks if two numbers are nearly the same.
+   --
+   -- This is similar to using `round()` but the precision is more fine-grained.
+   --
+   -- @since 5.3.0
+   --
+   -- @param int|float expected  The expected value.
+   -- @param int|float actual    The actual number.
+   -- @param int|float precision The allowed variation.
+   -- @return bool Whether the numbers match within the specified precision.
+   --
+   -- function wp_fuzzy_number_match( expected, actual, precision = 1 ) then
+   --         return abs( (float) expected - (float) actual ) <= precision;
+   -- end;
+
+   -------------------------
+   -- Wp_Get_Admin_Notice --
+   -------------------------
+
+   function Wp_Get_Admin_Notice
+     (Message : String; Args : Array_Type := Empty_Array) return String
+   is
+      use Php.Strings;
+      use Php.Types;
+      use Array_Lists;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_L10n;
+
+      Defaults : constant Array_Type :=
+        To_Array_Type
+          ([Build ("type", ""),
+            Build ("dismissible", False),
+            Build ("id", ""),
+            Build ("additional_classes", Empty_Array),
+            Build ("attributes", Empty_Array),
+            Build ("paragraph_wrap", True)]);
+
+      Args_2 : constant Array_Type := Wp_Parse_Args (Args, Defaults);
+
+      --
+      -- Filters the arguments for an admin notice.
+      --
+      -- @since 6.4.0
+      --
+      -- @param array  $args    The arguments for the admin notice.
+      -- @param string $message The message for the admin notice.
+      --
+      Args_3 : constant Array_Type :=
+        Apply_Filters ("wp_admin_notice_args", Args_2, Message);
+
+      Id         : UString;
+      Classes    : UString := +"notice";
+      Attributes : UString;
+   begin
+      if Is_String (Get (Args_3, "id")) then
+         declare
+            Trimmed_Id : constant String :=
+              Trim (Get_As_String (Args_3, "id"));
+         begin
+            if "" /= Trimmed_Id then
+               Id := +"id=""" & Trimmed_Id & """ ";
+            end if;
+         end;
+      end if;
+
+      if Is_String (Get (Args_3, "type")) then
+         declare
+            Typ : constant String := Trim (Get_As_String (Args_3, "type"));
+         begin
+            if Str_Contains (Typ, " ") then
+               X_Doing_It_Wrong
+                 ("__FUNCTION__",
+                  Sprintf
+                    (
+                     -- translators: %s: The "type" key.
+                     abs "The %s key must be a string without spaces.",
+                     ["<code>" & Typ & "</code>"]),
+                  "6.4.0");
+            end if;
+
+            if "" /= Typ then
+               Append (Classes, " notice-" & Typ);
+            end if;
+         end;
+      end if;
+
+      if True = As_Boolean (Get (Args_3, "dismissible")) then
+         Append (Classes, " is-dismissible");
+      end if;
+
+      if Is_Array (Get (Args_3, "additional_classes"))
+        and then not Empty (Get_As_String (Args_3, "additional_classes"))
+      then
+         Append
+           (Classes,
+            " "
+            & Implode (" ", As_Array (Get (Args_3, "additional_classes"))));
+      end if;
+
+      if Is_Array (Get (Args_3, "attributes"))
+        and then not Empty (Args_3, "attributes")
+      then
+         declare
+            Attributes : UString;
+         begin
+            for A in As_Array (Get (Args_3, "attributes")).Iterate loop
+               declare
+                  Attr : constant String := Key (A);
+                  Val  : constant Multi_Type := Element (A);
+               begin
+                  if Is_Boolean (Val) then
+                     Append
+                       (Attributes,
+                        (if not Is_Null (Val) then " " & Attr else ""));
+
+                  elsif Is_Numeric (Attr) then
+                     -- is_int
+                     Append
+                       (Attributes, " " & ESC_Attr (Trim (As_String (Val))));
+
+                  elsif not Is_Null (Val) then
+                     Append
+                       (Attributes,
+                        " "
+                        & Attr
+                        & "="""
+                        & ESC_Attr (Trim (As_String (Val)))
+                        & """");
+                  end if;
+               end;
+            end loop;
+         end;
+      end if;
+
+      declare
+         Message_2 : constant String :=
+           (if False /= As_Boolean (Get (Args_3, "paragraph_wrap"))
+            then "<p>" & Message & "</p>"
+            else Message);
+
+         Markup : constant String :=
+           Sprintf
+             ("<div %1$sclass=""%2$s""%3$s>%4$s</div>",
+              [-Id, -Classes, -Attributes, Message]);
+      begin
+         --
+         -- Filters the markup for an admin notice.
+         --
+         -- @since 6.4.0
+         --
+         -- @param string markup  The HTML markup for the admin notice.
+         -- @param string message The message for the admin notice.
+         -- @param array  args    The arguments for the admin notice.
+         --
+         return
+           Apply_Filters ("wp_admin_notice_markup", Markup, Message_2, Args_3);
+      end;
+   end Wp_Get_Admin_Notice;
+
+   ---------------------
+   -- Wp_Admin_Notice --
+   ---------------------
+
+   procedure Wp_Admin_Notice
+     (Message : String; Args : Array_Type := Empty_Array)
+   is
+      use Php.Echoing;
+      use Wp_Common;
+      use Inc_KSES;
+   begin
+      --
+      -- Fires before an admin notice is output.
+      --
+      -- @since 6.4.0
+      --
+      -- @param string message The message for the admin notice.
+      -- @param array  args    The arguments for the admin notice.
+      --
+      Do_Action ("wp_admin_notice", Message, Args);
+
+      Echo (Wp_KSES_Post (Wp_Get_Admin_Notice (Message, Args)));
+   end Wp_Admin_Notice;
 
 --
 -- Sorts the keys of an array alphabetically.

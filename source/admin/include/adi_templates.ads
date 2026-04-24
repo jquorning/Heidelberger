@@ -8,73 +8,73 @@ with Lists;
 with Class_Posts;
 with Class_Screens;
 
-package Adi_Templates
-is
+package Adi_Templates is
    use Arrays;
    use Lists;
 
---
--- Category Checklists.
---
+   --
+   -- Category Checklists.
+   --
 
---
--- Outputs an unordered list of checkbox input elements labeled with category names.
---
--- @since 2.5.1
---
--- @see wp_terms_checklist()
---
--- @param int         $post_id              Optional. Post to generate a categories checklist for. Default 0.
---                                          $selected_cats must not be an array. Default 0.
--- @param int         $descendants_and_self Optional. ID of the category to output along with its descendants.
---                                          Default 0.
--- @param int[]|false $selected_cats        Optional. Array of category IDs to mark as checked. Default false.
--- @param int[]|false $popular_cats         Optional. Array of category IDs to receive the "popular-category" class.
---                                          Default false.
--- @param Walker      $walker               Optional. Walker object to use to build the output.
---                                          Default is a Walker_Category_Checklist instance.
--- @param bool        $checked_ontop        Optional. Whether to move checked items out of the hierarchy and to
---                                          the top of the list. Default true.
---
+   --
+   -- Outputs an unordered list of checkbox input elements labeled with category names.
+   --
+   -- @since 2.5.1
+   --
+   -- @see wp_terms_checklist()
+   --
+   -- @param int         $post_id              Optional. Post to generate a categories checklist for. Default 0.
+   --                                          $selected_cats must not be an array. Default 0.
+   -- @param int         $descendants_and_self Optional. ID of the category to output along with its descendants.
+   --                                          Default 0.
+   -- @param int[]|false $selected_cats        Optional. Array of category IDs to mark as checked. Default false.
+   -- @param int[]|false $popular_cats         Optional. Array of category IDs to receive the "popular-category" class.
+   --                                          Default false.
+   -- @param Walker      $walker               Optional. Walker object to use to build the output.
+   --                                          Default is a Walker_Category_Checklist instance.
+   -- @param bool        $checked_ontop        Optional. Whether to move checked items out of the hierarchy and to
+   --                                          the top of the list. Default true.
+   --
 
    type Walker_Type is access procedure;
 
-   procedure Wp_Category_Checklist (Post_Id              : Integer     := 0;
-                                    Descendants_And_Self : Integer     := 0;
-                                    Selected_Cats        : Array_Type  := Empty_Array;
-                                    Popular_Cats         : Array_Type  := Empty_Array;
-                                    Walker               : Walker_Type := null;
-                                    Checked_Ontop        : Boolean     := True);
+   procedure Wp_Category_Checklist
+     (Post_Id              : Integer := 0;
+      Descendants_And_Self : Integer := 0;
+      Selected_Cats        : Array_Type := Empty_Array;
+      Popular_Cats         : Array_Type := Empty_Array;
+      Walker               : Walker_Type := null;
+      Checked_Ontop        : Boolean := True);
 
---
--- Outputs an unordered list of checkbox input elements labelled with term names.
---
--- Taxonomy-independent version of wp_category_checklist().
---
--- @since 3.0.0
--- @since 4.4.0 Introduced the `echo` argument.
---
--- @param int          post_id Optional. Post ID. Default 0.
--- @param array|string args then
---     Optional. Array or string of arguments for generating a terms checklist. Default empty array.
---
---     @type int    descendants_and_self ID of the category to output along with its descendants.
---                                        Default 0.
---     @type int[]  selected_cats        Array of category IDs to mark as checked. Default false.
---     @type int[]  popular_cats         Array of category IDs to receive the "popular-category" class.
---                                        Default false.
---     @type Walker walker               Walker object to use to build the output. Default empty which
---                                        results in a Walker_Category_Checklist instance being used.
---     @type string taxonomy             Taxonomy to generate the checklist for. Default "category".
---     @type bool   checked_ontop        Whether to move checked items out of the hierarchy and to
---                                        the top of the list. Default true.
---     @type bool   echo                 Whether to echo the generated markup. False to return the markup instead
---                                        of echoing it. Default true.
--- end;
--- @return string HTML list of input elements.
---
-   function Wp_Terms_Checklist (Post_Id : Integer := 0;
-                                Args    : Array_Type) return String;
+   --
+   -- Outputs an unordered list of checkbox input elements labelled with term names.
+   --
+   -- Taxonomy-independent version of wp_category_checklist().
+   --
+   -- @since 3.0.0
+   -- @since 4.4.0 Introduced the `echo` argument.
+   --
+   -- @param int          post_id Optional. Post ID. Default 0.
+   -- @param array|string args then
+   --     Optional. Array or string of arguments for generating a terms checklist. Default empty array.
+   --
+   --     @type int    descendants_and_self ID of the category to output along with its descendants.
+   --                                        Default 0.
+   --     @type int[]  selected_cats        Array of category IDs to mark as checked. Default false.
+   --     @type int[]  popular_cats         Array of category IDs to receive the "popular-category" class.
+   --                                        Default false.
+   --     @type Walker walker               Walker object to use to build the output. Default empty which
+   --                                        results in a Walker_Category_Checklist instance being used.
+   --     @type string taxonomy             Taxonomy to generate the checklist for. Default "category".
+   --     @type bool   checked_ontop        Whether to move checked items out of the hierarchy and to
+   --                                        the top of the list. Default true.
+   --     @type bool   echo                 Whether to echo the generated markup. False to return the markup instead
+   --                                        of echoing it. Default true.
+   -- end;
+   -- @return string HTML list of input elements.
+   --
+   function Wp_Terms_Checklist
+     (Post_Id : Integer := 0; Args : Array_Type) return String;
 
    function Get_Media_States (Post : Class_Posts.Wp_Post) return List_Type;
 
@@ -90,10 +90,11 @@ is
    -- @param string mode
    -- @param bool   table_row
    --
-   procedure Wp_Comment_Reply (Position  : Integer := 1;
-                               Checkbox  : Boolean := False;
-                               Mode      : String  := "single";
-                               Table_Row : Boolean := True);
+   procedure Wp_Comment_Reply
+     (Position  : Integer := 1;
+      Checkbox  : Boolean := False;
+      Mode      : String := "single";
+      Table_Row : Boolean := True);
 
    --
    -- Outputs "undo move to Trash" text for comments.
@@ -159,17 +160,18 @@ is
    --                                             null.
    --
 
-   type Callable_2 is access function (Data_Object : String;
-                                       Box         : Array_Type)
-                                       return Array_Type;
+   type Callable_2 is
+     access function
+       (Data_Object : String; Box : Array_Type) return Array_Type;
 
-   procedure Add_Meta_Box (Id            : String;
-                           Title         : String;
-                           Callback      : Callable_2;
-                           Screen        : Class_Screens.Wp_Screen;
-                           Context       : String     := "advanced";
-                           Priority      : String     := "default";
-                           Callback_Args : Array_Type := Empty_Array);
+   procedure Add_Meta_Box
+     (Id            : String;
+      Title         : String;
+      Callback      : Callable_2;
+      Screen        : Class_Screens.Wp_Screen;
+      Context       : String := "advanced";
+      Priority      : String := "default";
+      Callback_Args : Array_Type := Empty_Array);
 
    --
    -- Internal helper function to find the plugin from a meta box callback.
@@ -182,9 +184,8 @@ is
    -- @return array|null The plugin that the callback belongs to, or null if it
    --                    Doesn't belong to a plugin.
    --
-   function X_Get_Plugin_From_Callback (Callback : Callable)
-                                        return Array_Type
-                                        is (Empty_Array);
+   function X_Get_Plugin_From_Callback (Callback : Callable) return Array_Type
+   is (Empty_Array);
 
    --
    -- Meta-Box template function.
@@ -209,14 +210,12 @@ is
    --                                     `WP_Comment` object.
    -- @return int Number of meta_boxes.
    --
-   function Do_Meta_Boxes (Screen      : String;
-                           Context     : String;
-                           Data_Object : Multi_Type)
-                           return Natural;
+   function Do_Meta_Boxes
+     (Screen : String; Context : String; Data_Object : Multi_Type)
+      return Natural;
 
-   procedure Do_Meta_Boxes (Screen      : String;
-                            Context     : String;
-                            Data_Object : Multi_Type);
+   procedure Do_Meta_Boxes
+     (Screen : String; Context : String; Data_Object : Multi_Type);
 
    --
    -- Echoes a submit button, with provided text and appropriate class(es).
@@ -240,11 +239,13 @@ is
    --                                       as a string such as "tabindex="1"", though the array format is
    --                                       preferred. Default null.
    --
-   procedure Submit_Button (Text             : String     := ""; -- null;
-                            Typ              : String     := "primary";
-                            Name             : String     := "submit";
-                            Wrap             : Boolean    := True;
-                            Other_Attributes : Array_Type := Empty_Array);
+   procedure Submit_Button
+     (Text             : String := "";
+      -- null;
+      Typ              : String := "primary";
+      Name             : String := "submit";
+      Wrap             : Boolean := True;
+      Other_Attributes : Array_Type := Empty_Array);
 
    --
    -- Gets the post title.
@@ -258,8 +259,7 @@ is
    --                         global post.
    -- @return string The post title if set.
    --
-   function X_Draft_Or_Post_Title (Post : Integer := 0)
-                                   return String;
+   function X_Draft_Or_Post_Title (Post : Integer := 0) return String;
 
    --
    -- Displays the search query.
@@ -270,6 +270,28 @@ is
    -- @since 2.7.0
    --
    procedure X_Admin_Search_Query;
+
+   --
+   -- Generic Iframe header for use with Thickbox.
+   --
+   -- @since 2.7.0
+   --
+   -- @global string    hook_suffix
+   -- @global string    admin_body_class
+   -- @global WP_Locale wp_locale        WordPress date and time locale object.
+   --
+   -- @param string title      Optional. Title of the Iframe page. Default empty.
+   -- @param bool   deprecated Not used.
+   --
+   procedure Iframe_Header
+     (Title : String := ""; Deprecated : Boolean := False);
+
+   --
+   -- Generic Iframe footer for use with Thickbox.
+   --
+   -- @since 2.7.0
+   --
+   procedure Iframe_Footer;
 
    --
    -- Returns a submit button, with provided text and appropriate class.
@@ -292,12 +314,12 @@ is
    --                                       Default empty.
    -- @return string Submit button HTML.
    --
-   function Get_Submit_Button (Text             : String     := "";
-                               Typ              : String     := "primary large";
-                               Name             : String     := "submit";
-                               Wrap             : Boolean    := True;
-                               Other_Attributes : Array_Type := Empty_Array)
-                               return String;
+   function Get_Submit_Button
+     (Text             : String := "";
+      Typ              : String := "primary large";
+      Name             : String := "submit";
+      Wrap             : Boolean := True;
+      Other_Attributes : Array_Type := Empty_Array) return String;
 
    --
    -- Prints out the beginning of the admin HTML header.
@@ -315,7 +337,34 @@ is
    --                          determine the screen.
    -- @return WP_Screen Screen object.
    --
-   function Convert_To_Screen (Hook_Name : String)
-                               return Class_Screens.Wp_Screen;
+   function Convert_To_Screen
+     (Hook_Name : String) return Class_Screens.Wp_Screen;
+
+   --
+   -- Outputs a HTML element with a star rating for a given rating.
+   --
+   -- Outputs a HTML element with the star rating exposed on a 0..5 scale in
+   -- half star increments (ie. 1, 1.5, 2 stars). Optionally, if specified, the
+   -- number of ratings may also be displayed by passing the number parameter.
+   --
+   -- @since 3.8.0
+   -- @since 4.4.0 Introduced the `echo` parameter.
+   --
+   -- @param array args {
+   --     Optional. Array of star ratings arguments.
+   --
+   --     @type int|float rating The rating to display, expressed in either a 0.5 rating increment,
+   --                             or percentage. Default 0.
+   --     @type string    type   Format that the rating is in. Valid values are "rating" (default),
+   --                             or, "percent". Default "rating".
+   --     @type int       number The number of ratings that makes up this rating. Default 0.
+   --     @type bool      echo   Whether to echo the generated markup. False to return the markup instead
+   --                             of echoing it. Default true.
+   -- }
+   -- @return string Star rating HTML.
+   --
+   function Wp_Star_Rating (Args : Array_Type := Empty_Array) return String;
+
+   procedure Wp_Star_Rating (Args : Array_Type := Empty_Array);
 
 end Adi_Templates;

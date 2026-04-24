@@ -5,11 +5,15 @@
 -- @subpackage Theme
 --
 
+with Ada.Containers;
+
 with Php.Arrays;
 with Php.Echoing;
+with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.Lists;
+with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 with Php.Types;
@@ -18,121 +22,189 @@ with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
+with Logging;
 with UStrings;
 with Wp_Common;
 
 with Class_Customize_Managers;
+with Class_Customize_Settings;
+with Class_Customize_Widgets;
+with Class_Paused_Extensions_Storages;
 with Class_Querys;
 with Inc_Admin_Bar;
+with Inc_Error_Protection;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
+with Inc_Ms_Blogs;
 with Inc_Plugins;
 with Inc_Posts;
 with Inc_Post_Formats;
 with Inc_Options;
 with Inc_REST_API;
+with Inc_Templates;
 
 package body Inc_Themes
 is
 
    Global_Wp_Theme_Features : Array_Type;
 
-   --
-   -- Returns an array of WP_Theme objects based on the arguments.
-   --
-   -- Despite advances over get_themes(), this function is quite expensive, and grows
-   -- linearly with additional themes. Stick to wp_get_theme() if possible.
-   --
-   -- @since 3.4.0
-   --
-   -- @global array wp_theme_directories
-   --
-   -- @param array args {
-   --     Optional. The search arguments.
-   --
-   --     @type mixed errors  True to return themes with errors, false to return
-   --                          themes without errors, null to return all themes.
-   --                          Default false.
-   --     @type mixed allowed (Multisite) True to return only allowed themes for a
-   --                          site. False to return only disallowed themes for a
-   --                          site. "site" to return only site-allowed themes.
-   --                          "network" to return only network-allowed themes.
-   --                          Null to return all themes. Default null.
-   --     @type int   blog_id (Multisite) The blog ID used to calculate which themes
-   --                          are allowed. Default 0, synonymous for the current blog.
-   -- }
-   -- @return WP_Theme[] Array of WP_Theme objects.
-   --
-   function Wp_Get_Themes (Args : Array_Type := Empty_Array)
-                           return Array_Type -- Theme_List
-   is (raise Program_Error with "not implemented");
---         global wp_theme_directories;
+   -------------------
+   -- Wp_Get_Themes --
+   -------------------
 
---         defaults = array(
---                 "errors"  => false,
---                 "allowed" => null,
---                 "blog_id" => 0,
---         );
---         args     = wp_parse_args( args, defaults );
+   Static_X_Themes : Class_Themes.Theme_Array;
 
---         theme_directories = search_theme_directories();
+   function Wp_Get_Themes
+     (Args : Array_Type := Empty_Array)
+      return Class_Themes.Theme_Array -- Array_Type
+   is
+      use Php.Arrays;
+      use Php.Lists;
+      use Array_Lists;
+      use UStrings;
+      use Class_Errors;
+      use Class_Themes;
+      use Inc_Functions;
+      use Inc_Load;
+      -- global wp_theme_directories;
 
---         if ( is_array( wp_theme_directories ) && count( wp_theme_directories ) > 1 ) then
---                 // Make sure the active theme wins out, in case search_theme_directories() picks the wrong
---                 // one in the case of a conflict. (Normally, last registered theme root wins.)
---                 current_theme = get_stylesheet();
---                 if ( isset( theme_directories[ current_theme ] ) ) then
---                         root_of_current_theme = get_raw_theme_root( current_theme );
---                         if ( ! in_array( root_of_current_theme, wp_theme_directories, true ) ) then
---                                 root_of_current_theme = WP_CONTENT_DIR . root_of_current_theme;
---                         end;
---                         theme_directories[ current_theme ]["theme_root"] = root_of_current_theme;
---                 end;
---         end;
+      Defaults : constant Array_Type :=
+        To_Array_Type
+          ([Build ("errors", False),
+            Build ("allowed", ""), -- null),
+            Build ("blog_id", 0)]);
 
---         if ( empty( theme_directories ) ) then
---                 return array();
---         end;
+      Args_2 : constant Array_Type := Wp_Parse_Args (Args, Defaults);
 
---         if ( is_multisite() && null !== args["allowed"] ) then
---                 allowed = args["allowed"];
---                 if ( "network" === allowed ) then
---                         theme_directories = array_intersect_key( theme_directories, WP_Theme::get_allowed_on_network() );
---                 end; elseif ( "site" === allowed ) then
---                         theme_directories = array_intersect_key( theme_directories, WP_Theme::get_allowed_on_site( args["blog_id"] ) );
---                 end; elseif ( allowed ) then
---                         theme_directories = array_intersect_key( theme_directories, WP_Theme::get_allowed( args["blog_id"] ) );
---                 end; else then
---                         theme_directories = array_diff_key( theme_directories, WP_Theme::get_allowed( args["blog_id"] ) );
---                 end;
---         end;
+      Theme_Directories : Array_Type := Search_Theme_Directories;
+   begin
+      Logging.Log
+        ("wp_get_themes", "theme_directories: " & Theme_Directories'Image);
 
---         themes         = array();
---         static _themes = array();
+      -- if Is_Array (Wp_Theme_Directories) and then
+      if Length (Global_Wp_Theme_Directories) > 1 then
+         -- Make sure the active theme wins out, in case search_theme_directories() picks the wrong
+         -- one in the case of a conflict. (Normally, last registered theme root wins.)
+         declare
+            Current_Theme : constant String := Get_Stylesheet;
+         begin
+            if Isset (Theme_Directories, Current_Theme) then
+               declare
+                  Root_Of_Current_Theme_2 : constant String :=
+                    Get_Raw_Theme_Root (Current_Theme);
 
---         foreach ( theme_directories as theme => theme_root ) then
---                 if ( isset( _themes[ theme_root["theme_root"] . "/" . theme ] ) ) then
---                         themes[ theme ] = _themes[ theme_root["theme_root"] . "/" . theme ];
---                 end; else then
---                         themes[ theme ] = new WP_Theme( theme, theme_root["theme_root"] );
+                  Root_Of_Current_Theme : constant String :=
+                    (if not In_List
+                              (Root_Of_Current_Theme_2,
+                               Global_Wp_Theme_Directories,
+                               True)
+                     then (-Globals.WP_CONTENT_DIR) & Root_Of_Current_Theme_2
+                     else Root_Of_Current_Theme_2);
+               begin
+                  Set_2
+                    (Theme_Directories,
+                     Key_1 => Current_Theme,
+                     Key_2 => "theme_root",
+                     Value => From_String (Root_Of_Current_Theme));
+               end;
+            end if;
+         end;
+      end if;
 
---                         _themes[ theme_root["theme_root"] . "/" . theme ] = themes[ theme ];
---                 end;
---         end;
+      if Theme_Directories.Is_Empty then
+         return Empty_Theme_Array;
+      end if;
 
---         if ( null !== args["errors"] ) then
---                 foreach ( themes as theme => wp_theme ) then
---                         if ( wp_theme.errors() != args["errors"] ) then
---                                 unset( themes[ theme ] );
---                         end;
---                 end;
---         end;
+      if Is_Multisite and then "" /= Get_As_String (Args_2, "allowed") then
+         -- null
+         declare
+            Allowed : constant String := Get_As_String (Args_2, "allowed");
+            Blog_Id : constant Integer := As_Integer (Get (Args_2, "blog_id"));
+         begin
+            if "network" = Allowed then
+               Logging.Log ("wp_get_themes", "branch 1");
+               Theme_Directories :=
+                 Array_Intersect_Key
+                   (Theme_Directories, Get_Allowed_On_Network);
 
---         return themes;
--- end;
+            elsif "site" = Allowed then
+               Logging.Log ("wp_get_themes", "branch 2");
+               Theme_Directories :=
+                 Array_Intersect_Key
+                   (Theme_Directories, Get_Allowed_On_Site (Blog_Id));
+
+            elsif Allowed /= "" then
+               Logging.Log ("wp_get_themes", "branch 3");
+               Theme_Directories :=
+                 Array_Intersect_Key
+                   (Theme_Directories, Get_Allowed (Blog_Id));
+
+            else
+               Logging.Log ("wp_get_themes", "branch 4");
+               Theme_Directories :=
+                 Array_Diff_Key (Theme_Directories, Get_Allowed (Blog_Id));
+            end if;
+         end;
+      end if;
+
+      Logging.Log ("wp_get_themes", Theme_Directories'Image);
+
+      declare
+         Themes   : Theme_Array;
+         X_Themes : Theme_Array renames Static_X_Themes;
+      begin
+         for A in Theme_Directories.Iterate loop
+            declare
+               Theme      : constant String := Key (A);
+               Theme_Root : constant Array_Type := As_Array (Element (A));
+
+               Theme_Dir : constant String :=
+                 Get_As_String (Theme_Root, "theme_root") & "/" & Theme;
+            begin
+               Logging.Log ("wp_get_themes", "theme: " & Theme);
+               Logging.Log ("wp_get_themes", "  dir: " & Theme_Dir);
+               if X_Themes.Contains (Theme_Dir) then
+                  -- if Isset (X_Themes, Theme_Dir) then
+                  Themes.Include (Theme, X_Themes (Theme_Dir));
+               else
+                  declare
+                     Unused_Theme : Wp_Theme := Null_Theme;
+                  begin
+                     Themes.Insert
+                       (Theme,
+                        X_Construct
+                          (Theme,
+                           Get_As_String (Theme_Root, "theme_root"),
+                           Unused_Theme));
+                  end;
+                  X_Themes.Insert (Theme_Dir, Themes (Theme));
+               end if;
+            end;
+         end loop;
+
+         if False /= As_Boolean (Get (Args_2, "errors")) then
+            -- null
+            for A in Themes.Iterate loop
+               declare
+                  Theme    : constant String := Theme_Maps.Key (A);
+                  Wp_Theme : Class_Themes.Wp_Theme := Theme_Maps.Element (A);
+               begin
+                  Logging.Log ("wp_get_themes", "delete not implemented");
+                  Logging.Log ("wp_get_themes", Theme);
+               -- if Wp_Theme.Errors /= Get_As_String (Args_2, "errors") then
+               --    Delete (Themes, Theme);
+               -- Themes.Delete (Theme);
+               -- end if;
+               end;
+            end loop;
+         end if;
+
+         return Themes;
+      end;
+   end Wp_Get_Themes;
 
    ------------------
    -- Wp_Get_Theme --
@@ -145,30 +217,28 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
+      use Class_Themes;
 
       Stylesheet_2 : constant String :=
-        (if Empty (Stylesheet)
-         then Get_Stylesheet
-         else Stylesheet);
+        (if Empty (Stylesheet) then Get_Stylesheet else Stylesheet);
    begin
       if Empty (Theme_Root) then
          declare
             Theme_Root : UString := +Get_Raw_Theme_Root (Stylesheet_2);
          begin
-            if "" = Theme_Root then -- False =
+            if "" = Theme_Root then
                Theme_Root := Globals.WP_CONTENT_DIR & "/themes";
-            elsif not In_List (-Theme_Root, Wp_Theme_Directories, True) then
+            elsif not In_List (-Theme_Root, Global_Wp_Theme_Directories, True)
+            then
                Theme_Root := Globals.WP_CONTENT_DIR & Theme_Root;
             end if;
          end;
       end if;
 
       declare
-         use Class_Themes;
-
-         T : Wp_Theme := Null_Theme;
+         Theme : Wp_Theme := Null_Theme;
       begin
-         return Class_Themes.X_Construct (Stylesheet_2, Theme_Root, T);
+         return Class_Themes.X_Construct (Stylesheet_2, Theme_Root, Theme);
       end;
    end Wp_Get_Theme;
 
@@ -230,7 +300,7 @@ is
 
       Stylesheet     : constant String := Get_Stylesheet; -- ();
       Theme_Root     : constant String := Get_Theme_Root (Stylesheet);
-      Stylesheet_Dir : constant String := "theme_root/stylesheet";
+      Stylesheet_Dir : constant String := Theme_Root & "/" & Stylesheet;
    begin
       --
       -- Filters the stylesheet directory path for the active theme.
@@ -374,7 +444,7 @@ is
 
       Template     : constant String := Get_Template; -- ();
       Theme_Root   : constant String := Get_Theme_Root (Template);
-      Template_Dir : constant String := "theme_root/template";
+      Template_Dir : constant String := Theme_Root & "/" & Template;
    begin
       --
       -- Filters the active theme directory path.
@@ -434,8 +504,8 @@ is
 
       -- global wp_theme_directories;
    begin
-      if not Is_Array (Wp_Theme_Directories)
-        or else Wp_Theme_Directories.Length <= 1
+      if not Is_Array (Global_Wp_Theme_Directories)
+        or else Global_Wp_Theme_Directories.Length <= 1
       then
          return Build ("/themes", "/themes"); -- "/themes";
       end if;
@@ -488,9 +558,9 @@ is
       Untrailed := +Un_Trailing_Slash_It (-Directory_2);
       if
         not Empty (Untrailed) and then
-        not In_List (-Untrailed, Wp_Theme_Directories, True)
+        not In_List (-Untrailed, Global_Wp_Theme_Directories, True)
       then
-         Wp_Theme_Directories.Append (-Untrailed);
+         Global_Wp_Theme_Directories.Append (-Untrailed);
       end if;
 
       return True;
@@ -500,140 +570,278 @@ is
    -- Search_Theme_Directories --
    ------------------------------
 
-   function Search_Theme_Directories (Force : Boolean := False)
-                                      return Array_Type
-   is (raise Program_Error with "not implemented");
+   Static_Found_Themes : Array_Type; -- null
 
---         global wp_theme_directories;
---         static found_themes = null;
+   function Search_Theme_Directories
+     (Force : Boolean := False) return Array_Type
+   is
+      use Php.Arrays;
+      use Php.Errors;
+      use Php.Files;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Options;
 
---         if ( empty( wp_theme_directories ) ) then
---                 return false;
---         end;
+      -- global wp_theme_directories;
+      Found_Themes     : Array_Type renames Static_Found_Themes;
+      Cache_Expiration : Boolean;
 
---         if ( ! force && isset( found_themes ) ) then
---                 return found_themes;
---         end;
+      Cache_Expiration_Time : Integer;
+   begin
+      if Global_Wp_Theme_Directories.Is_Empty then
+         return Empty_Array; -- False;
 
---         found_themes = array();
+      end if;
 
---         wp_theme_directories = (array) wp_theme_directories;
---         relative_theme_roots = array();
+      if not Force and Found_Themes /= Empty_Array then
+         return Found_Themes;
+      end if;
 
---         /*
---         -- Set up maybe-relative, maybe-absolute array of theme directories.
---         -- We always want to return absolute, but we need to cache relative
---         -- to use in get_theme_root().
---         --
---         foreach ( wp_theme_directories as theme_root ) then
---                 if ( 0 === strpos( theme_root, WP_CONTENT_DIR ) ) then
---                         relative_theme_roots[ str_replace( WP_CONTENT_DIR, "", theme_root ) ] = theme_root;
---                 end; else then
---                         relative_theme_roots[ theme_root ] = theme_root;
---                 end;
---         end;
+      Found_Themes := Empty_Array;
 
---         --
---         -- Filters whether to get the cache of the registered theme directories.
---         --
---         -- @since 3.4.0
---         --
---         -- @param bool   cache_expiration Whether to get the cache of the theme directories. Default false.
---         -- @param string context          The class or function name calling the filter.
---         --
---         cache_expiration = apply_filters( "wp_cache_themes_persistently", false, "search_theme_directories" );
+      -- Wp_Theme_Directories := Wp_Theme_Directories; -- (array)
+      declare
+         Relative_Theme_Roots : Array_Type;
+      begin
+         --
+         -- Set up maybe-relative, maybe-absolute array of theme directories.
+         -- We always want to return absolute, but we need to cache relative
+         -- to use in get_theme_root().
+         --
+         for Theme_Root of Global_Wp_Theme_Directories loop
+            if Str_Starts_With (Theme_Root, -Globals.WP_CONTENT_DIR) then
+               Set
+                 (Relative_Theme_Roots,
+                  Str_Replace (-Globals.WP_CONTENT_DIR, "", Theme_Root),
+                  From_String (Theme_Root));
+            else
+               Set
+                 (Relative_Theme_Roots, Theme_Root, From_String (Theme_Root));
+            end if;
+         end loop;
 
---         if ( cache_expiration ) then
---                 cached_roots = get_site_transient( "theme_roots" );
---                 if ( is_array( cached_roots ) ) then
---                         foreach ( cached_roots as theme_dir => theme_root ) then
---                                 // A cached theme root is no longer around, so skip it.
---                                 if ( ! isset( relative_theme_roots[ theme_root ] ) ) then
---                                         continue;
---                                 end;
---                                 found_themes[ theme_dir ] = array(
---                                         "theme_file" => theme_dir . "/style.css",
---                                         "theme_root" => relative_theme_roots[ theme_root ], // Convert relative to absolute.
---                                 );
---                         end;
---                         return found_themes;
---                 end;
---                 if ( ! is_int( cache_expiration ) ) then
---                         cache_expiration = 30-- MINUTE_IN_SECONDS;
---                 end;
---         end; else then
---                 cache_expiration = 30-- MINUTE_IN_SECONDS;
---         end;
+         --
+         -- Filters whether to get the cache of the registered theme directories.
+         --
+         -- @since 3.4.0
+         --
+         -- @param bool   cache_expiration Whether to get the cache of the theme directories. Default false.
+         -- @param string context          The class or function name calling the filter.
+         --
+         Cache_Expiration :=
+           Apply_Filters
+             ("wp_cache_themes_persistently",
+              False,
+              "search_theme_directories");
 
---         /* Loop the registered theme directories and extract all themes--
---         foreach ( wp_theme_directories as theme_root ) then
+         if Cache_Expiration then
+            declare
+               Cached_Roots : constant Array_Type :=
+                 As_Array (Get_Site_Transient ("theme_roots"));
+            begin
+               if True then
+                  -- Is_Array (Cached_Roots) then
+                  for A in Cached_Roots.Iterate loop
+                     declare
+                        Theme_Dir  : constant String := Key (A);
+                        Theme_Root : constant String :=
+                          As_String (Element (A));
+                     begin
+                        -- A cached theme root is no longer around, so skip it.
+                        if not Isset (Relative_Theme_Roots, Theme_Root) then
+                           goto Continue_5;
+                        end if;
+                        Set
+                          (Found_Themes,
+                           Theme_Dir,
+                           From_Array
+                             (To_Array_Type
+                                ([Build
+                                    ("theme_file", Theme_Dir & "/style.css"),
+                                  Build
+                                    ("theme_root",
+                                     Get_As_String
+                                       (Relative_Theme_Roots,
+                                        Theme_Root)) -- Convert relative to absolute.
+                                 ])));
+                     end;
+                     <<Continue_5>>
+                  end loop;
 
---                 // Start with directories in the root of the active theme directory.
---                 dirs = @ scandir( theme_root );
---                 if ( ! dirs ) then
---                         trigger_error( "theme_root is not readable", E_USER_NOTICE );
---                         continue;
---                 end;
---                 foreach ( dirs as dir ) then
---                         if ( ! is_dir( theme_root . "/" . dir ) || "." === dir[0] || "CVS" === dir ) then
---                                 continue;
---                         end;
---                         if ( file_exists( theme_root . "/" . dir . "/style.css" ) ) then
---                                 // wp-content/themes/a-single-theme
---                                 // wp-content/themes is theme_root, a-single-theme is dir.
---                                 found_themes[ dir ] = array(
---                                         "theme_file" => dir . "/style.css",
---                                         "theme_root" => theme_root,
---                                 );
---                         end; else then
---                                 found_theme = false;
---                                 // wp-content/themes/a-folder-of-themes/*
---                                 // wp-content/themes is theme_root, a-folder-of-themes is dir, then themes are sub_dirs.
---                                 sub_dirs = @ scandir( theme_root . "/" . dir );
---                                 if ( ! sub_dirs ) then
---                                         trigger_error( "theme_root/dir is not readable", E_USER_NOTICE );
---                                         continue;
---                                 end;
---                                 foreach ( sub_dirs as sub_dir ) then
---                                         if ( ! is_dir( theme_root . "/" . dir . "/" . sub_dir ) || "." === dir[0] || "CVS" === dir ) then
---                                                 continue;
---                                         end;
---                                         if ( ! file_exists( theme_root . "/" . dir . "/" . sub_dir . "/style.css" ) ) then
---                                                 continue;
---                                         end;
---                                         found_themes[ dir . "/" . sub_dir ] = array(
---                                                 "theme_file" => dir . "/" . sub_dir . "/style.css",
---                                                 "theme_root" => theme_root,
---                                         );
---                                         found_theme                           = true;
---                                 end;
---                                 // Never mind the above, it"s just a theme missing a style.css.
---                                 // Return it; WP_Theme will catch the error.
---                                 if ( ! found_theme ) then
---                                         found_themes[ dir ] = array(
---                                                 "theme_file" => dir . "/style.css",
---                                                 "theme_root" => theme_root,
---                                         );
---                                 end;
---                         end;
---                 end;
---         end;
+                  Logging.Log
+                    ("search_theme_directories",
+                     "return 1: " & Found_Themes'Image);
 
---         asort( found_themes );
+                  return Found_Themes;
+               end if;
 
---         theme_roots          = array();
---         relative_theme_roots = array_flip( relative_theme_roots );
+            -- if not Is_Int (Cache_Expiration) then
+            --    Cache_Expiration := 30 * Constants.MINUTE_IN_SECONDS;
+            -- end if;
+            end;
+         else
+            Cache_Expiration_Time := 30 * Constants.MINUTE_IN_SECONDS;
+         end if;
 
---         foreach ( found_themes as theme_dir => theme_data ) then
---                 theme_roots[ theme_dir ] = relative_theme_roots[ theme_data["theme_root"] ]; // Convert absolute to relative.
---         end;
+         Logging.Log
+           ("search_theme_directories", "before loop: " & Found_Themes'Image);
 
---         if ( get_site_transient( "theme_roots" ) != theme_roots ) then
---                 set_site_transient( "theme_roots", theme_roots, cache_expiration );
---         end;
+         -- Loop the registered theme directories and extract all themes
+         for Theme_Root of Global_Wp_Theme_Directories loop
 
---         return found_themes;
--- end;
+            Logging.Log
+              ("search_theme_directories", "theme_root: " & Theme_Root);
+
+            -- Start with directories in the root of the active theme directory.
+            declare
+               Dirs : constant List_Type := Scandir (Theme_Root); -- @
+            begin
+               if Dirs.Is_Empty then
+                  Trigger_Error ("theme_root is not readable", E_USER_NOTICE);
+                  goto Continue_1;
+               end if;
+
+               for Dir of Dirs loop
+                  if not Is_Dir (Theme_Root & "/" & Dir)
+                    or else '.' = Dir (Dir'First)
+                    or else "CVS" = Dir
+                  then
+                     goto Continue_2;
+                  end if;
+
+                  if File_Exists (Theme_Root & "/" & Dir & "/style.css") then
+                     -- wp-content/themes/a-single-theme
+                     -- wp-content/themes is theme_root, a-single-theme is dir.
+
+                     Logging.Log ("search_theme_directories", "style found in: " & Dir);
+
+                     Set
+                       (Found_Themes,
+                        Dir,
+                        From_Array
+                          (To_Array_Type
+                             ([Build ("theme_file", Dir & "/style.css"),
+                               Build ("theme_root", Theme_Root)])));
+                  else
+                     -- wp-content/themes/a-folder-of-themes/*
+                     -- wp-content/themes is theme_root, a-folder-of-themes is dir, then themes are sub_dirs.
+                     declare
+                        Found_Theme : Boolean := False;
+
+                        Sub_Dirs : constant List_Type :=
+                          Scandir (Theme_Root & "/" & Dir); -- @
+                     begin
+                        if Sub_Dirs.Is_Empty then
+                           Trigger_Error
+                             ("theme_root/dir is not readable", E_USER_NOTICE);
+                           goto Continue_2;
+                        end if;
+
+                        for Sub_Dir of Sub_Dirs loop
+                           declare
+                              Sub_Relative : constant String :=
+                                Dir & "/" & Sub_Dir;
+
+                              Sub_Absolute : constant String :=
+                                Theme_Root & "/" & Sub_Relative;
+                           begin
+                              if not Is_Dir (Sub_Absolute)
+                                or else '.' = Dir (Dir'First)
+                                or else "CVS" = Dir
+                              then
+                                 goto Continue_3;
+                              end if;
+
+                              if not File_Exists (Sub_Absolute & "/style.css")
+                              then
+                                 goto Continue_3;
+                              end if;
+
+                              Set
+                                (Found_Themes,
+                                 Sub_Relative,
+                                 From_Array
+                                   (To_Array_Type
+                                      ([Build
+                                          ("theme_file",
+                                           Sub_Relative & "/style.css"),
+                                        Build ("theme_root", Theme_Root)])));
+
+                              Logging.Log
+                                ("search_theme_directories",
+                                 "found in sub_dir: " & Sub_Absolute);
+                           end;
+                           Found_Theme := True;
+
+                           <<Continue_3>>
+                        end loop;
+
+                        -- Never mind the above, it's just a theme missing a style.css.
+                        -- Return it; WP_Theme will catch the error.
+                        if not Found_Theme then
+
+                           Logging.Log
+                             ("search_theme_directories",
+                              "not found in: " & Dir);
+
+                           Set
+                             (Found_Themes,
+                              Dir,
+                              From_Array
+                                (To_Array_Type
+                                   ([Build ("theme_file", Dir & "/style.css"),
+                                     Build ("theme_root", Theme_Root)])));
+                        end if;
+                     end;
+                  end if;
+                  <<Continue_2>>
+               end loop;
+            end;
+            <<Continue_1>>
+         end loop;
+
+         Logging.Log
+           ("search_theme_directories", "before sort: " & Found_Themes'Image);
+
+         ASort (Found_Themes);
+
+         declare
+            Theme_Roots : Array_Type;
+         begin
+            Relative_Theme_Roots := Array_Flip (Relative_Theme_Roots);
+
+            for A in Found_Themes.Iterate loop
+               declare
+                  Theme_Dir  : constant String := Key (A);
+                  Theme_Data : constant Array_Type := As_Array (Element (A));
+                  Theme_Root : constant String :=
+                    Get_As_String (Theme_Data, "theme_root");
+               begin
+                  Set
+                    (Theme_Roots,
+                     Theme_Dir,
+                     From_String
+                       (Get_As_String
+                          (Relative_Theme_Roots,
+                           Theme_Root))); -- Convert absolute to relative.
+               end;
+            end loop;
+
+            if False -- As_Array (Get_Site_Transient ("theme_roots")) /= Theme_Roots
+            then
+               Set_Site_Transient
+                 ("theme_roots", Theme_Roots, Cache_Expiration_Time);
+            end if;
+         end;
+      end;
+
+      Logging.Log
+        ("search_theme_directories", "return 2: " & Found_Themes'Image);
+
+      return Found_Themes;
+   end Search_Theme_Directories;
 
    --------------------
    -- Get_Theme_Root --
@@ -653,10 +861,13 @@ is
       if Stylesheet_Or_Template /= "" then
          Theme_Root := +Get_Raw_Theme_Root (Stylesheet_Or_Template);
          if Theme_Root /= "" then
-            -- Always prepend WP_CONTENT_DIR unless the root currently registered as
-            -- a theme directory. This gives relative theme roots the benefit of the
-            -- doubt when things go haywire.
-            if not In_List (-Theme_Root, Wp_Theme_Directories, True) then -- (array)
+
+            -- Always prepend WP_CONTENT_DIR unless the root currently
+            -- registered as a theme directory. This gives relative theme
+            -- roots the benefit of the doubt when things go haywire.
+
+            if not In_List (-Theme_Root, Global_Wp_Theme_Directories, True)
+            then
                Theme_Root := WP_CONTENT_DIR & Theme_Root;
             end if;
          end if;
@@ -703,19 +914,23 @@ is
       Theme_Root_URI : UString;
    begin
       if Stylesheet_Or_Template /= "" and then Theme_Root_2 /= "" then
-         if In_List (Theme_Root_2, Wp_Theme_Directories, True) then -- (array)
+         if In_List (Theme_Root_2, Global_Wp_Theme_Directories, True) then
+
             -- Absolute path. Make an educated guess. YMMV -- but note the
             -- filter below.
+
             if 0 = Strpos (Theme_Root_2, -WP_CONTENT_DIR) then
                Theme_Root_URI :=
-                 +Content_URL (Str_Replace (-WP_CONTENT_DIR, "", Theme_Root_2));
+                 +Content_URL
+                    (Str_Replace (-WP_CONTENT_DIR, "", Theme_Root_2));
             elsif 0 = Strpos (Theme_Root_2, ABSPATH) then
-               Theme_Root_URI := +Site_URL (Str_Replace (ABSPATH, "", Theme_Root_2));
-            elsif
-              0 = Strpos (Theme_Root_2, -WP_PLUGIN_DIR) or else
-              0 = Strpos (Theme_Root_2, -WPMU_PLUGIN_DIR)
+               Theme_Root_URI :=
+                 +Site_URL (Str_Replace (ABSPATH, "", Theme_Root_2));
+            elsif 0 = Strpos (Theme_Root_2, -WP_PLUGIN_DIR)
+              or else 0 = Strpos (Theme_Root_2, -WPMU_PLUGIN_DIR)
             then
-               Theme_Root_URI := +Plugins_URL (Basename (Theme_Root_2), Theme_Root_2);
+               Theme_Root_URI :=
+                 +Plugins_URL (Basename (Theme_Root_2), Theme_Root_2);
             else
                Theme_Root_URI := +Theme_Root_2;
             end if;
@@ -760,8 +975,8 @@ is
       Theme_Root : UString;
    begin
       if
-        not Is_Array (Wp_Theme_Directories) or else
-        Wp_Theme_Directories.Length <= 1
+        not Is_Array (Global_Wp_Theme_Directories) or else
+        Global_Wp_Theme_Directories.Length <= 1
       then
          return "/themes";
       end if;
@@ -823,14 +1038,256 @@ is
       end;
    end Locale_Stylesheet;
 
+   ----------------------------
+   -- Validate_Current_Theme --
+   ----------------------------
+
+   function Validate_Current_Theme
+            return Boolean
+   is
+      use Php.Files;
+      use Wp_Common;
+      use Inc_Load;
+
+      Template_Dir   : constant String := Get_Template_Directory;
+      Stylesheet_Dir : constant String := Get_Stylesheet_Directory;
+   begin
+      if Wp_Installing
+        or else not Apply_Filters ("validate_current_theme", True)
+      then
+         return True;
+      end if;
+
+      -- Check that the theme has an index template.
+      if not File_Exists (Template_Dir & "/templates/index.html")
+        and then not File_Exists (Template_Dir & "/block-templates/index.html")
+        and then not File_Exists (Template_Dir & "/index.php")
+      then
+         null; -- fall through to invalid handling below
+      elsif not File_Exists (Template_Dir & "/style.css") then
+         null; -- fall through
+      elsif Get_Template /= Get_Stylesheet
+        and then not File_Exists (Stylesheet_Dir & "/style.css")
+      then
+         null; -- child theme stylesheet missing; fall through
+      else
+         return True; -- valid
+      end if;
+
+      -- Theme is invalid — try switching to WP_DEFAULT_THEME.
+      declare
+         use Constants;
+         use UStrings;
+         Default : constant Class_Themes.Wp_Theme := Wp_Get_Theme (-WP_DEFAULT_THEME);
+      begin
+         if Default.Exists then
+            Switch_Theme (-WP_DEFAULT_THEME);
+            return False;
+         end if;
+      end;
+
+      -- WP_DEFAULT_THEME not installed — try the latest core default theme.
+      declare
+         Default : constant Class_Themes.Wp_Theme :=
+           Class_Themes.Get_Core_Default_Theme;
+      begin
+         if Default.Get_Stylesheet = ""
+           or else Default.Get_Stylesheet = Get_Stylesheet
+         then
+            return True; -- nothing we can do
+         end if;
+         Switch_Theme (Default.Get_Stylesheet);
+         return False;
+      end;
+   end Validate_Current_Theme;
+
    ------------------
    -- Switch_Theme --
    ------------------
 
    procedure Switch_Theme (Stylesheet : String)
    is
+      use type Ada.Containers.Count_Type;
+      use Php.Misc;
+      use Array_Lists;
+      use Wp_Common;
+      use Class_Customize_Managers;
+      use Class_Customize_Settings;
+      use Class_Customize_Widgets;
+      use Class_Paused_Extensions_Storages;
+      use Class_Themes;
+      use Inc_Admin_Bar;
+      use Inc_Error_Protection;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
+      use Inc_Options;
+      use Inc_Plugins;
+      use Inc_Templates;
+
+      -- global wp_theme_directories
+      -- global wp_customize
+      -- global sidebars_widgets
+      -- global wp_registered_sidebars
+
+      Old_Theme : constant Wp_Theme := Wp_Get_Theme;
+      New_Theme : Wp_Theme := Wp_Get_Theme (Stylesheet);
+      Template  : constant String := New_Theme.Get_Template;
+      New_Name  : constant String := As_String (New_Theme.Get ("Name"));
+
+      Nav_Menu_Locations : constant Array_Type :=
+        As_Array (Get_Theme_Mod ("nav_menu_locations"));
    begin
-      raise Program_Error with "not implemented";
+
+      declare
+         Requirements : constant True_Or_Error_Type :=
+           Validate_Theme_Requirements (Stylesheet);
+      begin
+         if not Requirements.Success then
+            Wp_Die (Requirements.Error);
+         end if;
+      end;
+
+      declare
+         X_Sidebars_Widgets : Array_Type; -- UString; --  := null;
+      begin
+         if "wp_ajax_customize_save" = Current_Action then
+            declare
+               Old_Sidebars_Widgets_Data_Setting :
+                 constant Class_Customize_Settings.Wp_Customize_Setting :=
+                   Wp_Customize.Get_Setting ("old_sidebars_widgets_data");
+            begin
+               if Old_Sidebars_Widgets_Data_Setting /= Null_Setting then
+                  X_Sidebars_Widgets :=
+                    To_Array_Type
+                      ([Build
+                          (Wp_Customize.Post_Value
+                             (Old_Sidebars_Widgets_Data_Setting),
+                           "")]);
+               end if;
+            end;
+         else -- elsif Is_Array (Global_Sidebars_Widgets) then
+            X_Sidebars_Widgets := Global_Sidebars_Widgets;
+         end if;
+
+         if True then
+            -- Is_Array (X_Sidebars_Widgets) then
+            Set_Theme_Mod
+              ("sidebars_widgets",
+               From_Array
+                 (To_Array_Type
+                    ([1 => Build ("time", Time),
+                      2 => Build ("data", X_Sidebars_Widgets)])));
+         end if;
+      end;
+
+      Update_Option
+        ("theme_switch_menu_locations", From_Array (Nav_Menu_Locations), True);
+
+      if Wp_Is_Recovery_Mode then
+         declare
+            Paused_Themes : constant Wp_Paused_Extensions_Storage :=
+              Wp_Paused_Themes;
+         begin
+            Paused_Themes.Delete (Old_Theme.Get_Stylesheet);
+            Paused_Themes.Delete (Old_Theme.Get_Template);
+         end;
+      end if;
+
+      -- Update the core theme options.
+      Update_Option ("template", From_String (Template));
+      Update_Option ("stylesheet", From_String (Stylesheet));
+
+      if Global_Wp_Theme_Directories.Length > 1 then
+         Update_Option
+           ("template_root",
+            From_String (Get_Raw_Theme_Root (Template, True)));
+         Update_Option
+           ("stylesheet_root",
+            From_String (Get_Raw_Theme_Root (Stylesheet, True)));
+      else
+         Delete_Option ("template_root");
+         Delete_Option ("stylesheet_root");
+      end if;
+
+      Update_Option ("current_theme", From_String (New_Name));
+
+      -- Migrate theme mods from old mods_{name} to theme_mods_{slug}.
+      if Is_Admin
+        and then Length (Get_Option ("theme_mods_" & Stylesheet, Empty_Array))
+                 = 0
+      then
+         declare
+            Default_Theme_Mods : Array_Type :=
+              Get_Option ("mods_" & New_Name, Empty_Array);
+         begin
+            if not Nav_Menu_Locations.Is_Empty
+              and then not Isset (Default_Theme_Mods, "nav_menu_locations")
+            then
+               Set
+                 (Default_Theme_Mods,
+                  "nav_menu_locations",
+                  From_Array (Nav_Menu_Locations));
+            end if;
+            Add_Option
+              ("theme_mods_" & Stylesheet, From_Array (Default_Theme_Mods));
+         end;
+      else
+         --
+         -- Since retrieve_widgets() is called when initializing a theme in
+         -- the Customizer, we need to remove the theme mods to avoid
+         -- overwriting changes made via the Customizer when accessing
+         -- wp-admin/widgets.php.
+         --
+         if "wp_ajax_customize_save" = Current_Action then
+            Remove_Theme_Mod ("sidebars_widgets");
+         end if;
+      end if;
+
+      -- Stores classic sidebars for later use by block themes.
+      if New_Theme.Is_Block_Theme then
+         Set_Theme_Mod
+           ("wp_classic_sidebars", From_Array (Global_Wp_Registered_Sidebars));
+      end if;
+
+      Update_Option ("theme_switched", From_String (Old_Theme.Get_Stylesheet));
+      --
+      -- Reset template globals when switching themes outside of a switched
+      -- blog context to ensure templates will be loaded from the new theme.
+      --
+      if not Is_Multisite or else not MS_Is_Switched then
+         Wp_Set_Template_Globals;
+      end if;
+
+      -- Clear pattern caches.
+      if not Is_Multisite then
+         New_Theme.Delete_Pattern_Cache;
+         Old_Theme.Delete_Pattern_Cache;
+      end if;
+
+      -- Set autoload=no for the old theme, autoload=yes for the switched
+      -- theme.
+      declare
+         Theme_Mods_Options : constant Array_Type :=
+           To_Array_Type
+             ([Build ("theme_mods_" & Stylesheet, "yes"),
+               Build ("theme_mods_" & Old_Theme.Get_Stylesheet, "no")]);
+      begin
+         Wp_Set_Option_Autoload_Values (Theme_Mods_Options);
+      end;
+
+      -- Fires after the theme is switched.
+      --
+      -- See {@see 'after_switch_theme'}.
+      --
+      -- @since 1.5.0
+      -- @since 4.5.0 Introduced the `old_theme` parameter.
+      --
+      -- @param string   new_name  Name of the new theme.
+      -- @param WP_Theme new_theme WP_Theme instance of the new theme.
+      -- @param WP_Theme old_theme WP_Theme instance of the old theme.
+      --
+      Do_Action ("switch_theme", New_Name);
    end Switch_Theme;
 --         global wp_theme_directories, wp_customize, sidebars_widgets;
 
@@ -996,60 +1453,87 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Validates the theme requirements for WordPress version and PHP version.
--- --
--- -- Uses the information from `Requires at least` and `Requires PHP` headers
--- -- defined in the theme"s `style.css` file.
--- --
--- -- @since 5.5.0
--- -- @since 5.8.0 Removed support for using `readme.txt` as a fallback.
--- --
--- -- @param string stylesheet Directory name for the theme.
--- -- @return true|WP_Error True if requirements are met, WP_Error on failure.
--- --
--- function validate_theme_requirements( stylesheet ) then
---         theme = wp_get_theme( stylesheet );
+   ---------------------------------
+   -- Validate_Theme_Requirements --
+   ---------------------------------
 
---         requirements = array(
---                 "requires"     => ! empty( theme.get( "RequiresWP" ) ) ? theme.get( "RequiresWP" ) : "",
---                 "requires_php" => ! empty( theme.get( "RequiresPHP" ) ) ? theme.get( "RequiresPHP" ) : "",
---         );
+   function Validate_Theme_Requirements
+     (Stylesheet : String) return True_Or_Error_Type
+   is
+      use Php.Strings;
+      use Array_Lists;
+      use Class_Errors;
+      use Class_Themes;
+      use Inc_Functions;
+      use Inc_L10n;
 
---         compatible_wp  = is_wp_version_compatible( requirements["requires"] );
---         compatible_php = is_php_version_compatible( requirements["requires_php"] );
+      Theme : Wp_Theme := Wp_Get_Theme (Stylesheet);
 
---         if ( ! compatible_wp && ! compatible_php ) then
---                 return new WP_Error(
---                         "theme_wp_php_incompatible",
---                         sprintf(
---                                 /* translators: %s: Theme name.--
---                                 _x( "<strong>Error:</strong> Current WordPress and PHP versions do not meet minimum requirements for %s.", "theme" ),
---                                 theme.display( "Name" )
---                         )
---                 );
---         end; elseif ( ! compatible_php ) then
---                 return new WP_Error(
---                         "theme_php_incompatible",
---                         sprintf(
---                                 /* translators: %s: Theme name.--
---                                 _x( "<strong>Error:</strong> Current PHP version does not meet minimum requirements for %s.", "theme" ),
---                                 theme.display( "Name" )
---                         )
---                 );
---         end; elseif ( ! compatible_wp ) then
---                 return new WP_Error(
---                         "theme_wp_incompatible",
---                         sprintf(
---                                 /* translators: %s: Theme name.--
---                                 _x( "<strong>Error:</strong> Current WordPress version does not meet minimum requirements for %s.", "theme" ),
---                                 theme.display( "Name" )
---                         )
---                 );
---         end;
+      Requirements : constant Array_Type :=
+        To_Array_Type
+          ([Build
+              ("requires",
+               (if not Empty (As_String (Theme.Get ("RequiresWP")))
+                then As_String (Theme.Get ("RequiresWP"))
+                else "")),
+            Build
+              ("requires_php",
+               (if not Empty (As_String (Theme.Get ("RequiresPHP")))
+                then As_String (Theme.Get ("RequiresPHP"))
+                else ""))]);
 
---         return true;
--- end;
+      Compatible_WP : constant Boolean :=
+        Is_WP_Version_Compatible (Get_As_String (Requirements, "requires"));
+
+      Compatible_PHP : constant Boolean :=
+        Is_PHP_Version_Compatible
+          (Get_As_String (Requirements, "requires_php"));
+   begin
+      if not Compatible_WP and then not Compatible_PHP then
+         return
+           (Success => False,
+            Error   =>
+              X_Construct
+                ("theme_wp_php_incompatible",
+                 Sprintf
+                   (
+                    -- translators: %s: Theme name.
+                    X_X
+                      ("<strong>Error:</strong> Current WordPress and PHP versions do not meet minimum requirements for %s.",
+                       "theme"),
+                    [1 => Theme.Display ("Name")])));
+
+      elsif not Compatible_PHP then
+         return
+           (Success => False,
+            Error   =>
+              X_Construct
+                ("theme_php_incompatible",
+                 Sprintf
+                   (
+                    -- translators: %s: Theme name.
+                    X_X
+                      ("<strong>Error:</strong> Current PHP version does not meet minimum requirements for %s.",
+                       "theme"),
+                    [1 => Theme.Display ("Name")])));
+
+      elsif not Compatible_WP then
+         return
+           (Success => False,
+            Error   =>
+              X_Construct
+                ("theme_wp_incompatible",
+                 Sprintf
+                   (
+                    -- translators: %s: Theme name.
+                    X_X
+                      ("<strong>Error:</strong> Current WordPress version does not meet minimum requirements for %s.",
+                       "theme"),
+                    [1 => Theme.Display ("Name")])));
+      end if;
+
+      return (Success => True, Error => Null_Wp_Error);
+   end Validate_Theme_Requirements;
 
    --------------------
    -- Get_Theme_Mods --
@@ -1076,7 +1560,7 @@ is
 
             Theme_Name : String :=
               (if "" = Theme_Name_2 -- false
-               then Theme.Get ("Name")
+               then As_String (Theme.Get ("Name"))
                else Theme_Name_2);
 
             Mods_2 : constant String :=
@@ -1100,49 +1584,62 @@ is
    -- Get_Theme_Mod --
    -------------------
 
-   function Get_Theme_Mod (Name    : String;
-                           Default : String := "")
-                           return String
+   function Get_Theme_Mod
+     (Name : Modification_Name; Default : Multi_Type := From_Null)
+      return Multi_Type
    is
       use Php.Preg;
       use Php.Strings;
-      use Php.Types;
-      use UStrings;
       use Wp_Common;
 
-      Mods      : constant Array_Type := Get_Theme_Mods;
-      Default_2 : UString             := +Default;
+      Mods : constant Array_Type := Get_Theme_Mods;
    begin
       if Isset (Mods, Name) then
          --
          -- Filters the theme modification, or "theme_mod", value.
          --
-         -- The dynamic portion of the hook name, `name`, refers to the key name
-         -- of the modification array. For example, "header_textcolor", "header_image",
-         -- and so on depending on the theme options.
+         -- The dynamic portion of the hook name, `name`, refers to the key
+         -- name of the modification array. For example, "header_textcolor",
+         -- "header_image", and so on depending on the theme options.
          --
          -- @since 2.2.0
          --
-         -- @param mixed current_mod The value of the active theme modification.
+         -- @param mixed current_mod The value of the active theme
+         --                          modification.
          --
-         return Apply_Filters ("theme_mod_" & Name, Get_As_String (Mods, Name));
+         return
+           Apply_Filters
+             ("theme_mod_" & Name, From_String (Get_As_String (Mods, Name)));
       end if;
 
       if Is_String (Default) then
-         -- Only run the replacement if an sprintf() string format pattern was found.
-         if Preg_Match ("#(?<!%)%(?:\d+\?)?s#", Default) then
-            -- Remove a single trailing percent sign.
-            Default_2 := +Preg_Replace ("#(?<!%)%#", "", Default);
-            Default_2 := +Sprintf (-Default_2,
-                                   [
-                                     1 => Get_Template_Directory_URI,
-                                     2 => Get_Stylesheet_Directory_URI
-                                   ]);
-         end if;
+         declare
+            Default_1 : constant String := As_String (Default);
+         begin
+            -- Only run the replacement if an sprintf() string format pattern
+            -- was found.
+            if Preg_Match ("#(?<!%)%(?:\d+\?)?s#", Default_1) then
+               -- Remove a single trailing percent sign.
+               declare
+                  Default_2 : constant String :=
+                    Preg_Replace ("#(?<!%)%#", "", Default_1);
+
+                  Default_3 : constant String :=
+                    Sprintf
+                      (Default_2,
+                       [1 => Get_Template_Directory_URI,
+                        2 => Get_Stylesheet_Directory_URI]);
+               begin
+                  return
+                    Apply_Filters
+                      ("theme_mod_" & Name, From_String (Default_3));
+               end;
+            end if;
+         end;
       end if;
 
       -- This filter is documented in wp-includes/theme.php
-      return Apply_Filters ("theme_mod_" & Name, -Default_2);
+      return Apply_Filters ("theme_mod_" & Name, Default);
    end Get_Theme_Mod;
 
    -------------------
@@ -1187,58 +1684,63 @@ is
    -------------------
 
    procedure Set_Theme_Mod (Name  : String;
-                            Value : Integer)
+                            Value : Multi_Type) -- Integer)
    is
-      Unused : constant Boolean := Set_Theme_Mod (Name, From_Integer (Value));
+      Unused : constant Boolean := Set_Theme_Mod (Name, Value);
    begin
       null;
    end Set_Theme_Mod;
 
--- --
--- -- Removes theme modification name from active theme list.
--- --
--- -- If removing the name also removes all elements, then the entire option
--- -- will be removed.
--- --
--- -- @since 2.1.0
--- --
--- -- @param string name Theme modification name.
--- --
--- function remove_theme_mod( name ) then
---         mods = get_theme_mods();
+   ----------------------
+   -- Remove_Theme_Mod --
+   ----------------------
 
---         if ( ! isset( mods[ name ] ) ) then
---                 return;
---         end;
+   procedure Remove_Theme_Mod (Name : String) is
+      use Inc_Options;
 
---         unset( mods[ name ] );
+      Mods : Array_Type := Get_Theme_Mods;
+   begin
+      if not Isset (Mods, Name) then
+         return;
+      end if;
 
---         if ( empty( mods ) ) then
---                 remove_theme_mods();
---                 return;
---         end;
+      Delete (Mods, Name);
 
---         theme = get_option( "stylesheet" );
+      if Mods.Is_Empty then
+         Remove_Theme_Mods;
+         return;
+      end if;
 
---         update_option( "theme_mods_theme", mods );
--- end;
+      declare
+         Theme : constant String := Get_Option ("stylesheet");
+      begin
+         Update_Option ("theme_mods_" & Theme, Mods.First_Element);
+      end;
+   end Remove_Theme_Mod;
 
--- --
--- -- Removes theme modifications option for the active theme.
--- --
--- -- @since 2.1.0
--- --
--- function remove_theme_mods() then
---         delete_option( "theme_mods_" . get_option( "stylesheet" ) );
+   -----------------------
+   -- Remove_Theme_Mods --
+   -----------------------
 
---         // Old style.
---         theme_name = get_option( "current_theme" );
---         if ( false === theme_name ) then
---                 theme_name = wp_get_theme().get( "Name" );
---         end;
+   procedure Remove_Theme_Mods is
+      use Class_Themes;
+      use Inc_Options;
 
---         delete_option( "mods_" . theme_name );
--- end;
+      Theme : Wp_Theme := Wp_Get_Theme;  -- should be writable -- jq
+   begin
+      Delete_Option ("theme_mods_" & Get_Option ("stylesheet"));
+
+      -- Old style.
+      declare
+         Theme_Name_2 : constant String := Get_Option ("current_theme");
+         Theme_Name   : constant String :=
+           (if Theme_Name_2 = ""
+            then As_String (Theme.Get ("Name"))
+            else Theme_Name_2);
+      begin
+         Delete_Option ("mods_" & Theme_Name);
+      end;
+   end Remove_Theme_Mods;
 
 -- --
 -- -- Retrieves the custom header text color in 3- or 6-digit hexadecimal form.
@@ -1291,20 +1793,21 @@ is
    -- Get_Header_Image --
    ----------------------
 
-   function Get_Header_Image
-            return String
-   is
+   function Get_Header_Image return String is
       use Php.Strings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Link_Templates;
 
+      Support : constant Multi_Type :=
+        From_String (Get_Theme_Support ("custom-header", "default-image"));
+
       URL_2 : constant String :=
-        Get_Theme_Mod ("header_image",
-                       Get_Theme_Support ("custom-header", "default-image"));
+        As_String (Get_Theme_Mod ("header_image", Support));
    begin
       if "remove-header" = URL_2 then
          return ""; -- false;
+
       end if;
 
       declare
@@ -1321,8 +1824,9 @@ is
          URL_4 : constant String := Apply_Filters ("get_header_image", URL_3);
       begin
          if URL_4 = "" then
---       if ( ! is_string( Url_4 ) ) then
+            --       if ( ! is_string( Url_4 ) ) then
             return ""; -- false;
+
          end if;
 
          declare
@@ -1492,53 +1996,54 @@ is
    -- Get_Random_Header_Image --
    -----------------------------
 
-   function Get_Random_Header_Image
-            return String
-   is
+   function Get_Random_Header_Image return String is
       Random_Image : constant Duration := X_Get_Random_Header_Data;
    begin
       raise Program_Error with "not implemented";
       return "";
-      -- if Empty (Random_Image.URL)  then
-      --    return "";
-      -- end if;
+   -- if Empty (Random_Image.URL)  then
+   --    return "";
+   -- end if;
 
-      -- return Random_Image.URL;
+   -- return Random_Image.URL;
    end Get_Random_Header_Image;
 
--- --
--- -- Checks if random header image is in use.
--- --
--- -- Always true if user expressly chooses the option in Appearance > Header.
--- -- Also true if theme has multiple header images registered, no specific header image
--- -- is chosen, and theme turns on random headers with add_theme_support().
--- --
--- -- @since 3.2.0
--- --
--- -- @param string type The random pool to use. Possible values include "any",
--- --                     "default", "uploaded". Default "any".
--- -- @return bool
--- --
--- function is_random_header_image( type = "any" ) then
---         header_image_mod = get_theme_mod( "header_image", get_theme_support( "custom-header", "default-image" ) );
+   ----------------------------
+   -- Is_Random_Header_Image --
+   ----------------------------
 
---         if ( "any" === type ) then
---                 if ( "random-default-image" === header_image_mod
---                         || "random-uploaded-image" === header_image_mod
---                         || ( "" !== get_random_header_image() && empty( header_image_mod ) )
---                 ) then
---                         return true;
---                 end;
---         end; else then
---                 if ( "random-type-image" === header_image_mod ) then
---                         return true;
---                 end; elseif ( "default" === type && empty( header_image_mod ) && "" !== get_random_header_image() ) then
---                         return true;
---                 end;
---         end;
+   function Is_Random_Header_Image (Typ : Random_Pool := "any") return Boolean
+   is
+      use Php.Strings;
 
---         return false;
--- end;
+      Support : constant Multi_Type :=
+        From_String (Get_Theme_Support ("custom-header", "default-image"));
+
+      Header_Image_Mod : constant String :=
+        As_String (Get_Theme_Mod ("header_image", Support));
+
+   begin
+      if "any" = Typ then
+         if "random-default-image" = Header_Image_Mod
+           or else "random-uploaded-image" = Header_Image_Mod
+           or else ("" /= Get_Random_Header_Image
+                    and then Empty (Header_Image_Mod))
+         then
+            return True;
+         end if;
+      else
+         if "random-type-image" = Header_Image_Mod then
+            return True;
+         elsif "default" = Typ
+           and then Empty (Header_Image_Mod)
+           and then "" /= Get_Random_Header_Image
+         then
+            return True;
+         end if;
+      end if;
+
+      return False;
+   end Is_Random_Header_Image;
 
 -- --
 -- -- Displays header image URL.
@@ -1720,12 +2225,12 @@ is
       use Inc_Posts;
 
       Id : constant Post_Id_Type :=
-        Post_Id_Type (Integer'(Get_Theme_Mod ("header_video")));
+        Post_Id_Type (As_Integer (Get_Theme_Mod ("header_video")));
 
       URL_2 : constant String :=
         (if Id /= 0
          then Wp_Get_Attachment_URL (Id) -- Get the file URL from the attachment ID.
-         else Get_Theme_Mod ("external_header_video"));
+         else As_String (Get_Theme_Mod ("external_header_video")));
 
       --
       -- Filters the header video URL.
@@ -1892,13 +2397,11 @@ is
    -- Get_Background_Image --
    --------------------------
 
-   function Get_Background_Image
-            return String
-   is
+   function Get_Background_Image return String is
+      Support : constant Multi_Type :=
+        From_String (Get_Theme_Support ("custom-background", "default-image"));
    begin
-      return Get_Theme_Mod ("background_image",
-                            Get_Theme_Support ("custom-background",
-                                               "default-image"));
+      return As_String (Get_Theme_Mod ("background_image", Support));
    end Get_Background_Image;
 
 -- --
@@ -2071,7 +2574,8 @@ is
       if Get_Stylesheet = Stylesheet_2 then
          declare
             Post_Id : constant Class_Posts.Post_Id_Type :=
-              Class_Posts.Post_Id_Type (Integer'(Get_Theme_Mod ("custom_css_post_id")));
+              Class_Posts.Post_Id_Type
+                (As_Integer (Get_Theme_Mod ("custom_css_post_id")));
          begin
             if Post_Id > 0 and then Get_Post (Post_Id) /= Null_Post then
                Post := Get_Post (Post_Id);
@@ -2089,8 +2593,10 @@ is
                   -- @todo This should get cleared if a custom_css post is
                   -- added/removed.
                   --
-                  Set_Theme_Mod ("custom_css_post_id", Integer
-                                 (if Post /= Null_Post then Post.Id else -1));
+                  Set_Theme_Mod
+                    ("custom_css_post_id",
+                     From_Integer
+                       (Integer (if Post /= Null_Post then Post.Id else -1)));
                end;
             end if;
          end;
@@ -3062,7 +3568,7 @@ is
       if
         not Current_Theme_Supports ("custom-header", "header-text")   and then
         not Get_Theme_Support ("custom-logo", "header-text").Is_Empty and then
-        0 = Get_Theme_Mod ("header_text", True)
+        0 = As_Integer (Get_Theme_Mod ("header_text", From_Boolean (True)))
       then
          declare
             Classes_3 : constant List_Type :=
@@ -3750,7 +4256,6 @@ is
          Settings_Previewed : constant Boolean := not Is_Customize_Save_Action;
 
          Comp : constant Array_Type := To_Array_Type ([
---         Compact (
            Build ("changeset_uuid",     Changeset_UUID),
            Build ("theme",              Theme),
            Build ("messenger_channel",  Messenger_Channel),

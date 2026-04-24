@@ -5,12 +5,11 @@
 -- @subpackage Theme
 --
 
-with Ada.Containers.Vectors;
-
 with Arrays;
 with Helpers_2;
 with Lists;
 
+with Class_Errors;
 with Class_Posts;
 with Class_Themes;
 
@@ -19,26 +18,19 @@ is
    use Arrays;
    use Lists;
 
-   type Theme_Index is new Positive;
+   subtype Modification_Name is String;
 
-   package Theme_Lists is
-     new Ada.Containers.Vectors (Index_Type   => Theme_Index,
-                                 Element_Type => Class_Themes.Wp_Theme,
-                                 "="          => Class_Themes."=");
+   subtype Random_Pool is String
+   with Dynamic_Predicate => Random_Pool in "any" | "default" | "uploaded";
 
-   subtype Theme_List is Theme_Lists.Vector;
-
---   package String_Maps is new
---      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
---                                              Element_Type => String);
-
-   Wp_Theme_Directories : List_Type;
+   Global_Wp_Theme_Directories : List_Type;
 
    --
    -- Returns an array of WP_Theme objects based on the arguments.
    --
-   -- Despite advances over get_themes(), this function is quite expensive, and grows
-   -- linearly with additional themes. Stick to wp_get_theme() if possible.
+   -- Despite advances over get_themes(), this function is quite expensive,
+   -- and grows linearly with additional themes. Stick to wp_get_theme() if
+   -- possible.
    --
    -- @since 3.4.0
    --
@@ -47,21 +39,23 @@ is
    -- @param array args {
    --     Optional. The search arguments.
    --
-   --     @type mixed errors  True to return themes with errors, false to return
-   --                          themes without errors, null to return all themes.
-   --                          Default false.
-   --     @type mixed allowed (Multisite) True to return only allowed themes for a
-   --                          site. False to return only disallowed themes for a
-   --                          site. "site" to return only site-allowed themes.
-   --                          "network" to return only network-allowed themes.
-   --                          Null to return all themes. Default null.
-   --     @type int   blog_id (Multisite) The blog ID used to calculate which themes
-   --                          are allowed. Default 0, synonymous for the current blog.
+   --     @type mixed errors  True to return themes with errors, false to
+   --                         return themes without errors, null to return
+   --                         all themes. Default false.
+   --     @type mixed allowed (Multisite) True to return only allowed themes
+   --                         for a site. False to return only disallowed
+   --                         themes for a site. "site" to return only
+   --                         site-allowed themes. "network" to return only
+   --                         network-allowed themes. Null to return all
+   --                         themes. Default null.
+   --     @type int   blog_id (Multisite) The blog ID used to calculate which
+   --                          themes are allowed. Default 0, synonymous for
+   --                          the current blog.
    -- }
    -- @return WP_Theme[] Array of WP_Theme objects.
    --
-   function Wp_Get_Themes (Args : Array_Type := Empty_Array)
-                           return Array_Type; -- Theme_List;
+   function Wp_Get_Themes
+     (Args : Array_Type := Empty_Array) return Class_Themes.Theme_Array; -- Array_Type;
 
    --
    -- Gets a WP_Theme object for a theme.
@@ -70,18 +64,19 @@ is
    --
    -- @global array wp_theme_directories
    --
-   -- @param string stylesheet Optional. Directory name for the theme. Defaults to
-   --                           active theme.
-   -- @param string theme_root Optional. Absolute path of the theme root to look in.
-   --                           If not specified, get_raw_theme_root() is used to
-   --                           calculate the theme root for the stylesheet provided
-   --                           (or active theme).
-   -- @return WP_Theme Theme object. Be sure to check the object"s exists() method
-   --                  if you need to confirm the theme"s existence.
+   -- @param string stylesheet Optional. Directory name for the theme.
+   --                          Defaults to active theme.
+   -- @param string theme_root Optional. Absolute path of the theme root to
+   --                          look in. If not specified,
+   --                          get_raw_theme_root() is used to calculate the
+   --                          theme root for the stylesheet provided (or
+   --                          active theme).
+   -- @return WP_Theme Theme object. Be sure to check the object's exists()
+   --                  method if you need to confirm the theme"s existence.
    --
-   function Wp_Get_Theme (Stylesheet : String := "";
-                          Theme_Root : String := "")
-                          return Class_Themes.Wp_Theme;
+   function Wp_Get_Theme
+     (Stylesheet : String := ""; Theme_Root : String := "")
+      return Class_Themes.Wp_Theme;
 
    --
    -- Gets the header images uploaded for the active theme.
@@ -90,26 +85,24 @@ is
    --
    -- @return array
    --
-   function Get_Uploaded_Header_Images
-      return Array_Type
-      is (Empty_Array);
+   function Get_Uploaded_Header_Images return Array_Type
+   is (Empty_Array);
 
    --
    -- Checks if random header image is in use.
    --
    -- Always true if user expressly chooses the option in Appearance > Header.
-   -- Also true if theme has multiple header images registered, no specific header
-   -- image is chosen, and theme turns on random headers with add_theme_support().
+   -- Also true if theme has multiple header images registered, no specific
+   -- header image is chosen, and theme turns on random headers with
+   -- add_theme_support().
    --
    -- @since 3.2.0
    --
-   -- @param string type The random pool to use. Possible values include "any",
-   --                     "default", "uploaded". Default "any".
+   -- @param string type The random pool to use. Possible values include
+   --                    "any", "default", "uploaded". Default "any".
    -- @return bool
    --
-   function Is_Random_Header_Image (typ : String := "any")
-                                    return Boolean
-                                    is (False);
+   function Is_Random_Header_Image (Typ : Random_Pool := "any") return Boolean;
 
    --
    -- Searches all registered theme directories for complete and valid themes.
@@ -121,8 +114,8 @@ is
    -- @param bool force Optional. Whether to force a new directory scan. Default false.
    -- @return array|false Valid themes found on success, false on failure.
    --
-   function Search_Theme_Directories (Force : Boolean := False)
-                                      return Array_Type;
+   function Search_Theme_Directories
+     (Force : Boolean := False) return Array_Type;
 
    --
    -- Retrieves theme roots.
@@ -134,8 +127,7 @@ is
    -- @return array|string An array of theme roots keyed by template/stylesheet
    --                      or a single theme root if all themes have the same root.
    --
-   function Get_Theme_Roots
-            return Array_Type; -- Inc_Options.String_Maps.Map;
+   function Get_Theme_Roots return Array_Type; -- Inc_Options.String_Maps.Map;
 
    --
    -- Registers a directory that contains themes.
@@ -149,8 +141,7 @@ is
    -- @return bool True if successfully registered a directory that contains themes,
    --              false if the directory does not exist.
    --
-   function Register_Theme_Directory (Directory : String)
-                                      return Boolean;
+   function Register_Theme_Directory (Directory : String) return Boolean;
 
    --
    -- Retrieves name of the current stylesheet.
@@ -164,8 +155,7 @@ is
    --
    -- @return string Stylesheet name.
    --
-   function Get_Stylesheet
-            return String;
+   function Get_Stylesheet return String;
 
    --
    -- Retrieves stylesheet directory path for the active theme.
@@ -174,8 +164,7 @@ is
    --
    -- @return string Path to active theme"s stylesheet directory.
    --
-   function Get_Stylesheet_Directory
-            return String;
+   function Get_Stylesheet_Directory return String;
 
    --
    -- Retrieves stylesheet directory URI for the active theme.
@@ -184,8 +173,7 @@ is
    --
    -- @return string URI to active theme"s stylesheet directory.
    --
-   function Get_Stylesheet_Directory_URI
-            return String;
+   function Get_Stylesheet_Directory_URI return String;
 
    --
    -- Retrieves the localized stylesheet URI.
@@ -208,8 +196,7 @@ is
    --
    -- @return string URI to active theme"s localized stylesheet.
    --
-   function Get_Locale_Stylesheet_URI
-            return String;
+   function Get_Locale_Stylesheet_URI return String;
 
    --
    -- Retrieves name of the active theme.
@@ -218,28 +205,25 @@ is
    --
    -- @return string Template name.
    --
-   function Get_Template
-            return String;
+   function Get_Template return String;
 
    --
    -- Retrieves template directory path for the active theme.
    --
    -- @since 1.5.0
    --
-   -- @return string Path to active theme"s template directory.
+   -- @return string Path to active theme's template directory.
    --
-   function Get_Template_Directory
-            return String;
+   function Get_Template_Directory return String;
 
    --
    -- Retrieves template directory URI for the active theme.
    --
    -- @since 1.5.0
    --
-   -- @return string URI to active theme"s template directory.
+   -- @return string URI to active theme's template directory.
    --
-   function Get_Template_Directory_URI
-            return String;
+   function Get_Template_Directory_URI return String;
 
    --
    -- Retrieves path to themes directory.
@@ -255,8 +239,8 @@ is
    --                                      main theme root.
    -- @return string Themes directory path.
    --
-   function Get_Theme_Root (Stylesheet_Or_Template : String := "")
-                            return String;
+   function Get_Theme_Root
+     (Stylesheet_Or_Template : String := "") return String;
 
    --
    -- Retrieves URI for themes directory.
@@ -276,9 +260,9 @@ is
    --                                      Default empty.
    -- @return string Themes directory URI.
    --
-   function Get_Theme_Root_URI (Stylesheet_Or_Template : String := "";
-                                Theme_Root             : String := "")
-                                return String;
+   function Get_Theme_Root_URI
+     (Stylesheet_Or_Template : String := ""; Theme_Root : String := "")
+      return String;
 
    --
    -- Gets the raw theme root relative to the content directory with no filters
@@ -295,9 +279,9 @@ is
    --                                      used.
    -- @return string Theme root.
    --
-   function Get_Raw_Theme_Root (Stylesheet_Or_Template : String;
-                                Skip_Cache             : Boolean := False)
-                                return String;
+   function Get_Raw_Theme_Root
+     (Stylesheet_Or_Template : String; Skip_Cache : Boolean := False)
+      return String;
 
    --
    -- Displays localized stylesheet link element.
@@ -306,8 +290,8 @@ is
    --
    procedure Locale_Stylesheet;
 
-   function Locale_Stylesheet
-     is new Helpers_2.Generic_Call_Procedure (Locale_Stylesheet);
+   function Locale_Stylesheet is new
+     Helpers_2.Generic_Call_Procedure (Locale_Stylesheet);
 
    --
    -- Switches the theme.
@@ -325,6 +309,26 @@ is
    -- @param string stylesheet Stylesheet name.
    --
    procedure Switch_Theme (Stylesheet : String);
+
+   --
+   -- Validates the theme requirements for WordPress version and PHP version.
+   --
+   -- Uses the information from `Requires at least` and `Requires PHP` headers
+   -- defined in the theme"s `style.css` file.
+   --
+   -- @since 5.5.0
+   -- @since 5.8.0 Removed support for using `readme.txt` as a fallback.
+   --
+   -- @param string stylesheet Directory name for the theme.
+   -- @return true|WP_Error True if requirements are met, WP_Error on failure.
+   --
+   type True_Or_Error_Type is record
+      Success : Boolean;
+      Error   : Class_Errors.Wp_Error;
+   end record;
+
+   function Validate_Theme_Requirements
+     (Stylesheet : String) return True_Or_Error_Type;
 
    --
    -- Checks that the active theme has the required files.
@@ -349,9 +353,7 @@ is
    --
    -- @return bool
    --
-   function Validate_Current_Theme
-            return Boolean
-   is (raise Program_Error with "not implemented");
+   function Validate_Current_Theme return Boolean;
 
    --
    -- Checks whether a header video is set or not.
@@ -362,8 +364,7 @@ is
    --
    -- @return bool Whether a header video is set or not.
    --
-   function Has_Header_Video
-            return Boolean;
+   function Has_Header_Video return Boolean;
 
    --
    -- Retrieves header video URL for custom header.
@@ -374,8 +375,7 @@ is
    --
    -- @return string|false Header video URL or false if there is no video.
    --
-   function Get_Header_Video_URL
-            return String;
+   function Get_Header_Video_URL return String;
 
    --
    -- Checks a theme's support for a given feature.
@@ -397,9 +397,8 @@ is
    --                       features.
    -- @return bool True if the active theme supports the feature, false otherwise.
    --
-   function Current_Theme_Supports (Feature : String;
-                                    Arg_2   : String := "")
-                                    return Boolean;
+   function Current_Theme_Supports
+     (Feature : String; Arg_2 : String := "") return Boolean;
 
    --
    -- Retrieves all theme modifications.
@@ -409,8 +408,7 @@ is
    --
    -- @return array Theme modifications.
    --
-   function Get_Theme_Mods
-            return Array_Type;
+   function Get_Theme_Mods return Array_Type;
 
    --
    -- Renders the Custom CSS style element.
@@ -419,8 +417,8 @@ is
    --
    procedure Wp_Custom_CSS_CB;
 
-   function Wp_Custom_CSS_CB
-     is new Helpers_2.Generic_Call_Procedure (Wp_Custom_CSS_CB);
+   function Wp_Custom_CSS_CB is new
+     Helpers_2.Generic_Call_Procedure (Wp_Custom_CSS_CB);
 
    --
    -- Fetches the `custom_css` post for a given theme.
@@ -431,8 +429,8 @@ is
    --                          to the active theme.
    -- @return WP_Post|null The custom_css post or null if none exists.
    --
-   function Wp_Get_Custom_CSS_Post (Stylesheet : String := "")
-                                    return Class_Posts.Wp_Post;
+   function Wp_Get_Custom_CSS_Post
+     (Stylesheet : String := "") return Class_Posts.Wp_Post;
 
    --
    -- Fetches the saved Custom CSS content for rendering.
@@ -443,36 +441,27 @@ is
    --                          to the active theme.
    -- @return string The Custom CSS Post content.
    --
-   function Wp_Get_Custom_CSS (Stylesheet : String := "")
-                               return String;
+   function Wp_Get_Custom_CSS (Stylesheet : String := "") return String;
 
    --
    -- Retrieves theme modification value for the active theme.
    --
-   -- If the modification name does not exist and `default` is a string, then the
-   -- default will be passed through the {@link https://www.php.net/sprintf sprintf()}
-   -- PHP function with the template directory URI as the first value and the
-   -- stylesheet directory URI as the second value.
+   -- If the modification name does not exist and `default` is a string, then
+   -- the default will be passed through the {@link
+   -- https://www.php.net/sprintf sprintf()} PHP function with the template
+   -- directory URI as the first value and the stylesheet directory URI as
+   -- the second value.
    --
    -- @since 2.1.0
    --
    -- @param string name    Theme modification name.
-   -- @param mixed  default Optional. Theme modification default value. Default false.
+   -- @param mixed  default Optional. Theme modification default value.
+   --                       Default false.
    -- @return mixed Theme modification value.
    --
-   function Get_Theme_Mod (Name    : String;
-                           Default : Boolean := False)
-                           return Integer
-                           is (1);
-
-   function Get_Theme_Mod (Name    : String;
-                           Default : Boolean := False)
-                           return Array_Type
-                           is (Empty_Array);
-
-   function Get_Theme_Mod (Name    : String;
-                           Default : String := "")
-                           return String;
+   function Get_Theme_Mod
+     (Name : Modification_Name; Default : Multi_Type := From_Null)
+      return Multi_Type;
 
    --
    -- Updates theme modification value for the active theme.
@@ -484,12 +473,30 @@ is
    -- @param mixed  value Theme modification value.
    -- @return bool True if the value was updated, false otherwise.
    --
-   function Set_Theme_Mod (Name  : String;
-                           Value : Multi_Type) -- Array_Type)
-                           return Boolean;
+   function Set_Theme_Mod
+     (Name : Modification_Name; Value : Multi_Type)
+      return Boolean;
 
-   procedure Set_Theme_Mod (Name  : String;
-                            Value : Integer);
+   procedure Set_Theme_Mod (Name : Modification_Name; Value : Multi_Type);
+
+   --
+   -- Removes theme modification name from active theme list.
+   --
+   -- If removing the name also removes all elements, then the entire option
+   -- will be removed.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string name Theme modification name.
+   --
+   procedure Remove_Theme_Mod (Name : Modification_Name);
+
+   --
+   -- Removes theme modifications option for the active theme.
+   --
+   -- @since 2.1.0
+   --
+   procedure Remove_Theme_Mods;
 
    --
    -- Checks whether a header image is set or not.
@@ -500,8 +507,7 @@ is
    --
    -- @return bool Whether a header image is set or not.
    --
-   function Has_Header_Image
-            return Boolean;
+   function Has_Header_Image return Boolean;
 
    --
    -- Retrieves header image for custom header.
@@ -510,8 +516,7 @@ is
    --
    -- @return string|false
    --
-   function Get_Header_Image
-            return String;
+   function Get_Header_Image return String;
 
    --
    -- Gets random header image data from registered images in theme.
@@ -524,8 +529,7 @@ is
    --
    -- @return object
    --
-   function X_Get_Random_Header_Data
-            return Duration;
+   function X_Get_Random_Header_Data return Duration;
 
    --
    -- Gets random header image URL from registered images in theme.
@@ -534,8 +538,7 @@ is
    --
    -- @return string Path to header image.
    --
-   function Get_Random_Header_Image
-            return String;
+   function Get_Random_Header_Image return String;
 
    --
    -- Retrieves background image for custom background.
@@ -544,8 +547,7 @@ is
    --
    -- @return string
    --
-   function Get_Background_Image
-            return String;
+   function Get_Background_Image return String;
 
    --
    -- Gets the theme support arguments passed when registering that support.
@@ -569,17 +571,14 @@ is
    --               feature.
    --
    -- function get_theme_support( feature, ...args ) then
-   function Get_Theme_Support (Feature : String;
-                               T       : String := "")
-                               return List_Type;
+   function Get_Theme_Support
+     (Feature : String; T : String := "") return List_Type;
 
-   function Get_Theme_Support (Feature : String;
-                               T       : String := "")
-                               return Boolean;
+   function Get_Theme_Support
+     (Feature : String; T : String := "") return Boolean;
 
-   function Get_Theme_Support (Feature : String;
-                               T       : String := "")
-                               return String;
+   function Get_Theme_Support
+     (Feature : String; T : String := "") return String;
 
    --
    -- Whether the site is being previewed in the Customizer.
@@ -591,8 +590,7 @@ is
    -- @return bool True if the site is being previewed in the Customizer, false
    --              otherwise.
    --
-   function Is_Customize_Preview
-            return Boolean;
+   function Is_Customize_Preview return Boolean;
 
    --
    -- Returns a URL to load the Customizer.
@@ -603,8 +601,7 @@ is
    --                           The theme"s stylesheet will be urlencoded if necessary.
    -- @return string
    --
-   function Wp_Customize_URL (Stylesheet : String := "")
-                              return String;
+   function Wp_Customize_URL (Stylesheet : String := "") return String;
 
    --
    -- Prints a script to check whether or not the Customizer is supported,
@@ -626,8 +623,8 @@ is
    --
    procedure Wp_Customize_Support_Script;
 
-   function Wp_Customize_Support_Script
-     is new Helpers_2.Generic_Call_Procedure (Wp_Customize_Support_Script);
+   function Wp_Customize_Support_Script is new
+     Helpers_2.Generic_Call_Procedure (Wp_Customize_Support_Script);
 
    --
    -- Returns whether the active theme is a block-based theme or not.
@@ -636,8 +633,7 @@ is
    --
    -- @return boolean Whether the active theme is a block-based theme or not.
    --
-   function Wp_Is_Block_Theme
-            return Boolean;
+   function Wp_Is_Block_Theme return Boolean;
 
    --
    -- Registers a theme feature for use in add_theme_support().
@@ -689,8 +685,7 @@ is
    --
    Feature_Error : exception;
 
-   procedure Register_Theme_Feature (Feature : String;
-                                     Args    : Array_Type);
+   procedure Register_Theme_Feature (Feature : String; Args : Array_Type);
 
    --
    -- Includes and instantiates the WP_Customize_Manager class.
@@ -707,8 +702,8 @@ is
    --
    procedure X_Wp_Customize_Include;
 
-   function X_Wp_Customize_Include
-     is new Helpers_2.Generic_Call_Procedure (X_Wp_Customize_Include);
+   function X_Wp_Customize_Include is new
+     Helpers_2.Generic_Call_Procedure (X_Wp_Customize_Include);
 
    --
    -- Registers theme support for a given feature.
@@ -789,9 +784,10 @@ is
    --
    Support_Error : exception;
 
-   procedure Add_Theme_Support (Feature : String;
-                                List    : List_Type  := Empty_List;
-                                Arry    : Array_Type := Empty_Array); -- ...args
+   procedure Add_Theme_Support
+     (Feature : String;
+      List    : List_Type := Empty_List;
+      Arry    : Array_Type := Empty_Array); -- ...args
 
    --
    -- Adds CSS to hide header text for custom logo, based on Customizer setting.
@@ -801,8 +797,8 @@ is
    --
    procedure X_Custom_Logo_Header_Styles;
 
-   function X_Custom_Logo_Header_Styles
-     is new Helpers_2.Generic_Call_Procedure (X_Custom_Logo_Header_Styles);
+   function X_Custom_Logo_Header_Styles is new
+     Helpers_2.Generic_Call_Procedure (X_Custom_Logo_Header_Styles);
 
    --
    -- Creates the initial theme features when the "setup_theme" action is fired.
@@ -814,8 +810,8 @@ is
    --
    procedure Create_Initial_Theme_Features;
 
-   function Create_Initial_Theme_Features
-     is new Helpers_2.Generic_Call_Procedure (Create_Initial_Theme_Features);
+   function Create_Initial_Theme_Features is new
+     Helpers_2.Generic_Call_Procedure (Create_Initial_Theme_Features);
 
    --
    -- Adds default theme supports for block themes when the "setup_theme" action fires.
@@ -827,7 +823,7 @@ is
    --
    procedure X_Add_Default_Theme_Supports;
 
-   function X_Add_Default_Theme_Supports
-     is new Helpers_2.Generic_Call_Procedure (X_Add_Default_Theme_Supports);
+   function X_Add_Default_Theme_Supports is new
+     Helpers_2.Generic_Call_Procedure (X_Add_Default_Theme_Supports);
 
 end Inc_Themes;

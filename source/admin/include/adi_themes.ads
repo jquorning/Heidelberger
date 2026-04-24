@@ -5,13 +5,161 @@
 -- @subpackage Administration
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
+-- with Ada.Containers.Vectors;
+
 with Arrays;
+with UStrings;
 
 with Class_Errors;
+with Class_Themes;
 
 package Adi_Themes
 is
    use Arrays;
+
+   -- @param array|object args   {
+   --     Optional. Array or object of arguments to serialize for the Themes API.
+   --
+   --     @type string  slug     The theme slug. Default empty.
+   --     @type int     per_page Number of themes per page. Default 24.
+   --     @type int     page     Number of current page. Default 1.
+   --     @type int     number   Number of tags to be queried.
+   --     @type string  search   A search term. Default empty.
+   --     @type string  tag      Tag to filter themes. Default empty.
+   --     @type string  author   Username of an author to filter themes. Default empty.
+   --     @type string  user     Username to query for their favorites. Default empty.
+   --     @type string  browse   Browse view: "featured", "popular", "updated", "favorites".
+   --     @type string  locale   Locale to provide context-sensitive results. Default is the value of get_locale().
+   --     @type array   fields   {
+   --         Array of fields which should or should not be returned.
+   --
+   --         @type bool description        Whether to return the theme full
+   --                                       description. Default false.
+   --         @type bool sections           Whether to return the theme readme
+   --                                       sections: description, installation,  FAQ,
+   --                                       screenshots, other notes, and changelog.
+   --                                       Default false.
+   --         @type bool rating             Whether to return the rating in percent
+   --                                       and total number of ratings. Default false.
+   --         @type bool ratings            Whether to return the number of rating for
+   --                                       each star (1-5). Default false.
+   --         @type bool downloaded         Whether to return the download count.
+   --                                       Default false.
+   --         @type bool downloadlink       Whether to return the download link for
+   --                                       the package. Default false.
+   --         @type bool last_updated       Whether to return the date of the last
+   --                                       update. Default false.
+   --         @type bool tags               Whether to return the assigned tags.
+   --                                       Default false.
+   --         @type bool homepage           Whether to return the theme homepage link.
+   --                                       Default false.
+   --         @type bool screenshots        Whether to return the screenshots. Default
+   --                                       false.
+   --         @type int  screenshot_count   Number of screenshots to return. Default 1.
+   --         @type bool screenshot_url     Whether to return the URL of the first
+   --                                       screenshot. Default false.
+   --         @type bool photon_screenshots Whether to return the screenshots via
+   --                                       Photon. Default false.
+   --         @type bool template           Whether to return the slug of the parent
+   --                                       theme. Default false.
+   --         @type bool parent             Whether to return the slug, name and
+   --                                       homepage of the parent theme. Default
+   --                                       false.
+   --         @type bool versions           Whether to return the list of all
+   --                                       available versions. Default false.
+   --         @type bool theme_url          Whether to return theme's URL. Default
+   --                                       false.
+   --         @type bool extended_author    Whether to return nicename or nicename and
+   --                                       display name. Default false.
+   --     }
+   -- }
+   type Themes_API_Args is record
+      Slug     : UStrings.UString;   -- The theme slug. Default empty.
+      Per_Page : Natural;   -- Number of themes per page. Default 24.
+      Page     : Natural;   -- Number of current page. Default 1.
+      Number   : Natural;   -- Number of tags to be queried.
+      Search   : UStrings.UString;   -- A search term. Default empty.
+      Tag      : UStrings.UString;   -- Tag to filter themes. Default empty.
+
+      Author : UStrings.UString;
+      -- Username of an author to filter themes. Default empty.
+
+      User : UStrings.UString;
+      -- Username to query for their favorites. Default empty.
+
+      Browse : UStrings.UString;
+      -- Browse view: "featured", "popular", "updated", "favorites".
+
+      Locale : UStrings.UString;
+      -- Locale to provide context-sensitive results. Default is the value of get_locale().
+
+      Fields : Array_Type;   --     @type array   fields   {
+   end record;
+
+   Empty_Themes_API_Args : constant Themes_API_Args :=
+     (Per_Page | Page | Number => 0,
+      Fields                   => Empty_Array,
+      others                   => UStrings.Null_UString);
+
+   function To_Array (Args : Themes_API_Args) return Array_Type;
+
+   -- @param stdClass theme {
+   --     An object that contains theme data returned by the WordPress.org API.
+   --
+   --     @type string name           Theme name, e.g. "Twenty Twenty-One".
+   --     @type string slug           Theme slug, e.g. "twentytwentyone".
+   --     @type string version        Theme version, e.g. "1.1".
+   --     @type string author         Theme author username, e.g. "melchoyce".
+   --     @type string preview_url    Preview URL, e.g. "https://2021.wordpress.net/".
+   --     @type string screenshot_url Screenshot URL, e.g. "https://wordpress.org/themes/twentytwentyone/".
+   --     @type float  rating         Rating score.
+   --     @type int    num_ratings    The number of ratings.
+   --     @type string homepage       Theme homepage, e.g. "https://wordpress.org/themes/twentytwentyone/".
+   --     @type string description    Theme description.
+   --     @type string download_link  Theme ZIP download URL.
+   -- }
+   type Theme_API_Type is record
+      Name    : UStrings.UString; -- Theme name, e.g. "Twenty Twenty-One".
+      Slug    : UStrings.UString; -- Theme slug, e.g. "twentytwentyone".
+      Version : UStrings.UString; -- Theme version, e.g. "1.1".
+
+      Author  : UStrings.UString;
+      -- Theme author username, e.g. "melchoyce".
+
+      Preview_URL : UStrings.UString;
+      -- Preview URL, e.g. "https://2021.wordpress.net/".
+
+      Screenshot_URL : UStrings.UString;
+      -- Screenshot URL, e.g. "https://wordpress.org/themes/twentytwentyone/".
+
+      Rating      : Float; -- Rating score.
+      Num_Ratings : Integer; -- The number of ratings.
+
+      Homepage : UStrings.UString;
+      -- Theme homepage, e.g. "https://wordpress.org/themes/twentytwentyone/".
+
+      Description   : UStrings.UString; -- Theme description.
+      Download_Link : UStrings.UString; -- Theme ZIP download URL.
+   end record;
+
+   function To_Array (Args : Theme_API_Type) return Array_Type;
+
+   package Theme_API_Lists is new
+     Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type     => String,
+        Element_Type => Theme_API_Type);
+   -- package Theme_API_Lists is new
+   --   Ada.Containers.Vectors
+   --     (Index_Type   => Positive,
+   --      Element_Type => Theme_API_Type);
+
+   subtype Theme_API_List is Theme_API_Lists.Map;
+   -- subtype Theme_API_List is Theme_API_Lists.Vector;
+
+   Empty_Theme_API_List : constant Theme_API_List :=
+     Theme_API_Lists.Empty_Map;
+     -- Theme_API_Lists.Empty_Vector;
 
    type Bool_Error_Type is record
       Success : Boolean;
@@ -66,32 +214,32 @@ is
 --         return str_replace( dirname( dirname( containingfolder ) ), "", fullpath );
 -- end;
 
--- --
--- -- Check if there is an update for a theme available.
--- --
--- -- Will display link, if there is an update available.
--- --
--- -- @since 2.7.0
--- --
--- -- @see get_theme_update_available()
--- --
--- -- @param WP_Theme theme Theme data object.
--- --
--- function theme_update_available( theme ) then
---         echo get_theme_update_available( theme );
--- end;
+   --
+   -- Check if there is an update for a theme available.
+   --
+   -- Will display link, if there is an update available.
+   --
+   -- @since 2.7.0
+   --
+   -- @see get_theme_update_available()
+   --
+   -- @param WP_Theme theme Theme data object.
+   --
+   procedure Theme_Update_Available (Theme : in out Class_Themes.Wp_Theme);
 
--- --
--- -- Retrieves the update link if there is a theme update available.
--- --
--- -- Will return a link if there is an update available.
--- --
--- -- @since 3.8.0
--- --
--- -- @param WP_Theme theme WP_Theme object.
--- -- @return string|false HTML for the update link, or false if invalid info was passed.
--- --
--- function get_theme_update_available( theme ) then
+   --
+   -- Retrieves the update link if there is a theme update available.
+   --
+   -- Will return a link if there is an update available.
+   --
+   -- @since 3.8.0
+   --
+   -- @param WP_Theme theme WP_Theme object.
+   -- @return string|false HTML for the update link, or false if invalid
+   --                      info was passed.
+   --
+   function Get_Theme_Update_Available
+     (Theme : in out Class_Themes.Wp_Theme) return String;
 --         static themes_update = null;
 
 --         if ( ! current_user_can( "update_themes" ) ) then
@@ -177,41 +325,41 @@ is
 --         return html;
 -- end;
 
--- --
--- -- Retrieves list of WordPress theme features (aka theme tags).
--- --
--- -- @since 3.1.0
--- -- @since 3.2.0 Added "Gray" color and "Featured Image Header", "Featured Images",
--- --              "Full Width Template", and "Post Formats" features.
--- -- @since 3.5.0 Added "Flexible Header" feature.
--- -- @since 3.8.0 Renamed "Width" filter to "Layout".
--- -- @since 3.8.0 Renamed "Fixed Width" and "Flexible Width" options
--- --              to "Fixed Layout" and "Fluid Layout".
--- -- @since 3.8.0 Added "Accessibility Ready" feature and "Responsive Layout" option.
--- -- @since 3.9.0 Combined "Layout" and "Columns" filters.
--- -- @since 4.6.0 Removed "Colors" filter.
--- -- @since 4.6.0 Added "Grid Layout" option.
--- --              Removed "Fixed Layout", "Fluid Layout", and "Responsive Layout" options.
--- -- @since 4.6.0 Added "Custom Logo" and "Footer Widgets" features.
--- --              Removed "Blavatar" feature.
--- -- @since 4.6.0 Added "Blog", "E-Commerce", "Education", "Entertainment", "Food & Drink",
--- --              "Holiday", "News", "Photography", and "Portfolio" subjects.
--- --              Removed "Photoblogging" and "Seasonal" subjects.
--- -- @since 4.9.0 Reordered the filters from "Layout", "Features", "Subject"
--- --              to "Subject", "Features", "Layout".
--- -- @since 4.9.0 Removed "BuddyPress", "Custom Menu", "Flexible Header",
--- --              "Front Page Posting", "Microformats", "RTL Language Support",
--- --              "Threaded Comments", and "Translation Ready" features.
--- -- @since 5.5.0 Added "Block Editor Patterns", "Block Editor Styles",
--- --              and "Full Site Editing" features.
--- -- @since 5.5.0 Added "Wide Blocks" layout option.
--- -- @since 5.8.1 Added "Template Editing" feature.
--- -- @since 6.1.1 Replaced "Full Site Editing" feature name with "Site Editor".
--- --
--- -- @param bool api Optional. Whether try to fetch tags from the WordPress.org API. Defaults to true.
--- -- @return array Array of features keyed by category with translations keyed by slug.
--- --
--- function get_theme_feature_list( api = true ) then
+   --
+   -- Retrieves list of WordPress theme features (aka theme tags).
+   --
+   -- @since 3.1.0
+   -- @since 3.2.0 Added "Gray" color and "Featured Image Header", "Featured Images",
+   --              "Full Width Template", and "Post Formats" features.
+   -- @since 3.5.0 Added "Flexible Header" feature.
+   -- @since 3.8.0 Renamed "Width" filter to "Layout".
+   -- @since 3.8.0 Renamed "Fixed Width" and "Flexible Width" options
+   --              to "Fixed Layout" and "Fluid Layout".
+   -- @since 3.8.0 Added "Accessibility Ready" feature and "Responsive Layout" option.
+   -- @since 3.9.0 Combined "Layout" and "Columns" filters.
+   -- @since 4.6.0 Removed "Colors" filter.
+   -- @since 4.6.0 Added "Grid Layout" option.
+   --              Removed "Fixed Layout", "Fluid Layout", and "Responsive Layout" options.
+   -- @since 4.6.0 Added "Custom Logo" and "Footer Widgets" features.
+   --              Removed "Blavatar" feature.
+   -- @since 4.6.0 Added "Blog", "E-Commerce", "Education", "Entertainment", "Food & Drink",
+   --              "Holiday", "News", "Photography", and "Portfolio" subjects.
+   --              Removed "Photoblogging" and "Seasonal" subjects.
+   -- @since 4.9.0 Reordered the filters from "Layout", "Features", "Subject"
+   --              to "Subject", "Features", "Layout".
+   -- @since 4.9.0 Removed "BuddyPress", "Custom Menu", "Flexible Header",
+   --              "Front Page Posting", "Microformats", "RTL Language Support",
+   --              "Threaded Comments", and "Translation Ready" features.
+   -- @since 5.5.0 Added "Block Editor Patterns", "Block Editor Styles",
+   --              and "Full Site Editing" features.
+   -- @since 5.5.0 Added "Wide Blocks" layout option.
+   -- @since 5.8.1 Added "Template Editing" feature.
+   -- @since 6.1.1 Replaced "Full Site Editing" feature name with "Site Editor".
+   --
+   -- @param bool api Optional. Whether try to fetch tags from the WordPress.org API. Defaults to true.
+   -- @return array Array of features keyed by category with translations keyed by slug.
+   --
+   function Get_Theme_Feature_List (API : Boolean := True) return Array_Type;
 --         // Hard-coded list is used if API is not accessible.
 --         features = array(
 
@@ -318,15 +466,15 @@ is
    -- offer more choices. This is very powerful and must be used with care, when
    -- overriding the filters.
    --
-   -- The first filter, then@see "themes_api_args"end;, is for the args and gives the action
-   -- as the second parameter. The hook for then@see "themes_api_args"end; must ensure that
+   -- The first filter, {@see "themes_api_args"}, is for the args and gives the action
+   -- as the second parameter. The hook for {@see "themes_api_args"} must ensure that
    -- an object is returned.
    --
-   -- The second filter, then@see "themes_api"end;, allows a plugin to override the WordPress.org
+   -- The second filter, {@see "themes_api"}, allows a plugin to override the WordPress.org
    -- Theme API entirely. If `action` is "query_themes", "theme_information", or "feature_list",
    -- an object MUST be passed. If `action` is "hot_tags", an array should be passed.
    --
-   -- Finally, the third filter, then@see "themes_api_result"end;, makes it possible to filter the
+   -- Finally, the third filter, {@see "themes_api_result"}, makes it possible to filter the
    -- response object or array, depending on the `action` type.
    --
    -- Supported arguments per action:
@@ -411,15 +559,22 @@ is
    --         function reference article} for more information on the make-up of
    --         possible return objects depending on the value of `action`.
    --
-   type Array_Error_Type is record
+   type Themes_API_Result is record
       Success : Boolean;
-      Arry    : Array_Type;
+      Themes  : Theme_API_List;
       Error   : Class_Errors.Wp_Error;
    end record;
 
-   function Themes_API (Action : String;
-                        Args   : Array_Type := Empty_Array)
-                        return Array_Error_Type;
+   Empty_Themes_API_Result : constant Themes_API_Result :=
+     (Success => False,
+      Themes  => Empty_Theme_API_List,
+      Error   => Class_Errors.Null_Wp_Error);
+
+   function Themes_API
+     (Action : String;
+      Args   : Themes_API_Args :=
+        Empty_Themes_API_Args) -- Array_Type := Empty_Array)
+      return Themes_API_Result;
 
    --
    -- Prepares themes for JavaScript.
@@ -431,8 +586,9 @@ is
    --
    -- @return array An associative array of theme data, sorted by name.
    --
-   function Wp_Prepare_Themes_For_JS (Themes : Array_Type := Empty_Array) -- null
-                                      return Array_Type;
+   function Wp_Prepare_Themes_For_JS
+     (Themes : Class_Themes.Theme_Array := Class_Themes.Empty_Theme_Array) -- Array_Type := Empty_Array)
+      return Array_Type;
 
 -- --
 -- -- Prints JS templates for the theme-browsing UI in the Customizer.

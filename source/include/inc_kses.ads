@@ -66,6 +66,8 @@ is
                      Allowed_Protocols : List_Type := Empty_List)
                      return String;
 
+   function Wp_KSES (Item : String; Allowed_HTML : String) return String;
+
    --
    -- Returns an array of allowed HTML tags and attributes for a given context.
    --
@@ -442,6 +444,21 @@ is
    --
    function X_Wp_KSES_Decode_Entities_Chr_Hexdec (Match : List_Type)
                                                   return String;
+
+   --
+   -- Sanitizes content for allowed HTML tags for post content.
+   --
+   -- Post content refers to the page contents of the "post" type and not `$_POST`
+   -- data from forms.
+   --
+   -- This function expects unslashed data.
+   --
+   -- @since 2.9.0
+   --
+   -- @param string $data Post content to filter.
+   -- @return string Filtered post content with allowed HTML tags and attributes intact.
+   --
+   function Wp_KSES_Post (Data : String) return String;
 
    --
    -- Filters an inline style attribute and removes disallowed rules.

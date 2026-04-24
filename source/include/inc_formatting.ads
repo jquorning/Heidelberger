@@ -1221,6 +1221,10 @@ is
    function Wp_Unslash (Value : String)
                         return String;
 
+   function Wp_Unslash (Value : Array_Type)
+                        return Array_Type
+   is (raise Program_Error with "not implemented");
+
    function Wp_Unslash (Value : String)
                         return List_Type
    is (raise Program_Error with "not implemented");

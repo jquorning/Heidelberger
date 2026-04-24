@@ -12,129 +12,126 @@ with UStrings;
 
 with Class_Screens;
 
-package Class_List_Tables
-is
+package Class_List_Tables is
    use Arrays;
    use Lists;
 
-   type Columns_Type is
-      record
-         Columns  : Array_Type;
-         Hidden   : Array_Type;
-         Sortable : Array_Type;
-         Primary  : UStrings.UString;
-      end record;
+   type Columns_Type is record
+      Columns  : Array_Type;
+      Hidden   : Array_Type;
+      Sortable : Array_Type;
+      Primary  : UStrings.UString;
+   end record;
 
    --
    -- Base class for displaying a list of items in an ajaxified HTML table.
    --
    -- @since 3.1.0
    --
--- #[AllowDynamicProperties]
-   type Wp_List_Table is tagged
-      record
+   -- #[AllowDynamicProperties]
+   type Wp_List_Table is tagged record
 
-         --
-         -- The current list of items.
-         --
-         -- @since 3.1.0
-         -- @var array
-         --
-         Items : Array_Type;
+      --
+      -- The current list of items.
+      --
+      -- @since 3.1.0
+      -- @var array
+      --
+      Items : Array_Type;
 
-         --
-         -- Various information about the current table.
-         --
-         -- @since 3.1.0
-         -- @var array
-         --
-         -- protected
-         X_Args : Array_Type;
+      --
+      -- Various information about the current table.
+      --
+      -- @since 3.1.0
+      -- @var array
+      --
+      -- protected
+      X_Args : Array_Type;
 
-         --
-         -- Various information needed for displaying the pagination.
-         --
-         -- @since 3.1.0
-         -- @var array
-         --
-         -- protected
-         X_Pagination_Args : Array_Type;
+      --
+      -- Various information needed for displaying the pagination.
+      --
+      -- @since 3.1.0
+      -- @var array
+      --
+      -- protected
+      X_Pagination_Args : Array_Type;
 
-         --
-         -- The current screen.
-         --
-         -- @since 3.1.0
-         -- @var WP_Screen
-         --
---         protected
-          Screen : Class_Screens.Wp_Screen;
+      --
+      -- The current screen.
+      --
+      -- @since 3.1.0
+      -- @var WP_Screen
+      --
+      --         protected
+      Screen : Class_Screens.Wp_Screen;
 
-         --
-         -- Cached bulk actions.
-         --
-         -- @since 3.1.0
-         -- @var array
-         --
-         -- private
-         X_Actions : Array_Type;
+      --
+      -- Cached bulk actions.
+      --
+      -- @since 3.1.0
+      -- @var array
+      --
+      -- private
+      X_Actions : Array_Type;
 
-         --
-         -- Cached pagination output.
-         --
-         -- @since 3.1.0
-         -- @var string
-         --
-         X_Pagination : UStrings.UString;
+      --
+      -- Cached pagination output.
+      --
+      -- @since 3.1.0
+      -- @var string
+      --
+      X_Pagination : UStrings.UString;
 
-         --
-         -- The view switcher modes.
-         --
-         -- @since 4.1.0
-         -- @var array
-         --
-         -- protected
-         Modes : Array_Type;
+      --
+      -- The view switcher modes.
+      --
+      -- @since 4.1.0
+      -- @var array
+      --
+      -- protected
+      Modes : Array_Type;
 
-         --
-         -- Stores the value returned by .get_column_info().
-         --
-         -- @since 4.1.0
-         -- @var array
-         --
-         -- protected
-         X_Column_Headers : Columns_Type; -- Array_Type;
+      --
+      -- Stores the value returned by .get_column_info().
+      --
+      -- @since 4.1.0
+      -- @var array
+      --
+      -- protected
+      X_Column_Headers : Columns_Type; -- Array_Type;
 
---         --
---         -- then@internal Missing Summaryend;
---         --
---         -- @var array
---         --
---         protected compat_fields = array( "_args", "_pagination_args", "screen", "_actions", "_pagination" );
+      --         --
+      --         -- then@internal Missing Summaryend;
+      --         --
+      --         -- @var array
+      --         --
+      --         protected compat_fields = array( "_args", "_pagination_args", "screen", "_actions", "_pagination" );
 
---         --
---         -- then@internal Missing Summaryend;
---         --
---         -- @var array
---         --
---         protected compat_methods = array(
---                 "set_pagination_args",
---                 "get_views",
---                 "get_bulk_actions",
---                 "bulk_actions",
---                 "row_actions",
---                 "months_dropdown",
---                 "view_switcher",
---                 "comments_bubble",
---                 "get_items_per_page",
---                 "pagination",
---                 "get_sortable_columns",
---                 "get_column_info",
---                 "get_table_classes",
---                 "display_tablenav",
---                 "extra_tablenav",
---                 "single_row_columns",
---         );
-      end record;
+      --         --
+      --         -- then@internal Missing Summaryend;
+      --         --
+      --         -- @var array
+      --         --
+      --         protected compat_methods = array(
+      --                 "set_pagination_args",
+      --                 "get_views",
+      --                 "get_bulk_actions",
+      --                 "bulk_actions",
+      --                 "row_actions",
+      --                 "months_dropdown",
+      --                 "view_switcher",
+      --                 "comments_bubble",
+      --                 "get_items_per_page",
+      --                 "pagination",
+      --                 "get_sortable_columns",
+      --                 "get_column_info",
+      --                 "get_table_classes",
+      --                 "display_tablenav",
+      --                 "extra_tablenav",
+      --                 "single_row_columns",
+      --         );
+   end record;
 
    --
    -- Constructor.
@@ -163,8 +160,27 @@ is
    --                            will be automatically set. Default null.
    -- }
    --
-   function X_Construct (Args : Array_Type := Empty_Array)
-                         return Wp_List_Table;
+   function X_Construct
+     (Args : Array_Type := Empty_Array) return Wp_List_Table;
+
+   --
+   -- An internal method that sets all the necessary pagination arguments
+   --
+   -- @since 3.1.0
+   --
+   -- @param array|string args Array or string of arguments with information about the pagination.
+   --
+   -- protected
+   procedure Set_Pagination_Args
+     (This : in out Wp_List_Table; Args : Array_Type);
+
+   --
+   -- Checks the current user's permissions
+   --
+   -- @since 3.1.0
+   -- @abstract
+   --
+   procedure Ajax_User_Can (This : Wp_List_Table);
 
    --
    -- Prepares the list of items for displaying.
@@ -174,8 +190,7 @@ is
    -- @since 3.1.0
    -- @abstract
    --
-   procedure Prepare_Items (This : Wp_List_Table)
-                            is null;
+   procedure Prepare_Items (This : in out Wp_List_Table);
 
    --
    -- Access the pagination args.
@@ -187,10 +202,9 @@ is
    --                    "total_pages", "per_page", or "infinite_scroll".
    -- @return int Number of items that correspond to the given pagination argument.
    --
-   function Get_Pagination_Arg (This : Wp_List_Table;
-                                Key  : String)
-                                return Natural
-                                is (0);
+   function Get_Pagination_Arg
+     (This : Wp_List_Table; Key : String) return Natural
+   is (0);
 
    --
    -- Whether the table has items to display or not
@@ -199,8 +213,7 @@ is
    --
    -- @return bool
    --
-   function Has_Items (This : Wp_List_Table)
-                       return Boolean;
+   function Has_Items (This : Wp_List_Table) return Boolean;
 
    --
    -- Message to be displayed when there are no items
@@ -217,9 +230,27 @@ is
    -- @param string text     The "submit" button label.
    -- @param string input_id ID attribute value for the search input field.
    --
-   procedure Search_Box (This     : Wp_List_Table;
-                         Text     : String;
-                         Input_Id : String);
+   procedure Search_Box
+     (This : Wp_List_Table; Text : String; Input_Id : String);
+
+   --
+   -- Generates views links.
+   --
+   -- @since 6.1.0
+   --
+   -- @param array link_data then
+   --     An array of link data.
+   --
+   --     @type string url     The link URL.
+   --     @type string label   The link label.
+   --     @type bool   current Optional. Whether this is the currently selected view.
+   -- end;
+   -- @return array An array of link markup. Keys match the `link_data` input array.
+   --
+   -- protected
+   function Get_Views_Links
+     (This : Wp_List_Table; Link_Data : Array_Type := Empty_Array)
+      return Array_Type;
 
    --
    -- Gets the list of views available on this table.
@@ -232,8 +263,7 @@ is
    -- @return array
    --
    -- protected
-   function Get_Views (This : Wp_List_Table)
-            return Array_Type;
+   function Get_Views (This : Wp_List_Table) return Array_Type;
 
    --
    -- Displays the list of views available on this table.
@@ -273,8 +303,7 @@ is
    -- @return array
    --
    -- protected
-   function Get_Bulk_Actions (This : Wp_List_Table)
-                              return Array_Type;
+   function Get_Bulk_Actions (This : Wp_List_Table) return Array_Type;
 
    --
    -- Gets the current action selected from the bulk actions dropdown.
@@ -283,9 +312,8 @@ is
    --
    -- @return string|false The action name. False if no action was selected.
    --
-   function Current_Action (This : Wp_List_Table)
-                            return String
-                            is ("XXX-450");
+   function Current_Action (This : Wp_List_Table) return String
+   is ("XXX-450");
 
    --
    -- Gets the current page number.
@@ -294,9 +322,8 @@ is
    --
    -- @return int
    --
-   function Get_Pagenum (This : Wp_List_Table)
-                         return Natural
-                         is (1);
+   function Get_Pagenum (This : Wp_List_Table) return Natural
+   is (1);
 
    --
    -- Returns the number of visible columns.
@@ -305,8 +332,8 @@ is
    --
    -- @return int
    --
-   function Get_Column_Count (This : in out Wp_List_Table'Class)
-                              return Natural;
+   function Get_Column_Count
+     (This : in out Wp_List_Table'Class) return Natural;
 
    --
    -- Prints column headers, accounting for hidden and sortable columns.
@@ -315,8 +342,8 @@ is
    --
    -- @param bool with_id Whether to set the ID attribute or not
    --
-   procedure Print_Column_Headers (This    : in out Wp_List_Table'Class;
-                                   With_Id : Boolean := True);
+   procedure Print_Column_Headers
+     (This : in out Wp_List_Table'Class; With_Id : Boolean := True);
 
    --
    -- Displays the bulk actions dropdown.
@@ -327,8 +354,7 @@ is
    --                      This is designated as optional for backward compatibility.
    --
    -- protected
-   procedure Bulk_Actions (This  : in out Wp_List_Table;
-                           Which : String := "");
+   procedure Bulk_Actions (This : in out Wp_List_Table; Which : String := "");
 
    --
    -- Generates the required HTML for a list of row action links.
@@ -340,10 +366,11 @@ is
    -- @return string The HTML for the row actions.
    --
    -- protected
-   function Row_Actions (This           : Wp_List_Table;
-                         Actions        : Array_Type; -- List_Type;
-                         Always_Visible : Boolean := False)
-                         return String
+   function Row_Actions
+     (This           : Wp_List_Table;
+      Actions        : Array_Type;
+      -- List_Type;
+      Always_Visible : Boolean := False) return String
    is (raise Program_Error with "not implemented");
 
    --
@@ -354,8 +381,8 @@ is
    -- @return string Name of the default primary column, in this case, an empty string.
    --
    -- protected
-   function Get_Default_Primary_Column_Name (This : Wp_List_Table'Class)
-                                             return String;
+   function Get_Default_Primary_Column_Name
+     (This : Wp_List_Table'Class) return String;
 
    --
    -- Gets the name of the primary column.
@@ -365,8 +392,7 @@ is
    -- @return string The name of the primary column.
    --
    -- protected
-   function Get_Primary_Column_Name (This : Wp_List_Table'Class)
-                                     return String;
+   function Get_Primary_Column_Name (This : Wp_List_Table'Class) return String;
 
    --
    -- Gets a list of all, hidden, and sortable columns, with filter applied.
@@ -376,8 +402,8 @@ is
    -- @return array
    --
    -- protected
-   function Get_Column_Info (This : in out Wp_List_Table'Class)
-                             return Columns_Type; -- Array_Type;
+   function Get_Column_Info
+     (This : in out Wp_List_Table'Class) return Columns_Type; -- Array_Type;
 
    --
    -- Displays the table.
@@ -394,8 +420,7 @@ is
    -- @return string[] Array of CSS classes for the table tag.
    --
    -- protected
-   function Get_Table_Classes (This : Wp_List_Table)
-                               return List_Type;
+   function Get_Table_Classes (This : Wp_List_Table) return List_Type;
 
    --
    -- Generates the table navigation above or below the table
@@ -404,8 +429,7 @@ is
    -- @param string which
    --
    -- protected
-   procedure Display_Tablenav (This  : in out Wp_List_Table;
-                               Which : String);
+   procedure Display_Tablenav (This : in out Wp_List_Table; Which : String);
 
    --
    -- Extra controls to be displayed between bulk actions and pagination.
@@ -415,8 +439,7 @@ is
    -- @param string which
    --
    -- protected
-   procedure Extra_Tablenav (This  : Wp_List_Table;
-                             Which : String);
+   procedure Extra_Tablenav (This : Wp_List_Table; Which : String);
 
    --
    -- Generates the tbody element for the list table.
@@ -439,24 +462,21 @@ is
    --
    -- @param object|array item The current item
    --
-   procedure Single_Row (This : in out Wp_List_Table;
-                         Item : Array_Type);
+   procedure Single_Row (This : in out Wp_List_Table; Item : Array_Type);
 
    --
    -- @param object|array item
    -- @param string column_name
    --
    -- protected
-   procedure Column_Default (This        : Wp_List_Table;
-                             Item        : Array_Type;
-                             Column_Name : String);
+   procedure Column_Default
+     (This : Wp_List_Table; Item : Array_Type; Column_Name : String);
 
    --
    -- @param object|array item
    --
    -- protected
-   procedure Column_CB (This : Wp_List_Table;
-                        Item : Array_Type);
+   procedure Column_CB (This : Wp_List_Table; Item : Array_Type);
 
    --
    -- Generates the columns for a single row of the table.
@@ -466,8 +486,8 @@ is
    -- @param object|array item The current item.
    --
    -- protected
-   procedure Single_Row_Columns (This : in out Wp_List_Table;
-                                 Item : Array_Type);
+   procedure Single_Row_Columns
+     (This : in out Wp_List_Table; Item : Array_Type);
 
    --
    -- Generates and display row actions links for the list table.
@@ -481,11 +501,11 @@ is
    --                if the current column is not the primary column.
    --
    -- protected
-   function Handle_Row_Actions (This        : Wp_List_Table;
-                                Item        : Array_Type;
-                                Column_Name : String;
-                                Primary     : String)
-                                return String;
+   function Handle_Row_Actions
+     (This        : Wp_List_Table;
+      Item        : Array_Type;
+      Column_Name : String;
+      Primary     : String) return String;
 
    --
    -- Displays the pagination.
@@ -495,8 +515,7 @@ is
    -- @param string which
    --
    -- protected
-   procedure Pagination (This  : in out Wp_List_Table;
-                         Which : String);
+   procedure Pagination (This : in out Wp_List_Table; Which : String);
 
    --
    -- Gets a list of columns.
@@ -509,8 +528,7 @@ is
    --
    -- @return array
    --
-   function Get_Columns (This : Wp_List_Table)
-                         return Array_Type;
+   function Get_Columns (This : Wp_List_Table) return Array_Type;
 
    --
    -- Gets a list of sortable columns.
@@ -527,7 +545,23 @@ is
    -- @return array
    --
    -- protected
-   function Get_Sortable_Columns (This : Wp_List_Table)
-                                  return Array_Type;
+   function Get_Sortable_Columns (This : Wp_List_Table) return Array_Type;
+
+   --
+   -- Handles an incoming ajax request (called from admin-ajax.php)
+   --
+   -- @since 3.1.0
+   --
+   procedure Ajax_Response (This : in out Wp_List_Table);
+
+   --
+   -- Sends required variables to JavaScript land.
+   --
+   -- @since 3.1.0
+   --
+   procedure X_JS_Vars (This : Wp_List_Table);
+
+   -- added
+   function Get_Class (This : Wp_List_Table) return String;
 
 end Class_List_Tables;

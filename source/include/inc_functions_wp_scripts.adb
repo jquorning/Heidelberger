@@ -228,16 +228,18 @@ is
                                 Object_Name : String;
                                 L10n        : Array_Type)
                                 return Boolean
-   is (raise Program_Error with "not implemented");
---         global wp_scripts;
-
+   is
+      use Class_Scripts;
+      -- global wp_scripts;
+      Scripts : Wp_Scripts renames Globals.Global_Wp_Scripts;
+   begin
 --         if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
 --                 _wp_scripts_maybe_doing_it_wrong( __FUNCTION__, handle );
 --                 return false;
 --         end;
 
---         return wp_scripts.localize( handle, object_name, l10n );
--- end;
+      return Scripts.Localize (Handle, Object_Name, L10n);
+   end Wp_Localize_Script;
 
    ------------------------
    -- Wp_Localize_Script --

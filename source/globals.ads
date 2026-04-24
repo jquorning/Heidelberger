@@ -25,7 +25,7 @@ is
    use Arrays;
    use Lists;
 
-   GLOBALS : Array_Type := Empty_Array;
+   GLOBALS      : Array_Type := Empty_Array;
    Table_Prefix : UStrings.UString;
 
    Global_Blog_Id : Integer := Integer'First;
@@ -36,23 +36,23 @@ is
    WP_REPAIRING          : Boolean := False;
    WP_INSTALLING_NETWORK : Boolean := False;
 
-   WPINC           : UStrings.UString;
-   WP_CONTENT_DIR  : UStrings.UString;
-   WP_LANG_DIR     : UStrings.UString;
+   WPINC          : UStrings.UString;
+   WP_CONTENT_DIR : UStrings.UString;
+   WP_LANG_DIR    : UStrings.UString;
 
    Wp_Importers : Array_Type;
 
    package Count_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Natural);
+     Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type     => String,
+        Element_Type => Natural);
 
    package Natural_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Natural);
+     Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type     => String,
+        Element_Type => Natural);
 
-   Global_Wp                : Class_Wp.Wp_Class;
+   Global_Wp : Class_Wp.Wp_Class;
 
    Global_Wp_Filter         : Class_Hook_Maps.Hook_Maps.Map;
    Global_Wp_Actions        : Count_Maps.Map;
@@ -67,9 +67,10 @@ is
    Global_Pagenow : UStrings.UString;
    Hook_Suffix    : UStrings.UString;
 
-   Global_Title       : UStrings.UString;
-   Global_Parent_File : UStrings.UString;
-   Post_New_File      : UStrings.UString;
+   Global_Title        : UStrings.UString;
+   Global_Parent_File  : UStrings.UString;
+   Global_Submenu_File : UStrings.UString;
+   Post_New_File       : UStrings.UString;
 
    Current_Screen     : Class_Screens.Wp_Screen;
    Wp_Locale          : Class_Locales.Wp_Locale;
@@ -92,7 +93,8 @@ is
 
    Global_Action   : UStrings.UString;
    Global_Taxonomy : UStrings.UString;
-   Tax             : Class_Taxonomy.Wp_Taxonomy; -- := Class_Taxonomy.X_Construct;
+   Tax             :
+     Class_Taxonomy.Wp_Taxonomy; -- := Class_Taxonomy.X_Construct;
 
    Login_Grace_Period : Integer := 0;
 
@@ -101,6 +103,12 @@ is
    Global_Paged  : Natural;
    Global_S      : UStrings.UString;
    Global_Totals : Array_Type;
+
+   Global_Admin_Body_Class : UStrings.UString;
+
+   Global_Tab  : UStrings.UString;
+   Global_Tabs : Array_Type;
+   Global_Type : UStrings.UString;
 
    --
    --

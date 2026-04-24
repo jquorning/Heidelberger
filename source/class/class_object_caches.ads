@@ -15,6 +15,9 @@ is
    use Arrays;
    use Lists;
 
+   subtype Key_Type is String;
+   subtype Group_Type is String;
+
    --
    -- Core class that implements an object cache.
    --
@@ -30,120 +33,119 @@ is
    -- @since 2.0.0
    --
    -- #[AllowDynamicProperties]
-   type Wp_Object_Cache is tagged
-     record
+   type Wp_Object_Cache is tagged record
 
-        --
-        -- Holds the cached objects.
-        --
-        -- @since 2.0.0
-        -- @var array
-        --
-        -- private
-        Cache : Array_Type;
+      --
+      -- Holds the cached objects.
+      --
+      -- @since 2.0.0
+      -- @var array
+      --
+      -- private
+      Cache : Array_Type;
 
-        --
-        -- The amount of times the cache data was already stored in the cache.
-        --
-        -- @since 2.5.0
-        -- @var int
-        --
-        Cache_Hits : Natural := 0;
+      --
+      -- The amount of times the cache data was already stored in the cache.
+      --
+      -- @since 2.5.0
+      -- @var int
+      --
+      Cache_Hits : Natural := 0;
 
-        --
-        -- Amount of times the cache did not have the request in cache.
-        --
-        -- @since 2.0.0
-        -- @var int
-        --
-        Cache_Misses : Natural := 0;
+      --
+      -- Amount of times the cache did not have the request in cache.
+      --
+      -- @since 2.0.0
+      -- @var int
+      --
+      Cache_Misses : Natural := 0;
 
-        --
-        -- List of global cache groups.
-        --
-        -- @since 3.0.0
-        -- @var string[]
-        --
-        -- protected
-        Global_Groups : Array_Type;
+      --
+      -- List of global cache groups.
+      --
+      -- @since 3.0.0
+      -- @var string[]
+      --
+      -- protected
+      Global_Groups : Array_Type;
 
-        --
-        -- The blog prefix to prepend to keys in non-global groups.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        -- private
-        Blog_Prefix : UStrings.UString;
+      --
+      -- The blog prefix to prepend to keys in non-global groups.
+      --
+      -- @since 3.5.0
+      -- @var string
+      --
+      -- private
+      Blog_Prefix : UStrings.UString;
 
-        --
-        -- Holds the value of is_multisite().
-        --
-        -- @since 3.5.0
-        -- @var bool
-        --
-        -- private
-        Multisite : Boolean;
+      --
+      -- Holds the value of is_multisite().
+      --
+      -- @since 3.5.0
+      -- @var bool
+      --
+      -- private
+      Multisite : Boolean;
 
-     end record;
+   end record;
 
---         --
---         -- Sets up object properties; PHP 5 style constructor.
---         --
---         -- @since 2.0.8
---         --
---         public function __construct() then
---                 this->multisite   = is_multisite();
---                 this->blog_prefix = this->multisite ? get_current_blog_id() . ":" : "";
---         end;
+   --         --
+   --         -- Sets up object properties; PHP 5 style constructor.
+   --         --
+   --         -- @since 2.0.8
+   --         --
+   --         public function __construct() then
+   --                 this->multisite   = is_multisite();
+   --                 this->blog_prefix = this->multisite ? get_current_blog_id() . ":" : "";
+   --         end;
 
---         --
---         -- Makes private properties readable for backward compatibility.
---         --
---         -- @since 4.0.0
---         --
---         -- @param string name Property to get.
---         -- @return mixed Property.
---         --
---         public function __get( name ) then
---                 return this->name;
---         end;
+   --         --
+   --         -- Makes private properties readable for backward compatibility.
+   --         --
+   --         -- @since 4.0.0
+   --         --
+   --         -- @param string name Property to get.
+   --         -- @return mixed Property.
+   --         --
+   --         public function __get( name ) then
+   --                 return this->name;
+   --         end;
 
---         --
---         -- Makes private properties settable for backward compatibility.
---         --
---         -- @since 4.0.0
---         --
---         -- @param string name  Property to set.
---         -- @param mixed  value Property value.
---         -- @return mixed Newly-set property.
---         --
---         public function __set( name, value ) then
---                 return this->name = value;
---         end;
+   --         --
+   --         -- Makes private properties settable for backward compatibility.
+   --         --
+   --         -- @since 4.0.0
+   --         --
+   --         -- @param string name  Property to set.
+   --         -- @param mixed  value Property value.
+   --         -- @return mixed Newly-set property.
+   --         --
+   --         public function __set( name, value ) then
+   --                 return this->name = value;
+   --         end;
 
---         --
---         -- Makes private properties checkable for backward compatibility.
---         --
---         -- @since 4.0.0
---         --
---         -- @param string name Property to check if set.
---         -- @return bool Whether the property is set.
---         --
---         public function __isset( name ) then
---                 return isset( this->name );
---         end;
+   --         --
+   --         -- Makes private properties checkable for backward compatibility.
+   --         --
+   --         -- @since 4.0.0
+   --         --
+   --         -- @param string name Property to check if set.
+   --         -- @return bool Whether the property is set.
+   --         --
+   --         public function __isset( name ) then
+   --                 return isset( this->name );
+   --         end;
 
---         --
---         -- Makes private properties un-settable for backward compatibility.
---         --
---         -- @since 4.0.0
---         --
---         -- @param string name Property to unset.
---         --
---         public function __unset( name ) then
---                 unset( this->name );
---         end;
+   --         --
+   --         -- Makes private properties un-settable for backward compatibility.
+   --         --
+   --         -- @since 4.0.0
+   --         --
+   --         -- @param string name Property to unset.
+   --         --
+   --         public function __unset( name ) then
+   --                 unset( this->name );
+   --         end;
 
    --
    -- Serves as a utility function to determine whether a key is valid.
@@ -154,9 +156,8 @@ is
    -- @return bool Whether the key is valid.
    --
    -- protected
-   function Is_Valid_Key (This : Wp_Object_Cache;
-                          Key  : String)
-                          return Boolean;
+   function Is_Valid_Key
+     (This : Wp_Object_Cache; Key : Key_Type) return Boolean;
 
    --
    -- Serves as a utility function to determine whether a key exists in the cache.
@@ -168,10 +169,9 @@ is
    -- @return bool Whether the key exists in the cache for the given group.
    --
    -- protected
-   function X_Exists (This  : Wp_Object_Cache;
-                      Key   : String;
-                      Group : String)
-                      return Boolean;
+   function X_Exists
+     (This : Wp_Object_Cache; Key : Key_Type; Group : Group_Type)
+      return Boolean;
 
    --
    -- Adds data to the cache if it doesn"t already exist.
@@ -190,69 +190,70 @@ is
    --                           Default 0 (no expiration).
    -- @return bool True on success, false if cache key and group already exist.
    --
-   procedure Add (This    : in out Wp_Object_Cache;
-                  Key     : String;
-                  Data    : Multi_Type;
-                  Group   : String  := "default";
-                  Expire  : Natural := 0;
-                  Success : out Boolean);
+   procedure Add
+     (This    : in out Wp_Object_Cache;
+      Key     : Key_Type;
+      Data    : Multi_Type;
+      Group   : Group_Type := "default";
+      Expire  : Natural := 0;
+      Success : out Boolean);
 
---         --
---         -- Adds multiple values to the cache in one call.
---         --
---         -- @since 6.0.0
---         --
---         -- @param array  data   Array of keys and values to be added.
---         -- @param string group  Optional. Where the cache contents are grouped. Default empty.
---         -- @param int    expire Optional. When to expire the cache contents, in seconds.
---         --                       Default 0 (no expiration).
---         -- @return bool[] Array of return values, grouped by key. Each value is either
---         --                true on success, or false if cache key and group already exist.
---         --
---         public function add_multiple( array data, group = "", expire = 0 ) then
---                 values = array();
+   --         --
+   --         -- Adds multiple values to the cache in one call.
+   --         --
+   --         -- @since 6.0.0
+   --         --
+   --         -- @param array  data   Array of keys and values to be added.
+   --         -- @param string group  Optional. Where the cache contents are grouped. Default empty.
+   --         -- @param int    expire Optional. When to expire the cache contents, in seconds.
+   --         --                       Default 0 (no expiration).
+   --         -- @return bool[] Array of return values, grouped by key. Each value is either
+   --         --                true on success, or false if cache key and group already exist.
+   --         --
+   --         public function add_multiple( array data, group = "", expire = 0 ) then
+   --                 values = array();
 
---                 foreach ( data as key => value ) then
---                         values[ key ] = this->add( key, value, group, expire );
---                 end;
+   --                 foreach ( data as key => value ) then
+   --                         values[ key ] = this->add( key, value, group, expire );
+   --                 end;
 
---                 return values;
---         end;
+   --                 return values;
+   --         end;
 
---         --
---         -- Replaces the contents in the cache, if contents already exist.
---         --
---         -- @since 2.0.0
---         --
---         -- @see WP_Object_Cache::set()
---         --
---         -- @param int|string key    What to call the contents in the cache.
---         -- @param mixed      data   The contents to store in the cache.
---         -- @param string     group  Optional. Where to group the cache contents. Default "default".
---         -- @param int        expire Optional. When to expire the cache contents, in seconds.
---         --                           Default 0 (no expiration).
---         -- @return bool True if contents were replaced, false if original value does not exist.
---         --
---         public function replace( key, data, group = "default", expire = 0 ) then
---                 if ( ! this->is_valid_key( key ) ) then
---                         return false;
---                 end;
+   --         --
+   --         -- Replaces the contents in the cache, if contents already exist.
+   --         --
+   --         -- @since 2.0.0
+   --         --
+   --         -- @see WP_Object_Cache::set()
+   --         --
+   --         -- @param int|string key    What to call the contents in the cache.
+   --         -- @param mixed      data   The contents to store in the cache.
+   --         -- @param string     group  Optional. Where to group the cache contents. Default "default".
+   --         -- @param int        expire Optional. When to expire the cache contents, in seconds.
+   --         --                           Default 0 (no expiration).
+   --         -- @return bool True if contents were replaced, false if original value does not exist.
+   --         --
+   --         public function replace( key, data, group = "default", expire = 0 ) then
+   --                 if ( ! this->is_valid_key( key ) ) then
+   --                         return false;
+   --                 end;
 
---                 if ( empty( group ) ) then
---                         group = "default";
---                 end;
+   --                 if ( empty( group ) ) then
+   --                         group = "default";
+   --                 end;
 
---                 id = key;
---                 if ( this->multisite && ! isset( this->global_groups[ group ] ) ) then
---                         id = this->blog_prefix . key;
---                 end;
+   --                 id = key;
+   --                 if ( this->multisite && ! isset( this->global_groups[ group ] ) ) then
+   --                         id = this->blog_prefix . key;
+   --                 end;
 
---                 if ( ! this->_exists( id, group ) ) then
---                         return false;
---                 end;
+   --                 if ( ! this->_exists( id, group ) ) then
+   --                         return false;
+   --                 end;
 
---                 return this->set( key, data, group, (int) expire );
---         end;
+   --                 return this->set( key, data, group, (int) expire );
+   --         end;
 
    --
    -- Sets the data contents into the cache.
@@ -276,33 +277,34 @@ is
    -- @param int        expire Optional. Not used.
    -- @return bool True if contents were set, false if key is invalid.
    --
-   procedure Set (This    : in out Wp_Object_Cache;
-                  Key     : String;
-                  Data    : Multi_Type;
-                  Group   : String  := "default";
-                  Expire  : Natural := 0;
-                  Success : out Boolean);
+   procedure Set
+     (This    : in out Wp_Object_Cache;
+      Key     : Key_Type;
+      Data    : Multi_Type;
+      Group   : Group_Type := "default";
+      Expire  : Natural := 0;
+      Success : out Boolean);
 
---         --
---         -- Sets multiple values to the cache in one call.
---         --
---         -- @since 6.0.0
---         --
---         -- @param array  data   Array of key and value to be set.
---         -- @param string group  Optional. Where the cache contents are grouped. Default empty.
---         -- @param int    expire Optional. When to expire the cache contents, in seconds.
---         --                       Default 0 (no expiration).
---         -- @return bool[] Array of return values, grouped by key. Each value is always true.
---         --
---         public function set_multiple( array data, group = "", expire = 0 ) then
---                 values = array();
+   --         --
+   --         -- Sets multiple values to the cache in one call.
+   --         --
+   --         -- @since 6.0.0
+   --         --
+   --         -- @param array  data   Array of key and value to be set.
+   --         -- @param string group  Optional. Where the cache contents are grouped. Default empty.
+   --         -- @param int    expire Optional. When to expire the cache contents, in seconds.
+   --         --                       Default 0 (no expiration).
+   --         -- @return bool[] Array of return values, grouped by key. Each value is always true.
+   --         --
+   --         public function set_multiple( array data, group = "", expire = 0 ) then
+   --                 values = array();
 
---                 foreach ( data as key => value ) then
---                         values[ key ] = this->set( key, value, group, expire );
---                 end;
+   --                 foreach ( data as key => value ) then
+   --                         values[ key ] = this->set( key, value, group, expire );
+   --                 end;
 
---                 return values;
---         end;
+   --                 return values;
+   --         end;
 
    --
    -- Retrieves the cache contents, if it exists.
@@ -326,34 +328,35 @@ is
    -- @return mixed|false The cache contents on success, false on failure to retrieve
    --                      contents.
    --
-   function Get (This  : in out Wp_Object_Cache;
-                 Key   : String;
-                 Group : String  := "default";
-                 Force : Boolean := False;
-                 Found : out Boolean) -- null
-                 return Multi_Type;
+   function Get
+     (This  : in out Wp_Object_Cache;
+      Key   : Key_Type;
+      Group : Group_Type := "default";
+      Force : Boolean := False;
+      Found : out Boolean) -- null
+      return Multi_Type;
 
---         --
---         -- Retrieves multiple values from the cache in one call.
---         --
---         -- @since 5.5.0
---         --
---         -- @param array  keys  Array of keys under which the cache contents are stored.
---         -- @param string group Optional. Where the cache contents are grouped. Default "default".
---         -- @param bool   force Optional. Whether to force an update of the local cache
---         --                      from the persistent cache. Default false.
---         -- @return array Array of return values, grouped by key. Each value is either
---         --               the cache contents on success, or false on failure.
---         --
---         public function get_multiple( keys, group = "default", force = false ) then
---                 values = array();
+   --         --
+   --         -- Retrieves multiple values from the cache in one call.
+   --         --
+   --         -- @since 5.5.0
+   --         --
+   --         -- @param array  keys  Array of keys under which the cache contents are stored.
+   --         -- @param string group Optional. Where the cache contents are grouped. Default "default".
+   --         -- @param bool   force Optional. Whether to force an update of the local cache
+   --         --                      from the persistent cache. Default false.
+   --         -- @return array Array of return values, grouped by key. Each value is either
+   --         --               the cache contents on success, or false on failure.
+   --         --
+   --         public function get_multiple( keys, group = "default", force = false ) then
+   --                 values = array();
 
---                 foreach ( keys as key ) then
---                         values[ key ] = this->get( key, group, force );
---                 end;
+   --                 foreach ( keys as key ) then
+   --                         values[ key ] = this->get( key, group, force );
+   --                 end;
 
---                 return values;
---         end;
+   --                 return values;
+   --         end;
 
    --
    -- Removes the contents of the cache key in the group.
@@ -368,16 +371,17 @@ is
    -- @param bool       deprecated Optional. Unused. Default false.
    -- @return bool True on success, false if the contents were not deleted.
    --
-   function Delete (This       : in out Wp_Object_Cache;
-                    Key        : String;
-                    Group      : String := "default";
-                    Deprecated : Boolean := False)
-                    return Boolean;
+   function Delete
+     (This       : in out Wp_Object_Cache;
+      Key        : Key_Type;
+      Group      : Group_Type := "default";
+      Deprecated : Boolean := False) return Boolean;
 
-   procedure Delete (This       : in out Wp_Object_Cache;
-                     Key        : String;
-                     Group      : String := "default";
-                     Deprecated : Boolean := False);
+   procedure Delete
+     (This       : in out Wp_Object_Cache;
+      Key        : Key_Type;
+      Group      : Group_Type := "default";
+      Deprecated : Boolean := False);
 
    --
    -- Deletes multiple values from the cache in one call.
@@ -390,96 +394,96 @@ is
    -- @return bool[] Array of return values, grouped by key. Each value is either
    --                true on success, or false if the contents were not deleted.
    --
-   function Delete_Multiple (This  : in out Wp_Object_Cache;
-                             Keys  : List_Type;
-                             Group : String := "")
-                             return Array_Type;
+   function Delete_Multiple
+     (This  : in out Wp_Object_Cache;
+      Keys  : List_Type;
+      Group : Group_Type := "") return Array_Type;
 
---         --
---         -- Increments numeric cache item"s value.
---         --
---         -- @since 3.3.0
---         --
---         -- @param int|string key    The cache key to increment.
---         -- @param int        offset Optional. The amount by which to increment the item"s value.
---         --                           Default 1.
---         -- @param string     group  Optional. The group the key is in. Default "default".
---         -- @return int|false The item"s new value on success, false on failure.
---         --
---         public function incr( key, offset = 1, group = "default" ) then
---                 if ( ! this->is_valid_key( key ) ) then
---                         return false;
---                 end;
+   --         --
+   --         -- Increments numeric cache item"s value.
+   --         --
+   --         -- @since 3.3.0
+   --         --
+   --         -- @param int|string key    The cache key to increment.
+   --         -- @param int        offset Optional. The amount by which to increment the item"s value.
+   --         --                           Default 1.
+   --         -- @param string     group  Optional. The group the key is in. Default "default".
+   --         -- @return int|false The item"s new value on success, false on failure.
+   --         --
+   --         public function incr( key, offset = 1, group = "default" ) then
+   --                 if ( ! this->is_valid_key( key ) ) then
+   --                         return false;
+   --                 end;
 
---                 if ( empty( group ) ) then
---                         group = "default";
---                 end;
+   --                 if ( empty( group ) ) then
+   --                         group = "default";
+   --                 end;
 
---                 if ( this->multisite && ! isset( this->global_groups[ group ] ) ) then
---                         key = this->blog_prefix . key;
---                 end;
+   --                 if ( this->multisite && ! isset( this->global_groups[ group ] ) ) then
+   --                         key = this->blog_prefix . key;
+   --                 end;
 
---                 if ( ! this->_exists( key, group ) ) then
---                         return false;
---                 end;
+   --                 if ( ! this->_exists( key, group ) ) then
+   --                         return false;
+   --                 end;
 
---                 if ( ! is_numeric( this->cache[ group ][ key ] ) ) then
---                         this->cache[ group ][ key ] = 0;
---                 end;
+   --                 if ( ! is_numeric( this->cache[ group ][ key ] ) ) then
+   --                         this->cache[ group ][ key ] = 0;
+   --                 end;
 
---                 offset = (int) offset;
+   --                 offset = (int) offset;
 
---                 this->cache[ group ][ key ] += offset;
+   --                 this->cache[ group ][ key ] += offset;
 
---                 if ( this->cache[ group ][ key ] < 0 ) then
---                         this->cache[ group ][ key ] = 0;
---                 end;
+   --                 if ( this->cache[ group ][ key ] < 0 ) then
+   --                         this->cache[ group ][ key ] = 0;
+   --                 end;
 
---                 return this->cache[ group ][ key ];
---         end;
+   --                 return this->cache[ group ][ key ];
+   --         end;
 
---         --
---         -- Decrements numeric cache item"s value.
---         --
---         -- @since 3.3.0
---         --
---         -- @param int|string key    The cache key to decrement.
---         -- @param int        offset Optional. The amount by which to decrement the item"s value.
---         --                           Default 1.
---         -- @param string     group  Optional. The group the key is in. Default "default".
---         -- @return int|false The item"s new value on success, false on failure.
---         --
---         public function decr( key, offset = 1, group = "default" ) then
---                 if ( ! this->is_valid_key( key ) ) then
---                         return false;
---                 end;
+   --         --
+   --         -- Decrements numeric cache item"s value.
+   --         --
+   --         -- @since 3.3.0
+   --         --
+   --         -- @param int|string key    The cache key to decrement.
+   --         -- @param int        offset Optional. The amount by which to decrement the item"s value.
+   --         --                           Default 1.
+   --         -- @param string     group  Optional. The group the key is in. Default "default".
+   --         -- @return int|false The item"s new value on success, false on failure.
+   --         --
+   --         public function decr( key, offset = 1, group = "default" ) then
+   --                 if ( ! this->is_valid_key( key ) ) then
+   --                         return false;
+   --                 end;
 
---                 if ( empty( group ) ) then
---                         group = "default";
---                 end;
+   --                 if ( empty( group ) ) then
+   --                         group = "default";
+   --                 end;
 
---                 if ( this->multisite && ! isset( this->global_groups[ group ] ) ) then
---                         key = this->blog_prefix . key;
---                 end;
+   --                 if ( this->multisite && ! isset( this->global_groups[ group ] ) ) then
+   --                         key = this->blog_prefix . key;
+   --                 end;
 
---                 if ( ! this->_exists( key, group ) ) then
---                         return false;
---                 end;
+   --                 if ( ! this->_exists( key, group ) ) then
+   --                         return false;
+   --                 end;
 
---                 if ( ! is_numeric( this->cache[ group ][ key ] ) ) then
---                         this->cache[ group ][ key ] = 0;
---                 end;
+   --                 if ( ! is_numeric( this->cache[ group ][ key ] ) ) then
+   --                         this->cache[ group ][ key ] = 0;
+   --                 end;
 
---                 offset = (int) offset;
+   --                 offset = (int) offset;
 
---                 this->cache[ group ][ key ] -= offset;
+   --                 this->cache[ group ][ key ] -= offset;
 
---                 if ( this->cache[ group ][ key ] < 0 ) then
---                         this->cache[ group ][ key ] = 0;
---                 end;
+   --                 if ( this->cache[ group ][ key ] < 0 ) then
+   --                         this->cache[ group ][ key ] = 0;
+   --                 end;
 
---                 return this->cache[ group ][ key ];
---         end;
+   --                 return this->cache[ group ][ key ];
+   --         end;
 
    --
    -- Clears the object cache of all data.

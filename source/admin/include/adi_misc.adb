@@ -20,7 +20,6 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_HTTP;
 with Inc_Link_Templates;
-with Inc_Load;
 with Inc_Options;
 
 package body Adi_Misc
@@ -1606,13 +1605,12 @@ is
       use Inc_Functions;
       use Inc_HTTP;
       use Inc_Link_Templates;
-      use Inc_Load;
       use Inc_Options;
 
       Version : constant String := Php.Misc.PHP_VERSION;
       Key     : constant String := Php.Misc.MD5 (Version);
 
-      Response_2 : Array_Type;
+      Response_2 : Array_Error_Type;
 
       Response : constant Multi_Type :=
         Get_Site_Transient ("php_check_" & Key);
@@ -1629,8 +1627,8 @@ is
 
             Response_2 := Wp_Remote_Get (-URL);
 
-            if Is_Wp_Error (Response_2)
-              or else 200 /= Wp_Remote_Retrieve_Response_Code (Response_2)
+            if not Response_2.Success -- Is_Wp_Error (Response_2)
+              or else 200 /= Wp_Remote_Retrieve_Response_Code (Response_2.Arry)
             then
                return Empty_Array; -- False
 
@@ -1648,19 +1646,19 @@ is
             --                              acceptable or warnings should be shown
             --                              and an update recommended.
             --
-            Response_2 :=
-              JSON_Decode (Wp_Remote_Retrieve_Body (Response_2), True);
+            Response_2.Arry :=
+              JSON_Decode (Wp_Remote_Retrieve_Body (Response_2.Arry), True);
 
             -- if not Is_Array (Response) then
             --    return false;
             -- end if;
 
             Set_Site_Transient
-              ("php_check_" & Key, Response_2, Constants.WEEK_IN_SECONDS);
+              ("php_check_" & Key, Response_2.Arry, Constants.WEEK_IN_SECONDS);
          end;
 
-         if Isset (Response_2, "is_acceptable")
-           and then As_Boolean (Get (Response_2, "is_acceptable"))
+         if Isset (Response_2.Arry, "is_acceptable")
+           and then As_Boolean (Get (Response_2.Arry, "is_acceptable"))
          then
             --
             -- Filters whether the active PHP version is considered acceptable by
@@ -1680,7 +1678,7 @@ is
             -- @param string version       PHP version checked.
             --
             Set
-              (Response_2,
+              (Response_2.Arry,
                "is_acceptable",
                From_Boolean
                  (Apply_Filters
@@ -1688,22 +1686,22 @@ is
          end if;
 
          Set
-           (Response_2, "is_lower_than_future_minimum", From_Boolean (False));
+           (Response_2.Arry, "is_lower_than_future_minimum", From_Boolean (False));
 
          -- The minimum supported PHP version will be updated to 7.2. Check if the
          -- current version is lower.
          if Version_Compare (Version, "7.2", "<") then
             Set
-              (Response_2,
+              (Response_2.Arry,
                "is_lower_than_future_minimum",
                From_Boolean (True));
 
             -- Force showing of warnings.
-            Set (Response_2, "is_acceptable", From_Boolean (False));
+            Set (Response_2.Arry, "is_acceptable", From_Boolean (False));
          end if;
 
       end if;
-      return Response_2;
+      return Response_2.Arry;
    end Wp_Check_PHP_Version;
 
 end Adi_Misc;

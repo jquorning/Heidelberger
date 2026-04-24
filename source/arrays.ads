@@ -120,8 +120,11 @@ is
 
    function Kind_Of (Arry : Multi_Type) return Array_Kind;
 
-   function Is_Null (Multi : Multi_Type) return Boolean;
    function Is_Array (Multi : Multi_Type) return Boolean;
+   function Is_Boolean (Multi : Multi_Type) return Boolean;
+   function Is_Integer (Multi : Multi_Type) return Boolean;
+   function Is_Null (Multi : Multi_Type) return Boolean;
+   function Is_String (Multi : Multi_Type) return Boolean;
 
    function Empty (Obj : Cursor) return Boolean;
 

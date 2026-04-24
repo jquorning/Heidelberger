@@ -25,7 +25,6 @@ with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
 with Inc_HTTP;
 with Inc_Link_Templates;
-with Inc_Load;
 with Inc_L10n;
 with Inc_Media;
 with Inc_Options;
@@ -861,7 +860,6 @@ is
       use Array_Lists;
       use Inc_HTTP;
       use Inc_Themes;
-      use Inc_Load;
       use Inc_Link_Templates;
 --    global editor_styles;
 
@@ -874,14 +872,16 @@ is
          for Style of Global_Editor_Styles loop
             if Preg_Match ("~^(https?:)?//~", Style) then
                declare
-                  Response : constant Array_Type := Wp_Remote_Get (Style);
+                  Response : constant Array_Error_Type :=
+                    Wp_Remote_Get (Style);
                begin
-                  if not Is_Wp_Error (Response) then
-                     Styles.Append (To_Array_Type ([
-                       Build ("css",            Wp_Remote_Retrieve_Body (Response)),
-                       Build ("__unstableType", "theme"),
-                       Build ("isGlobalStyles", False)
-                     ]));
+                  if not Response.Success then -- Is_Wp_Error (Response) then
+                     Styles.Append
+                       (To_Array_Type
+                          ([Build
+                              ("css", Wp_Remote_Retrieve_Body (Response.Arry)),
+                            Build ("__unstableType", "theme"),
+                            Build ("isGlobalStyles", False)]));
                   end if;
                end;
             else

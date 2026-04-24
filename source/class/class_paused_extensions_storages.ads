@@ -83,15 +83,16 @@ is
 --                 return update_option( option_name, paused_extensions );
 --         end;
 
---         --
---         -- Forgets a previously recorded extension error.
---         --
---         -- @since 5.2.0
---         --
---         -- @param string extension Plugin or theme directory name.
---         -- @return bool True on success, false on failure.
---         --
---         public function delete( extension ) then
+   --
+   -- Forgets a previously recorded extension error.
+   --
+   -- @since 5.2.0
+   --
+   -- @param string extension Plugin or theme directory name.
+   -- @return bool True on success, false on failure.
+   --
+   function Delete (This : Wp_Paused_Extensions_Storage; Extension : String) return Boolean;
+   procedure Delete (This : Wp_Paused_Extensions_Storage; Extension : String);
 --                 if ( ! this->is_api_loaded() ) then
 --                         return false;
 --                 end;

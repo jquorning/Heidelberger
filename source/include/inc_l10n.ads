@@ -301,8 +301,7 @@ is
    --
    procedure X_Ex (Text    : String;
                    Context : String;
-                   Domain  : String := "default")
-                   is null;
+                   Domain  : String := "default");
 
    --
    -- Translates and retrieves the singular or plural form based on the supplied
@@ -487,6 +486,18 @@ is
    procedure Get_Translations_For_Domain (Domain : String);
 
    --
+   -- Determines whether there are translations for the text domain.
+   --
+   -- @since 3.0.0
+   --
+   -- @global MO[] l10n An array of all currently loaded text domains.
+   --
+   -- @param string domain Text domain. Unique identifier for retrieving translated strings.
+   -- @return bool Whether there are translations.
+   --
+   function Is_Textdomain_Loaded (Domain : String) return Boolean;
+
+   --
    -- Gets all available languages based on the presence of *.mo files in a given
    -- directory.
    --
@@ -598,6 +609,28 @@ is
    procedure Load_Default_Textdomain (Locale : String := ""); -- null
 
    --
+   -- Loads the theme"s translated strings.
+   --
+   -- If the current locale exists as a .mo file in the theme"s root directory, it
+   -- will be included in the translated strings by the domain.
+   --
+   -- The .mo files must be named based on the locale exactly.
+   --
+   -- @since 1.5.0
+   -- @since 4.6.0 The function now tries to load the .mo file from the languages directory first.
+   --
+   -- @global WP_Textdomain_Registry wp_textdomain_registry WordPress Textdomain Registry.
+   --
+   -- @param string       domain Text domain. Unique identifier for retrieving translated strings.
+   -- @param string|false path   Optional. Path to the directory containing the .mo file.
+   --                             Default false.
+   -- @return bool True when textdomain is successfully loaded, false otherwise.
+   --
+   function Load_Theme_Textdomain
+     (Domain : String; Path : String := "") -- false
+      return Boolean;
+
+   --
    -- Loads the script translated strings.
    --
    -- @since 5.0.0
@@ -680,5 +713,16 @@ is
                                                   Settings    : Array_Type;
                                                   Textdomain  : String)
                                                   return Array_Type;
+
+   --
+   -- Retrieves the list item separator based on the locale.
+   --
+   -- @since 6.0.0
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   --
+   -- @return string Locale-specific list item separator.
+   --
+   function Wp_Get_List_Item_Separator return String;
 
 end Inc_L10n;

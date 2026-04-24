@@ -835,7 +835,7 @@ is
             then Get_As_String (Plugin_Data, "RequiresWP") else ""); -- null
 
          Compatible_PHP : constant Boolean := Is_PHP_Version_Compatible (Requires_PHP);
-         Compatible_Wp  : constant Boolean := Is_Wp_Version_Compatible  (Requires_Wp);
+         Compatible_Wp  : constant Boolean := Is_WP_Version_Compatible  (Requires_Wp);
 
          Is_Active : Boolean;
          Plugin_Name : UString;

@@ -204,7 +204,7 @@ is
    -- @return string HTML attribute or empty string.
    --
    function Disabled (Disabled : String;
-                      Current  : String; -- Integer;
+                      Current  : String := ""; -- Integer;
                       Echo     : Boolean := True)
                       return String;
 

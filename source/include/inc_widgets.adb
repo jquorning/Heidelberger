@@ -778,7 +778,7 @@ is
       -- Sidebars_widgets settings from when this theme was previously active.
       declare
          Old_Sidebars_Widgets_2 : constant Array_Type :=
-           Get_Theme_Mod ("sidebars_widgets");
+           As_Array (Get_Theme_Mod ("sidebars_widgets"));
 
          Old_Sidebars_Widgets : Array_Type :=
            (if Isset (Old_Sidebars_Widgets_2, "data")

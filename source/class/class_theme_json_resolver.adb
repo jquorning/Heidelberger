@@ -237,7 +237,11 @@ is
          begin
             if "" /= Theme_JSON_File then
                Theme_JSON_Data := Read_JSON_File (Theme_JSON_File); -- static::
-               Theme_JSON_Data := Translate (Theme_JSON_Data, Wp_Theme.Get ("TextDomain")); -- static::
+               Theme_JSON_Data :=
+                 Translate
+                   (Theme_JSON_Data,
+                    As_String (Wp_Theme.Get ("TextDomain"))); -- static::
+
             else
                Theme_JSON_Data := Empty_Array;
             end if;
@@ -273,8 +277,9 @@ is
                           Read_JSON_File (Parent_Theme_JSON_File); -- static::
 
                         Parent_Theme_JSON_Data : constant Array_Type :=
-                          Translate (Parent_Theme_JSON_Data_2,
-                                     Wp_Theme.M_Parent.Get ("TextDomain")); -- static::
+                          Translate
+                            (Parent_Theme_JSON_Data_2,
+                             As_String (Wp_Theme.M_Parent.Get ("TextDomain"))); -- static::
 
                         Parent_Theme : Wp_Theme_JSON :=
                           X_Construct (Parent_Theme_JSON_Data);

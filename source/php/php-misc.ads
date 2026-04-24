@@ -66,8 +66,7 @@ is
 
    function MD5 (Item   : String;
                  Binary : Boolean := False)
-                 return String
-                 is ("XXX-937");
+                 return String;
 
    function Current (List : List_Type)
                      return String
@@ -95,5 +94,10 @@ is
                          Hash_2 : String)
                          return Boolean
    is (Hash_1 = Hash_2);
+
+   function Uniqid
+     (Prefix : String := ""; More_Entropy : Boolean := False) return String;
+
+   function Extension_Loaded (Extension : String) return Boolean;
 
 end Php.Misc;

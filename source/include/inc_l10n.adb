@@ -16,6 +16,7 @@ with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
+with Logging;
 with Wp_Common;
 
 with Adi_Translation_Install;
@@ -450,19 +451,23 @@ package body Inc_L10n is
       return Translate_With_Gettext_Context (Text, Context, Domain);
    end X_X;
 
--- --
--- -- Displays translated string with gettext context.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string text    Text to translate.
--- -- @param string context Context information for the translators.
--- -- @param string domain  Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                        Default "default".
--- --
--- function _ex( text, context, domain = "default" ) then
---         echo _x( text, context, domain );
--- end;
+   --
+   -- Displays translated string with gettext context.
+   --
+   -- @since 3.0.0
+   --
+   -- @param string text    Text to translate.
+   -- @param string context Context information for the translators.
+   -- @param string domain  Optional. Text domain. Unique identifier for retrieving translated strings.
+   --                        Default "default".
+   --
+   procedure X_Ex
+     (Text : String; Context : String; Domain : String := "default")
+   is
+      use Php.Echoing;
+   begin
+      Echo (X_X (Text, Context, Domain));
+   end X_Ex;
 
    ----------------
    -- ESC_Attr_X --
@@ -1084,53 +1089,52 @@ package body Inc_L10n is
 --         return load_textdomain( domain, path . "/" . mofile, locale );
 -- end;
 
--- --
--- -- Loads the theme"s translated strings.
--- --
--- -- If the current locale exists as a .mo file in the theme"s root directory, it
--- -- will be included in the translated strings by the domain.
--- --
--- -- The .mo files must be named based on the locale exactly.
--- --
--- -- @since 1.5.0
--- -- @since 4.6.0 The function now tries to load the .mo file from the languages directory first.
--- --
--- -- @global WP_Textdomain_Registry wp_textdomain_registry WordPress Textdomain Registry.
--- --
--- -- @param string       domain Text domain. Unique identifier for retrieving translated strings.
--- -- @param string|false path   Optional. Path to the directory containing the .mo file.
--- --                             Default false.
--- -- @return bool True when textdomain is successfully loaded, false otherwise.
--- --
--- function load_theme_textdomain( domain, path = false ) then
---         -- @var WP_Textdomain_Registry wp_textdomain_registry--
---         global wp_textdomain_registry;
+   ---------------------------
+   -- Load_Theme_Textdomain --
+   ---------------------------
 
---         --
---         -- Filters a theme"s locale.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string locale The theme"s current locale.
---         -- @param string domain Text domain. Unique identifier for retrieving translated strings.
---         --
---         locale = apply_filters( "theme_locale", determine_locale(), domain );
+   function Load_Theme_Textdomain
+     (Domain : String; Path : String := "") -- false
+      return Boolean
+   is
+      use UStrings;
+      use Wp_Common;
+      use Class_Textdomain_Registry;
+      use Inc_Themes;
 
---         mofile = domain . "-" . locale . ".mo";
+      -- @var WP_Textdomain_Registry wp_textdomain_registry
+      -- global wp_textdomain_registry;
 
---         // Try to load from the languages directory first.
---         if ( load_textdomain( domain, WP_LANG_DIR . "/themes/" . mofile, locale ) ) then
---                 return true;
---         end;
+      --
+      -- Filters a theme"s locale.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string locale The theme's current locale.
+      -- @param string domain Text domain. Unique identifier for retrieving translated strings.
+      --
+      Locale : constant String :=
+        Apply_Filters ("theme_locale", Determine_Locale, Domain);
 
---         if ( ! path ) then
---                 path = get_template_directory();
---         end;
+      MO_File : constant String := Domain & "-" & Locale & ".mo";
+   begin
+      -- Try to load from the languages directory first.
+      if Load_Textdomain
+           (Domain, (-Globals.WP_LANG_DIR) & "/themes/" & MO_File, Locale)
+      then
+         return True;
+      end if;
 
---         wp_textdomain_registry.set_custom_path( domain, path );
+      declare
+         Path_2 : constant String :=
+           (if Path = "" then Get_Template_Directory else Path);
+      begin
+         Textdomain_Registry.Set_Custom_Path (Domain, Path_2);
+         -- Wp_Textdomain_Registry.Set_Custom_Path (Domain, Path_2);
 
---         return load_textdomain( domain, path . "/" . locale . ".mo", locale );
--- end;
+         return Load_Textdomain (Domain, Path_2 & "/" & Locale & ".mo", Locale);
+      end;
+   end Load_Theme_Textdomain;
 
 -- --
 -- -- Loads the child themes translated strings.
@@ -1449,20 +1453,17 @@ package body Inc_L10n is
       null;
    end Get_Translations_For_Domain;
 
--- --
--- -- Determines whether there are translations for the text domain.
--- --
--- -- @since 3.0.0
--- --
--- -- @global MO[] l10n An array of all currently loaded text domains.
--- --
--- -- @param string domain Text domain. Unique identifier for retrieving translated strings.
--- -- @return bool Whether there are translations.
--- --
--- function is_textdomain_loaded( domain ) then
---         global l10n;
---         return isset( l10n[ domain ] );
--- end;
+   --------------------------
+   -- Is_Textdomain_Loaded --
+   --------------------------
+
+   function Is_Textdomain_Loaded (Domain : String) return Boolean is
+      -- global l10n;
+   begin
+      Logging.Log ("is_textdomain_loaded", "not implemented");
+      return False;
+      -- return Isset (L10n, Domain);
+   end Is_Textdomain_Loaded;
 
 -- --
 -- -- Translates role name.
@@ -2005,16 +2006,17 @@ package body Inc_L10n is
       return Empty_Array; -- added
    end Translate_Settings_Using_I18n_Schema;
 
--- --
--- -- Retrieves the list item separator based on the locale.
--- --
--- -- @since 6.0.0
--- --
--- -- @global WP_Locale wp_locale WordPress date and time locale object.
--- --
--- -- @return string Locale-specific list item separator.
--- --
--- function wp_get_list_item_separator() then
+   --
+   -- Retrieves the list item separator based on the locale.
+   --
+   -- @since 6.0.0
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   --
+   -- @return string Locale-specific list item separator.
+   --
+   function Wp_Get_List_Item_Separator return String
+   is (raise Program_Error with "not implemented");
 --         global wp_locale;
 
 --         return wp_locale.get_list_item_separator();

@@ -572,12 +572,13 @@ is
       if "option" = This.Typ then
          return Get_Option (Id_Base, Default_Value);
       elsif "theme_mod" = This.Typ then
-         return Get_Theme_Mod (Id_Base, Default_Value);
+         return
+           As_String (Get_Theme_Mod (Id_Base, From_String (Default_Value)));
       else
          --
-         -- Any WP_Customize_Setting subclass implementing aggregate multidimensional
-         -- will need to override this method to obtain the data from the appropriate
-         -- location.
+         -- Any WP_Customize_Setting subclass implementing aggregate
+         -- multidimensional will need to override this method to obtain
+         -- the data from the appropriate location.
          --
          return Default_Value;
       end if;

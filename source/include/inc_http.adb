@@ -169,13 +169,15 @@ is
    -- Wp_Remove_Get --
    -------------------
 
-   function Wp_Remote_Get (URL  : String;
-                           Args : Array_Type := Empty_Array)
-                           return Array_Type
+   function Wp_Remote_Get
+     (URL : String; Args : Array_Type := Empty_Array) return Array_Error_Type
    is
       HTTP : constant Wp_HTTP := X_Wp_HTTP_Get_Object;
    begin
-      return HTTP.Get (URL, Args);
+      return
+        (Success => True,
+         Arry    => HTTP.Get (URL, Args),
+         Error   => Class_Errors.Null_Wp_Error);
    end Wp_Remote_Get;
 
    --------------------

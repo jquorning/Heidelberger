@@ -4,11 +4,11 @@
 
 with UStrings;
 
-package Constants
-is
+package Constants is
 
    X_DIR_X         : constant String := "";
-   ABSPATH         : constant String := "/home/jq/GitHub/Heidelberger/"; -- source/;
+   ABSPATH         : constant String :=
+     "/home/jq/GitHub/Heidelberger/"; -- source/;
    WP_PLUGIN_DIR   : UStrings.UString;
    WPMU_PLUGIN_DIR : UStrings.UString;
    WP_TEMP_DIR     : UStrings.UString;
@@ -38,7 +38,7 @@ is
    MINUTE_IN_SECONDS : constant Natural := 60;
    HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
    DAY_IN_SECONDS    : constant Natural := 24 * HOUR_IN_SECONDS;
-   WEEK_IN_SECONDS   : constant Natural := 7  * DAY_IN_SECONDS;
+   WEEK_IN_SECONDS   : constant Natural := 7 * DAY_IN_SECONDS;
    MONTH_IN_SECONDS  : constant Natural := 30 * DAY_IN_SECONDS;
    YEAR_IN_SECONDS   : constant Natural := 365 * DAY_IN_SECONDS;
 
@@ -75,13 +75,13 @@ is
 
    MEDIA_TRASH : Boolean := False;
 
-   WP_ADMIN          : Boolean;
+   WP_ADMIN             : Boolean;
    WP_NETWORK_ADMIN_DEF : constant Boolean := False;
    WP_NETWORK_ADMIN     : constant Boolean := False;
    WP_USER_ADMIN_DEF    : constant Boolean := False;
    WP_USER_ADMIN        : constant Boolean := False;
    WP_BLOG_ADMIN_DEF    : constant Boolean := False;
-   WP_BLOG_ADMIN        :          Boolean := False;
+   WP_BLOG_ADMIN        : Boolean := False;
 
    WP_LOAD_IMPORTERS : Boolean;
 
@@ -91,25 +91,25 @@ is
    REST_REQUEST     : Boolean := False;
 
    WP_HTTP_BLOCK_EXTERNAL : Boolean := False;
-   WP_ACCESSIBLE_HOSTS : UStrings.UString;
+   WP_ACCESSIBLE_HOSTS    : UStrings.UString;
 
    WP_PROXY_HOST : UStrings.UString;
    WP_PROXY_PORT : UStrings.UString;
 
    WP_HOME_DEF : constant Boolean := False;
-   WP_HOME     : constant String  := "";
+   WP_HOME     : constant String := "";
 
    WP_SITEURL_DEF : constant Boolean := False;
-   WP_SITEURL     : constant String  := "";
+   WP_SITEURL     : constant String := "";
 
    KB_IN_BYTES : constant := 1024;
    MB_IN_BYTES : constant := 1024 * KB_IN_BYTES;
    GB_IN_BYTES : constant := 1024 * MB_IN_BYTES;
---         define( "TB_IN_BYTES", 1024 * GB_IN_BYTES );
---         define( "PB_IN_BYTES", 1024 * TB_IN_BYTES );
---         define( "EB_IN_BYTES", 1024 * PB_IN_BYTES );
---         define( "ZB_IN_BYTES", 1024 * EB_IN_BYTES );
---         define( "YB_IN_BYTES", 1024 * ZB_IN_BYTES );
+   --         define( "TB_IN_BYTES", 1024 * GB_IN_BYTES );
+   --         define( "PB_IN_BYTES", 1024 * TB_IN_BYTES );
+   --         define( "EB_IN_BYTES", 1024 * PB_IN_BYTES );
+   --         define( "ZB_IN_BYTES", 1024 * EB_IN_BYTES );
+   --         define( "YB_IN_BYTES", 1024 * ZB_IN_BYTES );
 
    ALLOW_UNFILTERED_UPLOADS : constant Boolean := True;
    DISALLOW_UNFILTERED_HTML : constant Boolean := True;
@@ -130,5 +130,10 @@ is
 
    UPLOADS       : constant String := "";
    BLOGUPLOADDIR : constant String := "";
+
+   FS_METHOD : constant String := "direct";
+
+   FTP_SSH : constant Boolean := True;
+   FTP_SSL : constant Boolean := True;
 
 end Constants;

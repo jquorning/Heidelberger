@@ -28,6 +28,55 @@ is
       return This;
    end X_Construct;
 
+   ------------
+   -- Delete --
+   ------------
+
+   function Delete
+     (This : Wp_Paused_Extensions_Storage; Extension : String) return Boolean
+   is (raise Program_Error with "not implemented");
+--                 if ( ! this->is_api_loaded() ) then
+--                         return false;
+--                 end;
+
+--                 option_name = this->get_option_name();
+
+--                 if ( ! option_name ) then
+--                         return false;
+--                 end;
+
+--                 paused_extensions = (array) get_option( option_name, array() );
+
+--                 // Do not delete if no error is stored.
+--                 if ( ! isset( paused_extensions[ this->type ][ extension ] ) ) then
+--                         return true;
+--                 end;
+
+--                 unset( paused_extensions[ this->type ][ extension ] );
+
+--                 if ( empty( paused_extensions[ this->type ] ) ) then
+--                         unset( paused_extensions[ this->type ] );
+--                 end;
+
+--                 // Clean up the entire option if we're removing the only error.
+--                 if ( ! paused_extensions ) then
+--                         return delete_option( option_name );
+--                 end;
+
+--                 return update_option( option_name, paused_extensions );
+--         end;
+
+   ------------
+   -- Delete --
+   ------------
+
+   procedure Delete (This : Wp_Paused_Extensions_Storage; Extension : String)
+   is
+      Unused : constant Boolean := Delete (This, Extension);
+   begin
+      null;
+   end Delete;
+
    ---------
    -- Get --
    ---------

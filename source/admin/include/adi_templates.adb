@@ -8,17 +8,21 @@
 -- @subpackage Administration
 --
 
+with Ada.Strings.Fixed;
+
 with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
 with Php.Numerics;
+with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
 with Array_Lists;
 with Binder;
 with Constants;
+with Globals;
 with Helpers;
 with Helpers_3;
 with UStrings;
@@ -32,7 +36,9 @@ with Inc_Admin_Bar;
 with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
+with Inc_Link_Templates;
 with Inc_L10n;
 with Inc_Options;
 with Inc_Posts;
@@ -2426,137 +2432,181 @@ is
              then ESC_Attr (Wp_Unslash (Get_As_String (X_REQUEST, "s"))) else ""));
    end X_Admin_Search_Query;
 
--- --
--- -- Generic Iframe header for use with Thickbox.
--- --
--- -- @since 2.7.0
--- --
--- -- @global string    hook_suffix
--- -- @global string    admin_body_class
--- -- @global WP_Locale wp_locale        WordPress date and time locale object.
--- --
--- -- @param string title      Optional. Title of the Iframe page. Default empty.
--- -- @param bool   deprecated Not used.
--- --
--- procedure Iframe_Header (Title      : String  := "";
---                          Deprecated : Boolean := false)
--- is
--- begin
---         Show_Admin_Bar (False);
---         global (Hook_Suffix, Admin_Body_Class, Hb_Locale);
---         Admin_Body_Class := Preg_Replace ("/[^a-z0-9_-)+/i", "-", Hook_Suffix);
+   -------------------
+   -- Iframe_Header --
+   -------------------
 
---         Current_Screen := Get_Current_Screen; -- ();
+   procedure Iframe_Header
+     (Title : String := ""; Deprecated : Boolean := False)
+   is
+      pragma Unreferenced (Deprecated);
+      use Php.Echoing;
+      use Php.HTML;
+      use Php.Preg;
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Wp_Common;
+      use Class_Screens;
+      use Inc_Admin_Bar;
+      use Inc_Formatting;
+      use Inc_Functions_Wp_Styles;
+      use Inc_General_Templates;
+      use Adi_Screens;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Options;
+      --        global (Hook_Suffix, Admin_Body_Class, Wp_Locale);
+      Hook_Suffix        : constant String := -Globals.Hook_Suffix;
+      Admin_Body_Class   : UString renames Globals.Global_Admin_Body_Class;
+      Admin_Body_Classes : UString;
+      Admin_Body_Id      : UString;
+   begin
+      Show_Admin_Bar (False);
 
---         Header ("Content-Type: " & Get_Option ("html_type") & "; charset=" & Get_Option ("blog_charset"));
---         X_Hb_Admin_Html_Begin; -- ();
--- --        ?>
--- -- <title><?php bloginfo ("name"); ?> &rsaquo; <?php echo title; ?> &#8212; <?php _e ("WordPress"); ?></title>
--- --        <?php
---         Hb_Enqueue_Style ("colors");
--- --        ?>
--- -- <script type="text/javascript">
--- -- addLoadEvent = function(func)thenif(typeof jQuery!=="undefined")jQuery(function()thenfunc();end;);else if(typeof wpOnload!=="function")thenwpOnload=func;end;elsethenvar oldonload=wpOnload;wpOnload=function()thenoldonload();func();end;end;end;;
--- -- function tb_close()thenvar win=window.dialogArguments||opener||parent||top;win.tb_remove();end;
--- -- var ajaxurl = "<?php echo esc_js (admin_url ("admin-ajax.php", "relative")); ?>",
--- --        pagenow = "<?php echo esc_js (current_screen->id); ?>",
--- --        typenow = "<?php echo esc_js (current_screen->post_type); ?>",
--- --        adminpage = "<?php echo esc_js (admin_body_class); ?>",
--- --        thousandsSeparator = "<?php echo esc_js (wp_locale->number_format["thousands_sep")); ?>",
--- --        decimalPoint = "<?php echo esc_js (wp_locale->number_format["decimal_point")); ?>",
--- --        isRtl = <?php echo (int) is_rtl(); ?>;
--- -- </script>
--- --        <?php
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_enqueue_scripts", Hook_Suffix);
+      Admin_Body_Class := +Preg_Replace ("/[^a-z0-9_-)+/i", "-", Hook_Suffix);
 
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_print_styles-{hook_suffix}");
---         -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+      declare
+         Current_Screen : constant Wp_Screen := Get_Current_Screen;
+      begin
+         Header
+           ("Content-Type: "
+            & Get_Option ("html_type")
+            & "; charset="
+            & Get_Option ("blog_charset"));
 
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_print_styles");
+         X_Wp_Admin_HTML_Begin;
+         Echo (" <title>");
+         Bloginfo ("name");
+         Echo (" &rsaquo; " & Title & " &#8212; ");
+         X_E ("WordPress");
+         Echo ("</title>");
 
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_print_scripts-{hook_suffix}");
---         -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+         Wp_Enqueue_Style ("colors");
 
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_print_scripts");
+         Echo ("<script type=""text/javascript"">");
+         Echo
+           (" addLoadEvent = function(func)thenif(typeof jQuery!==""undefined"")jQuery(function()thenfunc();end;);else if(typeof wpOnload!==""function"")thenwpOnload=func;end;elsethenvar oldonload=wpOnload;wpOnload=function()thenoldonload();func();end;end;end;;");
+         Echo
+           (" function tb_close()thenvar win=window.dialogArguments||opener||parent||top;win.tb_remove();end;");
+         Echo
+           (" var ajaxurl = "
+            & ESC_JS (Admin_URL ("admin-ajax.php", "relative"))
+            & ",");
+         Echo ("        pagenow = " & ESC_JS (-Current_Screen.Id) & ",");
+         Echo
+           ("        typenow = " & ESC_JS (-Current_Screen.Post_Type) & ",");
+         Echo ("        adminpage = " & ESC_JS (-Admin_Body_Class) & ",");
+         Echo
+           ("        thousandsSeparator = "
+            & ESC_JS (Get_As_String (Wp_Locale.Number_Format, "thousands_sep"))
+            & ",");
+         Echo
+           ("        decimalPoint = "
+            & ESC_JS (Get_As_String (Wp_Locale.Number_Format, "decimal_point"))
+            & ",");
+         Echo ("        isRtl = " & Boolean'Image (Is_RTL) & ";"); -- (int)
+         Echo ("</script>");
 
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_head-{hook_suffix}");
---         -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_enqueue_scripts", Hook_Suffix);
 
---         -- This action is documented in wp-admin/admin-header.php
---         Do_Action ("admin_head");
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_print_styles-" & Hook_Suffix);
 
---         Admin_Body_Class := Admin_Body_Class & " locale-" & Sanitize_Html_Class (Strtolower (Str_Replace ("_", "-", Get_User_Locale)));
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_print_styles");
 
---         if Is_Rtl then -- ()
---                 Admin_Body_Class := Admin_Body_Class & " rtl";
---         end if;
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_print_scripts-" & Hook_Suffix);
 
--- --        ?>
--- -- </head>
--- --        <?php
---         --
---         -- @global string body_id
---         --
---         Admin_Body_Id := (if Isset (GLOBALS ("body_id")) then "id=""" & GLOBALS ("body_id") & """ " else "");
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_print_scripts");
 
---         -- This filter is documented in wp-admin/admin-header.php
---         Admin_Body_Classes := Apply_Filters ("admin_body_class", "");
---         Admin_Body_Classes := Ltrim (Admin_Body_Classes & " " & Admin_Body_Class);
--- --        ?>
--- -- <body <?php echo admin_body_id; ?>class="wp-admin wp-core-ui no-js iframe <?php echo admin_body_classes; ?>">
--- -- <script type="text/javascript">
--- -- (function()then
--- -- var c = document.body.className;
--- -- c = c.replace(/no-js/, "js");
--- -- document.body.className = c;
--- -- end;)();
--- -- </script>
--- --        <?php
--- end Iframe_Header;
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_head-" & Hook_Suffix);
 
--- --
--- -- Generic Iframe footer for use with Thickbox.
--- --
--- -- @since 2.7.0
--- --
--- procedure Iframe_Footer
--- is
--- begin
---         --
---         -- We're going to hide any footer output on iFrame pages,
---         -- but run the hooks anyway since they output JavaScript
---         -- or other needed content.
---         --
+         -- This action is documented in wp-admin/admin-header.php
+         Do_Action ("admin_head");
 
---         --
---         -- @global string hook_suffix
---         --
---         global (Hook_Suffix);
--- --        ?>
--- --        <div class="hidden">
--- --        <?php
---         -- This action is documented in wp-admin/admin-footer.php
---         Do_Action ("admin_footer", Hook_Suffix);
+         Admin_Body_Class :=
+           Admin_Body_Class
+           & " locale-"
+           & Sanitize_HTML_Class
+               (Strtolower (Str_Replace ("_", "-", Get_User_Locale)));
 
---         -- This action is documented in wp-admin/admin-footer.php
---         Do_Action ("admin_print_footer_scripts-{hook_suffix}");
---         -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+         if Is_RTL then
+            Admin_Body_Class := Admin_Body_Class & " rtl";
+         end if;
 
---         -- This action is documented in wp-admin/admin-footer.php
---         Do_Action ("admin_print_footer_scripts");
--- --        ?>
--- --        </div>
--- -- <script type="text/javascript">if(typeof wpOnload==="function")wpOnload();</script>
--- -- </body>
--- -- </html>
--- --        <?php
--- end Iframe_Footer;
+         Echo ("</head>");
+
+         --
+         -- @global string body_id
+         --
+         Admin_Body_Id := +"XXX-D99";
+         --           (if Isset (GLOBALS ("body_id"))
+         --            then "id=""" & GLOBALS ("body_id") & """ "
+         --            else "");
+
+         -- This filter is documented in wp-admin/admin-header.php
+         Admin_Body_Classes := +Apply_Filters ("admin_body_class", "");
+         Admin_Body_Classes :=
+           +Ltrim (-(Admin_Body_Classes & " " & Admin_Body_Class));
+
+         Echo
+           (-("<body "
+            & Admin_Body_Id
+            & " class=""wp-admin wp-core-ui no-js iframe "
+            & Admin_Body_Classes
+            & """>"));
+         Echo ("<script type=""text/javascript"">");
+         Echo ("(function()then");
+         Echo ("var c = document.body.className;");
+         Echo ("c = c.replace(/no-js/, ""js"");");
+         Echo ("document.body.className = c;");
+         Echo ("end;)();");
+         Echo ("</script>");
+      end;
+   end Iframe_Header;
+
+   -------------------
+   -- Iframe_Footer --
+   -------------------
+
+   procedure Iframe_Footer is
+      use Php.Echoing;
+      use UStrings;
+      use Wp_Common;
+
+      Hook_Suffix : constant String := -Globals.Hook_Suffix;
+   begin
+
+      -- We're going to hide any footer output on iFrame pages,
+      -- but run the hooks anyway since they output JavaScript
+      -- or other needed content.
+
+      --
+      -- @global string hook_suffix
+      --
+      -- global (Hook_Suffix);
+      --        ?>
+      --        <div class="hidden">
+      --        <?php
+      -- This action is documented in wp-admin/admin-footer.php
+      Do_Action ("admin_footer", Hook_Suffix);
+
+      -- This action is documented in wp-admin/admin-footer.php
+      Do_Action ("admin_print_footer_scripts-" & Hook_Suffix);
+
+      -- This action is documented in wp-admin/admin-footer.php
+      Do_Action ("admin_print_footer_scripts");
+      Echo ("</div>");
+      Echo
+        ("<script type=""text/javascript"">if(typeof wpOnload===""function"")wpOnload();</script>");
+      Echo ("</body>");
+      Echo ("</html>");
+   end Iframe_Footer;
 
 -- --
 -- -- Echoes or returns the post states as HTML.
@@ -2825,14 +2875,15 @@ is
             Meta_Background : constant Array_Type
                := Get_Post_Meta (Post.Id, "_wp_attachment_is_custom_background", True);
          begin
-            if not Empty (Meta_Background) and then Meta_Background = Stylesheet then
+            if not Empty (Meta_Background)
+              and then Meta_Background = Stylesheet
+            then
                Media_States := +abs "Background Image";
                declare
-                  Background_Image : constant String := Get_Background_Image;  -- ();
+                  Background_Image : constant String := Get_Background_Image;
                begin
-                  if
-                    Background_Image /= "" and then
-                    Wp_Get_Attachment_URL (Post.Id) = Background_Image
+                  if Background_Image /= ""
+                    and then Wp_Get_Attachment_URL (Post.Id) = Background_Image
                   then
                      Media_States := +abs "Current Background Image";
                   end if;
@@ -2845,18 +2896,20 @@ is
          Media_States := +abs "Site Icon";
       end if;
 
-      if Get_Theme_Mod ("custom_logo") = Integer (Post.Id) then
+      if As_Integer (Get_Theme_Mod ("custom_logo")) = Integer (Post.Id) then
          Media_States := +abs "Logo";
       end if;
 
       --
-      -- Filters the default media display states for items in the Media list table.
+      -- Filters the default media display states for items in the Media
+      -- list table.
       --
       -- @since 3.2.0
       -- @since 4.8.0 Added the `post` parameter.
       --
-      -- @param string () media_states An array of media states. Default "Header Image",
-      --                               "Background Image", "Site Icon", "Logo".
+      -- @param string () media_states An array of media states. Default
+      --                               "Header Image", "Background Image",
+      --                               "Site Icon", "Logo".
       -- @param WP_Post  post         The current attachment object.
       --
       return Apply_Filters ("display_media_states", -Media_States, Post);
@@ -3143,89 +3196,106 @@ is
 --         -- <?php
 -- end X_Local_Storage_Notice;
 
--- --
--- -- Outputs a HTML element with a star rating for a given rating.
--- --
--- -- Outputs a HTML element with the star rating exposed on a 0..5 scale in
--- -- half star increments (ie. 1, 1.5, 2 stars). Optionally, if specified, the
--- -- number of ratings may also be displayed by passing the number parameter.
--- --
--- -- @since 3.8.0
--- -- @since 4.4.0 Introduced the `echo` parameter.
--- --
--- -- @param array args {
--- --     Optional. Array of star ratings arguments.
--- --
--- --     @type int|float rating The rating to display, expressed in either a 0.5 rating increment,
--- --                             or percentage. Default 0.
--- --     @type string    type   Format that the rating is in. Valid values are "rating" (default),
--- --                             or, "percent". Default "rating".
--- --     @type int       number The number of ratings that makes up this rating. Default 0.
--- --     @type bool      echo   Whether to echo the generated markup. False to return the markup instead
--- --                             of echoing it. Default true.
--- -- }
--- -- @return string Star rating HTML.
--- --
--- function Hb_Star_Rating (Args : Array_Type := Empty_Array) return String
--- is
---          Output : UString;
---          Title  : UString;
---          Format : UString;
+   --------------------
+   -- Wp_Star_Rating --
+   --------------------
 
---          Rating      : Float;
---          Full_Stars  : Natural;
---          Half_Stars  : Natural;
---          Empty_Stars : Natural;
+   function Wp_Star_Rating (Args : Array_Type := Empty_Array) return String is
+      use Ada.Strings.Fixed;
+      use Php.Echoing;
+      use Php.Numerics;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Inc_Functions;
+      use Inc_L10n;
 
---         Defaults : Array_Type   := To_Array_Type ([
---                 Build ("rating", "0"),
---                 Build ("type",   "rating"),
---                 Build ("number", "0"),
---                 Build ("echo",   "true")
---        ));
---         Parsed_Args : Array_Type := HB_Parse_Args (Args, Defaults);
+      Output : UString;
+      Title  : UString;
 
---         -- Non-English decimal places when the rating is coming from a string.
---         Rating : Float := Float'Value (Str_Replace (",", ".", Parsed_Args ("rating")));
+      Defaults : constant Array_Type :=
+        To_Array_Type
+          ([Build ("rating", "0"),
+            Build ("type", "rating"),
+            Build ("number", "0"),
+            Build ("echo", "true")]);
 
--- begin
---         -- Convert percentage to star rating, 0..5 in .5 increments.
---         if "percent" = Parsed_Args ("type") then
---                 Rating := Float'Round (Rating / 10.0, 0) / 2.0;
---         end if;
--- declare
---         -- Calculate the number of each type of star needed.
---         Full_Stars  : Natural := Natural (Float'Floor (Rating));
---         Half_Stars  : Natural := Natural (Float'Ceiling (Rating - Float (Full_Stars)));
---         Empty_Stars : Natural := Natural (5 - Full_Stars - Half_Stars);
--- begin
---         if Parsed_Args ("number") then
---             -- translators: 1: The rating, 2: The number of ratings.
---             Format := N_N ("%1s rating based on %2s rating",
---                            "%1s rating based on %2s ratings", Parsed_Args ("number"));
---             Title  := Sprintf (Format, Number_Format_I18n (Rating, 1),
---                                Number_Format_I18n (Parsed_Args ("number")));
---         else
---                 -- translators: %s: The rating.
---                 Title := Sprintf (abs "%s rating", Number_Format_I18n (Rating, 1));
---         end if;
+      Parsed_Args : constant Array_Type := Wp_Parse_Args (Args, Defaults);
 
---         Append (Output, "<div class=""star-rating"">");
---         Append (Output, "<span class=""screen-reader-text"">" & Title & "</span>");
---         Append (Output, Full_Stars  *
---                 "<div class=""star star-full"" aria-hidden=""true""></div>");
---         Append (Output, Half_Stars  *
---                 "<div class=""star star-half"" aria-hidden=""true""></div>");
---         Append (Output, Empty_Stars *
---                 "<div class=""star star-empty"" aria-hidden=""true""></div>");
---         Append (Output, "</div>");
--- end;
---         if Parsed_Args ("echo") then
---                 Echo (-Output);
---         end if;
+      -- Non-English decimal places when the rating is coming from a string.
+      Rating_2 : constant Float :=
+        Float'Value
+          (Str_Replace (",", ".", Get_As_String (Parsed_Args, "rating")));
 
---         return -Output;
--- end Hb_Star_Rating;
+      -- Convert percentage to star rating, 0..5 in .5 increments.
+      Rating : constant Float :=
+        (if "percent" = Get_As_String (Parsed_Args, "type")
+         then Round (Rating_2 / 10.0, 0) / 2.0
+         else Rating_2);
+
+      -- Calculate the number of each type of star needed.
+      Full_Stars : constant Natural := Natural (Float'Floor (Rating));
+
+      Half_Stars : constant Natural :=
+        Natural (Float'Ceiling (Rating - Float (Full_Stars)));
+
+      Empty_Stars : constant Natural := Natural (5 - Full_Stars - Half_Stars);
+   begin
+      if As_Boolean (Get (Parsed_Args, "number")) then
+         declare
+            -- translators: 1: The rating, 2: The number of ratings.
+            Format : constant String :=
+              X_N
+                ("%1s rating based on %2s rating",
+                 "%1s rating based on %2s ratings",
+                 As_Integer (Get (Parsed_Args, "number")));
+         begin
+            Title :=
+              +Sprintf
+                 (Format,
+                  [1 => Number_Format_I18n (Rating, 1),
+                   2 =>
+                     Number_Format_I18n
+                       (Float (As_Integer (Get (Parsed_Args, "number"))))]);
+         end;
+      else
+         -- translators: %s: The rating.
+         Title := +Sprintf (abs "%s rating", [Number_Format_I18n (Rating, 1)]);
+      end if;
+
+      Append (Output, "<div class=""star-rating"">");
+      Append
+        (Output, "<span class=""screen-reader-text"">" & Title & "</span>");
+      Append
+        (Output,
+         Full_Stars
+         * "<div class=""star star-full"" aria-hidden=""true""></div>");
+      Append
+        (Output,
+         Half_Stars
+         * "<div class=""star star-half"" aria-hidden=""true""></div>");
+      Append
+        (Output,
+         Empty_Stars
+         * "<div class=""star star-empty"" aria-hidden=""true""></div>");
+      Append (Output, "</div>");
+
+      if As_Boolean (Get (Parsed_Args, "echo")) then
+         Echo (-Output);
+      end if;
+
+      return -Output;
+   end Wp_Star_Rating;
+
+   --------------------
+   -- Wp_Star_Rating --
+   --------------------
+
+   procedure Wp_Star_Rating (Args : Array_Type := Empty_Array) is
+      Unused : constant String := Wp_Star_Rating (Args);
+   begin
+      null;
+   end Wp_Star_Rating;
 
 -- --
 -- -- Outputs a notice when editing the page for posts (internal use only).

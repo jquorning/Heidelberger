@@ -92,15 +92,16 @@ is
                then Set_URL_Scheme (URL_2, "https")
                else URL_2);
 
-            Response : constant Array_Type := Wp_Remote_Get (URL, Options);
+            Response : constant Array_Error_Type :=
+              Wp_Remote_Get (URL, Options);
          begin
-            if 200 /= Wp_Remote_Retrieve_Response_Code (Response) then
+            if 200 /= Wp_Remote_Retrieve_Response_Code (Response.Arry) then
                return From_Null;
             end if;
 
             declare
                JSON : constant Multi_Type :=
-                 JSON_Decode (Wp_Remote_Retrieve_Body (Response));
+                 JSON_Decode (Wp_Remote_Retrieve_Body (Response.Arry));
             begin
                -- Set_Site_Transient
                --   ("wordpress_credits_" & Locale_2,

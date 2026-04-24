@@ -285,7 +285,13 @@ is
    is
       use Globals;
    begin
-      return Global_Wp_Current_Filter.Last_Element; -- end()
+      -- Added by jq
+      if Global_Wp_Current_Filter.Is_Empty then
+         Logging.Log ("current_filter", "global_wp_current_filter is empty");
+         return "";
+      else
+         return Global_Wp_Current_Filter.Last_Element; -- end()
+      end if;
    end Current_Filter;
 
    -----------------
@@ -571,16 +577,14 @@ is
 --         return remove_all_filters( hook_name, priority );
 -- end;
 
--- --
--- -- Retrieves the name of the current action hook.
--- --
--- -- @since 3.9.0
--- --
--- -- @return string Hook name of the current action.
--- --
--- function current_action() then
---         return current_filter();
--- end;
+   --------------------
+   -- Current_Action --
+   --------------------
+
+   function Current_Action return String is
+   begin
+      return Current_Filter;
+   end Current_Action;
 
    ------------------
    -- Doing_Action --

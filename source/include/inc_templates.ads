@@ -734,6 +734,16 @@ is
 -- end;
 
    --
+   -- Set up the globals used for template loading.
+   --
+   -- @since 6.5.0
+   --
+   -- @global string $wp_stylesheet_path Path to current theme's stylesheet directory.
+   -- @global string $wp_template_path   Path to current theme's template directory.
+   --
+   procedure Wp_Set_Template_Globals;
+
+   --
    -- Retrieves the name of the highest priority template file that exists.
    --
    -- Searches in the STYLESHEETPATH before TEMPLATEPATH and wp-includes/theme-compat

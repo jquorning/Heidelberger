@@ -13,11 +13,11 @@ is
                          Depth : Integer := 512)
                          return String;
 
-   function JSON_Decode (JSON        : String;
-                         Associative : Boolean := False)
-                         return Array_Type;
+   function JSON_Decode
+     (JSON : String; Associative : Boolean := False) return Array_Type;
 
-   function JSON_Decode (JSON : String) return Multi_Type;
+   function JSON_Decode
+     (JSON : String; Associative : Boolean := False) return Multi_Type;
 
    JSON_ERROR_NONE : constant Integer := 0; -- Arbitrary value
 

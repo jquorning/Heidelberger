@@ -5,7 +5,6 @@
 -- @subpackage Administration
 --
 
-with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.Files;
@@ -13,13 +12,14 @@ with Php.HTML;
 with Php.Lists;
 with Php.Strings;
 
-with Arrays;
+with Arrays.IO;
 with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
 with Helpers;
 with Lists;
+with Logging;
 with UStrings;
 with Wp_Common;
 
@@ -54,6 +54,8 @@ package body Adm_Themes
 is
    use Arrays;
    use Lists;
+
+   function Keys_Of (Themes : Class_Themes.Theme_Array) return List_Type;
 
    -- Placeholder for real 'data' when I find out where it is from. XXX
    type Screenshot_Array is array (0 .. 0) of Boolean;
@@ -110,7 +112,6 @@ is
 
    procedure Render
    is
-      use Php.Arrays;
       use Php.Echoing;
       use Php.Errors;
       use Php.HTML;
@@ -189,14 +190,17 @@ is
                Theme : constant Wp_Theme :=
                  Wp_Get_Theme (Get_As_String (XX_GET, "stylesheet"));
             begin
-               if not Current_User_Can ("resume_theme", Get_As_String (XX_GET, "stylesheet")) then
-                  Wp_Die (
-                    "<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                    "<p>" &
-                    abs "Sorry, you are not allowed to resume this theme." &
-                    "</p>",
-                    Code => 403
-                             );
+               if not Current_User_Can
+                        ("resume_theme", Get_As_String (XX_GET, "stylesheet"))
+               then
+                  Wp_Die
+                    ("<h1>"
+                     & abs "You need a higher level of permission."
+                     & "</h1>"
+                     & "<p>"
+                     & abs "Sorry, you are not allowed to resume this theme."
+                     & "</p>",
+                     Code => 403);
                end if;
 
                declare
@@ -205,13 +209,12 @@ is
                                   Self_Admin_URL ("themes.php?error=resuming"));
                begin
                   if not Result.Success then
---                if Is_Wp_Error (result) then
                      Wp_Die (Result.Error);
                   end if;
                end;
             end;
             Wp_Redirect (Admin_URL ("themes.php?resumed=true"));
-            Die; -- exit;
+            Die;
 
          elsif "delete" = Get_As_String (XX_GET, "action") then
             Check_Admin_Referer ("delete-theme_" & Get_As_String (XX_GET, "stylesheet"));
@@ -220,12 +223,14 @@ is
                  Wp_Get_Theme (Get_As_String (XX_GET, "stylesheet"));
             begin
                if not Current_User_Can ("delete_themes") then
-                  Wp_Die (
-                    "<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                    "<p>" &
-                    abs "Sorry, you are not allowed to delete this item." & "</p>",
-                    Code => 403
-                  );
+                  Wp_Die
+                    ("<h1>"
+                     & abs "You need a higher level of permission."
+                     & "</h1>"
+                     & "<p>"
+                     & abs "Sorry, you are not allowed to delete this item."
+                     & "</p>",
+                     Code => 403);
                end if;
 
                if not Theme.Exists then
@@ -239,15 +244,18 @@ is
                declare
                   Active : Wp_Theme := Wp_Get_Theme;
                begin
-                  if Active.Get ("Template") = Get_As_String (XX_GET, "stylesheet") then
-                     Wp_Redirect (Admin_URL ("themes.php?delete-active-child=true"));
+                  if As_String (Active.Get ("Template"))
+                    = Get_As_String (XX_GET, "stylesheet")
+                  then
+                     Wp_Redirect
+                       (Admin_URL ("themes.php?delete-active-child=true"));
                   else
                      Delete_Theme (Get_As_String (XX_GET, "stylesheet"));
                      Wp_Redirect (Admin_URL ("themes.php?deleted=true"));
                   end if;
                end;
             end;
-            Die; -- exit;
+            Die;
 
          elsif "enable-auto-update" = Get_As_String (XX_GET, "action") then
             if
@@ -259,7 +267,7 @@ is
 
             Check_Admin_Referer ("updates");
             declare
-               All_Items : constant Array_Type := Wp_Get_Themes;
+               All_Items : constant Theme_Array := Wp_Get_Themes;
 
                Auto_Updates : List_Type :=
                  As_List (Get_Site_Option ("auto_update_themes",
@@ -270,13 +278,13 @@ is
                -- Remove themes that have been deleted since the site option was
                -- last updated.
                Auto_Updates := List_Intersect (Auto_Updates,
-                                               Array_Keys (All_Items));
+                                               Keys_Of (All_Items)); -- Array_Keys (All_Items));
 
                Update_Site_Option ("auto_update_themes",
                                    From_List (Auto_Updates));
             end;
             Wp_Redirect (Admin_URL ("themes.php?enabled-auto-update=true"));
-            Die; -- exit;
+            Die;
 
          elsif "disable-auto-update" = Get_As_String (XX_GET, "action") then
             if
@@ -288,7 +296,7 @@ is
             Check_Admin_Referer ("updates");
 
             declare
-               All_Items    : constant Array_Type := Wp_Get_Themes;
+               All_Items    : constant Theme_Array := Wp_Get_Themes;
                Auto_Updates : List_Type  :=
                  As_List (Get_Site_Option ("auto_update_themes",
                                            From_Array (Empty_Array))); -- (array)
@@ -298,13 +306,13 @@ is
                -- Remove themes that have been deleted since the site option was
                -- last updated.
                Auto_Updates := List_Intersect (Auto_Updates,
-                                               Array_Keys (All_Items));
+                                               Keys_Of (All_Items)); -- Array_Keys (All_Items));
 
                Update_Site_Option ("auto_update_themes",
                                    From_List (Auto_Updates));
             end;
             Wp_Redirect (Admin_URL ("themes.php?disabled-auto-update=true"));
-            Die; -- exit;
+            Die;
          end if;
       end if;
 
@@ -314,12 +322,12 @@ is
 
       Build_Help_Tabs;
 
---      declare
-      Themes := --  Array_Type :=
+      Themes :=
         (if Current_User_Can ("switch_themes")
          then Wp_Prepare_Themes_For_JS
          else Wp_Prepare_Themes_For_JS); -- (Build ("", Wp_Get_Theme)); -- array -- XXX
---      begin
+      Logging.Log ("adm_themes.render", "after wp_prepare_themes_for_js");
+      Arrays.IO.Dump (Themes);
 
          Wp_Reset_Vars (["theme", "search"]); -- array
 
@@ -455,111 +463,147 @@ is
       --
       -- This PHP is synchronized with the tmpl-theme template below!
       --
+      Arrays.IO.Dump (Themes);
       for A in Themes.Iterate loop
 -- for Theme of Themes loop
          declare
+            K     : constant String := Key (A);
             Theme : constant Array_Type := As_Array (Element (A));
 
-            Aria_Action : constant String := Get_As_String (Theme, "id") & "-action";
-            Aria_Name   : constant String := Get_As_String (Theme, "id") & "-name";
+            Aria_Action : constant String :=
+              Get_As_String (Theme, "id") & "-action";
 
-            Active_Class : UString;
+            Aria_Name : constant String :=
+              Get_As_String (Theme, "id") & "-name";
+
+            Active_Class : constant String :=
+              (if As_Boolean (Get (Theme, "active")) then " active" else "");
          begin
-            if As_Boolean (Get (Theme, "active")) then
-               Active_Class := +" active";
-            end if;
+            Logging.Log ("XXX-B97", K);
+            Arrays.IO.Dump (Theme);
 
-            Echo ("<div class=""theme" & (-Active_Class) & """>");
-            if not Empty (As_String (Get (Ref_2 (Theme, "screenshot", "[0]")))) then
+            Echo ("<div class=""theme" & Active_Class & """>");
+
+            if False -- not Empty (As_String (Get (Ref_2 (Theme, "screenshot", "[0]"))))
+            then
                Echo ("<div class=""theme-screenshot"">");
-               Echo ("<img src=""" & ESC_URL (As_String (Get (Ref_2 (Theme, "screenshot", "[0]"))) & "?ver=" & Get_As_String (Theme, "version")) & """ alt="""" />");
+               Echo
+                 ("<img src="""
+                  & ESC_URL
+                      (As_String (Get (Ref_2 (Theme, "screenshot", "[0]")))
+                       & "?ver="
+                       & Get_As_String (Theme, "version"))
+                  & """ alt="""" />");
                Echo ("</div>");
             else
                Echo ("<div class=""theme-screenshot Blank""></div>");
             end if;
 
             if As_Boolean (Get (Theme, "hasUpdate")) then
-               if
-                  As_Boolean (Get (Ref_2 (Theme, "updateResponse", "compatibleWP")))
-                  and then
-                  As_Boolean (Get (Ref_2 (Theme, "updateResponse", "compatiblePHP")))
+               if As_Boolean
+                    (Get (Ref_2 (Theme, "updateResponse", "compatibleWP")))
+                 and then As_Boolean
+                            (Get
+                               (Ref_2
+                                  (Theme, "updateResponse", "compatiblePHP")))
                then
-                  Echo ("<div class=""update-message notice inline notice-warning notice-alt""><p>");
+                  Echo
+                    ("<div class=""update-message notice inline notice-warning notice-alt""><p>");
                   if As_Boolean (Get (Theme, "hasPackage")) then
-                     X_E ("New version available. <button class=""button-link"" type=""button"">Update now</button>");
+                     X_E
+                       ("New version available. <button class=""button-link"" type=""button"">Update now</button>");
                   else
                      X_E ("New version available.");
                   end if;
                   Echo ("</p></div>");
                else
-                  Echo ("<div class=""update-message notice inline notice-error notice-alt""><p>");
+                  Echo
+                    ("<div class=""update-message notice inline notice-error notice-alt""><p>");
 
-                  if
-                     not As_Boolean (Get (Ref_2 (Theme, "updateResponse", "compatibleWP")))
-                     and then
-                     not As_Boolean (Get (Ref_2 (Theme, "updateResponse", "compatiblePHP")))
+                  if not As_Boolean
+                           (Get
+                              (Ref_2
+                                 (Theme, "updateResponse", "compatibleWP")))
+                    and then not As_Boolean
+                                   (Get
+                                      (Ref_2
+                                         (Theme,
+                                          "updateResponse",
+                                          "compatiblePHP")))
                   then
-                     Printf (
-                       -- translators: %s: Theme name.
-                       abs "There is a new version of %s available, but it does not work with your versions of WordPress and PHP.",
-                       [Get_As_String (Theme, "name")]
-                     );
-                     if
-                       Current_User_Can ("update_core") and then
-                       Current_User_Can ("update_php")
+                     Printf
+                       (
+                        -- translators: %s: Theme name.
+                        abs "There is a new version of %s available, but it does not work with your versions of WordPress and PHP.",
+                        [Get_As_String (Theme, "name")]);
+                     if Current_User_Can ("update_core")
+                       and then Current_User_Can ("update_php")
                      then
-                        Printf (
-                          -- translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page.
-                          " " & abs "<a href=""%1s"">Please update WordPress</a>, and then <a href=""%2s"">learn more about updating PHP</a>.",
-                          [
-                            1 => Self_Admin_URL ("update-core.php"),
-                            2 => ESC_URL (Wp_Get_Update_PHP_URL)
-                          ]
-                        );
+                        Printf
+                          (
+                           -- translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page.
+                           " "
+                           & abs "<a href=""%1s"">Please update WordPress</a>, and then <a href=""%2s"">learn more about updating PHP</a>.",
+                           [1 => Self_Admin_URL ("update-core.php"),
+                            2 => ESC_URL (Wp_Get_Update_PHP_URL)]);
                         Wp_Update_PHP_Annotation ("</p><p><em>", "</em>");
 
                      elsif Current_User_Can ("update_core") then
-                        Printf (
-                          -- translators: %s: URL to WordPress Updates screen.
-                          " " & abs "<a href=""%s"">Please update WordPress</a>.",
-                          [1 => Self_Admin_URL ("update-core.php")]
-                        );
+                        Printf
+                          (
+                           -- translators: %s: URL to WordPress Updates screen.
+                           " "
+                           & abs "<a href=""%s"">Please update WordPress</a>.",
+                           [1 => Self_Admin_URL ("update-core.php")]);
 
                      elsif Current_User_Can ("update_php") then
-                        Printf (
-                          -- translators: %s: URL to Update PHP page.--
-                          " " & abs "<a href=""%s"">Learn more about updating PHP</a>.",
-                          [1 => ESC_URL (Wp_Get_Update_PHP_URL)]
-                        );
+                        Printf
+                          (
+                           -- translators: %s: URL to Update PHP page.--
+                           " "
+                           & abs "<a href=""%s"">Learn more about updating PHP</a>.",
+                           [1 => ESC_URL (Wp_Get_Update_PHP_URL)]);
                         Wp_Update_PHP_Annotation ("</p><p><em>", "</em>");
                      end if;
 
-                  elsif not As_Boolean (Get (Ref_2 (Theme, "updateResponse", "compatibleWP"))) then
-                     Printf (
-                       -- translators: %s: Theme name.
-                       abs "There is a new version of %s available, but it does not work with your version of WordPress.",
-                       [Get_As_String (Theme, "name")]
-                     );
+                  elsif not As_Boolean
+                              (Get
+                                 (Ref_2
+                                    (Theme, "updateResponse", "compatibleWP")))
+                  then
+                     Printf
+                       (
+                        -- translators: %s: Theme name.
+                        abs "There is a new version of %s available, but it does not work with your version of WordPress.",
+                        [Get_As_String (Theme, "name")]);
                      if Current_User_Can ("update_core") then
-                        Printf (
-                          -- translators: %s: URL to WordPress Updates screen.
-                          " " & abs "<a href=""%s"">Please update WordPress</a>.",
-                          [Self_Admin_URL ("update-core.php")]
-                        );
+                        Printf
+                          (
+                           -- translators: %s: URL to WordPress Updates screen.
+                           " "
+                           & abs "<a href=""%s"">Please update WordPress</a>.",
+                           [Self_Admin_URL ("update-core.php")]);
                      end if;
 
-                  elsif not As_Boolean (Get (Ref_2 (Theme, "updateResponse", "compatiblePHP"))) then
-                     Printf (
-                       -- translators: %s: Theme name.
-                       abs "There is a new version of %s available, but it does not work with your version of PHP.",
-                       [Get_As_String (Theme, "name")]
-                     );
+                  elsif not As_Boolean
+                              (Get
+                                 (Ref_2
+                                    (Theme,
+                                     "updateResponse",
+                                     "compatiblePHP")))
+                  then
+                     Printf
+                       (
+                        -- translators: %s: Theme name.
+                        abs "There is a new version of %s available, but it does not work with your version of PHP.",
+                        [Get_As_String (Theme, "name")]);
                      if Current_User_Can ("update_php") then
-                        Printf (
-                          -- translators: %s: URL to Update PHP page.--
-                          " " & abs "<a href=""%s"">Learn more about updating PHP</a>.",
-                          [ESC_URL (Wp_Get_Update_PHP_URL)]
-                        );
+                        Printf
+                          (
+                           -- translators: %s: URL to Update PHP page.--
+                           " "
+                           & abs "<a href=""%s"">Learn more about updating PHP</a>.",
+                           [ESC_URL (Wp_Get_Update_PHP_URL)]);
                         Wp_Update_PHP_Annotation ("</p><p><em>", "</em>");
                      end if;
                   end if;
@@ -568,64 +612,67 @@ is
                end if;
             end if;
 
-            if
-              not As_Boolean (Get (Theme, "compatibleWP")) or else
-              not As_Boolean (Get (Theme, "compatiblePHP"))
+            if not As_Boolean (Get (Theme, "compatibleWP"))
+              or else not As_Boolean (Get (Theme, "compatiblePHP"))
             then
-               Echo ("<div class=""notice inline notice-error notice-alt""><p>");
-               if
-                 not As_Boolean (Get (Theme, "compatibleWP")) and then
-                 not As_Boolean (Get (Theme, "compatiblePHP"))
+               Echo
+                 ("<div class=""notice inline notice-error notice-alt""><p>");
+               if not As_Boolean (Get (Theme, "compatibleWP"))
+                 and then not As_Boolean (Get (Theme, "compatiblePHP"))
                then
-                  X_E ("This theme does not work with your versions of WordPress and PHP.");
-                  if
-                    Current_User_Can ("update_core") and then
-                    Current_User_Can ("update_php")
+                  X_E
+                    ("This theme does not work with your versions of WordPress and PHP.");
+                  if Current_User_Can ("update_core")
+                    and then Current_User_Can ("update_php")
                   then
-                     Printf (
-                       -- translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page.
-                       " " & abs "<a href=""%1s"">Please update WordPress</a>, and then <a href=""%2s"">learn more about updating PHP</a>.",
-                       [
-                         1 => Self_Admin_URL ("update-core.php"),
-                         2 => ESC_URL (Wp_Get_Update_PHP_URL)
-                       ]
-                     );
+                     Printf
+                       (
+                        -- translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page.
+                        " "
+                        & abs "<a href=""%1s"">Please update WordPress</a>, and then <a href=""%2s"">learn more about updating PHP</a>.",
+                        [1 => Self_Admin_URL ("update-core.php"),
+                         2 => ESC_URL (Wp_Get_Update_PHP_URL)]);
                      Wp_Update_PHP_Annotation ("</p><p><em>", "</em>");
 
                   elsif Current_User_Can ("update_core") then
-                     Printf (
-                       -- translators: %s: URL to WordPress Updates screen.
-                       " " & abs "<a href=""%s"">Please update WordPress</a>.",
-                       [1 => Self_Admin_URL ("update-core.php")]
-                     );
+                     Printf
+                       (
+                        -- translators: %s: URL to WordPress Updates screen.
+                        " "
+                        & abs "<a href=""%s"">Please update WordPress</a>.",
+                        [1 => Self_Admin_URL ("update-core.php")]);
 
                   elsif Current_User_Can ("update_php") then
-                     Printf (
-                       -- translators: %s: URL to Update PHP page.
-                       " " & abs "<a href=""%s"">Learn more about updating PHP</a>.",
-                       [ESC_URL (Wp_Get_Update_PHP_URL)]
-                     );
+                     Printf
+                       (
+                        -- translators: %s: URL to Update PHP page.
+                        " "
+                        & abs "<a href=""%s"">Learn more about updating PHP</a>.",
+                        [ESC_URL (Wp_Get_Update_PHP_URL)]);
                      Wp_Update_PHP_Annotation ("</p><p><em>", "</em>");
                   end if;
 
                elsif not As_Boolean (Get (Theme, "compatibleWP")) then
-                  X_E ("This theme does not work with your version of WordPress.");
+                  X_E
+                    ("This theme does not work with your version of WordPress.");
                   if Current_User_Can ("update_core") then
-                     Printf (
-                       -- translators: %s: URL to WordPress Updates screen.
-                       " " & abs "<a href=""%s"">Please update WordPress</a>.",
-                       [Self_Admin_URL ("update-core.php")]
-                     );
+                     Printf
+                       (
+                        -- translators: %s: URL to WordPress Updates screen.
+                        " "
+                        & abs "<a href=""%s"">Please update WordPress</a>.",
+                        [Self_Admin_URL ("update-core.php")]);
                   end if;
 
                elsif not As_Boolean (Get (Theme, "compatiblePHP")) then
                   X_E ("This theme does not work with your version of PHP.");
                   if Current_User_Can ("update_php") then
-                     Printf (
+                     Printf
+                       (
                         -- translators: %s: URL to Update PHP page.
-                        " " & abs "<a href=""%s"">Learn more about updating PHP</a>.",
-                        [ESC_URL (Wp_Get_Update_PHP_URL)]
-                     );
+                        " "
+                        & abs "<a href=""%s"">Learn more about updating PHP</a>.",
+                        [ESC_URL (Wp_Get_Update_PHP_URL)]);
                      Wp_Update_PHP_Annotation ("</p><p><em>", "</em>");
                   end if;
                end if;
@@ -636,14 +683,18 @@ is
             declare
                -- translators: %s: Theme name.
                Details_Aria_Label : constant String :=
-                 Sprintf (X_X ("View Theme Details for %s", "theme"),
-                          [Get_As_String (Theme, "name")]);
+                 Sprintf
+                   (X_X ("View Theme Details for %s", "theme"),
+                    [Get_As_String (Theme, "name")]);
             begin
-               Echo ("<button type=""button"" aria-label=""" &
-                     ESC_Attr (Details_Aria_Label) &
-                     """ class=""more-details"" id=""" &
-                     ESC_Attr (Aria_Action) & """>");
-               X_E ("Theme Details");  Echo ("</button>");
+               Echo
+                 ("<button type=""button"" aria-label="""
+                  & ESC_Attr (Details_Aria_Label)
+                  & """ class=""more-details"" id="""
+                  & ESC_Attr (Aria_Action)
+                  & """>");
+               X_E ("Theme Details");
+               Echo ("</button>");
                Echo ("<div class=""theme-author"">");
             end;
 
@@ -654,67 +705,88 @@ is
 
             Echo ("<div class=""theme-id-container"">");
             if As_Boolean (Get (Theme, "active")) then
-               Echo ("<h2 class=""theme-name"" id=""" & ESC_Attr (Aria_Name) & """>");
+               Echo
+                 ("<h2 class=""theme-name"" id="""
+                  & ESC_Attr (Aria_Name)
+                  & """>");
                Echo ("<span>");
                X_Ex ("Active:", "theme");
                Echo ("</span> " & Get_As_String (Theme, "name"));
                Echo ("</h2>");
             else
-               Echo ("<h2 class=""theme-name"" id=""" & ESC_Attr (Aria_Name) &
-                     """>" & Get_As_String (Theme, "name") & "</h2>");
+               Echo
+                 ("<h2 class=""theme-name"" id="""
+                  & ESC_Attr (Aria_Name)
+                  & """>"
+                  & Get_As_String (Theme, "name")
+                  & "</h2>");
             end if;
 
             Echo ("<div class=""theme-actions"">");
 
             if As_Boolean (Get (Theme, "active")) then
-               if
-                 As_Boolean (Get (Ref_2 (Theme, "actions", "customize"))) and then
-                 Current_User_Can ("edit_theme_options") and then
-                 Current_User_Can ("customize")
+               if As_Boolean (Get (Ref_2 (Theme, "actions", "customize")))
+                 and then Current_User_Can ("edit_theme_options")
+                 and then Current_User_Can ("customize")
                then
                   declare
                      -- translators: %s: Theme name.
                      Customize_Aria_Label : constant String :=
-                       Sprintf (X_X ("Customize %s", "theme"),
-                                [Get_As_String (Theme, "name")]);
+                       Sprintf
+                         (X_X ("Customize %s", "theme"),
+                          [Get_As_String (Theme, "name")]);
                   begin
-                     Echo ("<a aria-label=""" & ESC_Attr (Customize_Aria_Label) &
-                           """ class=""button button-primary customize load-customize hide-if-no-customize"" href=""" & As_String (Get (Ref_2 (Theme, "actions", "customize"))) & """>");
-                     X_E ("Customize");  Echo ("</a>");
+                     Echo
+                       ("<a aria-label="""
+                        & ESC_Attr (Customize_Aria_Label)
+                        & """ class=""button button-primary customize load-customize hide-if-no-customize"" href="""
+                        & As_String
+                            (Get (Ref_2 (Theme, "actions", "customize")))
+                        & """>");
+                     X_E ("Customize");
+                     Echo ("</a>");
                   end;
                end if;
 
-            elsif
-              As_Boolean (Get (Theme, "compatibleWP")) and then
-              As_Boolean (Get (Theme, "compatiblePHP"))
+            elsif As_Boolean (Get (Theme, "compatibleWP"))
+              and then As_Boolean (Get (Theme, "compatiblePHP"))
             then
                declare
                   -- translators: %s: Theme name.
                   Aria_Label : constant String :=
-                    Sprintf (X_X ("Activate %s", "theme"),
-                             ["{{ data.name }}"]);
+                    Sprintf
+                      (X_X ("Activate %s", "theme"), ["{{ data.name }}"]);
                begin
-                  Echo ("<a class=""button activate"" href=""" &
-                        As_String (Get (Ref_2 (Theme, "actions", "activate"))) &
-                        """ aria-label=""" & ESC_Attr (Aria_Label) & """>");
+                  Echo
+                    ("<a class=""button activate"" href="""
+                     & "XXX-C04"
+                     & -- As_String (Get (Ref_2 (Theme, "actions", "activate"))) &
+                                                                                   """ aria-label="""
+                     & ESC_Attr (Aria_Label)
+                     & """>");
                   X_E ("Activate");
                   Echo ("</a>");
                end;
 
-               if
-                 not As_Boolean (Get (Theme, "blockTheme")) and then
-                 Current_User_Can ("edit_theme_options") and then
-                 Current_User_Can ("customize")
+               if not As_Boolean (Get (Theme, "blockTheme"))
+                 and then Current_User_Can ("edit_theme_options")
+                 and then Current_User_Can ("customize")
                then
                   declare
                      -- translators: %s: Theme name.
                      Live_Preview_Aria_Label : constant String :=
-                       Sprintf (X_X ("Live Preview %s", "theme"),
-                                ["{{ data.name }}"]);
+                       Sprintf
+                         (X_X ("Live Preview %s", "theme"),
+                          ["{{ data.name }}"]);
                   begin
-                     Echo ("<a aria-label=""" & ESC_Attr (Live_Preview_Aria_Label) &
-                           """ class=""button button-primary load-customize hide-if-no-customize"" href=""" &
-                           As_String (Get (Ref_2 (Theme, "actions", "customize"))) & """>");
+                     Echo
+                       ("<a aria-label="""
+                        & ESC_Attr (Live_Preview_Aria_Label)
+                        & """ class=""button button-primary load-customize hide-if-no-customize"" href="""
+                        & "XXX-C05"
+                        -- & As_String
+                        --     (Get (Ref_2 (Theme, "actions", "customize")))
+                        & """>");
                      X_E ("Live Preview");
                      Echo ("</a>");
                   end;
@@ -724,19 +796,23 @@ is
                declare
                   -- translators: %s: Theme name.
                   Aria_Label : constant String :=
-                    Sprintf (X_X ("Cannot Activate %s", "theme"),
-                             ["{{ data.name }}"]);
+                    Sprintf
+                      (X_X ("Cannot Activate %s", "theme"),
+                       ["{{ data.name }}"]);
                begin
-                  Echo ("<a class=""button disabled"" aria-label=""" &
-                        ESC_Attr (Aria_Label) & """>");
-                  X_Ex ("Cannot Activate", "theme");  Echo ("</a>");
+                  Echo
+                    ("<a class=""button disabled"" aria-label="""
+                     & ESC_Attr (Aria_Label)
+                     & """>");
+                  X_Ex ("Cannot Activate", "theme");
+                  Echo ("</a>");
                end;
-               if
-                 not As_Boolean (Get (Theme, "blockTheme")) and then
-                 Current_User_Can ("edit_theme_options") and then
-                 Current_User_Can ("customize")
+               if not As_Boolean (Get (Theme, "blockTheme"))
+                 and then Current_User_Can ("edit_theme_options")
+                 and then Current_User_Can ("customize")
                then
-                  Echo ("<a class=""button button-primary hide-if-no-customize disabled"">");
+                  Echo
+                    ("<a class=""button button-primary hide-if-no-customize disabled"">");
                   X_E ("Live Preview");
                   Echo ("</a>");
                end if;
@@ -758,7 +834,7 @@ is
 
       -- List broken themes, if any.
       declare
-         Broken_Themes : constant Array_Type :=
+         Broken_Themes : constant Theme_Array :=
            Wp_Get_Themes (Build ("errors", True)); -- array
       begin
          if not Is_Multisite and then not Broken_Themes.Is_Empty then
@@ -798,7 +874,7 @@ is
                   begin
                      Echo ("<tr>");
                      Echo ("<td>");
-                     if Broken_Theme.Get ("Name") /= "" then
+                     if As_String (Broken_Theme.Get ("Name")) /= "" then
                         Echo (Broken_Theme.Display ("Name"));
                      else
                         Echo (ESC_HTML (Broken_Theme.Get_Stylesheet));
@@ -866,11 +942,16 @@ is
                      then
                         declare
                            Parent_Theme_Name : constant String :=
-                             Broken_Theme.Get ("Template");
+                             As_String (Broken_Theme.Get ("Template"));
 
-                           Parent_Theme : constant Array_Error_Type :=
-                             Themes_API ("theme_information",
-                                         Build ("slug", URL_Encode (Parent_Theme_Name))); -- array
+                           Args : constant Themes_API_Args :=
+                             (Empty_Themes_API_Args
+                              with delta
+                                Slug => +URL_Encode (Parent_Theme_Name));
+
+                           Parent_Theme : constant Themes_API_Result :=
+                             Themes_API ("theme_information", Args);
+--                                         Build ("slug", URL_Encode (Parent_Theme_Name))); -- array
                         begin
                            if Parent_Theme.Success then
 --                         if not Is_Wp_Error (Parent_Theme) then
@@ -1729,5 +1810,20 @@ is
       --
       return Apply_Filters ("theme_auto_update_setting_template", -Template);
    end Wp_Theme_Auto_Update_Setting_Template;
+
+   -------------
+   -- Keys_Of --
+   -------------
+
+   function Keys_Of (Themes : Class_Themes.Theme_Array) return List_Type is
+      use Class_Themes.Theme_Maps;
+
+      List : List_Type;
+   begin
+      for T in Themes.Iterate loop
+         List.Append (Key (T));
+      end loop;
+      return List;
+   end Keys_Of;
 
 end Adm_Themes;

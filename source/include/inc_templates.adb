@@ -26,6 +26,7 @@ with Inc_Functions;
 with Inc_Posts;
 with Inc_Post_Formats;
 with Inc_Post_Templates;
+with Inc_Themes;
 with Inc_Querys;
 
 package body Inc_Templates
@@ -35,9 +36,8 @@ is
    -- Get_Query_Template --
    ------------------------
 
-   function Get_Query_Template (Typ       : String;
-                                Templates : List_Type := Empty_List)
-                                return String
+   function Get_Query_Template
+     (Typ : String; Templates : List_Type := Empty_List) return String
    is
       use Php.Preg;
       use UStrings;
@@ -89,7 +89,7 @@ is
 
       Template := +Locate_Template (Templates_2);
 
---    Template := Locate_Block_Template (Template, Typ, Templates_2); -- XXX
+      --    Template := Locate_Block_Template (Template, Typ, Templates_2); -- XXX
 
       --
       -- Filters the path of the queried template by type.
@@ -128,16 +128,15 @@ is
       -- @param string[] templates A list of template candidates, in descending order
       --                           of priority.
       --
-      return Apply_Filters (Typ & "_" & (-Template), -Template, Typ, Templates_2);
+      return
+        Apply_Filters (Typ & "_" & (-Template), -Template, Typ, Templates_2);
    end Get_Query_Template;
 
    ------------------------
    -- Get_Index_Template --
    ------------------------
 
-   function Get_Index_Template
-            return String
-   is
+   function Get_Index_Template return String is
    begin
       return Get_Query_Template ("index");
    end Get_Index_Template;
@@ -146,9 +145,7 @@ is
    -- Get_404_Template --
    ----------------------
 
-   function Get_404_Template
-            return String
-   is
+   function Get_404_Template return String is
    begin
       return Get_Query_Template ("404");
    end Get_404_Template;
@@ -157,9 +154,7 @@ is
    -- Get_Archive_Template --
    --------------------------
 
-   function Get_Archive_Template
-            return String
-   is
+   function Get_Archive_Template return String is
       use Php.Lists;
       use Inc_Querys;
 
@@ -185,9 +180,7 @@ is
    -- Get_Post_Type_Archive_Template --
    ------------------------------------
 
-   function Get_Post_Type_Archive_Template
-            return String
-   is
+   function Get_Post_Type_Archive_Template return String is
       use Class_Post_Type;
       use Inc_Posts;
       use Inc_Querys;
@@ -201,7 +194,8 @@ is
       declare
          Obj : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
       begin
-         if not (Obj in Wp_Post_Type) or else not Obj.Has_Archive then -- instanceof
+         if not (Obj in Wp_Post_Type) or else not Obj.Has_Archive then
+            -- instanceof
             return "";
          end if;
       end;
@@ -212,17 +206,16 @@ is
    -- Get_Author_Template --
    -------------------------
 
-   function Get_Author_Template
-            return String
-   is
+   function Get_Author_Template return String is
       use UStrings;
       use Class_Users;
       use Inc_Querys;
 
-      Author : constant Wp_User := Get_Queried_Object;
+      Author    : constant Wp_User := Get_Queried_Object;
       Templates : List_Type; --  = array();
    begin
-      if Author in Wp_User then -- instanceof
+      if Author in Wp_User then
+         -- instanceof
          Templates.Append ("author-" & (-Author.Prop.User_Nicename) & ".php");
          Templates.Append ("author-" & Image (Author.Id) & ".php");
       end if;
@@ -235,16 +228,14 @@ is
    -- Get_Category_Template --
    ---------------------------
 
-   function Get_Category_Template
-            return String
-   is
+   function Get_Category_Template return String is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
       use Class_Terms;
       use Inc_Querys;
 
-      Category : constant Wp_Term := Get_Queried_Object;
+      Category  : constant Wp_Term := Get_Queried_Object;
       Templates : List_Type; -- = array();
    begin
       if not Empty (Category.Slug) then
@@ -256,7 +247,8 @@ is
             end if;
 
             Templates.Append ("category-" & (-Category.Slug) & ".php");
-            Templates.Append ("category-" & Helpers.Image (Category.Term_Id) & ".php");
+            Templates.Append
+              ("category-" & Helpers.Image (Category.Term_Id) & ".php");
          end;
       end if;
       Templates.Append ("category.php");
@@ -268,9 +260,7 @@ is
    -- Get_Tag_Template --
    ----------------------
 
-   function Get_Tag_Template
-            return String
-   is
+   function Get_Tag_Template return String is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
@@ -300,9 +290,7 @@ is
    -- Get_Taxonomy_Template --
    ---------------------------
 
-   function Get_Taxonomy_Template
-            return String
-   is
+   function Get_Taxonomy_Template return String is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
@@ -314,7 +302,7 @@ is
    begin
       if not Empty (Term.Slug) then
          declare
-            Taxonomy : constant String := -Term.Taxonomy;
+            Taxonomy     : constant String := -Term.Taxonomy;
             Slug_Decoded : constant String := URL_Decode (-Term.Slug);
          begin
             if Slug_Decoded /= Term.Slug then
@@ -333,9 +321,7 @@ is
    -- Get_Date_Template --
    -----------------------
 
-   function Get_Date_Template
-            return String
-   is
+   function Get_Date_Template return String is
    begin
       return Get_Query_Template ("date");
    end Get_Date_Template;
@@ -344,9 +330,7 @@ is
    -- Get_Home_Template --
    -----------------------
 
-   function Get_Home_Template
-            return String
-   is
+   function Get_Home_Template return String is
       Templates : constant List_Type := ["home.php", "index.php"];
    begin
       return Get_Query_Template ("home", Templates);
@@ -356,9 +340,7 @@ is
    -- Get_Front_Page_Template --
    -----------------------------
 
-   function Get_Front_Page_Template
-            return String
-   is
+   function Get_Front_Page_Template return String is
       Templates : constant List_Type := ["front-page.php"];
    begin
       return Get_Query_Template ("frontpage", Templates);
@@ -368,9 +350,7 @@ is
    -- Get_Privacy_Policy_Template --
    ---------------------------------
 
-   function Get_Privacy_Policy_Template
-            return String
-   is
+   function Get_Privacy_Policy_Template return String is
       Templates : constant List_Type := ["privacy-policy.php"];
    begin
       return Get_Query_Template ("privacypolicy", Templates);
@@ -380,9 +360,7 @@ is
    -- Get_Page_Template --
    -----------------------
 
-   function Get_Page_Template
-            return String
-   is
+   function Get_Page_Template return String is
       use Php.HTML;
       use UStrings;
       use Class_Posts;
@@ -434,9 +412,7 @@ is
    -- Get_Search_Template --
    -------------------------
 
-   function Get_Search_Template
-            return String
-   is
+   function Get_Search_Template return String is
    begin
       return Get_Query_Template ("search");
    end Get_Search_Template;
@@ -445,9 +421,7 @@ is
    -- Get_Single_Template --
    -------------------------
 
-   function Get_Single_Template
-            return String
-   is
+   function Get_Single_Template return String is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
@@ -456,7 +430,7 @@ is
       use Inc_Post_Templates;
       use Inc_Querys;
 
-      Object : constant Wp_Post := Get_Queried_Object;
+      Object    : constant Wp_Post := Get_Queried_Object;
       Templates : List_Type;
    begin
       if not Empty (Object.Post_Type) then
@@ -468,16 +442,25 @@ is
             end if;
 
             declare
-               Name_Decoded : constant String := URL_Decode (-Object.Post_Name);
+               Name_Decoded : constant String :=
+                 URL_Decode (-Object.Post_Name);
             begin
                if Name_Decoded /= Object.Post_Name then
-                  Templates.Append ("single-" & (-Object.Post_Type) &
-                                    "-" & Name_Decoded & ".php");
+                  Templates.Append
+                    ("single-"
+                     & (-Object.Post_Type)
+                     & "-"
+                     & Name_Decoded
+                     & ".php");
                end if;
             end;
          end;
-         Templates.Append ("single-" & (-Object.Post_Type) &
-                           "-" & (-Object.Post_Name) & ".php");
+         Templates.Append
+           ("single-"
+            & (-Object.Post_Type)
+            & "-"
+            & (-Object.Post_Name)
+            & ".php");
          Templates.Append ("single-" & (-Object.Post_Type) & ".php");
       end if;
 
@@ -490,16 +473,14 @@ is
    -- Get_Embed_Template --
    ------------------------
 
-   function Get_Embed_Template
-            return String
-   is
+   function Get_Embed_Template return String is
       use Php.Strings;
       use UStrings;
       use Class_Posts;
       use Inc_Post_Formats;
       use Inc_Querys;
 
-      Object : constant Wp_Post := Get_Queried_Object;
+      Object    : constant Wp_Post := Get_Queried_Object;
       Templates : List_Type;
    begin
       if not Empty (Object.Post_Type) then
@@ -507,8 +488,8 @@ is
             Post_Format : constant String := Get_Post_Format (Object);
          begin
             if Post_Format /= "" then
-               Templates.Append ("embed-" & (-Object.Post_Type) &
-                                 "-" & Post_Format & ".php");
+               Templates.Append
+                 ("embed-" & (-Object.Post_Type) & "-" & Post_Format & ".php");
             end if;
          end;
          Templates.Append ("embed-" & (-Object.Post_Type) & ".php");
@@ -523,9 +504,7 @@ is
    -- Get_Singular_Template --
    ---------------------------
 
-   function Get_Singular_Template
-            return String
-   is
+   function Get_Singular_Template return String is
    begin
       return Get_Query_Template ("singular");
    end Get_Singular_Template;
@@ -534,9 +513,7 @@ is
    -- Get_Attachment_Template --
    -----------------------------
 
-   function Get_Attachment_Template
-            return String
-   is
+   function Get_Attachment_Template return String is
       use Php.Strings;
       use UStrings;
       use Class_Posts;
@@ -544,8 +521,8 @@ is
 
       Attachment : constant Wp_Post := Get_Queried_Object;
       Templates  : List_Type;
-      Typ    : UString;
-      Subtyp : UString;
+      Typ        : UString;
+      Subtyp     : UString;
    begin
       if Attachment /= Null_Post then
          if 0 /= Strpos (-Attachment.Post_Mime_Type, "/") then
@@ -553,15 +530,14 @@ is
                List : constant List_Type :=
                  Explode ("/", -Attachment.Post_Mime_Type);
             begin
-               Typ    := +List (1);
+               Typ := +List (1);
                Subtyp := +List (2);
             end;
          else
             declare
-               List : constant List_Type :=
-                 [-Attachment.Post_Mime_Type, ""];
+               List : constant List_Type := [-Attachment.Post_Mime_Type, ""];
             begin
-               Typ    := +List (1);
+               Typ := +List (1);
                Subtyp := +List (2);
             end;
          end if;
@@ -577,15 +553,31 @@ is
       return Get_Query_Template ("attachment", Templates);
    end Get_Attachment_Template;
 
+   -----------------------------
+   -- Wp_Set_Template_Globals --
+   -----------------------------
+
+   Global_Wp_Stylesheet_Path : UStrings.UString;
+   Global_Wp_Template_Path   : UStrings.UString;
+
+   procedure Wp_Set_Template_Globals is
+      use UStrings;
+      use Inc_Themes;
+   begin
+      Global_Wp_Stylesheet_Path := +Get_Stylesheet_Directory;
+      Global_Wp_Template_Path := +Get_Template_Directory;
+   end Wp_Set_Template_Globals;
+
    ---------------------
    -- Locate_Template --
    ---------------------
 
-   function Locate_Template (Template_Names : List_Type; -- String;
-                             Load           : Boolean    := False;
-                             Require_Once   : Boolean    := True;
-                             Args           : Array_Type := Empty_Array)
-                             return String
+   function Locate_Template
+     (Template_Names : List_Type;
+      -- String;
+      Load           : Boolean := False;
+      Require_Once   : Boolean := True;
+      Args           : Array_Type := Empty_Array) return String
    is
       use Php.Files;
       use Constants;
@@ -607,11 +599,13 @@ is
             Located := (TEMPLATEPATH & "/" & Template_Name);
             exit;
 
-         elsif File_Exists (-(ABSPATH & WPINC) & "/theme-compat/" & Template_Name) then
+         elsif File_Exists
+                 (-(ABSPATH & WPINC) & "/theme-compat/" & Template_Name)
+         then
             Located := (ABSPATH & WPINC & "/theme-compat/" & Template_Name);
             exit;
          end if;
-         << Continue >>
+         <<Continue>>
       end loop;
 
       if Load and then "" /= Located then

@@ -8,8 +8,7 @@
 --
 
 with Helpers;
-
-with Class_Object_Caches;
+with Logging;
 
 package body Inc_Caches
 is
@@ -31,14 +30,15 @@ is
    -- Wp_Cache_Add --
    ------------------
 
-   procedure Wp_Cache_Add (Key     : String;
-                           Data    : Multi_Type;
-                           Group   : String  := "";
-                           Expire  : Natural := 0;
-                           Success : out Boolean)
-   is
+   procedure Wp_Cache_Add
+     (Key     : Key_Type;
+      Data    : Multi_Type;
+      Group   : Group_Type := "";
+      Expire  : Natural := 0;
+      Success : out Boolean) is
    begin
-      Global_Wp_Object_Cache.Add (Key, Data, Group, Expire, Success => Success);
+      Global_Wp_Object_Cache.Add
+        (Key, Data, Group, Expire, Success => Success);
    end Wp_Cache_Add;
 
 -- --
@@ -88,12 +88,12 @@ is
    -- Wp_Cache_Set --
    ------------------
 
-   procedure Wp_Cache_Set (Key     : String;
-                           Data    : Multi_Type;
-                           Group   : String  := "";
-                           Expire  : Integer := 0;
-                           Success : out Boolean)
-   is
+   procedure Wp_Cache_Set
+     (Key     : Key_Type;
+      Data    : Multi_Type;
+      Group   : Group_Type := "";
+      Expire  : Integer := 0;
+      Success : out Boolean) is
    begin
       Global_Wp_Object_Cache.Set (Key, Data, Group, Expire, Success);
    end Wp_Cache_Set;
@@ -123,13 +123,13 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Multi_Type
-   is
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Multi_Type is
    begin
+      Logging.Log ("wp_cache_get", "");
       return Global_Wp_Object_Cache.Get (Key, Group, Force, Found);
    end Wp_Cache_Get;
 
@@ -137,20 +137,22 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Array_Type
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Array_Type
    is
-      Result : constant Multi_Type :=
-        Wp_Cache_Get (Key, Group, Force, Found);
+      Result : constant Multi_Type := Wp_Cache_Get (Key, Group, Force, Found);
    begin
+      Logging.Log ("wp_cache_get array", String (Key));
       case Kind_Of (Result) is
-      when Kind_Null =>
-         return Empty_Array;
-      when others =>
-         return As_Array (Result);
+         when Kind_Null =>
+            Logging.Log ("wp_cache_get array", "null");
+            return Empty_Array;
+
+         when others    =>
+            return As_Array (Result);
       end case;
    end Wp_Cache_Get;
 
@@ -158,12 +160,11 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Boolean
-   is
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Boolean is
    begin
       return As_Boolean (Wp_Cache_Get (Key, Group, Force, Found));
    end Wp_Cache_Get;
@@ -172,12 +173,11 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return String
-   is
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return String is
    begin
       return As_String (Wp_Cache_Get (Key, Group, Force, Found));
    end Wp_Cache_Get;
@@ -186,11 +186,11 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Class_Posts.Wp_Post
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Class_Posts.Wp_Post
    is
       Result : constant Multi_Type := Wp_Cache_Get (Key, Group, Force, Found);
    begin
@@ -205,12 +205,11 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Integer
-   is
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Integer is
    begin
       return As_Integer (Wp_Cache_Get (Key, Group, Force, Found));
    end Wp_Cache_Get;
@@ -219,14 +218,13 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Inc_Comments.Comment_Counts_Type
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Inc_Comments.Comment_Counts_Type
    is
-      Result : constant Multi_Type :=
-        Wp_Cache_Get (Key, Group, Force, Found);
+      Result : constant Multi_Type := Wp_Cache_Get (Key, Group, Force, Found);
    begin
       if Result = From_Null then
          return Inc_Comments.Null_Comment_Counts;
@@ -239,15 +237,15 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : Integer;         -- Comment_Id
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Class_Comments.Wp_Comment
+   function Wp_Cache_Get
+     (Key   : Integer;
+      -- Comment_Id
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Class_Comments.Wp_Comment
    is
       Result : constant Multi_Type :=
-        Wp_Cache_Get (Helpers.Image (Key),
-                      Group, Force, Found);
+        Wp_Cache_Get (Key_Type (Helpers.Image (Key)), Group, Force, Found);
    begin
       if Result = From_Null then
          return Class_Comments.Null_Comment;
@@ -260,15 +258,15 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : Integer;         -- User_Id
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Class_Users.Wp_User
+   function Wp_Cache_Get
+     (Key   : Integer;
+      -- User_Id
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Class_Users.Wp_User
    is
       Result : constant Multi_Type :=
-        Wp_Cache_Get (Helpers.Image (Key),
-                      Group, Force, Found);
+        Wp_Cache_Get (Key_Type (Helpers.Image (Key)), Group, Force, Found);
    begin
       if Result = From_Null then
          return Class_Users.Null_User;
@@ -281,14 +279,13 @@ is
    -- Wp_Cache_Get --
    ------------------
 
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean)
-                          return Class_Users.Wp_User
+   function Wp_Cache_Get
+     (Key   : Key_Type;
+      Group : Group_Type := "";
+      Force : Boolean := False;
+      Found : out Boolean) return Class_Users.Wp_User
    is
-      Result : constant Multi_Type :=
-        Wp_Cache_Get (Key, Group, Force, Found);
+      Result : constant Multi_Type := Wp_Cache_Get (Key, Group, Force, Found);
    begin
       if Result = From_Null then
          return Class_Users.Null_User;
@@ -322,10 +319,8 @@ is
    -- Wp_Cache_Delete --
    ---------------------
 
-   function Wp_Cache_Delete (Key   : String;
-                             Group : String := "")
-                             return Boolean
-   is
+   function Wp_Cache_Delete
+     (Key : Key_Type; Group : Group_Type := "") return Boolean is
    begin
       return Global_Wp_Object_Cache.Delete (Key, Group);
    end Wp_Cache_Delete;
@@ -334,9 +329,7 @@ is
    -- Wp_Cache_Delete --
    ---------------------
 
-   procedure Wp_Cache_Delete (Key   : String;
-                              Group : String := "")
-   is
+   procedure Wp_Cache_Delete (Key : Key_Type; Group : Group_Type := "") is
       Unused_Done : constant Boolean := Wp_Cache_Delete (Key, Group);
    begin
       null;
@@ -346,12 +339,11 @@ is
    -- Wp_Cache_Delete_Multiple --
    ------------------------------
 
-   function Wp_Cache_Delete_Multiple (Keys  : List_Type;
-                                      Group : String := "")
-                                      return Array_Type
+   function Wp_Cache_Delete_Multiple
+     (Keys : List_Type; Group : Group_Type := "") return Array_Type
    is
       use Class_Object_Caches;
---         global $wp_object_cache;
+      --         global $wp_object_cache;
    begin
       return Global_Wp_Object_Cache.Delete_Multiple (Keys, Group);
    end Wp_Cache_Delete_Multiple;
@@ -360,11 +352,10 @@ is
    -- Wp_Cache_Delete_Multiple --
    ------------------------------
 
-   procedure Wp_Cache_Delete_Multiple (Keys  : List_Type;
-                                       Group : String := "")
+   procedure Wp_Cache_Delete_Multiple
+     (Keys : List_Type; Group : Group_Type := "")
    is
-      Unused : constant Array_Type :=
-        Wp_Cache_Delete_Multiple (Keys, Group);
+      Unused : constant Array_Type := Wp_Cache_Delete_Multiple (Keys, Group);
    begin
       null;
    end Wp_Cache_Delete_Multiple;
@@ -499,11 +490,10 @@ is
    -- Wp_Cache_Add_Global_Groups --
    --------------------------------
 
-   procedure Wp_Cache_Add_Global_Groups (Groups : String)
-   is
---    global $wp_object_cache;
+   procedure Wp_Cache_Add_Global_Groups (Groups : Group_Type) is
+      --    global $wp_object_cache;
    begin
---    Wp_Object_Cache.Add_Global_Groups (Groups);
+      --    Wp_Object_Cache.Add_Global_Groups (Groups);
       null;
    end Wp_Cache_Add_Global_Groups;
 
@@ -511,8 +501,7 @@ is
    -- Wp_Cache_Add_Non_Persistent_Groups --
    ----------------------------------------
 
-   procedure Wp_Cache_Add_Non_Persistent_Groups (Groups : String)
-   is null;
+   procedure Wp_Cache_Add_Non_Persistent_Groups (Groups : Group_Type) is null;
    -- Default cache doesn't persist so nothing to do here.
 
 -- --

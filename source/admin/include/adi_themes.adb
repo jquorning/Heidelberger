@@ -5,8 +5,37 @@
 -- @subpackage Administration
 --
 
+with Php.Arrays;
+with Php.Echoing;
+with Php.Errors;
+with Php.HTML;
+with Php.JSON;
+with Php.Lists;
+with Php.Strings;
+
+with Arrays.IO;
+with Array_Lists;
+with Binder;
+with Constants;
+with Lists;
+with Logging;
+with Wp_Common;
+
+with Adi_Update;
+
+with Inc_Capabilities;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_HTTP;
+with Inc_Link_Templates;
+with Inc_Load;
+with Inc_L10n;
+with Inc_Options;
+with Inc_Themes;
+
 package body Adi_Themes
 is
+   use Lists;
 
    ------------------
    -- Delete_Theme --
@@ -73,7 +102,7 @@ is
 --                 return new WP_Error( "fs_error", __( "Filesystem error." ), wp_filesystem.errors );
 --         end;
 
---         // Get the base plugin folder.
+--         // Get the base theme folder.
 --         themes_dir = wp_filesystem.wp_themes_dir();
 --         if ( empty( themes_dir ) ) then
 --                 return new WP_Error( "fs_no_themes_dir", __( "Unable to locate WordPress theme directory." ) );
@@ -88,6 +117,8 @@ is
 --         --
 --         do_action( "delete_theme", stylesheet );
 
+--         theme = wp_get_theme( stylesheet );
+--
 --         themes_dir = trailingslashit( themes_dir );
 --         theme_dir  = trailingslashit( themes_dir . stylesheet );
 --         deleted    = wp_filesystem.delete( theme_dir, true );
@@ -119,6 +150,7 @@ is
 --                 foreach ( translations as translation => data ) then
 --                         wp_filesystem.delete( WP_LANG_DIR . "/themes/" . stylesheet . "-" . translation . ".po" );
 --                         wp_filesystem.delete( WP_LANG_DIR . "/themes/" . stylesheet . "-" . translation . ".mo" );
+--                         wp_filesystem.delete( WP_LANG_DIR . "/themes/" . stylesheet . "-" . translation . ".l10n.php" );
 
 --                         json_translation_files = glob( WP_LANG_DIR . "/themes/" . stylesheet . "-" . translation . "-*.json" );
 --                         if ( json_translation_files ) then
@@ -132,6 +164,9 @@ is
 --                 WP_Theme::network_disable_theme( stylesheet );
 --         end;
 
+--         // Clear theme caches.
+--         theme.cache_delete();
+--
 --         // Force refresh of theme update information.
 --         delete_site_transient( "update_themes" );
 
@@ -163,577 +198,922 @@ is
 -- -- @return string
 -- --
 -- function _get_template_edit_filename( fullpath, containingfolder ) then
---         return str_replace( dirname( dirname( containingfolder ) ), "", fullpath );
+--         return str_replace( dirname( containingfolder, 2 ), "", fullpath );
 -- end;
 
--- --
--- -- Check if there is an update for a theme available.
--- --
--- -- Will display link, if there is an update available.
--- --
--- -- @since 2.7.0
--- --
--- -- @see get_theme_update_available()
--- --
--- -- @param WP_Theme theme Theme data object.
--- --
--- function theme_update_available( theme ) then
---         echo get_theme_update_available( theme );
--- end;
+   ----------------------------
+   -- Theme_Update_Available --
+   ----------------------------
 
--- --
--- -- Retrieves the update link if there is a theme update available.
--- --
--- -- Will return a link if there is an update available.
--- --
--- -- @since 3.8.0
--- --
--- -- @param WP_Theme theme WP_Theme object.
--- -- @return string|false HTML for the update link, or false if invalid info was passed.
--- --
--- function get_theme_update_available( theme ) then
---         static themes_update = null;
+   procedure Theme_Update_Available (Theme : in out Class_Themes.Wp_Theme) is
+      use Php.Echoing;
+   begin
+      Echo (Get_Theme_Update_Available (Theme));
+   end Theme_Update_Available;
 
---         if ( ! current_user_can( "update_themes" ) ) then
---                 return false;
---         end;
+   --------------------------------
+   -- Get_Theme_Update_Available --
+   --------------------------------
 
---         if ( ! isset( themes_update ) ) then
---                 themes_update = get_site_transient( "update_themes" );
---         end;
+   Static_Themes_Update : Array_Type := Empty_Array;
 
---         if ( ! ( theme instanceof WP_Theme ) ) then
---                 return false;
---         end;
+   function Get_Theme_Update_Available
+     (Theme : in out Class_Themes.Wp_Theme) return String
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Link_Templates;
+      use Inc_L10n;
 
---         stylesheet = theme.get_stylesheet();
+      Themes_Update : Array_Type renames Static_Themes_Update;
+   begin
+      if not Current_User_Can ("update_themes") then
+         return ""; -- False
 
---         html = "";
+      end if;
 
---         if ( isset( themes_update.response[ stylesheet ] ) ) then
---                 update      = themes_update.response[ stylesheet ];
---                 theme_name  = theme.display( "Name" );
---                 details_url = add_query_arg(
---                         array(
---                                 "TB_iframe" => "true",
---                                 "width"     => 1024,
---                                 "height"    => 800,
---                         ),
---                         update["url"]
---                 ); // Theme browser inside WP? Replace this. Also, theme preview JS will override this on the available list.
---                 update_url  = wp_nonce_url( admin_url( "update.php?action=upgrade-theme&amp;theme=" . urlencode( stylesheet ) ), "upgrade-theme_" . stylesheet );
+      if Themes_Update = Empty_Array then
+         -- if not Isset (Themes_Update) then
+         Themes_Update := Empty_Array; -- As_Array (Get_Site_Transient ("update_themes"));
+      end if;
 
---                 if ( ! is_multisite() ) then
---                         if ( ! current_user_can( "update_themes" ) ) then
---                                 html = sprintf(
---                                         /* translators: 1: Theme name, 2: Theme details URL, 3: Additional link attributes, 4: Version number.--
---                                         "<p><strong>" . __( "There is a new version of %1s available. <a href="%2s" %3s>View version %4s details</a>." ) . "</strong></p>",
---                                         theme_name,
---                                         esc_url( details_url ),
---                                         sprintf(
---                                                 "class="thickbox open-plugin-details-modal" aria-label="%s"",
---                                                 /* translators: 1: Theme name, 2: Version number.--
---                                                 esc_attr( sprintf( __( "View %1s version %2s details" ), theme_name, update["new_version"] ) )
---                                         ),
---                                         update["new_version"]
---                                 );
---                         end; elseif ( empty( update["package"] ) ) then
---                                 html = sprintf(
---                                         /* translators: 1: Theme name, 2: Theme details URL, 3: Additional link attributes, 4: Version number.--
---                                         "<p><strong>" . __( "There is a new version of %1s available. <a href="%2s" %3s>View version %4s details</a>. <em>Automatic update is unavailable for this theme.</em>" ) . "</strong></p>",
---                                         theme_name,
---                                         esc_url( details_url ),
---                                         sprintf(
---                                                 "class="thickbox open-plugin-details-modal" aria-label="%s"",
---                                                 /* translators: 1: Theme name, 2: Version number.--
---                                                 esc_attr( sprintf( __( "View %1s version %2s details" ), theme_name, update["new_version"] ) )
---                                         ),
---                                         update["new_version"]
---                                 );
---                         end; else then
---                                 html = sprintf(
---                                         /* translators: 1: Theme name, 2: Theme details URL, 3: Additional link attributes, 4: Version number, 5: Update URL, 6: Additional link attributes.--
---                                         "<p><strong>" . __( "There is a new version of %1s available. <a href="%2s" %3s>View version %4s details</a> or <a href="%5s" %6s>update now</a>." ) . "</strong></p>",
---                                         theme_name,
---                                         esc_url( details_url ),
---                                         sprintf(
---                                                 "class="thickbox open-plugin-details-modal" aria-label="%s"",
---                                                 /* translators: 1: Theme name, 2: Version number.--
---                                                 esc_attr( sprintf( __( "View %1s version %2s details" ), theme_name, update["new_version"] ) )
---                                         ),
---                                         update["new_version"],
---                                         update_url,
---                                         sprintf(
---                                                 "aria-label="%s" id="update-theme" data-slug="%s"",
---                                                 /* translators: %s: Theme name.--
---                                                 esc_attr( sprintf( _x( "Update %s now", "theme" ), theme_name ) ),
---                                                 stylesheet
---                                         )
---                                 );
---                         end;
---                 end;
---         end;
+      -- if not ( theme instanceof WP_Theme ) then
+      --    return False;
+      -- end if;
 
---         return html;
--- end;
+      declare
+         Stylesheet : constant String := Theme.Get_Stylesheet;
 
--- --
--- -- Retrieves list of WordPress theme features (aka theme tags).
--- --
--- -- @since 3.1.0
--- -- @since 3.2.0 Added "Gray" color and "Featured Image Header", "Featured Images",
--- --              "Full Width Template", and "Post Formats" features.
--- -- @since 3.5.0 Added "Flexible Header" feature.
--- -- @since 3.8.0 Renamed "Width" filter to "Layout".
--- -- @since 3.8.0 Renamed "Fixed Width" and "Flexible Width" options
--- --              to "Fixed Layout" and "Fluid Layout".
--- -- @since 3.8.0 Added "Accessibility Ready" feature and "Responsive Layout" option.
--- -- @since 3.9.0 Combined "Layout" and "Columns" filters.
--- -- @since 4.6.0 Removed "Colors" filter.
--- -- @since 4.6.0 Added "Grid Layout" option.
--- --              Removed "Fixed Layout", "Fluid Layout", and "Responsive Layout" options.
--- -- @since 4.6.0 Added "Custom Logo" and "Footer Widgets" features.
--- --              Removed "Blavatar" feature.
--- -- @since 4.6.0 Added "Blog", "E-Commerce", "Education", "Entertainment", "Food & Drink",
--- --              "Holiday", "News", "Photography", and "Portfolio" subjects.
--- --              Removed "Photoblogging" and "Seasonal" subjects.
--- -- @since 4.9.0 Reordered the filters from "Layout", "Features", "Subject"
--- --              to "Subject", "Features", "Layout".
--- -- @since 4.9.0 Removed "BuddyPress", "Custom Menu", "Flexible Header",
--- --              "Front Page Posting", "Microformats", "RTL Language Support",
--- --              "Threaded Comments", and "Translation Ready" features.
--- -- @since 5.5.0 Added "Block Editor Patterns", "Block Editor Styles",
--- --              and "Full Site Editing" features.
--- -- @since 5.5.0 Added "Wide Blocks" layout option.
--- -- @since 5.8.1 Added "Template Editing" feature.
--- -- @since 6.1.1 Replaced "Full Site Editing" feature name with "Site Editor".
--- --
--- -- @param bool api Optional. Whether try to fetch tags from the WordPress.org API. Defaults to true.
--- -- @return array Array of features keyed by category with translations keyed by slug.
--- --
--- function get_theme_feature_list( api = true ) then
---         // Hard-coded list is used if API is not accessible.
---         features = array(
+         HTML : UString;
+      begin
+         if False then -- Isset (As_Array (Get (Themes_Update, "response")), Stylesheet) then
+            declare
+               Update : constant Array_Type :=
+                 As_Array
+                   (Get
+                      (As_Array (Get (Themes_Update, "response")),
+                       Stylesheet));
 
---                 __( "Subject" )  => array(
---                         "blog"           => __( "Blog" ),
---                         "e-commerce"     => __( "E-Commerce" ),
---                         "education"      => __( "Education" ),
---                         "entertainment"  => __( "Entertainment" ),
---                         "food-and-drink" => __( "Food & Drink" ),
---                         "holiday"        => __( "Holiday" ),
---                         "news"           => __( "News" ),
---                         "photography"    => __( "Photography" ),
---                         "portfolio"      => __( "Portfolio" ),
---                 ),
+               Theme_Name : constant String := Theme.Display ("Name");
 
---                 __( "Features" ) => array(
---                         "accessibility-ready"   => __( "Accessibility Ready" ),
---                         "block-patterns"        => __( "Block Editor Patterns" ),
---                         "block-styles"          => __( "Block Editor Styles" ),
---                         "custom-background"     => __( "Custom Background" ),
---                         "custom-colors"         => __( "Custom Colors" ),
---                         "custom-header"         => __( "Custom Header" ),
---                         "custom-logo"           => __( "Custom Logo" ),
---                         "editor-style"          => __( "Editor Style" ),
---                         "featured-image-header" => __( "Featured Image Header" ),
---                         "featured-images"       => __( "Featured Images" ),
---                         "footer-widgets"        => __( "Footer Widgets" ),
---                         "full-site-editing"     => __( "Site Editor" ),
---                         "full-width-template"   => __( "Full Width Template" ),
---                         "post-formats"          => __( "Post Formats" ),
---                         "sticky-post"           => __( "Sticky Post" ),
---                         "template-editing"      => __( "Template Editing" ),
---                         "theme-options"         => __( "Theme Options" ),
---                 ),
+               Details_URL : constant String :=
+                 Add_Query_Arg
+                   (To_Array_Type
+                      ([Build ("TB_iframe", "true"),
+                        Build ("width", 1024),
+                        Build ("height", 800)]),
+                    Get_As_String
+                      (Update,
+                       "url")); -- Theme browser inside WP? Replace this. Also, theme preview JS will override this on the available list.
 
---                 __( "Layout" )   => array(
---                         "grid-layout"   => __( "Grid Layout" ),
---                         "one-column"    => __( "One Column" ),
---                         "two-columns"   => __( "Two Columns" ),
---                         "three-columns" => __( "Three Columns" ),
---                         "four-columns"  => __( "Four Columns" ),
---                         "left-sidebar"  => __( "Left Sidebar" ),
---                         "right-sidebar" => __( "Right Sidebar" ),
---                         "wide-blocks"   => __( "Wide Blocks" ),
---                 ),
+               Update_URL : constant String :=
+                 Wp_Nonce_URL
+                   (Admin_URL
+                      ("update.php?action=upgrade-theme&amp;theme="
+                       & URL_Encode (Stylesheet)),
+                    "upgrade-theme_" & Stylesheet);
+            begin
+               if not Is_Multisite then
+                  if not Current_User_Can ("update_themes") then
+                     HTML :=
+                       +Sprintf
+                          (
+                           -- translators: 1: Theme name, 2: Theme details URL, 3: Additional link attributes, 4: Version number.
+                           "<p><strong>"
+                           & abs "There is a new version of %1s available. <a href=""%2s"" %3s>View version %4s details</a>."
+                           & "</strong></p>",
+                           [1 => Theme_Name,
+                            2 => ESC_URL (Details_URL),
+                            3 =>
+                              Sprintf
+                                ("class=""thickbox open-plugin-details-modal"" aria-label=""%s""",
+                                 -- translators: 1: Theme name, 2: Version number.
+                                 [1 =>
+                                    ESC_Attr
+                                      (Sprintf
+                                         (abs "View %1s version %2s details",
+                                          [1 => Theme_Name,
+                                           2 =>
+                                             Get_As_String
+                                               (Update, "new_version")]))]),
+                            4 => Get_As_String (Update, "new_version")]);
 
---         );
+                  elsif Empty (Update, "package") then
+                     HTML :=
+                       +Sprintf
+                          (
+                           -- translators: 1: Theme name, 2: Theme details URL, 3: Additional link attributes, 4: Version number.
+                           "<p><strong>"
+                           & abs "There is a new version of %1s available. <a href=""%2s"" %3s>View version %4s details</a>. <em>Automatic update is unavailable for this theme.</em>"
+                           & "</strong></p>",
+                           [1 => Theme_Name,
+                            2 => ESC_URL (Details_URL),
+                            3 =>
+                              Sprintf
+                                ("class=""thickbox open-plugin-details-modal"" aria-label=""%s""",
+                                 -- translators: 1: Theme name, 2: Version number.
+                                 [ESC_Attr
+                                    (Sprintf
+                                       (abs "View %1s version %2s details",
+                                        [1 => Theme_Name,
+                                         2 =>
+                                           Get_As_String
+                                             (Update, "new_version")]))]),
+                            4 => Get_As_String (Update, "new_version")]);
+                  else
+                     HTML :=
+                       +Sprintf
+                          (
+                           -- translators: 1: Theme name, 2: Theme details URL, 3: Additional link attributes, 4: Version number, 5: Update URL, 6: Additional link attributes.
+                           "<p><strong>"
+                           & abs "There is a new version of %1s available. <a href=""%2s"" %3s>View version %4s details</a> or <a href=""%5s"" %6s>update now</a>."
+                           & "</strong></p>",
+                           [1 => Theme_Name,
+                            2 => ESC_URL (Details_URL),
+                            3 =>
+                              Sprintf
+                                ("class=""thickbox open-plugin-details-modal"" aria-label=""%s""",
+                                 -- translators: 1: Theme name, 2: Version number.
+                                 [ESC_Attr
+                                    (Sprintf
+                                       (abs "View %1s version %2s details",
+                                        [1 => Theme_Name,
+                                         2 =>
+                                           Get_As_String
+                                             (Update, "new_version")]))]),
+                            4 => Get_As_String (Update, "new_version"),
+                            5 => Update_URL,
+                            6 =>
+                              Sprintf
+                                ("aria-label=""%s"" id=""update-theme"" data-slug=""%s""",
+                                 -- translators: %s: Theme name.
+                                 [1 =>
+                                    ESC_Attr
+                                      (Sprintf
+                                         (X_X ("Update %s now", "theme"),
+                                          [1 => Theme_Name])),
+                                  2 => Stylesheet])]);
+                  end if;
+               end if;
+            end;
+         end if;
 
---         if ( ! api || ! current_user_can( "install_themes" ) ) then
---                 return features;
---         end;
+         return -HTML;
+      end;
+   end Get_Theme_Update_Available;
 
---         feature_list = get_site_transient( "wporg_theme_feature_list" );
---         if ( ! feature_list ) then
---                 set_site_transient( "wporg_theme_feature_list", array(), 3-- HOUR_IN_SECONDS );
---         end;
+   ----------------------------
+   -- Get_Theme_Feature_List --
+   ----------------------------
 
---         if ( ! feature_list ) then
---                 feature_list = themes_api( "feature_list", array() );
---                 if ( is_wp_error( feature_list ) ) then
---                         return features;
---                 end;
---         end;
+   function Get_Theme_Feature_List (API : Boolean := True) return Array_Type is
+      use Array_Lists;
+      use Inc_Capabilities;
+      use Adi_Themes.Theme_API_Lists;
+      use Inc_L10n;
+      use Inc_Options;
 
---         if ( ! feature_list ) then
---                 return features;
---         end;
+      -- Hard-coded list is used if API is not accessible.
+      Features : constant Array_Type :=
+        To_Array_Type
+          ([Build
+              (abs "Subject",
+               To_Array_Type
+                 ([Build ("blog", abs "Blog"),
+                   Build ("e-commerce", abs "E-Commerce"),
+                   Build ("education", abs "Education"),
+                   Build ("entertainment", abs "Entertainment"),
+                   Build ("food-and-drink", abs "Food & Drink"),
+                   Build ("holiday", abs "Holiday"),
+                   Build ("news", abs "News"),
+                   Build ("photography", abs "Photography"),
+                   Build ("portfolio", abs "Portfolio")])),
 
---         set_site_transient( "wporg_theme_feature_list", feature_list, 3-- HOUR_IN_SECONDS );
+            Build
+              (abs "Features",
+               To_Array_Type
+                 ([Build ("accessibility-ready", abs "Accessibility Ready"),
+                   Build ("block-patterns", abs "Block Editor Patterns"),
+                   Build ("block-styles", abs "Block Editor Styles"),
+                   Build ("custom-background", abs "Custom Background"),
+                   Build ("custom-colors", abs "Custom Colors"),
+                   Build ("custom-header", abs "Custom Header"),
+                   Build ("custom-logo", abs "Custom Logo"),
+                   Build ("editor-style", abs "Editor Style"),
+                   Build
+                     ("featured-image-header", abs "Featured Image Header"),
+                   Build ("featured-images", abs "Featured Images"),
+                   Build ("footer-widgets", abs "Footer Widgets"),
+                   Build ("full-site-editing", abs "Site Editor"),
+                   Build ("full-width-template", abs "Full Width Template"),
+                   Build ("post-formats", abs "Post Formats"),
+                   Build ("sticky-post", abs "Sticky Post"),
+                   Build ("style-variations", abs "Style Variations"),
+                   Build ("template-editing", abs "Template Editing"),
+                   Build ("theme-options", abs "Theme Options")])),
 
---         category_translations = array(
---                 "Layout"   => __( "Layout" ),
---                 "Features" => __( "Features" ),
---                 "Subject"  => __( "Subject" ),
---         );
+            Build
+              (abs "Layout",
+               To_Array_Type
+                 ([Build ("grid-layout", abs "Grid Layout"),
+                   Build ("one-column", abs "One Column"),
+                   Build ("two-columns", abs "Two Columns"),
+                   Build ("three-columns", abs "Three Columns"),
+                   Build ("four-columns", abs "Four Columns"),
+                   Build ("left-sidebar", abs "Left Sidebar"),
+                   Build ("right-sidebar", abs "Right Sidebar"),
+                   Build ("wide-blocks", abs "Wide Blocks")]))
 
---         wporg_features = array();
+           ]);
+   begin
+      if not API or else not Current_User_Can ("install_themes") then
+         return Features;
+      end if;
 
---         // Loop over the wp.org canonical list and apply translations.
---         foreach ( (array) feature_list as feature_category => feature_items ) then
---                 if ( isset( category_translations[ feature_category ] ) ) then
---                         feature_category = category_translations[ feature_category ];
---                 end;
+      declare
+         Feature_List : Theme_API_List := -- API_Result_Type := -- Array_Type :=
+           Get_Site_Transient ("wporg_theme_feature_list");
+      begin
+         if Feature_List.Is_Empty then
+            Set_Site_Transient
+              ("wporg_theme_feature_list",
+               Empty_Array,
+               3 * Constants.HOUR_IN_SECONDS);
+         end if;
 
---                 wporg_features[ feature_category ] = array();
+         if Feature_List.Is_Empty then
+            declare
+               Result : constant Themes_API_Result :=
+                 Themes_API ("feature_list", Empty_Themes_API_Args);
+            begin
+               if not Result.Success then
+                  -- Is_Wp_Error (Feature_List) then
+                  return Features;
+               end if;
+               Feature_List := Result.Themes; -- Arry;
+            end;
+         end if;
 
---                 foreach ( feature_items as feature ) then
---                         if ( isset( features[ feature_category ][ feature ] ) ) then
---                                 wporg_features[ feature_category ][ feature ] = features[ feature_category ][ feature ];
---                         end; else then
---                                 wporg_features[ feature_category ][ feature ] = feature;
---                         end;
---                 end;
---         end;
+         if Feature_List.Is_Empty then
+            return Features;
+         end if;
 
---         return wporg_features;
--- end;
+         Set_Site_Transient
+           ("wporg_theme_feature_list",
+            Feature_List,
+            3 * Constants.HOUR_IN_SECONDS);
+
+         declare
+            Category_Translations : constant Array_Type :=
+              To_Array_Type
+                ([Build ("Layout", abs "Layout"),
+                  Build ("Features", abs "Features"),
+                  Build ("Subject", abs "Subject")]);
+
+            Wporg_Features : Array_Type;
+         begin
+            -- Loop over the wp.org canonical list and apply translations.
+            for A in Feature_List.Iterate loop
+               declare
+                  Feature_Category_2 : constant String := Key (A);
+
+                  Feature_Items : constant Array_Type :=
+                    To_Array (Element (A));
+
+                  Feature_Category : constant String :=
+                    (if Isset (Category_Translations, Feature_Category_2)
+                     then
+                       Get_As_String
+                         (Category_Translations, Feature_Category_2)
+                     else Feature_Category_2);
+               begin
+                  Set
+                    (Wporg_Features,
+                     Key   => Feature_Category,
+                     Value => From_Array (Empty_Array));
+
+                  for F in Feature_Items.Iterate loop
+                     declare
+                        Feature : constant String := Key (F);
+                     begin
+                        if Isset_2 (Features, Feature_Category, Feature) then
+                           Set_2
+                             (Wporg_Features,
+                              Key_1 => Feature_Category,
+                              Key_2 => Feature,
+                              Value =>
+                                Get
+                                  (Ref_2
+                                     (Features,
+                                      Key_1 => Feature_Category,
+                                      Key_2 => Feature)));
+                        else
+                           Set_2
+                             (Wporg_Features,
+                              Key_1 => Feature_Category,
+                              Key_2 => Feature,
+                              Value => From_String (Feature));
+                        end if;
+                     end;
+                  end loop;
+               end;
+            end loop;
+
+            return Wporg_Features;
+         end;
+      end;
+   end Get_Theme_Feature_List;
 
    ----------------
    -- Themes_API --
    ----------------
 
-   function Themes_API (Action : String;
-                        Args   : Array_Type := Empty_Array)
-                        return Array_Error_Type
-   is (raise Program_Error with "not implemented");
---         // Include an unmodified wp_version.
---         require ABSPATH . WPINC . "/version.php";
+   function Themes_API
+     (Action : String; Args : Themes_API_Args := Empty_Themes_API_Args)
+      return Themes_API_Result
+   is
+      use Php.Errors;
+      use Php.HTML;
+      use Php.JSON;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Wp_Common;
+      use Adi_Themes.Theme_API_Lists;
+      use Inc_Functions;
+      use Inc_HTTP;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_L10n;
 
---         if ( is_array( args ) ) then
---                 args = (object) args;
---         end;
+      Args_2 : Themes_API_Args := Args;
+   begin
+      -- if Is_Array (Args) then
+      --    Args := (object) args;
+      -- end if;
 
---         if ( "query_themes" === action ) then
---                 if ( ! isset( args.per_page ) ) then
---                         args.per_page = 24;
---                 end;
---         end;
+      if "query_themes" = Action then
+         if Args_2.Per_Page = 0 then
+            -- if not Isset (Args_2.Per_Page) then
+            Args_2.Per_Page := 24;
+         end if;
+      end if;
 
---         if ( ! isset( args.locale ) ) then
---                 args.locale = get_user_locale();
---         end;
+      if Args_2.Locale = "" then
+         -- if not Isset (Args_2.Locale) then
+         Args_2.Locale := +Get_User_Locale;
+      end if;
 
---         if ( ! isset( args.wp_version ) ) then
---                 args.wp_version = substr( wp_version, 0, 3 ); // x.y
---         end;
+      -- if Args_2.Wp_Version = "" then
+      -- -- if not isset (Args_2.Wp_Version) then
+      --    Args_2.Wp_Version := Substr (Wp_Get_Wp_Version, 0, 3); -- x.y
 
---         --
---         -- Filters arguments used to query for installer pages from the WordPress.org Themes API.
---         --
---         -- Important: An object MUST be returned to this filter.
---         --
---         -- @since 2.8.0
---         --
---         -- @param object args   Arguments used to query for installer pages from the WordPress.org Themes API.
---         -- @param string action Requested action. Likely values are "theme_information",
---         --                       "feature_list", or "query_themes".
---         --
---         args = apply_filters( "themes_api_args", args, action );
+      -- end if;
+      declare
+         --
+         -- Filters arguments used to query for installer pages from the WordPress.org Themes API.
+         --
+         -- Important: An object MUST be returned to this filter.
+         --
+         -- @since 2.8.0
+         --
+         -- @param object args   Arguments used to query for installer pages from the WordPress.org Themes API.
+         -- @param string action Requested action. Likely values are "theme_information",
+         --                       "feature_list", or "query_themes".
+         --
+         Args_3 : constant Themes_API_Args :=
+           Apply_Filters ("themes_api_args", Args_2, Action);
 
---         --
---         -- Filters whether to override the WordPress.org Themes API.
---         --
---         -- Returning a non-false value will effectively short-circuit the WordPress.org API request.
---         --
---         -- If `action` is "query_themes", "theme_information", or "feature_list", an object MUST
---         -- be passed. If `action` is "hot_tags", an array should be passed.
---         --
---         -- @since 2.8.0
---         --
---         -- @param false|object|array override Whether to override the WordPress.org Themes API. Default false.
---         -- @param string             action   Requested action. Likely values are "theme_information",
---         --                                    "feature_list", or "query_themes".
---         -- @param object             args     Arguments used to query for installer pages from the Themes API.
---         --
---         res = apply_filters( "themes_api", false, action, args );
+         --
+         -- Filters whether to override the WordPress.org Themes API.
+         --
+         -- Returning a non-false value will effectively short-circuit the WordPress.org API request.
+         --
+         -- If `action` is "query_themes", "theme_information", or "feature_list", an object MUST
+         -- be passed. If `action` is "hot_tags", an array should be passed.
+         --
+         -- @since 2.8.0
+         --
+         -- @param false|object|array override Whether to override the WordPress.org Themes API. Default false.
+         -- @param string             action   Requested action. Likely values are "theme_information",
+         --                                    "feature_list", or "query_themes".
+         -- @param object             args     Arguments used to query for installer pages from the Themes API.
+         --
+         Res : Themes_API_Result :=
+           Apply_Filters
+             ("themes_api",
+              Empty_Themes_API_Result, -- False,
+              Action,
+              Args_3);
+      begin
+         if not Res.Success then
+            -- if not Res then
+            declare
+               URL_3 : constant String :=
+                 "http://api.wordpress.org/themes/info/1.2/";
 
---         if ( ! res ) then
---                 url = "http://api.wordpress.org/themes/info/1.2/";
---                 url = add_query_arg(
---                         array(
---                                 "action"  => action,
---                                 "request" => args,
---                         ),
---                         url
---                 );
+               URL_2 : constant String :=
+                 Add_Query_Arg
+                   (To_Array_Type
+                      ([Build ("action", Action),
+                        Build ("request", To_Array (Args_3))]),
+                    URL_3);
 
---                 http_url = url;
---                 ssl      = wp_http_supports( array( "ssl" ) );
---                 if ( ssl ) then
---                         url = set_url_scheme( url, "https" );
---                 end;
+               HTTP_URL : constant String := URL_2;
 
---                 http_args = array(
---                         "user-agent" => "WordPress/" . wp_version . "; " . home_url( "/" ),
---                 );
---                 request   = wp_remote_get( url, http_args );
+               SSL : constant Boolean := Wp_HTTP_Supports (Build ("ssl", ""));
 
---                 if ( ssl && is_wp_error( request ) ) then
---                         if ( ! wp_doing_ajax() ) then
---                                 trigger_error(
---                                         sprintf(
---                                                 /* translators: %s: Support forums URL.--
---                                                 __( "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>." ),
---                                                 __( "https://wordpress.org/support/forums/" )
---                                         ) . " " . __( "(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)" ),
---                                         headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
---                                 );
---                         end;
---                         request = wp_remote_get( http_url, http_args );
---                 end;
+               URL : constant String :=
+                 (if SSL then Set_URL_Scheme (URL_2, "https") else URL_2);
 
---                 if ( is_wp_error( request ) ) then
---                         res = new WP_Error(
---                                 "themes_api_failed",
---                                 sprintf(
---                                         /* translators: %s: Support forums URL.--
---                                         __( "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>." ),
---                                         __( "https://wordpress.org/support/forums/" )
---                                 ),
---                                 request.get_error_message()
---                         );
---                 end; else then
---                         res = json_decode( wp_remote_retrieve_body( request ), true );
---                         if ( is_array( res ) ) then
---                                 // Object casting is required in order to match the info/1.0 format.
---                                 res = (object) res;
---                         end; elseif ( null === res ) then
---                                 res = new WP_Error(
---                                         "themes_api_failed",
---                                         sprintf(
---                                                 /* translators: %s: Support forums URL.--
---                                                 __( "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>." ),
---                                                 __( "https://wordpress.org/support/forums/" )
---                                         ),
---                                         wp_remote_retrieve_body( request )
---                                 );
---                         end;
+               HTTP_Args : constant Array_Type :=
+                 To_Array_Type
+                   ([Build ("timeout", 15),
+                     Build
+                       ("user-agent",
+                        "WordPress/"
+                        & Wp_Get_Wp_Version
+                        & "; "
+                        & Home_URL ("/"))]);
 
---                         if ( isset( res.error ) ) then
---                                 res = new WP_Error( "themes_api_failed", res.error );
---                         end;
---                 end;
+               Request : Array_Error_Type := Wp_Remote_Get (URL, HTTP_Args);
+            begin
+               if SSL and then not Request.Success then
+                  -- if SSL and then Is_Wp_Error (Request) then
+                  if not Wp_Doing_AJAX then
+                     Wp_Trigger_Error
+                       ("__FUNCTION__",
+                        Sprintf
+                          (
+                           -- translators: %s: Support forums URL.
+                           abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
+                           [abs "https://wordpress.org/support/forums/"])
+                        & " "
+                        & abs "(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)",
+                        (if Headers_Sent or else Constants.WP_DEBUG
+                         then E_USER_WARNING
+                         else E_USER_NOTICE));
+                  end if;
+                  Request := Wp_Remote_Get (HTTP_URL, HTTP_Args);
+               end if;
 
---                 if ( ! is_wp_error( res ) ) then
---                         // Back-compat for info/1.2 API, upgrade the theme objects in query_themes to objects.
---                         if ( "query_themes" === action ) then
---                                 foreach ( res.themes as i => theme ) then
---                                         res.themes[ i ] = (object) theme;
---                                 end;
---                         end;
+               if not Request.Success then
+                  -- if Is_Wp_Error (Request) then
+                  Res.Error :=
+                    Class_Errors.X_Construct
+                      ( -- new WP_Error(
+                       "themes_api_failed",
+                       Sprintf
+                         (
+                          -- translators: %s: Support forums URL.
+                          abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
+                          [abs "https://wordpress.org/support/forums/"]),
+                       Request.Error.Get_Error_Message);
+               else
+                  declare
+                     Res2 : constant Multi_Type :=
+                       JSON_Decode
+                         (Wp_Remote_Retrieve_Body (Request.Arry),
+                          Associative => True);
+                  begin
+                     if Is_Array (Res2) then
+                        -- Object casting is required in order to match the info/1.0 format.
+                        null; -- res := (object) res;
 
---                         // Back-compat for info/1.2 API, downgrade the feature_list result back to an array.
---                         if ( "feature_list" === action ) then
---                                 res = (array) res;
---                         end;
---                 end;
---         end;
+                     elsif Is_Null (Res2) then
+                        Res.Error :=
+                          Class_Errors.X_Construct
+                            ( -- new WP_Error(
+                             "themes_api_failed",
+                             Sprintf
+                               (
+                                -- translators: %s: Support forums URL.
+                                abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
+                                [abs "https://wordpress.org/support/forums/"]),
+                             Wp_Remote_Retrieve_Body (Request.Arry));
+                     end if;
 
---         --
---         -- Filters the returned WordPress.org Themes API response.
---         --
---         -- @since 2.8.0
---         --
---         -- @param array|stdClass|WP_Error res    WordPress.org Themes API response.
---         -- @param string                  action Requested action. Likely values are "theme_information",
---         --                                        "feature_list", or "query_themes".
---         -- @param stdClass                args   Arguments used to query for installer pages from the WordPress.org Themes API.
---         --
---         return apply_filters( "themes_api_result", res, action, args );
--- end;
+                     if not Res.Success then
+                        -- if Isset (Res.Error) then
+                        Res.Error :=
+                          Class_Errors.X_Construct
+                            ("themes_api_failed", "XXX-E03"); -- Res2.Error);
+                     -- Res := new WP_Error ("themes_api_failed", Res.Error);
+
+                     end if;
+                  end;
+               end if;
+            end;
+
+            if not Res.Success then
+               -- if not Is_Wp_Error (Res) then
+               -- Back-compat for info/1.2 API, upgrade the theme objects in query_themes to objects.
+               if "query_themes" = Action then
+                  for A in Res.Themes.Iterate loop
+                     declare
+                        I     : constant String := Key (A);
+                        Theme : constant Theme_API_Type := Element (A);
+                     begin
+                        Res.Themes.Insert (I, Theme); -- (object) theme;
+                     -- Set (Res.Themes, I, From_Array (To_Array (Theme))); -- (object) theme;
+                     -- Set (Res.Themes, I, Theme); -- (object) theme;
+                     end;
+                  end loop;
+               end if;
+
+               -- Back-compat for info/1.2 API, downgrade the feature_list result back to an array.
+               if "feature_list" = Action then
+                  null; -- Res := Res; -- (array) res;
+
+               end if;
+            end if;
+         end if;
+
+         --
+         -- Filters the returned WordPress.org Themes API response.
+         --
+         -- @since 2.8.0
+         --
+         -- @param array|stdClass|WP_Error res    WordPress.org Themes API response.
+         -- @param string                  action Requested action. Likely values are "theme_information",
+         --                                        "feature_list", or "query_themes".
+         -- @param stdClass                args   Arguments used to query for installer pages from the WordPress.org Themes API.
+         --
+         return Apply_Filters ("themes_api_result", Res, Action, Args_3);
+      end;
+   end Themes_API;
 
    ------------------------------
    -- Wp_Prepare_Themes_For_JS --
    ------------------------------
 
-   function Wp_Prepare_Themes_For_JS (Themes : Array_Type := Empty_Array) -- null
-                                      return Array_Type
-   is (raise Program_Error with "not implemented");
---         current_theme = get_stylesheet();
+   function Wp_Prepare_Themes_For_JS
+     (Themes : Class_Themes.Theme_Array := Class_Themes.Empty_Theme_Array)
+      return Array_Type
+   is
+      use Php.Arrays;
+      use Php.HTML;
+      use Php.Lists;
+      use Array_Lists;
+      use Binder;
+      use Wp_Common;
+      use Class_Themes;
+      use Class_Themes.Theme_Maps;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Options;
+      use Inc_Themes;
 
---         --
---         -- Filters theme data before it is prepared for JavaScript.
---         --
---         -- Passing a non-empty array will result in wp_prepare_themes_for_js() returning
---         -- early with that value instead.
---         --
---         -- @since 4.2.0
---         --
---         -- @param array           prepared_themes An associative array of theme data. Default empty array.
---         -- @param WP_Theme[]|null themes          An array of theme objects to prepare, if any.
---         -- @param string          current_theme   The active theme slug.
---         --
---         prepared_themes = (array) apply_filters( "pre_prepare_themes_for_js", array(), themes, current_theme );
+      --
+      -- Builds the customize action URL, or "" if not applicable.
+      --
+      function Build_Customize_Action
+        (Slug : String; Is_Block : Boolean; Is_Active : Boolean) return String;
 
---         if ( ! empty( prepared_themes ) ) then
---                 return prepared_themes;
---         end;
+      --
+      -- Process one theme slug: build its data record and add to
+      -- Prepared_Themes.
+      --
+      --      procedure Process_Theme (Slug : String);
 
---         // Make sure the active theme is listed first.
---         prepared_themes[ current_theme ] = array();
+      Current_Theme : constant String := Get_Stylesheet;
 
---         if ( null === themes ) then
---                 themes = wp_get_themes( array( "allowed" => true ) );
---                 if ( ! isset( themes[ current_theme ] ) ) then
---                         themes[ current_theme ] = wp_get_theme();
---                 end;
---         end;
+      Themes_2 : Theme_Array := Themes;
+      -- Themes_Dir : constant String := -Globals.WP_CONTENT_DIR & "/themes";
 
---         updates    = array();
---         no_updates = array();
---         if ( ! is_multisite() && current_user_can( "update_themes" ) ) then
---                 updates_transient = get_site_transient( "update_themes" );
---                 if ( isset( updates_transient.response ) ) then
---                         updates = updates_transient.response;
---                 end;
---                 if ( isset( updates_transient.no_update ) ) then
---                         no_updates = updates_transient.no_update;
---                 end;
---         end;
+      Can_Switch : constant Boolean := Current_User_Can ("switch_themes");
 
---         WP_Theme::sort_by_name( themes );
+      Can_Delete : constant Boolean :=
+        not Is_Multisite and then Current_User_Can ("delete_themes");
 
---         parents = array();
+      Can_Customize : constant Boolean := Current_User_Can ("customize");
 
---         auto_updates = (array) get_site_option( "auto_update_themes", array() );
+      Can_Edit : constant Boolean := Current_User_Can ("edit_theme_options");
 
---         foreach ( themes as theme ) then
---                 slug         = theme.get_stylesheet();
---                 encoded_slug = urlencode( slug );
+      Can_Update : constant Boolean := Current_User_Can ("update_themes");
 
---                 parent = false;
---                 if ( theme.parent() ) then
---                         parent           = theme.parent();
---                         parents[ slug ] = parent.get_stylesheet();
---                         parent           = parent.display( "Name" );
---                 end;
+      Auto_Enabled : constant Boolean :=
+        Adi_Update.Wp_Is_Auto_Update_Enabled_For_Type ("theme")
+        and then not Is_Multisite
+        and then Can_Update;
 
---                 customize_action = null;
+      Auto_Updates : constant List_Type :=
+        As_List
+          (Get_Site_Option ("auto_update_themes", From_Array (Empty_Array)));
 
---                 can_edit_theme_options = current_user_can( "edit_theme_options" );
---                 can_customize          = current_user_can( "customize" );
---                 is_block_theme         = theme.is_block_theme();
+      Request_URI : constant String :=
+        Sanitize_URL (Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")));
 
---                 if ( is_block_theme && can_edit_theme_options ) then
---                         customize_action = esc_url( admin_url( "site-editor.php" ) );
---                 end; elseif ( ! is_block_theme && can_customize && can_edit_theme_options ) then
---                         customize_action = esc_url(
---                                 add_query_arg(
---                                         array(
---                                                 "return" => urlencode( sanitize_url( remove_query_arg( wp_removable_query_args(), wp_unslash( _SERVER["REQUEST_URI"] ) ) ) ),
---                                         ),
---                                         wp_customize_url( slug )
---                                 )
---                         );
---                 end;
+      Prepared_Themes : Array_Type := Empty_Array;
+      Parents         : Array_Type := Empty_Array;
 
---                 update_requires_wp  = isset( updates[ slug ]["requires"] ) ? updates[ slug ]["requires"] : null;
---                 update_requires_php = isset( updates[ slug ]["requires_php"] ) ? updates[ slug ]["requires_php"] : null;
+      ----------------------------
+      -- Build_Customize_Action --
+      ----------------------------
 
---                 auto_update        = in_array( slug, auto_updates, true );
---                 auto_update_action = auto_update ? "disable-auto-update" : "enable-auto-update";
+      function Build_Customize_Action
+        (Slug : String; Is_Block : Boolean; Is_Active : Boolean) return String
+      is
+         Return_Param : constant Array_Type :=
+           To_Array_Type
+             ([Build
+                 ("return",
+                  URL_Encode
+                    (Remove_Query_Arg
+                       (Wp_Removable_Query_Args, Request_URI)))]);
+      begin
+         if Is_Block and then Can_Edit then
+            declare
+               Base : constant String :=
+                 (if Is_Active
+                  then Admin_URL ("site-editor.php")
+                  else
+                    Add_Query_Arg
+                      ("wp_theme_preview",
+                       Slug,
+                       Admin_URL ("site-editor.php")));
+            begin
+               return ESC_URL (Add_Query_Arg (Return_Param, Base));
+            end;
+         elsif not Is_Block and then Can_Customize and then Can_Edit then
+            return
+              ESC_URL (Add_Query_Arg (Return_Param, Wp_Customize_URL (Slug)));
+         end if;
+         return "";
+      end Build_Customize_Action;
 
---                 if ( isset( updates[ slug ] ) ) then
---                         auto_update_supported      = true;
---                         auto_update_filter_payload = (object) updates[ slug ];
---                 end; elseif ( isset( no_updates[ slug ] ) ) then
---                         auto_update_supported      = true;
---                         auto_update_filter_payload = (object) no_updates[ slug ];
---                 end; else then
---                         auto_update_supported = false;
---                         /*
---                         -- Create the expected payload for the auto_update_theme filter, this is the same data
---                         -- as contained within updates or no_updates but used when the Theme is not known.
---                         --
---                         auto_update_filter_payload = (object) array(
---                                 "theme"        => slug,
---                                 "new_version"  => theme.get( "Version" ),
---                                 "url"          => "",
---                                 "package"      => "",
---                                 "requires"     => theme.get( "RequiresWP" ),
---                                 "requires_php" => theme.get( "RequiresPHP" ),
---                         );
---                 end;
+   begin
+      Logging.Log ("wp_prepare_themes_for_js", Themes'Image);
 
---                 auto_update_forced = wp_is_auto_update_forced_for_item( "theme", null, auto_update_filter_payload );
+      --
+      -- Filters theme data before it is prepared for JavaScript.
+      --
+      -- Passing a non-empty array will result in wp_prepare_themes_for_js()
+      -- returning early with that value instead.
+      --
+      -- @since 4.2.0
+      --
+      -- @param array           prepared_themes An associative array of
+      --                                        theme data. Default empty
+      --                                        array.
+      -- @param WP_Theme[]|null themes          An array of theme objects to
+      --                                        prepare, if any.
+      -- @param string          current_theme   The active theme slug.
+      --
+      Prepared_Themes :=
+        Apply_Filters
+          ("pre_prepare_themes_for_js", Empty_Array, Themes_2, Current_Theme);
 
---                 prepared_themes[ slug ] = array(
---                         "id"             => slug,
---                         "name"           => theme.display( "Name" ),
---                         "screenshot"     => array( theme.get_screenshot() ), // @todo Multiple screenshots.
---                         "description"    => theme.display( "Description" ),
---                         "author"         => theme.display( "Author", false, true ),
---                         "authorAndUri"   => theme.display( "Author" ),
---                         "tags"           => theme.display( "Tags" ),
---                         "version"        => theme.get( "Version" ),
---                         "compatibleWP"   => is_wp_version_compatible( theme.get( "RequiresWP" ) ),
---                         "compatiblePHP"  => is_php_version_compatible( theme.get( "RequiresPHP" ) ),
---                         "updateResponse" => array(
---                                 "compatibleWP"  => is_wp_version_compatible( update_requires_wp ),
---                                 "compatiblePHP" => is_php_version_compatible( update_requires_php ),
---                         ),
---                         "parent"         => parent,
---                         "active"         => slug === current_theme,
---                         "hasUpdate"      => isset( updates[ slug ] ),
---                         "hasPackage"     => isset( updates[ slug ] ) && ! empty( updates[ slug ]["package"] ),
---                         "update"         => get_theme_update_available( theme ),
---                         "autoupdate"     => array(
---                                 "enabled"   => auto_update || auto_update_forced,
---                                 "supported" => auto_update_supported,
---                                 "forced"    => auto_update_forced,
---                         ),
---                         "actions"        => array(
---                                 "activate"   => current_user_can( "switch_themes" ) ? wp_nonce_url( admin_url( "themes.php?action=activate&amp;stylesheet=" . encoded_slug ), "switch-theme_" . slug ) : null,
---                                 "customize"  => customize_action,
---                                 "delete"     => ( ! is_multisite() && current_user_can( "delete_themes" ) ) ? wp_nonce_url( admin_url( "themes.php?action=delete&amp;stylesheet=" . encoded_slug ), "delete-theme_" . slug ) : null,
---                                 "autoupdate" => wp_is_auto_update_enabled_for_type( "theme" ) && ! is_multisite() && current_user_can( "update_themes" )
---                                         ? wp_nonce_url( admin_url( "themes.php?action=" . auto_update_action . "&amp;stylesheet=" . encoded_slug ), "updates" )
---                                         : null,
---                         ),
---                         "blockTheme"     => theme.is_block_theme(),
---                 );
---         end;
+      if not Empty (Prepared_Themes) then
+         return Prepared_Themes;
+      end if;
 
---         // Remove "delete" action if theme has an active child.
---         if ( ! empty( parents ) && array_key_exists( current_theme, parents ) ) then
---                 unset( prepared_themes[ parents[ current_theme ] ]["actions"]["delete"] );
---         end;
+      -- Ensure current theme entry exists first (for ordering).
+      Set (Prepared_Themes, Current_Theme, From_Array (Empty_Array));
 
---         --
---         -- Filters the themes prepared for JavaScript, for themes.php.
---         --
---         -- Could be useful for changing the order, which is by name by default.
---         --
---         -- @since 3.8.0
---         --
---         -- @param array prepared_themes Array of theme data.
---         --
---         prepared_themes = apply_filters( "wp_prepare_themes_for_js", prepared_themes );
---         prepared_themes = array_values( prepared_themes );
---         return array_filter( prepared_themes );
--- end;
+      if Themes_2 = Empty_Theme_Array then
+         Themes_2 := Wp_Get_Themes (To_Array_Type ([Build ("allowed", True)]));
+         if not Themes_2.Contains (Current_Theme) then
+         -- if not Isset (Themes_2, Current_Theme) then
+            Logging.Log ("wp_prepare_themes_for_js", "not implemented");
+            Logging.Log ("wp_prepare_themes_for_js", Wp_Get_Theme'Image);
+
+            Themes_2.Include (Current_Theme, Wp_Get_Theme);
+         end if;
+      end if;
+
+      -- declare
+      --    Updates    : Array_Type;
+      --    No_Updates : Array_Type;
+      -- begin
+      --    if not Is_Multisite and then Current_User_Can ("update_themes") then
+      --       declare
+      --          Updates_Transient : Multi_Type :=
+      --            Get_Site_Transient ("update_themes");
+      --       begin
+      --          if Isset (Updates_Transient.Response) then
+      --             Updates := Updates_Transient.Response;
+      --          end if;
+      --          if Isset (Updates_Transient.No_Update) then
+      --             No_Updates := Updates_Transient.No_Update;
+      --          end if;
+      --       end;
+      --    end if;
+      -- end;
+
+      Sort_By_Name (Themes_2);
+
+      Logging.Log ("XXX-C92", Themes_2'Image);
+      -- Arrays.IO.Dump (Themes_2);
+
+      for A in Themes_2.Iterate loop
+         Process_Theme :
+         declare
+            Theme : Wp_Theme; --  := Element (A); -- Wp_Get_Theme (Slug);
+            Slug  : constant String := Theme.Get_Stylesheet;
+
+            Parent      : Wp_Theme := Theme.Parent;
+            Parent_Slug : constant String := Parent.Get_Stylesheet;
+
+            Parent_Name : constant String :=
+              (if Parent_Slug /= "" then Parent.Display ("Name") else "");
+
+            Is_Block    : constant Boolean := Theme.Is_Block_Theme;
+            Is_Active   : constant Boolean := Slug = Current_Theme;
+            Auto_Update : constant Boolean :=
+              In_List (Slug, Auto_Updates, True);
+
+            Auto_Action : constant String :=
+              (if Auto_Update
+               then "disable-auto-update"
+               else "enable-auto-update");
+
+            Is_WP : constant Boolean :=
+              Is_WP_Version_Compatible (As_String (Theme.Get ("RequiresWP")));
+
+            Is_PHP : constant Boolean :=
+              Is_PHP_Version_Compatible (As_String (Theme.Get ("RequiresPHP")));
+
+            Encoded_Slug : constant String := URL_Encode (Slug);
+
+            Customize_A : constant String :=
+              Build_Customize_Action (Slug, Is_Block, Is_Active);
+
+            Theme_Data : constant Array_Type :=
+              To_Array_Type
+                ([Build ("id", Slug),
+                  Build ("name", Theme.Display ("Name")),
+                  Build
+                    ("screenshot",
+                     To_Array_Type ([Build ("1", Theme.Get_Screenshot)])),
+                  Build ("description", Theme.Display ("Description")),
+                  Build ("author", Theme.Display ("Author", False, True)),
+                  Build ("authorAndUri", Theme.Display ("Author")),
+                  Build ("tags", Theme.Display ("Tags")),
+                  Build ("version", Theme.Get ("Version")),
+                  Build ("compatibleWP", Is_WP),
+                  Build ("compatiblePHP", Is_PHP),
+                  Build
+                    ("updateResponse",
+                     To_Array_Type
+                       ([Build ("compatibleWP", Is_WP),
+                         Build ("compatiblePHP", Is_PHP),
+                         Build ("parent", Parent_Name),
+                         Build ("active", Is_Active),
+                         Build ("hasUpdate", False), -- Isset (Updates, Slug)),
+                         Build ("hasPackage", False),
+                         -- Isset (Updates, Slug)
+                         -- and then not Empty (Updates, Slug, "package")),
+                         Build ("update", Get_Theme_Update_Available (Theme)),
+                         Build
+                           ("autoupdate",
+                            To_Array_Type
+                              ([Build ("enabled", Auto_Update),
+                                Build
+                                  ("supported",
+                                   False), -- Auto_Update_Supported),
+                                Build
+                                  ("forced", False), -- Auto_Update_Forced)])),
+                                Build
+                                  ("actions",
+                                   To_Array_Type
+                                     ([Build
+                                         ("activate",
+                                          (if Can_Switch
+                                           then
+                                             Wp_Nonce_URL
+                                               (Admin_URL
+                                                  ("themes.php?action=activate&amp;stylesheet="
+                                                   & Encoded_Slug),
+                                                "switch-theme_" & Slug)
+                                           else "")),
+                                       Build ("customize", Customize_A),
+                                       Build
+                                         ("delete",
+                                          (if Can_Delete
+                                           then
+                                             Wp_Nonce_URL
+                                               (Admin_URL
+                                                  ("themes.php?action=delete&amp;stylesheet="
+                                                   & Encoded_Slug),
+                                                "delete-theme_" & Slug)
+                                           else "")),
+                                       Build
+                                         ("autoupdate",
+                                          (if Auto_Enabled
+                                           then
+                                             Wp_Nonce_URL
+                                               (Admin_URL
+                                                  ("themes.php?action="
+                                                   & Auto_Action
+                                                   & "&amp;stylesheet="
+                                                   & Encoded_Slug),
+                                                "updates")
+                                           else ""))])),
+                                Build ("blockTheme", Is_Block)]))]))]);
+         begin
+            if Parent_Slug /= "" then
+               Set (Parents, Slug, From_String (Parent_Slug));
+            end if;
+            Set (Prepared_Themes, Slug, From_Array (Theme_Data));
+            Logging.Log ("XXX-C94", Slug);
+            Arrays.IO.Dump (Prepared_Themes);
+         end Process_Theme;
+      end loop;
+
+      -- if Length (Themes_2) > 0 then
+      --    -- Use the keys of the provided array.
+      --    declare
+      --       Slugs : constant List_Type := Php.Arrays.Array_Keys (Themes_2);
+      --    begin
+      --       for S of Slugs loop
+      --          Process_Theme (S);
+      --       end loop;
+      --    end;
+      -- else
+      --    -- Scan the themes directory for installed themes.
+      --    if Is_Dir (Themes_Dir) then
+      --       declare
+      --          Search    : Search_Type;
+      --          Dir_Entry : Directory_Entry_Type;
+      --       begin
+      --          Start_Search
+      --            (Search,
+      --             Themes_Dir,
+      --             "",
+      --             (Directory => True, others => False));
+      --          while More_Entries (Search) loop
+      --             Get_Next_Entry (Search, Dir_Entry);
+      --             declare
+      --                Name : constant String := Simple_Name (Dir_Entry);
+      --             begin
+      --                if Name /= "."
+      --                  and then Name (Name'First) /= '.'
+      --                  and then File_Exists
+      --                             (Themes_Dir & "/" & Name & "/style.css")
+      --                then
+      --                   Process_Theme (Name);
+      --                end if;
+      --             end;
+      --          end loop;
+      --          End_Search (Search);
+      --       end;
+      --    end if;
+      -- end if;
+
+      -- Remove 'delete' action if the active theme has a child whose parent
+      -- is also installed (the active theme is the child; its parent cannot
+      -- be deleted while that child is active).
+      if not Parents.Is_Empty and then Isset (Parents, Current_Theme) then
+         declare
+            Parent_Slug : constant String :=
+              Get_As_String (Parents, Current_Theme);
+
+            Parent_Data : Array_Type :=
+              As_Array (Get (Prepared_Themes, Parent_Slug));
+
+            Actions : Array_Type := As_Array (Get (Parent_Data, "actions"));
+         begin
+            Logging.Log ("XXX-C95", Parent_Slug);
+            Set (Actions, "delete", From_String (""));
+            Set (Parent_Data, "actions", From_Array (Actions));
+            Set (Prepared_Themes, Parent_Slug, From_Array (Parent_Data));
+         end;
+      end if;
+
+      --
+      -- Filters the themes prepared for JavaScript, for themes.php.
+      --
+      -- Could be useful for changing the order, which is by name by default.
+      --
+      -- @since 3.8.0
+      --
+      -- @param array $prepared_themes Array of theme data.
+      --
+      Logging.Log ("wp_prepare_themes_for_js", "XXX-C00");
+      -- Arrays.IO.Dump (Themes_2);
+      Arrays.IO.Dump (Prepared_Themes);
+
+      Prepared_Themes :=
+        Apply_Filters ("wp_prepare_themes_for_js", Prepared_Themes);
+
+      -- Logging.Log ("wp_prepare_themes_for_js", "XXX-C01");
+      -- Arrays.IO.Dump (Prepared_Themes);
+
+      Prepared_Themes := Array_Values (Prepared_Themes);
+      Logging.Log ("wp_prepare_themes_for_js", "XXX-C02");
+      Arrays.IO.Dump (Prepared_Themes);
+      return Array_Filter (Prepared_Themes);
+   end Wp_Prepare_Themes_For_JS;
 
 -- --
 -- -- Prints JS templates for the theme-browsing UI in the Customizer.
@@ -746,9 +1126,24 @@ is
 --                 <div class="theme-backdrop"></div>
 --                 <div class="theme-wrap wp-clearfix" role="document">
 --                         <div class="theme-header">
---                                 <button type="button" class="left dashicons dashicons-no"><span class="screen-reader-text"><?php _e( "Show previous theme" ); ?></span></button>
---                                 <button type="button" class="right dashicons dashicons-no"><span class="screen-reader-text"><?php _e( "Show next theme" ); ?></span></button>
---                                 <button type="button" class="close dashicons dashicons-no"><span class="screen-reader-text"><?php _e( "Close details dialog" ); ?></span></button>
+--                                 <button type="button" class="left dashicons dashicons-no"><span class="screen-reader-text">
+--                                         <?php
+--                                         /* translators: Hidden accessibility text. */
+--                                         _e( "Show previous theme" );
+--                                         ?>
+--                                 </span></button>
+--                                 <button type="button" class="right dashicons dashicons-no"><span class="screen-reader-text">
+--                                         <?php
+--                                         /* translators: Hidden accessibility text. */
+--                                         _e( "Show next theme" );
+--                                         ?>
+--                                 </span></button>
+--                                 <button type="button" class="close dashicons dashicons-no"><span class="screen-reader-text">
+--                                         <?php
+--                                         /* translators: Hidden accessibility text. */
+--                                         _e( "Close details dialog" );
+--                                         ?>
+--                                 </span></button>
 --                         </div>
 --                         <div class="theme-about wp-clearfix">
 --                                 <div class="theme-screenshots">
@@ -964,27 +1359,28 @@ is
 --                                 <# if ( data.active ) then #>
 --                                         <button type="button" class="button button-primary customize-theme"><?php _e( "Customize" ); ?></button>
 --                                 <# end; else if ( "installed" === data.type ) then #>
---                                         <?php if ( current_user_can( "delete_themes" ) ) then ?>
---                                                 <# if ( data.actions && data.actions["delete"] ) then #>
---                                                         <a href="thenthenthen data.actions["delete"] end;end;end;" data-slug="thenthen data.id end;end;" class="button button-secondary delete-theme"><?php _e( "Delete" ); ?></a>
---                                                 <# end; #>
---                                         <?php end; ?>
-
+--                                         <div class="theme-inactive-actions">
 --                                         <# if ( data.blockTheme ) then #>
 --                                                 <?php
---                                                         /* translators: %s: Theme name.--
---                                                         aria_label = sprintf( _x( "Activate %s", "theme" ), "thenthen data.name end;end;" );
+--                                                         /* translators: %s: Theme name. */
+--                                                         aria_label = sprintf( _x( "Activate %s", "theme" ), "{{ data.name }}" );
 --                                                 ?>
 --                                                 <# if ( data.compatibleWP && data.compatiblePHP && data.actions.activate ) then #>
---                                                         <a href="thenthenthen data.actions.activate end;end;end;" class="button button-primary activate" aria-label="<?php echo esc_attr( aria_label ); ?>"><?php _e( "Activate" ); ?></a>
+--                                                         <a href="{{{ data.actions.activate }}}" class="button button-primary activate" aria-label="<?php echo esc_attr( aria_label ); ?>"><?php _e( "Activate" ); ?></a>
 --                                                 <# end; #>
 --                                         <# end; else then #>
 --                                                 <# if ( data.compatibleWP && data.compatiblePHP ) then #>
---                                                         <button type="button" class="button button-primary preview-theme" data-slug="thenthen data.id end;end;"><?php _e( "Live Preview" ); ?></button>
+--                                                         <button type="button" class="button button-primary preview-theme" data-slug="{{ data.id }}"><?php _e( "Live Preview" ); ?></button>
 --                                                 <# end; else then #>
 --                                                         <button class="button button-primary disabled"><?php _e( "Live Preview" ); ?></button>
 --                                                 <# end; #>
 --                                         <# end; #>
+--                                         </div>
+--                                         <?php if ( current_user_can( "delete_themes" ) ) then ?>
+--                                                 <# if ( data.actions && data.actions["delete"] ) then #>
+--                                                         <a href="{{{ data.actions["delete"] }}}" data-slug="{{ data.id }}" class="button button-secondary delete-theme"><?php _e( "Delete" ); ?></a>
+--                                                 <# end; #>
+--                                         <?php end; ?>
 --                                 <# end; else then #>
 --                                         <# if ( data.compatibleWP && data.compatiblePHP ) then #>
 --                                                 <button type="button" class="button theme-install" data-slug="thenthen data.id end;end;"><?php _e( "Install" ); ?></button>
@@ -1057,16 +1453,17 @@ is
    is (raise Program_Error with "not implemented");
 --         list( extension ) = explode( "/", theme );
 
+--         global wp_stylesheet_path, wp_template_path;
 --         /*
 --         -- We"ll override this later if the theme could be resumed without
 --         -- creating a fatal error.
 --         --
 --         if ( ! empty( redirect ) ) then
 --                 functions_path = "";
---                 if ( strpos( STYLESHEETPATH, extension ) ) then
---                         functions_path = STYLESHEETPATH . "/functions.php";
---                 end; elseif ( strpos( TEMPLATEPATH, extension ) ) then
---                         functions_path = TEMPLATEPATH . "/functions.php";
+--                 if ( str_contains( wp_stylesheet_path, extension ) ) then
+--                         functions_path = wp_stylesheet_path . "/functions.php";
+--                 end; elseif ( str_contains( wp_template_path, extension ) ) then
+--                         functions_path = wp_template_path . "/functions.php";
 --                 end;
 
 --                 if ( ! empty( functions_path ) ) then
@@ -1120,13 +1517,70 @@ is
 --                 return;
 --         end;
 
---         printf(
---                 "<div class="notice notice-error"><p><strong>%s</strong><br>%s</p><p><a href="%s">%s</a></p></div>",
+--         message = sprintf(
+--                 "<p><strong>%s</strong><br>%s</p><p><a href="%s">%s</a></p>",
 --                 __( "One or more themes failed to load properly." ),
 --                 __( "You can find more details and make changes on the Themes screen." ),
 --                 esc_url( admin_url( "themes.php" ) ),
 --                 __( "Go to the Themes screen" )
 --         );
+--         wp_admin_notice(
+--                 message,
+--                 array(
+--                         "type"           => "error",
+--                         "paragraph_wrap" => false,
+--                 )
+--         );
 -- end;
+
+   --------------
+   -- To_Array --
+   --------------
+
+   function To_Array (Args : Themes_API_Args) return Array_Type is
+      use Array_Lists;
+      use UStrings;
+
+      Themes : constant Array_Type :=
+        To_Array_Type
+          ([Build ("slug", -Args.Slug),
+            Build ("per_page", Args.Per_Page),
+            Build ("page", Args.Page),
+            Build ("number", Args.Number),
+            Build ("search", -Args.Search),
+            Build ("tag", -Args.Tag),
+            Build ("author", -Args.Author),
+            Build ("user", -Args.User),
+            Build ("browse", -Args.Browse),
+            Build ("locale", -Args.Locale),
+            Build ("fields", Args.Fields)]);
+   begin
+      return Themes;
+   end To_Array;
+
+   --------------
+   -- To_Array --
+   --------------
+
+   function To_Array (Args : Theme_API_Type) return Array_Type is
+      use Array_Lists;
+      use UStrings;
+
+      Themes : constant Array_Type :=
+        To_Array_Type
+          ([Build ("name", -Args.Name),
+            Build ("slug", -Args.Slug),
+            Build ("version", -Args.Version),
+            Build ("author", -Args.Author),
+            Build ("preview_url", -Args.Preview_URL),
+            Build ("screenshot_url", -Args.Screenshot_URL),
+            Build ("rating", Integer (Args.Rating)),
+            Build ("num_ratings", Args.Num_Ratings),
+            Build ("homepage", -Args.Homepage),
+            Build ("description", -Args.Description),
+            Build ("download_link", -Args.Download_Link)]);
+   begin
+      return Themes;
+   end To_Array;
 
 end Adi_Themes;

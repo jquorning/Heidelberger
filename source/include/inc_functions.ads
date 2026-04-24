@@ -3,6 +3,7 @@
 --
 
 with Php.Calendar;
+with Php.Errors;
 
 with Arrays;
 with Helpers_2;
@@ -866,6 +867,27 @@ is
      (Funct : String; Message : String; Version : String);
 
    --
+   -- Generates a user-level error/warning/notice/deprecation message.
+   --
+   -- Generates the message when `WP_DEBUG` is true.
+   --
+   -- @since 6.4.0
+   --
+   -- @param string function_name The function that triggered the error.
+   -- @param string message       The message explaining the error.
+   --                             The message can contain allowed HTML 'a' (with href), 'code',
+   --                             'br', 'em', and 'strong' tags and http or https protocols.
+   --                             If it contains other HTML tags or protocols, the message should be escaped
+   --                             before passing to this function to avoid being stripped {@see wp_kses()}.
+   -- @param int    error_level   Optional. The designated error type for this error.
+   --                             Only works with E_USER family of constants. Default E_USER_NOTICE.
+   --
+   procedure Wp_Trigger_Error
+     (Function_Name : String;
+      Message       : String;
+      Error_Level   : Php.Errors.Error_Level_Type := Php.Errors.E_USER_NOTICE);
+
+   --
    -- Merges user defined arguments into defaults array.
    --
    -- This function is used throughout WordPress to allow for both string or array
@@ -1597,8 +1619,21 @@ is
    -- @param string required Minimum required PHP version.
    -- @return bool True if required version is compatible or empty, false if not.
    --
-   function Is_PHP_Version_Compatible (Required : String) return Boolean
-   is (raise Program_Error with "not implementations");
+   function Is_PHP_Version_Compatible (Required : String) return Boolean;
+
+   --
+   -- Returns the current WordPress version.
+   --
+   -- Returns an unmodified value of `$wp_version`. Some plugins modify the
+   -- global in an attempt to improve security through obscurity. This
+   -- practice can cause errors in WordPress, so the ability to get an
+   -- unmodified version is needed.
+   --
+   -- @since 6.7.0
+   --
+   -- @return string The current WordPress version.
+   --
+   function Wp_Get_Wp_Version return String;
 
    --
    -- Checks compatibility with the current WordPress version.
@@ -1610,8 +1645,7 @@ is
    -- @param string required Minimum required WordPress version.
    -- @return bool True if required version is compatible or empty, false if not.
    --
-   function Is_Wp_Version_Compatible (Required : String) return Boolean
-   is (raise Program_Error with "not implementations");
+   function Is_WP_Version_Compatible (Required : String) return Boolean;
 
    --
    -- Prints the default annotation for the web host altering the "Update PHP" page
@@ -1708,5 +1742,50 @@ is
    -- @return array Empty array.
    --
    function X_Return_Empty_Array return Array_Type;
+
+   --
+   -- Creates and returns the markup for an admin notice.
+   --
+   -- @since 6.4.0
+   --
+   -- @param string message The message.
+   -- @param array  args {
+   --     Optional. An array of arguments for the admin notice. Default empty array.
+   --
+   --     @type string   type               Optional. The type of admin notice.
+   --                                        For example, 'error', 'success', 'warning', 'info'.
+   --                                        Default empty string.
+   --     @type bool     dismissible        Optional. Whether the admin notice is dismissible. Default false.
+   --     @type string   id                 Optional. The value of the admin notice's ID attribute. Default empty string.
+   --     @type string[] additional_classes Optional. A string array of class names. Default empty array.
+   --     @type string[] attributes         Optional. Additional attributes for the notice div. Default empty array.
+   --     @type bool     paragraph_wrap     Optional. Whether to wrap the message in paragraph tags. Default true.
+   -- }
+   -- @return string The markup for an admin notice.
+   --
+   function Wp_Get_Admin_Notice
+     (Message : String; Args : Array_Type := Empty_Array) return String;
+
+   --
+   -- Outputs an admin notice.
+   --
+   -- @since 6.4.0
+   --
+   -- @param string message The message to output.
+   -- @param array  args {
+   --     Optional. An array of arguments for the admin notice. Default empty array.
+   --
+   --     @type string   type               Optional. The type of admin notice.
+   --                                        For example, 'error', 'success', 'warning', 'info'.
+   --                                        Default empty string.
+   --     @type bool     dismissible        Optional. Whether the admin notice is dismissible. Default false.
+   --     @type string   id                 Optional. The value of the admin notice's ID attribute. Default empty string.
+   --     @type string[] additional_classes Optional. A string array of class names. Default empty array.
+   --     @type string[] attributes         Optional. Additional attributes for the notice div. Default empty array.
+   --     @type bool     paragraph_wrap     Optional. Whether to wrap the message in paragraph tags. Default true.
+   -- }
+   --
+   procedure Wp_Admin_Notice
+     (Message : String; Args : Array_Type := Empty_Array);
 
 end Inc_Functions;

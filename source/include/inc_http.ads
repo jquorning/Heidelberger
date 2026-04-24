@@ -13,9 +13,17 @@ with Php.HTML;
 
 with Arrays;
 
+with Class_Errors;
+
 package Inc_HTTP
 is
    use Arrays;
+
+   type Array_Error_Type is record
+      Success : Boolean;
+      Arry    : Array_Type;
+      Error   : Class_Errors.Wp_Error;
+   end record;
 
    --
    -- Returns the initialized WP_Http Object
@@ -42,7 +50,7 @@ is
    --
    function Wp_Remote_Get (URL  : String;
                            Args : Array_Type := Empty_Array)
-                           return Array_Type;
+                           return Array_Error_Type; -- Array_Type;
 
    --
    -- Performs an HTTP request using the POST method and returns its response.

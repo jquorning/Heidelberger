@@ -43,6 +43,7 @@ package body HB_Server is
       Register (Dispatcher, "/wp-admin/plugins.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/post.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/themes.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/theme-install.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/upgrade.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/", Binder.Render'Access);

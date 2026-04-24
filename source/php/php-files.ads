@@ -2,6 +2,8 @@
 --
 --
 
+with Ada.Text_IO;
+
 with Arrays;
 with Lists;
 
@@ -66,6 +68,8 @@ is
    function Realpath (Path : String)
             return String;
 
+   function Scandir (Directory : String) return List_Type;
+
    --
    --
    --
@@ -112,22 +116,28 @@ is
                    return Boolean
    is (raise Program_Error with "not implemented");
 
-   type File_Type is null record;
+   type File_Type is record
+      File : Ada.Text_IO.File_Type;
+   end record;
+
+   function Is_Open (File : File_Type) return Boolean;
+   -- Not a PHP function
 
    function Fopen (Filename : String;
                    Mode     : String)
-                   return File_Type
-   is (raise Program_Error with "not implemented");
+                   return File_Type;
 
    procedure Fwrite (File : in out File_Type;
-                     Data : String)
-   is null;
+                     Data : String);
 
-   procedure Fclose (File : in out File_Type)
-   is null;
+   procedure Fclose (File : in out File_Type);
 
    function Stat (Filename : String)
                   return Array_Type
    is (raise Program_Error with "not implemented");
+
+   function Fileowner (Filename : String) return Integer;
+
+   procedure Unlink (Filename : String);
 
 end Php.Files;

@@ -2,9 +2,12 @@
 --
 --
 
+with GNAT.MD5;
+
 with Php.Strings;
 
 with Arrayable_Arrays;
+with Logging;
 
 package body Php.Misc
 is
@@ -103,5 +106,39 @@ is
    begin
       return Empty_Arrayable;
    end Func_Get_Args;
+
+   ---------
+   -- MD5 --
+   ---------
+
+   function MD5 (Item   : String;
+                 Binary : Boolean := False) return String
+   is
+      use GNAT.MD5;
+   begin
+      return Digest (Item);
+   end MD5;
+
+   -------------
+   -- Uniquid --
+   -------------
+
+   function Uniqid
+     (Prefix : String := ""; More_Entropy : Boolean := False) return String is
+   begin
+      Logging.Log ("php.uniqid", "not implemented, prefix: " & Prefix);
+      return "XXX-C99";
+   end Uniqid;
+
+   ----------------------
+   -- Extension_Loaded --
+   ----------------------
+
+   function Extension_Loaded (Extension : String) return Boolean is
+   begin
+      Logging.Log
+        ("php.extension_loaded", "not implemented, extenstion: " & Extension);
+      return False;
+   end Extension_Loaded;
 
 end Php.Misc;

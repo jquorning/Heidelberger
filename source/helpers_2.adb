@@ -65,4 +65,18 @@ is
       return Arrays.Empty_Array;
    end Generic_Call_Procedure_3;
 
+   ------------------------------
+   -- Generic_Call_Procedure_4 --
+   ------------------------------
+
+   function Generic_Call_Procedure_4
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type
+   is
+      pragma Unreferenced (Arry);
+   begin
+      Procedur (Item => False);
+      return Arrays.Empty_Array;
+   end Generic_Call_Procedure_4;
+
 end Helpers_2;

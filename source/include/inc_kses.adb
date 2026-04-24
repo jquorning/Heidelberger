@@ -740,6 +740,15 @@ is
       return Wp_KSES_Split (String_1, Allowed_HTML, Allowed_Protocols_2);
    end Wp_KSES;
 
+   -------------
+   -- Wp_KSES --
+   -------------
+
+   function Wp_KSES (Item : String; Allowed_HTML : String) return String is
+   begin
+      return Wp_KSES (Item, Empty_Array);
+   end Wp_KSES;
+
 -- --
 -- -- Filters one HTML attribute and ensures its value is allowed.
 -- --
@@ -2138,22 +2147,14 @@ is
 --         return $data;
 -- end;
 
--- --
--- -- Sanitizes content for allowed HTML tags for post content.
--- --
--- -- Post content refers to the page contents of the "post" type and not `$_POST`
--- -- data from forms.
--- --
--- -- This function expects unslashed data.
--- --
--- -- @since 2.9.0
--- --
--- -- @param string $data Post content to filter.
--- -- @return string Filtered post content with allowed HTML tags and attributes intact.
--- --
--- function wp_kses_post( $data ) then
---         return wp_kses( $data, "post" );
--- end;
+   ------------------
+   -- Wp_KSES_Post --
+   ------------------
+
+   function Wp_KSES_Post (Data : String) return String is
+   begin
+      return Wp_KSES (Data, "post");
+   end Wp_KSES_Post;
 
 -- --
 -- -- Navigates through an array, object, or scalar, and sanitizes content for
@@ -2271,6 +2272,7 @@ is
                                  Deprecated : String := "")
                                  return String
    is
+      pragma Unreferenced (Deprecated);
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;

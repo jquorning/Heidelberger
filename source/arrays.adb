@@ -265,6 +265,33 @@ is
       return Arry.Kind;
    end Kind_Of;
 
+   --------------
+   -- Is_Array --
+   --------------
+
+   function Is_Array (Multi : Multi_Type) return Boolean is
+   begin
+      return Kind_Of (Multi) = Kind_Array;
+   end Is_Array;
+
+   ----------------
+   -- Is_Boolean --
+   ----------------
+
+   function Is_Boolean (Multi : Multi_Type) return Boolean is
+   begin
+      return Kind_Of (Multi) = Kind_Boolean;
+   end Is_Boolean;
+
+   ----------------
+   -- Is_Integer --
+   ----------------
+
+   function Is_Integer (Multi : Multi_Type) return Boolean is
+   begin
+      return Kind_Of (Multi) = Kind_Integer;
+   end Is_Integer;
+
    -------------
    -- Is_Null --
    -------------
@@ -274,14 +301,14 @@ is
       return Kind_Of (Multi) = Kind_Null;
    end Is_Null;
 
-   --------------
-   -- Is_Array --
-   --------------
+   ---------------
+   -- Is_String --
+   ---------------
 
-   function Is_Array (Multi : Multi_Type) return Boolean is
+   function Is_String (Multi : Multi_Type) return Boolean is
    begin
-      return Kind_Of (Multi) = Kind_Array;
-   end Is_Array;
+      return Kind_Of (Multi) = Kind_String;
+   end Is_String;
 
    -----------
    -- Empty --

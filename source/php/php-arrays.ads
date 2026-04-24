@@ -119,8 +119,7 @@ is
                           return List_Type;
 
    function Array_Values (Arry : Array_Type)
-                          return Array_Type
-   is (raise Program_Error with "not implemented");
+                          return Array_Type;
 
    function Array_Keys (Arry : Array_Type)
                         return Array_Type
@@ -157,8 +156,7 @@ is
    is (raise Program_Error with "not implemented");
 
    function Array_Flip (Arry : Array_Type)
-                        return Array_Type
-   is (raise Program_Error with "not implemented");
+                        return Array_Type;
 
    function Array_Flip (Arry : List_Type)
                         return Array_Type
@@ -295,6 +293,9 @@ is
    function Array_Change_Key_Case (Arry : Array_Type;
                                    Cas  : Integer := CASE_LOWER)
                                    return Array_Type;
+
+   procedure ASort (Arry : in out Array_Type)
+   is null;
 
    procedure Arsort (Arry : in out Array_Type)
    is null;

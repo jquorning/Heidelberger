@@ -84,30 +84,27 @@ is
       -- redirect requests to deprecated keys to the new, correct ones.
       --
       declare
-         Deprecated_Keys : constant Array_Type := To_Array_Type ([
-           Build ("blacklist_keys",    "disallowed_keys"),
-           Build ("comment_whitelist", "comment_previously_approved")
-         ]);
+         Deprecated_Keys : constant Array_Type :=
+           To_Array_Type
+             ([Build ("blacklist_keys", "disallowed_keys"),
+               Build ("comment_whitelist", "comment_previously_approved")]);
       begin
-         if
-           Isset (Deprecated_Keys, Option) and then
-           not Wp_Installing
-         then
-            X_Deprecated_Argument (
-              "__FUNCTION__",
-              "5.5.0",
-              Sprintf (
-                -- translators: 1: Deprecated option key, 2: New option key.
-                abs "The ""%1s"" option key has been renamed to ""%2s"".",
-                [
-                  1 => Option,
-                  2 => Get_As_String (Deprecated_Keys, Option)
-                ]
-              )
-            );
-            return Get_Option (Get_As_String (Deprecated_Keys, Option), Default);
+         if Isset (Deprecated_Keys, Option) and then not Wp_Installing then
+            X_Deprecated_Argument
+              ("__FUNCTION__",
+               "5.5.0",
+               Sprintf
+                 (
+                  -- translators: 1: Deprecated option key, 2: New option key.
+                  abs "The ""%1s"" option key has been renamed to ""%2s"".",
+                  [1 => Option,
+                   2 => Get_As_String (Deprecated_Keys, Option)]));
+            return
+              Get_Option (Get_As_String (Deprecated_Keys, Option), Default);
          end if;
       end;
+
+      Logging.Log ("get_option", "XXX-B10");
 
       --
       -- Filters the value of an existing option before it is retrieved.
@@ -132,8 +129,8 @@ is
       --
       declare
          Pre_2 : constant Multi_Type :=
-           Apply_Filters ("pre_option_" & Option, From_Boolean (False),
-                          Option, Default);
+           Apply_Filters
+             ("pre_option_" & Option, From_Boolean (False), Option, Default);
 
          --
          -- Filters the value of all existing options before it is retrieved.
@@ -166,11 +163,12 @@ is
 
       if not Wp_Installing then
          declare
-            Found : Boolean;
+            Found      : Boolean;
             -- Prevent non-existent options from triggering multiple queries.
-            Notoptions : Array_Type := Wp_Cache_Get ("notoptions", "options",
-                                                     Found => Found);
+            Notoptions : Array_Type :=
+              Wp_Cache_Get ("notoptions", "options", Found => Found);
          begin
+            Logging.Log ("get_option", Notoptions'Image);
             -- Prevent non-existent `notoptions` key from triggering multiple
             -- key lookups.
             if not Is_Array (Notoptions) then
@@ -197,8 +195,11 @@ is
                --                               value?
                --
                return
-                 Apply_Filters ("default_option_" & Option,
-                                Default, Option, Passed_Default);
+                 Apply_Filters
+                   ("default_option_" & Option,
+                    Default,
+                    Option,
+                    Passed_Default);
             end if;
 
             declare
@@ -206,10 +207,15 @@ is
                Found      : Boolean;
             begin
                if Isset (Alloptions, Option) then
+                  Logging.Log ("get_option", "XXX-B12B");
+
                   Value := new Multi_Type'(Get (Alloptions, Option));
                else
+                  Logging.Log ("get_option", "XXX-B12C");
+
                   Value :=
-                    new Multi_Type'(Wp_Cache_Get (Option, "options", Found => Found));
+                    new Multi_Type'
+                      (Wp_Cache_Get (Option, "options", Found => Found));
 
                   if From_Boolean (False) = Value.all then
                      declare
@@ -219,12 +225,12 @@ is
                           Statement_Type (-Globals.WpDB.Options);
 
                         Statement : constant Statement_Type :=
-                          Globals.WpDB.Prepare (
-                            "SELECT option_value" &
-                            " FROM " & Options    &
-                            " WHERE option_name = %s LIMIT 1",
-                            [1 => Option]
-                          );
+                          Globals.WpDB.Prepare
+                            ("SELECT option_value"
+                             & " FROM "
+                             & Options
+                             & " WHERE option_name = %s LIMIT 1",
+                             [1 => Option]);
 
                         Row : constant Array_Type :=
                           Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -232,7 +238,7 @@ is
                         -- Has to be get_row() instead of get_var() because of
                         -- funkiness with 0, false, null values.
                         if Is_Object (Row) then
---                         Value := Row.Option_Value;
+                           --                         Value := Row.Option_Value;
                            Wp_Cache_Add (Option, Value.all, "options");
 
                         else
@@ -247,8 +253,11 @@ is
 
                            -- This filter is documented in wp-includes/option.php
                            return
-                             Apply_Filters ("default_option_" & Option,
-                                            Default, Option, Passed_Default);
+                             Apply_Filters
+                               ("default_option_" & Option,
+                                Default,
+                                Option,
+                                Passed_Default);
                         end if;
                      end;
                   end if;
@@ -265,10 +274,11 @@ is
               Statement_Type (-Globals.WpDB.Options);
 
             Statement : constant Statement_Type :=
-              Globals.WpDB.Prepare (
-                "SELECT option_value FROM " & Options &
-                " WHERE option_name = %s LIMIT 1",
-                [1 => Option]);
+              Globals.WpDB.Prepare
+                ("SELECT option_value FROM "
+                 & Options
+                 & " WHERE option_name = %s LIMIT 1",
+                 [1 => Option]);
 
             Row : constant Array_Type :=
               Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -278,13 +288,16 @@ is
 
             if Is_Object (Row) then
                null;
---             Value := Row.Option_Value;
+               --             Value := Row.Option_Value;
                Value := new Multi_Type'(Get (Row, "option_value"));
             else
                -- This filter is documented in wp-includes/option.php
                return
-                 Apply_Filters ("default_option_" & Option,
-                                Default, Option, Passed_Default);
+                 Apply_Filters
+                   ("default_option_" & Option,
+                    Default,
+                    Option,
+                    Passed_Default);
             end if;
          end;
       end if;
@@ -307,12 +320,14 @@ is
          end;
       end if;
 
-      if
-        In_List (Option, List_Type'["siteurl", "home", "category_base",
-                                    "tag_base"], True)
+      if In_List
+           (Option,
+            List_Type'["siteurl", "home", "category_base", "tag_base"],
+            True)
       then
-         Value := new Multi_Type'(From_String (
-           Un_Trailing_Slash_It (As_String (Value.all))));
+         Value :=
+           new Multi_Type'
+             (From_String (Un_Trailing_Slash_It (As_String (Value.all))));
       end if;
 
       --
@@ -328,8 +343,12 @@ is
       --                       unserialized prior to being returned.
       -- @param string option Option name.
       --
-      return Apply_Filters ("option_" & Option,
-                            Maybe_Unserialize (As_String (Value.all)), Option);
+      Logging.Log ("get_option", "done");
+      return
+        Apply_Filters
+          ("option_" & Option,
+           Maybe_Unserialize (As_String (Value.all)),
+           Option);
    end Get_Option;
 
    ----------------
@@ -406,8 +425,207 @@ is
       Result : constant Multi_Type :=
         Get_Option (Option, From_String (Default));
    begin
-      return As_Boolean (Result);
+      return As_String (Result) /= "";
    end Get_Option;
+
+   -----------------------------------
+   -- Wp_Set_Option_Autoload_Values --
+   -----------------------------------
+
+   function Wp_Set_Option_Autoload_Values
+     (Options : Array_Type) return Array_Type
+   is
+      use Php.Lists;
+      use Php.Strings;
+      use Array_Lists;
+      use UStrings;
+      use Class_WpDB;
+      use Inc_Caches;
+
+      -- global $wpdb;
+      Grouped_Options : Array_Type :=
+        To_Array_Type
+          ([Build ("on", Empty_Array), Build ("off", Empty_Array)]);
+
+      Results : Array_Type;
+   begin
+      if Options = Empty_Array then
+         return Empty_Array;
+      end if;
+
+      for A in Options.Iterate loop
+         declare
+            Option   : constant String := Key (A);
+            Autoload : constant String := As_String (Element (A));
+         begin
+            Wp_Protect_Special_Option
+              (Option); -- Ensure only valid options can be passed.
+
+            --
+            -- Sanitize autoload value and categorize accordingly.
+            -- The values 'yes', 'no', 'on', and 'off' are supported for backward compatibility.
+            --
+            if Autoload in "off" | "no" | "" then
+               Append (Grouped_Options, "off", From_String (Option));
+            else
+               Append (Grouped_Options, "on", From_String (Option));
+            end if;
+            Set (Results, Option, From_Boolean (False)); -- Initialize result value.
+         end;
+      end loop;
+
+      declare
+         Where             : List_Type;
+         Where_Args        : List_Type;
+         Options_To_Update : List_Type;
+      begin
+         for A in Grouped_Options.Iterate loop
+            declare
+               Autoload : constant String := Key (A);
+               Options  : constant List_Type := As_List (Element (A));
+            begin
+               if Options.Is_Empty then
+                  goto Continue_2;
+               end if;
+
+               declare
+                  Placeholders : constant String :=
+                    Implode
+                      (",",
+                       List_Fill
+                         (Start_Index => 1,
+                          Count       => Natural (Options.Length),
+                          Value       => From_String ("%s")));
+               begin
+                  Append
+                    (Where,
+                     "autoload != '%s' AND option_name IN ("
+                     & Placeholders
+                     & ")");
+               end;
+               Append (Where_Args, Autoload);
+               for Option of Options loop
+                  Append (Where_Args, Option);
+               end loop;
+            end;
+            <<Continue_2>>
+         end loop;
+
+         declare
+            Where_2 : constant Statement_Type :=
+              Statement_Type ("WHERE " & Implode (" OR ", Where));
+         begin
+            --
+            -- Determine the relevant options that do not already use the given autoload value.
+            -- If no options are returned, no need to update.
+            --
+            Options_To_Update :=
+              Globals.WpDB.Get_Col
+                (Globals.WpDB.Prepare
+                   ("SELECT option_name FROM "
+                    & Statement_Type (-Globals.WpDB.Options)
+                    & " "
+                    & Where_2,
+                    Where_Args));
+         end;
+         if Options_To_Update.Is_Empty then
+            return Results;
+         end if;
+
+         -- Run UPDATE queries as needed (maximum 2) to update the relevant options' autoload values to 'yes' or 'no'.
+         for A in Grouped_Options.Iterate loop
+            declare
+               Autoload : constant String := Key (A);
+               Options  : List_Type := As_List (Element (A));
+               Query_Result : Rows_Result_Type;
+            begin
+               if Options.Is_Empty then
+                  goto Continue_1;
+               end if;
+               Options := List_Intersect (Options, Options_To_Update);
+               Set (Grouped_Options, Autoload, From_List (Options));
+
+               if not As_Boolean (Get (Grouped_Options, Autoload)) then
+                  goto Continue_1;
+               end if;
+
+               declare
+                  List_2 : constant List_Type :=
+                    As_List (Get (Grouped_Options, Autoload));
+
+                  List : constant String :=
+                    Implode
+                      (",",
+                       List_Fill
+                         (Start_Index => 1,
+                          Count       => Length (List_2),
+                          Value       => From_String ("%s")));
+               begin
+                  -- Run query to update autoload value for all the options where it is needed.
+                  Query_Result :=
+                    Globals.WpDB.Query
+                      (Globals.WpDB.Prepare
+                         ("UPDATE "
+                          & Statement_Type (-Globals.WpDB.Options)
+                          & " SET autoload = %s WHERE option_name IN ("
+                          & Statement_Type (List)
+                          & ")",
+                          List_Merge
+                            ([Autoload],
+                             As_List (Get (Grouped_Options, Autoload)))));
+               end;
+
+               if Query_Result.Status /= Error then
+                  -- Set option list to an empty array to indicate no options were updated.
+                  Set (Grouped_Options, Autoload, From_Array (Empty_Array));
+                  goto Continue_1;
+               end if;
+
+               -- Assume that on success all options were updated, which should be the case given only new values are sent.
+               for Option of As_List (Get (Grouped_Options, Autoload)) loop
+                  Set (Results, Option, From_Boolean (True));
+               end loop;
+            end;
+            <<Continue_1>>
+         end loop;
+      end;
+
+      --
+      -- If any options were changed to 'on', delete their individual caches, and delete 'alloptions' cache so that it
+      -- is refreshed as needed.
+      -- If no options were changed to 'on' but any options were changed to 'no', delete them from the 'alloptions'
+      -- cache. This is not necessary when options were changed to 'on', since in that situation the entire cache is
+      -- deleted anyway.
+      --
+      if As_Boolean (Get (Grouped_Options, "on")) then
+         Wp_Cache_Delete_Multiple (As_List (Get (Grouped_Options, "on")), "options");
+         Wp_Cache_Delete ("alloptions", "options");
+      elsif As_Boolean (Get (Grouped_Options, "off")) then
+         declare
+            Alloptions : Array_Type := Wp_Load_Alloptions (True);
+         begin
+            for Option of As_List (Get (Grouped_Options, "off")) loop
+               if Isset (Alloptions, Option) then
+                  Delete (Alloptions, Option);
+               end if;
+            end loop;
+
+            Wp_Cache_Set ("alloptions", Alloptions, "options");
+         end;
+      end if;
+
+      return Results;
+   end Wp_Set_Option_Autoload_Values;
+
+   -----------------------------------
+   -- Wp_Set_Option_Autoload_Values --
+   -----------------------------------
+
+   procedure Wp_Set_Option_Autoload_Values (Options : Array_Type) is
+      Unused : constant Array_Type := Wp_Set_Option_Autoload_Values (Options);
+   begin
+      null;
+   end Wp_Set_Option_Autoload_Values;
 
    -------------------------------
    -- Wp_Protect_Special_Option --
@@ -459,6 +677,8 @@ is
       Unused_Found : Boolean;
       Alloptions   : Array_Type;
    begin
+      Logging.Log ("wp_load_alloptions", "XXX-B13");
+
       if not Wp_Installing or else not Is_Multisite then
          Alloptions :=
            Wp_Cache_Get ("alloptions", "options", Force_Cache, Unused_Found);
@@ -467,6 +687,7 @@ is
       end if;
 
       if Alloptions.Is_Empty then
+         Logging.Log ("wp_load_alloptions", "XXX-B13A");
          declare
             Unused   : Boolean;
             Suppress : constant Boolean := Globals.WpDB.Suppress_Errors;
@@ -814,8 +1035,6 @@ is
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;
-
-      Value_2 : Multi_Type (Kind_Null);
    begin
       -- if ( ! empty( deprecated ) ) then
       --    x_deprecated_argument( __FUNCTION__, "2.3.0" );
@@ -863,76 +1082,79 @@ is
       --    value = clone value;
       -- end if;
 
-      Value_2 := From_String (Sanitize_Option (Option, As_String (Value)));
-
-      -- Make sure the option doesn't already exist.
-      -- We can check the "notoptions" cache before we ask for a DB query.
       declare
-         Found : Boolean;
-
-         Notoptions : constant Array_Type :=
-           Wp_Cache_Get ("notoptions", "options", Found => Found);
+         Value_2 : constant Multi_Type :=
+           From_String (Sanitize_Option (Option, As_String (Value)));
       begin
-         if not Is_Array (Notoptions) or else not Isset (Notoptions, Option) then
-            -- This filter is documented in wp-includes/option.php
-            if
-              Apply_Filters ("default_option_" & Option, False, Option, False)
-              /= Get_Option (Option)
-            then
-               return False;
-            end if;
-         end if;
-      end;
-
-      declare
-         Serialized_Value : constant Multi_Type :=
-           Maybe_Serialize (As_String (Value_2));
---       Autoload         = ( "no" === autoload || false === autoload ) ? "no" : "yes";
-      begin
-         --
-         -- Fires before an option is added.
-         --
-         -- @since 2.9.0
-         --
-         -- @param string option Name of the option to add.
-         -- @param mixed  value  Value of the option.
-         --
-         Do_Action ("add_option", Option, Value_2);
-
+         -- Make sure the option doesn't already exist.
+         -- We can check the "notoptions" cache before we ask for a DB query.
          declare
-            Statement : constant Statement_Type :=
-              Globals.WpDB.Prepare (
-                "INSERT INTO `wpdb->options` (`option_name`, `option_value`, " &
-                "`autoload`) " &
-                "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = " &
-                "VALUES(`option_name`), `option_value` = " &
-                "VALUES(`option_value`), `autoload` = VALUES(`autoload`)",
-                [
-                  1 => Option,
-                  2 => As_String (Serialized_Value),
-                  3 => Boolean'Image (Autoload)
-                ]);
+            Found : Boolean;
 
-            Result : constant Rows_Result_Type :=
-              Globals.WpDB.Query (Statement);
+            Notoptions : constant Array_Type :=
+              Wp_Cache_Get ("notoptions", "options", Found => Found);
          begin
-            if Result.Status = Error then
-               return False;
+            if not Is_Array (Notoptions) or else not Isset (Notoptions, Option)
+            then
+               -- This filter is documented in wp-includes/option.php
+               if Apply_Filters
+                    ("default_option_" & Option, False, Option, False)
+                 /= Get_Option (Option)
+               then
+                  return False;
+               end if;
             end if;
          end;
 
-         if Wp_Installing then
-            if Autoload then
-               declare
-                  Alloptions : Array_Type := Wp_Load_Alloptions (True);
-               begin
-                  Set (Alloptions, Option, Serialized_Value);
-                  Wp_Cache_Set ("alloptions", Alloptions, "options");
-               end;
-            else
-               Wp_Cache_Set (Option, As_Array (Serialized_Value), "options");
+         declare
+            Serialized_Value : constant Multi_Type :=
+              Maybe_Serialize (As_String (Value_2));
+            --       Autoload         = ( "no" === autoload || false === autoload ) ? "no" : "yes";
+         begin
+            --
+            -- Fires before an option is added.
+            --
+            -- @since 2.9.0
+            --
+            -- @param string option Name of the option to add.
+            -- @param mixed  value  Value of the option.
+            --
+            Do_Action ("add_option", Option, Value_2);
+
+            declare
+               Statement : constant Statement_Type :=
+                 Globals.WpDB.Prepare
+                   ("INSERT INTO `wpdb->options` (`option_name`, `option_value`, "
+                    & "`autoload`) "
+                    & "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = "
+                    & "VALUES(`option_name`), `option_value` = "
+                    & "VALUES(`option_value`), `autoload` = VALUES(`autoload`)",
+                    [1 => Option,
+                     2 => As_String (Serialized_Value),
+                     3 => Boolean'Image (Autoload)]);
+
+               Result : constant Rows_Result_Type :=
+                 Globals.WpDB.Query (Statement);
+            begin
+               if Result.Status = Error then
+                  return False;
+               end if;
+            end;
+
+            if Wp_Installing then
+               if Autoload then
+                  declare
+                     Alloptions : Array_Type := Wp_Load_Alloptions (True);
+                  begin
+                     Set (Alloptions, Option, Serialized_Value);
+                     Wp_Cache_Set ("alloptions", Alloptions, "options");
+                  end;
+               else
+                  Wp_Cache_Set
+                    (Option, As_Array (Serialized_Value), "options");
+               end if;
             end if;
-         end if;
+         end;
 
          -- This option exists now.
          declare
@@ -940,7 +1162,7 @@ is
 
             Notoptions : constant Array_Type :=
               Wp_Cache_Get ("notoptions", "options", Found => Found);
-              -- Yes, again... we need it to be fresh.
+            -- Yes, again... we need it to be fresh.
          begin
             if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
                Delete (Ref (Notoptions, Option));
@@ -973,6 +1195,10 @@ is
       end;
       return True;
    end Add_Option;
+
+   ----------------
+   -- Add_Option --
+   ----------------
 
    procedure Add_Option (Option     : String;
                          Value      : Multi_Type := From_String ("");
@@ -1097,53 +1323,57 @@ is
       null;
    end Delete_Option;
 
--- --
--- -- Deletes a transient.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string transient Transient name. Expected to not be SQL-escaped.
--- -- @return bool True if the transient was deleted, false otherwise.
--- --
--- function delete_transient( transient ) then
+   ----------------------
+   -- Delete_Transient --
+   ----------------------
 
---         --
---         -- Fires immediately before a specific transient is deleted.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string transient Transient name.
---         --
---         do_action( "delete_transient_thentransientend;", transient );
+   function Delete_Transient (Transient : String) return Boolean
 
---         if ( wp_using_ext_object_cache() || wp_installing() ) then
---                 result = wp_cache_delete( transient, "transient" );
---         end; else then
---                 option_timeout = "_transient_timeout_" . transient;
---                 option         = "_transient_" . transient;
---                 result         = delete_option( option );
+   is
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Load;
 
---                 if ( result ) then
---                         delete_option( option_timeout );
---                 end;
---         end;
+      Result : Boolean;
+   begin
+      --
+      -- Fires immediately before a specific transient is deleted.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient name.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string transient Transient name.
+      --
+      Do_Action ("delete_transient_" & Transient, Transient);
 
---         if ( result ) then
+      if Wp_Using_Ext_Object_Cache or else Wp_Installing then
+         Result := Wp_Cache_Delete (Transient, "transient");
+      else
+         declare
+            Option_Timeout : constant String := "_transient_timeout_" & Transient;
+            Option         : constant String := "_transient_" & Transient;
+         begin
+            Result := Delete_Option (Option);
+            if Result then
+               Delete_Option (Option_Timeout);
+            end if;
+         end;
+      end if;
 
---                 --
---                 -- Fires after a transient is deleted.
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string transient Deleted transient name.
---                 --
---                 do_action( "deleted_transient", transient );
---         end;
+      if Result then
+         --
+         -- Fires after a transient is deleted.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string transient Deleted transient name.
+         --
+         Do_Action ("deleted_transient", Transient);
+      end if;
 
---         return result;
--- end;
+      return Result;
+   end Delete_Transient;
 
    ----------------------
    -- Delete_Transient --
@@ -2648,6 +2878,14 @@ is
    end Get_Site_Transient;
 
    ------------------------
+   -- Get_Site_Transient --
+   ------------------------
+
+   function Get_Site_Transient (Transient : String)
+                                return Adi_Themes.Theme_API_List
+   is (raise Program_Error with "not implemented");
+
+   ------------------------
    -- Set_Site_Transient --
    ------------------------
 
@@ -2778,6 +3016,18 @@ is
                                  Value      : Array_Lists.Array_List;
                                  Expiration : Integer := 0)
    is
+   begin
+      raise Program_Error with "not implemented";
+   end Set_Site_Transient;
+
+   ------------------------
+   -- Set_Site_Transient --
+   ------------------------
+
+   procedure Set_Site_Transient
+     (Transient  : String;
+      Value      : Adi_Themes.Theme_API_List;
+      Expiration : Integer := 0) is
    begin
       raise Program_Error with "not implemented";
    end Set_Site_Transient;

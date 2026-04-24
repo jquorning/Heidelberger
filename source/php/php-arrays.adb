@@ -1,3 +1,4 @@
+
 --
 --
 --
@@ -5,6 +6,9 @@
 with Ada.Containers;
 
 with Php.Strings;
+
+with Helpers;
+with Logging;
 
 package body Php.Arrays
 is
@@ -44,6 +48,26 @@ is
 
       return Arry;
    end Array_Filter;
+
+   ----------------
+   -- Array_Flip --
+   ----------------
+
+   function Array_Flip (Arry : Array_Type) return Array_Type is
+      Result : Array_Type;
+   begin
+      Logging.Log ("array_flip", "inout: " & Arry'Image);
+      for A in Arry.Iterate loop
+         declare
+            K : constant String := Key (A);
+            V : constant String := As_String (Element (A));
+         begin
+            Result.Append (V, From_String (K));
+         end;
+      end loop;
+      Logging.Log ("array_flip", "result: " & Result'Image);
+      return Result;
+   end Array_Flip;
 
    -----------------
    -- Array_Merge --
@@ -145,6 +169,21 @@ is
          Result.Append (As_String (Element (A)));
       end loop;
       return Result;
+   end Array_Values;
+
+   ------------------
+   -- Array_Values --
+   ------------------
+
+   function Array_Values (Arry : Array_Type) return Array_Type is
+      Filtered : constant List_Type := Array_Values (Arry);
+      Result   : Array_Type;
+   begin
+      for A in Filtered.First_Index .. Filtered.Last_Index loop
+         Result.Append (Helpers.Image (A), From_String (Filtered (A)));
+      end loop;
+      return Arry;
+      -- return Result;
    end Array_Values;
 
    ----------------

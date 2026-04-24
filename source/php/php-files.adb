@@ -3,7 +3,6 @@
 --
 
 with Ada.Directories;
-with Ada.Text_IO;
 
 with Dir_Iterators.Recursive;
 with Logging;
@@ -120,6 +119,38 @@ is
       return Full_Name (Path);
    end Realpath;
 
+   -------------
+   -- Scandir --
+   -------------
+
+   function Scandir (Directory : String) return List_Type is
+      use Ada.Directories;
+
+      Search : Search_Type;
+
+      Filter : constant Filter_Type :=
+        (Ada.Directories.Directory => True,
+         Ordinary_File             => True,
+         Special_File              => False);
+
+      Result : List_Type;
+   begin
+      Logging.Log ("php.files.scandir", "dir: " & Directory);
+
+      Start_Search (Search, Directory, Pattern => "*", Filter => Filter);
+      while More_Entries (Search) loop
+         declare
+            Item : Directory_Entry_Type;
+         begin
+            Get_Next_Entry (Search, Item);
+            Result.Append (Ada.Directories.Simple_Name (Item));
+         end;
+      end loop;
+      End_Search (Search);
+      -- Logging.Log ("php.files.scandir", Result'Image);
+      return Result;
+   end Scandir;
+
    ----------
    -- Glob --
    ----------
@@ -194,5 +225,77 @@ is
       Close (File);
       return -Buffer;
    end File_Get_Contents;
+
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (File : File_Type) return Boolean is
+   begin
+      return Ada.Text_IO.Is_Open (File.File);
+   end Is_Open;
+
+   -----------
+   -- Fopen --
+   -----------
+
+   function Fopen (Filename : String; Mode : String) return File_Type is
+      use Ada.Text_IO;
+
+      A_Mode : constant Ada.Text_IO.File_Mode :=
+        (if Mode = "r"
+         then In_File
+         elsif Mode = "w"
+         then Out_File
+         else raise Program_Error with "not implemented");
+   begin
+      Logging.Log ("php.fopen", Filename);
+      return Result : File_Type do
+         Ada.Text_IO.Open (Result.File, A_Mode, Filename);
+      end return;
+   exception
+      when Name_Error =>
+         Logging.Log ("php.fopen", "excpeption name_error");
+         return Result : File_Type do
+            null;
+         end return;
+   end Fopen;
+
+   ------------
+   -- Fwrite --
+   ------------
+
+   procedure Fwrite (File : in out File_Type; Data : String) is
+   begin
+      raise Program_Error with "not implemented";
+   end Fwrite;
+
+   ------------
+   -- Fclose --
+   ------------
+
+   procedure Fclose (File : in out File_Type) is
+   begin
+      Ada.Text_IO.Close (File.File);
+   end Fclose;
+
+   ---------------
+   -- Fileowner --
+   ---------------
+
+   function Fileowner (Filename : String) return Integer is
+   begin
+      Logging.Log ("php.fileowner", "not implemented");
+      return 999;
+   end Fileowner;
+
+   ------------
+   -- unlink --
+   ------------
+
+   procedure Unlink (Filename : String) is
+   begin
+      Logging.Log ("php.unlink", "not implemented");
+   end Unlink;
 
 end Php.Files;

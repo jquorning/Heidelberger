@@ -135,6 +135,8 @@ is
                          Flags : Unique_Flags := Sort_String)
                          return List_Type;
 
+   function Length (List : List_Type) return Natural;
+
    function Get (List : List_Type;
                  Key  : String)
                  return String

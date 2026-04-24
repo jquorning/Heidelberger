@@ -32,4 +32,10 @@ package Helpers_2 is
               (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                return Arrays.Array_Type;
 
+   generic
+      with procedure Procedur (Item : Boolean);
+   function Generic_Call_Procedure_4
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type;
+
 end Helpers_2;

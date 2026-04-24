@@ -69,6 +69,7 @@ is
       use Adi_Plugins;
       use Inc_Formatting;
       use Inc_Functions;
+      use Inc_HTTP;
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_L10n;
@@ -178,7 +179,7 @@ is
                then
 --                       require_once ABSPATH . WPINC . "/http.php";
                   declare
-                     Response : Array_Type;
+                     Response : Array_Error_Type;
                   begin
                      Response := Inc_HTTP.Wp_Remote_Get (
                         Admin_URL ("upgrade.php?step=1"),
@@ -188,7 +189,7 @@ is
                            ])
                         );
                      -- This action is documented in wp-admin/network/upgrade.php
-                     Do_Action ("after_mu_upgrade", Response);
+                     Do_Action ("after_mu_upgrade", Response.Arry);
 --                     Unset (Response);
                   end;
                end if;

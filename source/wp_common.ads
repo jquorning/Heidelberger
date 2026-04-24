@@ -3,12 +3,14 @@
 --
 
 with Php.Calendar;
+with Php.Errors;
 
 with Array_Lists;
 with Arrays;
 with Lists;
 
 with Adi_Translation_Install;
+with Adi_Themes;
 
 -- with Class_Admin_Bar;
 with Class_Block_Editor_Contexts;
@@ -23,18 +25,88 @@ with Class_Posts;
 with Class_Post_Type;
 with Class_Screens;
 with Class_Sites;
+with Class_Themes;
 with Class_Users;
+
 with Inc_Capabilities;
 with Inc_Comments;
 with Inc_Media;
 with Inc_Posts;
 with Inc_Users;
+
 with POMO_Translations;
 
 package Wp_Common
 is
    use Arrays;
    use Lists;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Themes.Themes_API_Result; -- Boolean;
+      Action    : String;
+      Args      : Adi_Themes.Themes_API_Args)
+      return Adi_Themes.Themes_API_Result;
+
+   function Apply_Filters
+     (Hook_Name : String; Value : Adi_Themes.Themes_API_Args)
+      return Adi_Themes.Themes_API_Args;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Themes.Themes_API_Args;
+      Action    : String) return Adi_Themes.Themes_API_Args;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : List_Type;
+      Theme     : Adi_Themes.Theme_API_Type) return List_Type;
+
+   -- function Apply_Filters
+   --   (Hook_Name : String;
+   --    Value     : List_Type;
+   --    Theme     : Class_Themes.Wp_Theme) return List_Type;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Array_Type;
+      Theme     : Class_Themes.Wp_Theme;
+      Typ       : String) return Array_Type;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Multi_Type) return Multi_Type;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Array_Type;
+      Post_Form : String;
+      Typ       : String;
+      Error     : Class_Errors.Wp_Error;
+      Context   : String;
+      Extra     : List_Type;
+      Relaxed   : Boolean) return Array_Type;
+
+   function Apply_Filters
+     (Hook_Name   : String;
+      Value       : Array_Type;
+      Credentials : Array_Type;
+      Typ         : String;
+      Error       : Class_Errors.Wp_Error;
+      Context     : String) return Array_Type;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : String;
+      Args      : Array_Type;
+      Context   : String;
+      Allowed   : Boolean) return String;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Array_Type;
+      Themes    : Class_Themes.Theme_Array; -- Array_Type;
+      Current   : String) return Array_Type;
 
    function Apply_Filters
      (Hook_Name : String;
@@ -711,6 +783,17 @@ is
                Hook      : String)
                return Array_Type
                is (Value);
+
+   procedure Do_Action
+     (Hook_Name     : String;
+      Function_Name : String;
+      Message       : String;
+      Error_Level   : Php.Errors.Error_Level_Type);
+
+   procedure Do_Action
+     (Hook_Name : String;
+      Message   : String;
+      Args      : Array_Type);
 
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String := "";

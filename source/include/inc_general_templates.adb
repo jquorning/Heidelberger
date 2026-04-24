@@ -5673,7 +5673,7 @@ is
    --------------
 
    function Disabled (Disabled : String;
-                      Current  : String; -- Integer;
+                      Current  : String := ""; -- Integer;
                       Echo     : Boolean := True)
                       return String
    is

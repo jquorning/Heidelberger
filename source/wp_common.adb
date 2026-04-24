@@ -12,6 +12,158 @@ is
 
    function Apply_Filters
      (Hook_Name : String;
+      Value     : Adi_Themes.Themes_API_Result; -- Boolean;
+      Action    : String;
+      Args      : Adi_Themes.Themes_API_Args)
+      return Adi_Themes.Themes_API_Result
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String; Value : Adi_Themes.Themes_API_Args)
+      return Adi_Themes.Themes_API_Args
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Themes.Themes_API_Args;
+      Action    : String) return Adi_Themes.Themes_API_Args
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : List_Type;
+      Theme     : Adi_Themes.Theme_API_Type) return List_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Array_Type;
+      Theme     : Class_Themes.Wp_Theme;
+      Typ       : String) return Array_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Multi_Type) return Multi_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Array_Type;
+      Post_Form : String;
+      Typ       : String;
+      Error     : Class_Errors.Wp_Error;
+      Context   : String;
+      Extra     : List_Type;
+      Relaxed   : Boolean) return Array_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name   : String;
+      Value       : Array_Type;
+      Credentials : Array_Type;
+      Typ         : String;
+      Error       : Class_Errors.Wp_Error;
+      Context     : String) return Array_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : String;
+      Args      : Array_Type;
+      Context   : String;
+      Allowed   : Boolean) return String
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Array_Type;
+      Themes    : Class_Themes.Theme_Array; -- Array_Type;
+      Current   : String) return Array_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
       Value     : String;
       Single    : String;
       Plural    : String;
@@ -1613,6 +1765,29 @@ is
       Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
       return Value;
    end Apply_Filters;
+
+   procedure Do_Action
+     (Hook_Name     : String;
+      Function_Name : String;
+      Message       : String;
+      Error_Level   : Php.Errors.Error_Level_Type)
+   is
+      use Arrayable_Arrays;
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
+   end Do_Action;
+
+   procedure Do_Action
+     (Hook_Name : String;
+      Message   : String;
+      Args      : Array_Type)
+   is
+      use Arrayable_Arrays;
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, Empty_Arrayable);
+   end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String := "";

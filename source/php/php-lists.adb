@@ -317,6 +317,15 @@ is
       return Result;
    end List_Unique;
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length (List : List_Type) return Natural is
+   begin
+      return Natural (List_Vectors.Length (List));
+   end Length;
+
    -----------
    -- Isset --
    -----------
