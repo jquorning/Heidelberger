@@ -20,7 +20,7 @@ is
    X_Wp_Real_Parent_File : Array_Type;
 
    --
-   -- Parses the plugin contents to retrieve plugin"s metadata.
+   -- Parses the plugin contents to retrieve plugin's metadata.
    --
    -- All plugin headers must be on their own line. Plugin description must not have
    -- any newlines, otherwise only parts of the description will be displayed.
@@ -30,8 +30,8 @@ is
    --     Plugin Name: Name of the plugin.
    --     Plugin URI: The home page of the plugin.
    --     Description: Plugin description.
-   --     Author: Plugin author"s name.
-   --     Author URI: Link to the author"s website.
+   --     Author: Plugin author's name.
+   --     Author URI: Link to the author's website.
    --     Version: Plugin version.
    --     Text Domain: Optional. Unique identifier, should be same as the one used in
    --          load_plugin_textdomain().
@@ -89,8 +89,7 @@ is
    function Get_Plugin_Data (Plugin_File : String;
                              Markup      : Boolean := True;
                              Translate   : Boolean := True)
-                             return Array_Type
-   is (raise Program_Error with "not implemented");
+                             return Array_Type;
 
    --
    -- Adds a submenu page.
@@ -464,8 +463,7 @@ is
    --                 See get_plugin_data().
    --
    function Get_Plugins (Plugin_Folder : String := "")
-                         return Array_Type
-   is (raise Program_Error with "not implemented");
+                         return Array_Type;
 
    --
    -- Sanitizes plugin data, optionally adds markup, optionally translates.

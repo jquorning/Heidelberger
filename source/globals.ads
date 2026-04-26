@@ -109,6 +109,7 @@ is
    Global_Tab  : UStrings.UString;
    Global_Tabs : Array_Type;
    Global_Type : UStrings.UString;
+   Global_Term : UStrings.UString;
 
    --
    --

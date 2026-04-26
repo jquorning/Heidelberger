@@ -2,6 +2,7 @@
 --
 --
 
+private with Ada.Directories;
 with Ada.Text_IO;
 
 with Arrays;
@@ -48,22 +49,18 @@ is
                   return List_Type
    is (raise Program_Error with "not implemented");
 
-   type Dir_Handle is tagged null record;
+   type Dir_Handle is tagged limited private; -- tagged null record;
 
    function Is_Good (Handle : Dir_Handle)
-                     return Boolean
-   is (raise Program_Error with "not implemented");
+                     return Boolean;
 
    function Opendir (Directory : String)
-                     return Dir_Handle
-   is (raise Program_Error with "not implemented");
+                     return Dir_Handle;
 
    function Readdir (Handle : in out Dir_Handle)
-                     return String
-   is (raise Program_Error with "not implemented");
+                     return String;
 
-   procedure Closedir (Handle : in out Dir_Handle)
-   is null;
+   procedure Closedir (Handle : in out Dir_Handle);
 
    function Realpath (Path : String)
             return String;
@@ -139,5 +136,11 @@ is
    function Fileowner (Filename : String) return Integer;
 
    procedure Unlink (Filename : String);
+
+private
+
+   type Dir_Handle is tagged limited record
+      Handle : Ada.Directories.Search_Type;
+   end record;
 
 end Php.Files;

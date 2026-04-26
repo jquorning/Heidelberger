@@ -100,4 +100,6 @@ is
 
    function Extension_Loaded (Extension : String) return Boolean;
 
+   function Strtotime (Datetime : String) return Integer;
+
 end Php.Misc;

@@ -15,7 +15,7 @@ with Class_Posts;
 package Inc_Category_Templates
 is
    use Arrays;
--- use Lists;
+   -- use Lists;
 
    No_Terms : exception;
    Error    : exception;
@@ -36,12 +36,13 @@ is
    -- @return string|WP_Error A list of category parents on success, WP_Error on
    --                          failure.
    --
-   function Get_Category_Parents (Category_Id : Integer;
-                                  Link        : Boolean := False;
-                                  Separator   : String  := "/";
-                                  Nicename    : Boolean := False)
-                                  -- , $deprecated = array() ) then
-                                  return String; -- List_Type; -- String;
+   function Get_Category_Parents
+     (Category_Id : Integer;
+      Link        : Boolean := False;
+      Separator   : String := "/";
+      Nicename    : Boolean := False)
+      -- , $deprecated = array() ) then
+      return String; -- List_Type; -- String;
 
    --
    -- Retrieves post categories.
@@ -57,8 +58,9 @@ is
    -- @return WP_Term[] Array of WP_Term objects, one for each category assigned to
    --                    the post.
    --
-   function Get_The_Category (Post_Id : Class_Posts.Post_Id_Type := 0) -- false
-                              return Class_Terms.Wp_Term_Array;
+   function Get_The_Category
+     (Post_Id : Class_Posts.Post_Id_Type := 0) -- false
+      return Class_Terms.Wp_Term_Array;
 
    --
    -- Displays or retrieves the HTML dropdown list of categories.
@@ -137,8 +139,59 @@ is
    -- }
    -- @return string HTML dropdown list of categories.
    --
-   function Wp_Dropdown_Categories (Args : Array_Type := Empty_Array) -- := "")
-                                    return String;
+   function Wp_Dropdown_Categories
+     (Args : Array_Type := Empty_Array) -- := "")
+      return String;
+
+   --
+   -- Generates a tag cloud (heatmap) from provided data.
+   --
+   -- @todo Complete functionality.
+   -- @since 2.3.0
+   -- @since 4.8.0 Added the `show_count` argument.
+   --
+   -- @param WP_Term[]    $tags Array of WP_Term objects to generate the tag cloud for.
+   -- @param string|array $args then
+   --     Optional. Array or string of arguments for generating a tag cloud.
+   --
+   --     @type int      $smallest                   Smallest font size used to display tags. Paired
+   --                                                with the value of `$unit`, to determine CSS text
+   --                                                size unit. Default 8 (pt).
+   --     @type int      $largest                    Largest font size used to display tags. Paired
+   --                                                with the value of `$unit`, to determine CSS text
+   --                                                size unit. Default 22 (pt).
+   --     @type string   $unit                       CSS text size unit to use with the `$smallest`
+   --                                                and `$largest` values. Accepts any valid CSS text
+   --                                                size unit. Default "pt".
+   --     @type int      $number                     The number of tags to return. Accepts any
+   --                                                positive integer or zero to return all.
+   --                                                Default 0.
+   --     @type string   $format                     Format to display the tag cloud in. Accepts "flat"
+   --                                                (tags separated with spaces), "list" (tags displayed
+   --                                                in an unordered list), or "array" (returns an array).
+   --                                                Default "flat".
+   --     @type string   $separator                  HTML or text to separate the tags. Default "\n" (newline).
+   --     @type string   $orderby                    Value to order tags by. Accepts "name" or "count".
+   --                                                Default "name". The {@see "tag_cloud_sort"} filter
+   --                                                can also affect how tags are sorted.
+   --     @type string   $order                      How to order the tags. Accepts "ASC" (ascending),
+   --                                                "DESC" (descending), or "RAND" (random). Default "ASC".
+   --     @type int|bool $filter                     Whether to enable filtering of the final output
+   --                                                via {@see "wp_generate_tag_cloud"}. Default 1.
+   --     @type array    $topic_count_text           Nooped plural text from _n_noop() to supply to
+   --                                                tag counts. Default null.
+   --     @type callable $topic_count_text_callback  Callback used to generate nooped plural text for
+   --                                                tag counts based on the count. Default null.
+   --     @type callable $topic_count_scale_callback Callback used to determine the tag count scaling
+   --                                                value. Default default_topic_count_scale().
+   --     @type bool|int $show_count                 Whether to display the tag counts. Default 0. Accepts
+   --                                                0, 1, or their bool equivalents.
+   -- end;
+   -- @return string|string[] Tag cloud as a string or an array, depending on "format" argument.
+   --
+   function Wp_Generate_Tag_Cloud
+     (Tags : Array_Type; Args : Array_Type := Empty_Array) -- ""
+      return String;
 
    --
    -- Retrieves the terms of the taxonomy that are attached to the post.
@@ -151,14 +204,14 @@ is
    --                                  there are no terms or the post does not exist,
    --                                  WP_Error on failure.
    --
-   function Get_The_Terms (Post     : Class_Posts.Wp_Post;
-                           Taxonomy : String)
-                           return Class_Terms.Wp_Term_Array;
-                           -- Inc_Class_Posts.Wp_Post;
+   function Get_The_Terms
+     (Post : Class_Posts.Wp_Post; Taxonomy : String)
+      return Class_Terms.Wp_Term_Array;
+   -- Inc_Class_Posts.Wp_Post;
 
-   function Get_The_Terms (Post     : Class_Posts.Post_Id_Type;
-                           Taxonomy : String)
-                           return Class_Terms.Wp_Term_Array;
+   function Get_The_Terms
+     (Post : Class_Posts.Post_Id_Type; Taxonomy : String)
+      return Class_Terms.Wp_Term_Array;
 
    --
    -- Retrieves term parents with separator.
@@ -180,10 +233,9 @@ is
    -- @return string|WP_Error A list of term parents on success, WP_Error or empty
    --                          string on failure.
    --
-   function Get_Term_Parents_List (Term_Id  : Integer;
-                                   Taxonomy : String;
-                                   Args     : Array_Type := Empty_Array)
-                                   return String; -- List_Type;
+   function Get_Term_Parents_List
+     (Term_Id : Integer; Taxonomy : String; Args : Array_Type := Empty_Array)
+      return String; -- List_Type;
 
    --
    -- Retrieves HTML dropdown (select) content for category list.
@@ -200,9 +252,9 @@ is
    -- @return string
    --
    function Walk_Category_Dropdown_Tree
-     (Categories : Array_Type; -- Class_Terms.Wp_Term_Array; -- ...$args
+     (Categories : Array_Type;
+      -- Class_Terms.Wp_Term_Array; -- ...$args
       Depth      : Integer;
-      Args       : Array_Type)
-      return String;
+      Args       : Array_Type) return String;
 
 end Inc_Category_Templates;

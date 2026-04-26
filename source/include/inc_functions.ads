@@ -564,6 +564,8 @@ is
    --
    function Wp_Referer_Field (Echo : Boolean := True) return String;
 
+   procedure Wp_Referer_Field (Echo : Boolean := True);
+
    --
    -- Marks a function argument as deprecated and inform when it has been used.
    --
@@ -1657,14 +1659,24 @@ is
    --
    -- @since 5.1.0
    -- @since 5.2.0 Added the `before` and `after` parameters.
+   -- @since 6.4.0 Added the `display` parameter.
    --
    -- @param string before Markup to output before the annotation.
    --                      Default `<p class="description">`.
    -- @param string after  Markup to output after the annotation. Default `</p>`.
+   -- @param bool   $display Whether to echo or return the markup. Default `true` for echo.
    --
+   --  @return string|void
+   --
+   function Wp_Update_PHP_Annotation
+     (Before  : String := "<p class=""description"">";
+      After   : String := "</p>";
+      Display : Boolean := True) return String;
+
    procedure Wp_Update_PHP_Annotation
-     (Before : String := "<p class=""description"">";
-      After  : String := "</p>");
+     (Before  : String := "<p class=""description"">";
+      After   : String := "</p>";
+      Display : Boolean := True);
 
    --
    -- Returns the default annotation for the web hosting altering the "Update PHP"

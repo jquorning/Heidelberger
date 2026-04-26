@@ -25,6 +25,8 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
+with Class_HTTP;
+
 with Inc_Functions;
 with Inc_General_Templates;
 with Inc_HTTP;
@@ -5320,91 +5322,103 @@ is
       return Excerpt_3;
    end Wp_HTML_Excerpt;
 
--- --
--- -- Adds a base URL to relative links in passed content.
--- --
--- -- By default it supports the "src" and "href" attributes. However this can be
--- -- changed via the 3rd param.
--- --
--- -- @since 2.7.0
--- --
--- -- @global string _links_add_base
--- --
--- -- @param string content String to search for links in.
--- -- @param string base    The base URL to prefix to links.
--- -- @param array  attrs   The attributes which should be processed.
--- -- @return string The processed content.
--- --
--- function links_add_base_url( content, base, attrs = array( "src", "href" ) ) then
---         global _links_add_base;
---         _links_add_base = base;
---         attrs           = implode( "|", (array) attrs );
---         return preg_replace_callback( "!(attrs)=(["\"])(.+?)\\2!i", "_links_add_base", content );
--- end;
+   ------------------------
+   -- Links_Add_Base_URL --
+   ------------------------
 
--- --
--- -- Callback to add a base URL to relative links in passed content.
--- --
--- -- @since 2.7.0
--- -- @access private
--- --
--- -- @global string _links_add_base
--- --
--- -- @param string m The matched link.
--- -- @return string The processed link.
--- --
--- function _links_add_base( m ) then
---         global _links_add_base;
---         // 1 = attribute name  2 = quotation mark  3 = URL.
---         return m[1] . "=" . m[2] .
---                 ( preg_match( "#^(\wthen1,20end;):#", m[3], protocol ) && in_array( protocol[1], wp_allowed_protocols(), true ) ?
---                         m[3] :
---                         WP_Http::make_absolute_url( m[3], _links_add_base )
---                 )
---                 . m[2];
--- end;
+   Global_X_Links_Add_Base : UStrings.UString;
 
--- --
--- -- Adds a Target attribute to all links in passed content.
--- --
--- -- This function by default only applies to `<a>` tags, however this can be
--- -- modified by the 3rd param.
--- --
--- ----NOTE:* Any current target attributed will be stripped and replaced.
--- --
--- -- @since 2.7.0
--- --
--- -- @global string _links_add_target
--- --
--- -- @param string   content String to search for links in.
--- -- @param string   target  The Target to add to the links.
--- -- @param string[] tags    An array of tags to apply to.
--- -- @return string The processed content.
--- --
--- function links_add_target( content, target = "_blank", tags = array( "a" ) ) then
---         global _links_add_target;
---         _links_add_target = target;
---         tags              = implode( "|", (array) tags );
---         return preg_replace_callback( "!<(tags)((\s[^>]*)?)>!i", "_links_add_target", content );
--- end;
+   function Links_Add_Base_URL
+     (Content : String;
+      Base    : String;
+      Attrs   : List_Type := List_Type'["src", "href"]) return String
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use UStrings;
 
--- --
--- -- Callback to add a target attribute to all links in passed content.
--- --
--- -- @since 2.7.0
--- -- @access private
--- --
--- -- @global string _links_add_target
--- --
--- -- @param string m The matched link.
--- -- @return string The processed link.
--- --
--- function _links_add_target( m ) then
---         global _links_add_target;
---         tag  = m[1];
---         link = preg_replace( "|( target=([\""])(.*?)\2)|i", "", m[2] );
---         return "<" . tag . link . " target="" . esc_attr( _links_add_target ) . "">";
--- end;
+      -- global _links_add_base;
+      Attrs_2 : constant String := Implode ("|", Attrs);
+   begin
+      Global_X_Links_Add_Base := +Base;
+      return
+        Preg_Replace_Callback
+          ("!(" & Attrs_2 & ")=(['\'])(.+?)\\2!i",
+           X_Links_Add_Base'Access,
+           Content);
+   end Links_Add_Base_URL;
+
+   ----------------------
+   -- X_Links_Add_Base --
+   ----------------------
+
+   function X_Links_Add_Base (M : List_Type) return String is
+      use Php.Lists;
+      use Php.Preg;
+      use UStrings;
+      use Inc_Functions;
+      use Class_HTTP;
+
+      -- global _links_add_base;
+      Attr     : constant String := M (1);
+      Quot     : constant String := M (2);
+      URL      : constant String := M (3);
+      Protocol : List_Type; -- Array_Type;
+      Cond     : constant Boolean :=
+        0 /= Preg_Match ("#^(\w{1,20}):#", URL, Protocol)
+        and then In_List (Protocol (1), Wp_Allowed_Protocols, True);
+   begin
+      -- 1 = attribute name  2 = quotation mark  3 = URL.
+      return
+        Attr
+        & "="
+        & Quot
+        & (if Cond
+           then URL
+           else Make_Absolute_URL (URL, -Global_X_Links_Add_Base))
+        & Quot;
+   end X_Links_Add_Base;
+
+   ----------------------
+   -- Links_Add_Target --
+   ----------------------
+
+   Global_X_Links_Add_Target : UStrings.UString;
+
+   function Links_Add_Target
+     (Content : String;
+      Target  : String := "_blank";
+      Tags    : Array_Type := Build ("a", "")) return String
+   is
+      use Php.Strings;
+      use Php.Preg;
+      use UStrings;
+      -- global _links_add_target;
+      Tags_2 : constant String := Implode ("|", Tags);
+   begin
+      Global_X_Links_Add_Target := +Target;
+      return
+        Preg_Replace_Callback
+          ("!<(" & Tags_2 & ")((\s[^>]*)?)>!i",
+           X_Links_Add_Target'Access,
+           Content);
+   end Links_Add_Target;
+
+   ------------------------
+   -- X_Links_Add_Target --
+   ------------------------
+
+   function X_Links_Add_Target (M : List_Type) return String is
+      use Php.Preg;
+      use UStrings;
+      -- global _links_add_target;
+
+      Tag  : constant String := M (1);
+      Link : constant String :=
+        Preg_Replace ("|( target=([\""])(.*?)\2)|i", "", M (2));
+   begin
+      return "<" & Tag & Link & " target=""" & ESC_Attr (-Global_X_Links_Add_Target) & """>";
+   end X_Links_Add_Target;
 
 -- --
 -- -- Normalizes EOL characters and strips duplicate whitespace.

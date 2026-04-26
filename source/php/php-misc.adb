@@ -141,4 +141,14 @@ is
       return False;
    end Extension_Loaded;
 
+   ---------------
+   -- Strtotime --
+   ---------------
+
+   function Strtotime (Datetime : String) return Integer is
+   begin
+      Logging.Log ("strtotime", "not implemented");
+      return 999;
+   end Strtotime;
+
 end Php.Misc;

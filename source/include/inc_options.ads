@@ -18,6 +18,8 @@ is
    use Arrays;
    use Lists;
 
+   subtype Transient_Name is String with Dynamic_Predicate => True;
+
    package String_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                               Element_Type => String);
@@ -193,10 +195,10 @@ is
    -- @param string transient Transient name. Expected to not be SQL-escaped.
    -- @return bool True if the transient was deleted, false otherwise.
    --
-   function Delete_Transient (Transient : String)
+   function Delete_Transient (Transient : Transient_Name)
                               return Boolean;
 
-   procedure Delete_Transient (Transient : String);
+   procedure Delete_Transient (Transient : Transient_Name);
 
    --
    -- Saves and restores user interface settings stored in a cookie.
@@ -385,7 +387,7 @@ is
    -- @param string transient Transient name. Expected to not be SQL-escaped.
    -- @return bool True if the transient was deleted, false otherwise.
    --
-   procedure Delete_Site_Transient (Transient : String);
+   procedure Delete_Site_Transient (Transient : Transient_Name);
 
    --
    -- Updates the value of an option that was already added.
@@ -573,7 +575,7 @@ is
    -- @param string transient Transient name. Expected to not be SQL-escaped.
    -- @return mixed Value of transient.
    --
-   function Get_Transient (Transient : String)
+   function Get_Transient (Transient : Transient_Name)
                            return Multi_Type;
 
    --
@@ -592,12 +594,12 @@ is
    --                           (no expiration).
    -- @return bool True if the value was set, false otherwise.
    --
-   function Set_Transient (Transient  : String;
+   function Set_Transient (Transient  : Transient_Name;
                            Value      : Multi_Type;
                            Expiration : Integer := 0)
                            return Boolean;
 
-   procedure Set_Transient (Transient  : String;
+   procedure Set_Transient (Transient  : Transient_Name;
                             Value      : Multi_Type;
                             Expiration : Integer := 0);
 
@@ -629,11 +631,14 @@ is
    -- @param string transient Transient name. Expected to not be SQL-escaped.
    -- @return mixed Value of transient.
    --
-   function Get_Site_Transient (Transient : String)
+   function Get_Site_Transient (Transient : Transient_Name)
                                 return Multi_Type; -- String_Maps.Map;
 
-   function Get_Site_Transient (Transient : String)
+   function Get_Site_Transient (Transient : Transient_Name)
                                 return Adi_Themes.Theme_API_List;
+
+   function Get_Site_Transient (Transient : Transient_Name)
+                                return Array_Type;
 
    --
    -- Sets/updates the value of a site transient.
@@ -652,7 +657,7 @@ is
    --                           0 (no expiration).
    -- @return bool True if the value was set, false otherwise.
    --
-   function Set_Site_Transient (Transient  : String;
+   function Set_Site_Transient (Transient  : Transient_Name;
                                 Value      : Array_Type;
                                 Expiration : Integer := 0)
                                 return Boolean;
@@ -668,6 +673,11 @@ is
    procedure Set_Site_Transient
      (Transient  : String;
       Value      : Adi_Themes.Theme_API_List;
+      Expiration : Integer := 0);
+
+   procedure Set_Site_Transient
+     (Transient  : String;
+      Value      : Boolean;
       Expiration : Integer := 0);
 
 end Inc_Options;

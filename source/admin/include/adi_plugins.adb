@@ -4,118 +4,114 @@
 -- @package WordPress
 -- @subpackage Administration
 --
+
+with Php.Files;
+with Php.Sorting;
+with Php.Strings;
+
+with Array_Lists;
+with Constants;
+with UStrings;
+
+with Inc_Caches;
+with Inc_Functions;
+with Inc_L10n;
+with Inc_Plugins;
+
 package body Adi_Plugins
 is
--- --
--- -- Parses the plugin contents to retrieve plugin"s metadata.
--- --
--- -- All plugin headers must be on their own line. Plugin description must not have
--- -- any newlines, otherwise only parts of the description will be displayed.
--- -- The below is formatted for printing.
--- --
--- --     /*
--- --     Plugin Name: Name of the plugin.
--- --     Plugin URI: The home page of the plugin.
--- --     Description: Plugin description.
--- --     Author: Plugin author"s name.
--- --     Author URI: Link to the author"s website.
--- --     Version: Plugin version.
--- --     Text Domain: Optional. Unique identifier, should be same as the one used in
--- --          load_plugin_textdomain().
--- --     Domain Path: Optional. Only useful if the translations are located in a
--- --          folder above the plugin"s base path. For example, if .mo files are
--- --          located in the locale folder then Domain Path will be "/locale/" and
--- --          must have the first slash. Defaults to the base folder the plugin is
--- --          located in.
--- --     Network: Optional. Specify "Network: true" to require that a plugin is activated
--- --          across all sites in an installation. This will prevent a plugin from being
--- --          activated on a single site when Multisite is enabled.
--- --     Requires at least: Optional. Specify the minimum required WordPress version.
--- --     Requires PHP: Optional. Specify the minimum required PHP version.
--- --    -- / # Remove the space to close comment.
--- --
--- -- The first 8 KB of the file will be pulled in and if the plugin data is not
--- -- within that first 8 KB, then the plugin author should correct their plugin
--- -- and move the plugin data headers to the top.
--- --
--- -- The plugin file is assumed to have permissions to allow for scripts to read
--- -- the file. This is not checked however and the file is only opened for
--- -- reading.
--- --
--- -- @since 1.5.0
--- -- @since 5.3.0 Added support for `Requires at least` and `Requires PHP` headers.
--- -- @since 5.8.0 Added support for `Update URI` header.
--- --
--- -- @param string $plugin_file Absolute path to the main plugin file.
--- -- @param bool   $markup      Optional. If the returned data should have HTML markup applied.
--- --                            Default true.
--- -- @param bool   $translate   Optional. If the returned data should be translated. Default true.
--- -- @return array then
--- --     Plugin data. Values will be empty if not supplied by the plugin.
--- --
--- --     @type string $Name        Name of the plugin. Should be unique.
--- --     @type string $PluginURI   Plugin URI.
--- --     @type string $Version     Plugin version.
--- --     @type string $Description Plugin description.
--- --     @type string $Author      Plugin author"s name.
--- --     @type string $AuthorURI   Plugin author"s website address (if set).
--- --     @type string $TextDomain  Plugin textdomain.
--- --     @type string $DomainPath  Plugin"s relative directory path to .mo files.
--- --     @type bool   $Network     Whether the plugin can only be activated network-wide.
--- --     @type string $RequiresWP  Minimum required version of WordPress.
--- --     @type string $RequiresPHP Minimum required version of PHP.
--- --     @type string $UpdateURI   ID of the plugin for update purposes, should be a URI.
--- --     @type string $Title       Title of the plugin and link to the plugin"s site (if set).
--- --     @type string AuthorName  Plugin author"s name.
--- -- end;
--- --
--- function get_plugin_data( plugin_file, markup = true, translate = true ) then
 
---         default_headers = array(
---                 "Name"        => "Plugin Name",
---                 "PluginURI"   => "Plugin URI",
---                 "Version"     => "Version",
---                 "Description" => "Description",
---                 "Author"      => "Author",
---                 "AuthorURI"   => "Author URI",
---                 "TextDomain"  => "Text Domain",
---                 "DomainPath"  => "Domain Path",
---                 "Network"     => "Network",
---                 "RequiresWP"  => "Requires at least",
---                 "RequiresPHP" => "Requires PHP",
---                 "UpdateURI"   => "Update URI",
---                 -- Site Wide Only is deprecated in favor of Network.
---                 "_sitewide"   => "Site Wide Only",
---         );
+   ---------------------
+   -- Get_Plugin_Data --
+   ---------------------
 
---         plugin_data = get_file_data( plugin_file, default_headers, "plugin" );
+   function Get_Plugin_Data
+     (Plugin_File : String;
+      Markup      : Boolean := True;
+      Translate   : Boolean := True) return Array_Type
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Array_Lists;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Plugins;
 
---         -- Site Wide Only is the old header for Network.
---         if ( ! plugin_data["Network"] && plugin_data["_sitewide"] ) then
---                 /* translators: 1: Site Wide Only: true, 2: Network: true--
---                 _deprecated_argument( __FUNCTION__, "3.0.0", sprintf( __( "The %1s plugin header is deprecated. Use %2s instead." ), "<code>Site Wide Only: true</code>", "<code>Network: true</code>" ) );
---                 plugin_data["Network"] = plugin_data["_sitewide"];
---         end;
---         plugin_data["Network"] = ( "true" === strtolower( plugin_data["Network"] ) );
---         unset( plugin_data["_sitewide"] );
+      Default_Headers : constant Array_Type :=
+        To_Array_Type
+          ([Build ("Name", "Plugin Name"),
+            Build ("PluginURI", "Plugin URI"),
+            Build ("Version", "Version"),
+            Build ("Description", "Description"),
+            Build ("Author", "Author"),
+            Build ("AuthorURI", "Author URI"),
+            Build ("TextDomain", "Text Domain"),
+            Build ("DomainPath", "Domain Path"),
+            Build ("Network", "Network"),
+            Build ("RequiresWP", "Requires at least"),
+            Build ("RequiresPHP", "Requires PHP"),
+            Build ("UpdateURI", "Update URI"),
+            -- Site Wide Only is deprecated in favor of Network.
+            Build ("_sitewide", "Site Wide Only")]);
 
---         -- If no text domain is defined fall back to the plugin slug.
---         if ( ! plugin_data["TextDomain"] ) then
---                 plugin_slug = dirname( plugin_basename( plugin_file ) );
---                 if ( "." !== plugin_slug && false === strpos( plugin_slug, "/" ) ) then
---                         plugin_data["TextDomain"] = plugin_slug;
---                 end;
---         end;
+      Plugin_Data : Array_Type :=
+        Get_File_Data (Plugin_File, Default_Headers, "plugin");
+   begin
+      -- Site Wide Only is the old header for Network.
+      if "" = Get_As_String (Plugin_Data, "Network")
+        and then "" /= Get_As_String (Plugin_Data, "_sitewide")
+      then
+         -- translators: 1: Site Wide Only: true, 2: Network: true
+         X_Deprecated_Argument
+           ("__FUNCTION__",
+            "3.0.0",
+            Sprintf
+              (abs "The %1s plugin header is deprecated. Use %2s instead.",
+               [1 => "<code>Site Wide Only: true</code>",
+                2 => "<code>Network: true</code>"]));
+         Set
+           (Plugin_Data,
+            Key   => "Network",
+            Value => From_String (Get_As_String (Plugin_Data, "_sitewide")));
+      end if;
+      Set
+        (Plugin_Data,
+         Key   => "Network",
+         Value =>
+           From_Boolean
+             (("true" = Strtolower (Get_As_String (Plugin_Data, "Network")))));
 
---         if ( markup || translate ) then
---                 plugin_data = _get_plugin_data_markup_translate( plugin_file, plugin_data, markup, translate );
---         end; else then
---                 plugin_data["Title"]      = plugin_data["Name"];
---                 plugin_data["AuthorName"] = plugin_data["Author"];
---         end;
+      Delete (Plugin_Data, "_sitewide");
 
---         return plugin_data;
--- end;
+      -- If no text domain is defined fall back to the plugin slug.
+      if "" = Get_As_String (Plugin_Data, "TextDomain") then
+         declare
+            Plugin_Slug : constant String :=
+              Dirname (Plugin_Basename (Plugin_File));
+         begin
+            if "." /= Plugin_Slug and then 0 = Strpos (Plugin_Slug, "/") then
+               Set (Plugin_Data, "TextDomain", From_String (Plugin_Slug));
+            end if;
+         end;
+      end if;
+
+      if Markup or else Translate then
+         Plugin_Data :=
+           X_Get_Plugin_Data_Markup_Translate
+             (Plugin_File, Plugin_Data, Markup, Translate);
+      else
+         Set
+           (Plugin_Data,
+            Key   => "Title",
+            Value => From_String (Get_As_String (Plugin_Data, "Name")));
+         Set
+           (Plugin_Data,
+            Key   => "AuthorName",
+            Value => From_String (Get_As_String (Plugin_Data, "Author")));
+      end if;
+
+      return Plugin_Data;
+   end Get_Plugin_Data;
 
 -- --
 -- -- Sanitizes plugin data, optionally adds markup, optionally translates.
@@ -251,105 +247,131 @@ is
 --         return plugin_files;
 -- end;
 
--- --
--- -- Checks the plugins directory and retrieve all plugin files with plugin data.
--- --
--- -- WordPress only supports plugin files in the base plugins directory
--- -- (wp-content/plugins) and in one directory above the plugins directory
--- -- (wp-content/plugins/my-plugin). The file it looks for has the plugin data
--- -- and must be found in those two locations. It is recommended to keep your
--- -- plugin files in their own directories.
--- --
--- -- The file with the plugin data is the file that will be included and therefore
--- -- needs to have the main execution for the plugin. This does not mean
--- -- everything must be contained in the file and it is recommended that the file
--- -- be split for maintainability. Keep everything in one file for extreme
--- -- optimization purposes.
--- --
--- -- @since 1.5.0
--- --
--- -- @param string plugin_folder Optional. Relative path to single plugin folder.
--- -- @return array[] Array of arrays of plugin data, keyed by plugin file name. See get_plugin_data().
--- --
--- function get_plugins( plugin_folder = "" ) then
+   -----------------
+   -- Get_Plugins --
+   -----------------
 
---         cache_plugins = wp_cache_get( "plugins", "plugins" );
---         if ( ! cache_plugins ) then
---                 cache_plugins = array();
---         end;
+   function Get_Plugins (Plugin_Folder : String := "") return Array_Type is
+      use Php.Files;
+      use Php.Sorting;
+      use Php.Strings;
+      use UStrings;
+      use Inc_Caches;
+      use Inc_Plugins;
 
---         if ( isset( cache_plugins[ plugin_folder ] ) ) then
---                 return cache_plugins[ plugin_folder ];
---         end;
+      Unused_Found  : Boolean;
+      Cache_Plugins : Array_Type :=
+        Wp_Cache_Get ("plugins", "plugins", Found => Unused_Found);
+   begin
+      if Cache_Plugins.Is_Empty then
+         Cache_Plugins := Empty_Array;
+      end if;
 
---         wp_plugins  = array();
---         plugin_root = WP_PLUGIN_DIR;
---         if ( ! empty( plugin_folder ) ) then
---                 plugin_root .= plugin_folder;
---         end;
+      if Isset (Cache_Plugins, Plugin_Folder) then
+         return As_Array (Get (Cache_Plugins, Plugin_Folder));
+      end if;
 
---         -- Files in wp-content/plugins directory.
---         plugins_dir  = @opendir( plugin_root );
---         plugin_files = array();
+      declare
+         Wp_Plugins  : Array_Type;
+         Plugin_Root : UString := Constants.WP_PLUGIN_DIR;
+      begin
+         if not Empty (Plugin_Folder) then
+            Append (Plugin_Root, Plugin_Folder);
+         end if;
 
---         if ( plugins_dir ) then
---                 while ( ( file = readdir( plugins_dir ) ) !== false ) then
---                         if ( "." === substr( file, 0, 1 ) ) then
---                                 continue;
---                         end;
+         declare
+            -- Files in wp-content/plugins directory.
+            Plugins_Dir  : Dir_Handle := Opendir (-Plugin_Root); -- @
+            Plugin_Files : List_Type;
+         begin
+            if True then -- Plugins_Dir then
+               while Plugins_Dir.Is_Good loop
+                  declare
+                     File : constant String := Readdir (Plugins_Dir);
+                  begin
+                     -- exit when File = ""; -- False
+                     if "." = Substr (File, 0, 1) then
+                        goto Continue;
+                     end if;
 
---                         if ( is_dir( plugin_root . "/" . file ) ) then
---                                 plugins_subdir = @opendir( plugin_root . "/" . file );
+                     if Is_Dir ((-Plugin_Root) & "/" & File) then
+                        declare
+                           Plugins_Subdir : Dir_Handle :=
+                             Opendir ((-Plugin_Root) & "/" & File); -- @
+                        begin
+                           if True then
+                              -- Plugins_Subdir then
+                              while Plugins_Subdir.Is_Good loop
+                                 declare
+                                    Subfile : constant String :=
+                                      Readdir (Plugins_Subdir);
+                                 begin
+                                    -- exit when Subfile = ""; -- False
+                                    if "." = Substr (Subfile, 0, 1) then
+                                       goto Continue_2;
+                                    end if;
 
---                                 if ( plugins_subdir ) then
---                                         while ( ( subfile = readdir( plugins_subdir ) ) !== false ) then
---                                                 if ( "." === substr( subfile, 0, 1 ) ) then
---                                                         continue;
---                                                 end;
+                                    if ".php" = Substr (Subfile, -4) then
+                                       Append
+                                         (Plugin_Files, File & "/" & Subfile);
+                                    end if;
+                                 end;
+                                 <<Continue_2>>
+                              end loop;
 
---                                                 if ( ".php" === substr( subfile, -4 ) ) then
---                                                         plugin_files[] = "file/subfile";
---                                                 end;
---                                         end;
+                              Closedir (Plugins_Subdir);
+                           end if;
+                        end;
+                     else
+                        if ".php" = Substr (File, -4) then
+                           Append (Plugin_Files, File);
+                        end if;
+                     end if;
+                  end;
+                  <<Continue>>
+               end loop;
 
---                                         closedir( plugins_subdir );
---                                 end;
---                         end; else then
---                                 if ( ".php" === substr( file, -4 ) ) then
---                                         plugin_files[] = file;
---                                 end;
---                         end;
---                 end;
+               Closedir (Plugins_Dir);
+            end if;
 
---                 closedir( plugins_dir );
---         end;
+            if Plugin_Files.Is_Empty then
+               return Wp_Plugins;
+            end if;
 
---         if ( empty( plugin_files ) ) then
---                 return wp_plugins;
---         end;
+            for Plugin_File of Plugin_Files loop
+               if not Is_Readable (-(Plugin_Root & "/" & Plugin_File)) then
+                  goto Continue_3;
+               end if;
 
---         foreach ( plugin_files as plugin_file ) then
---                 if ( ! is_readable( "plugin_root/plugin_file" ) ) then
---                         continue;
---                 end;
+               -- Do not apply markup/translate as it will be cached.
+               declare
+                  Plugin_Data : constant Array_Type :=
+                    Get_Plugin_Data
+                      (-(Plugin_Root & "/" & Plugin_File), False, False);
+               begin
+                  if Empty (Plugin_Data, "Name") then
+                     goto Continue_3;
+                  end if;
 
---                 -- Do not apply markup/translate as it will be cached.
---                 plugin_data = get_plugin_data( "plugin_root/plugin_file", false, false );
+                  Set
+                    (Wp_Plugins,
+                     Key   => Plugin_Basename (Plugin_File),
+                     Value => From_Array (Plugin_Data));
+               end;
 
---                 if ( empty( plugin_data["Name"] ) ) then
---                         continue;
---                 end;
+               <<Continue_3>>
+            end loop;
 
---                 wp_plugins[ plugin_basename( plugin_file ) ] = plugin_data;
---         end;
+            UASort (Wp_Plugins); -- , "_sort_uname_callback"); XXX
 
---         uasort( wp_plugins, "_sort_uname_callback" );
+            Set (Cache_Plugins, Plugin_Folder, From_Array (Wp_Plugins));
 
---         cache_plugins[ plugin_folder ] = wp_plugins;
---         wp_cache_set( "plugins", cache_plugins, "plugins" );
+            Wp_Cache_Set ("plugins", Cache_Plugins, "plugins");
 
---         return wp_plugins;
--- end;
+            return Wp_Plugins;
+         end;
+      end;
+   end Get_Plugins;
 
 -- --
 -- -- Checks the mu-plugins directory and retrieve all mu-plugin files with any plugin data.

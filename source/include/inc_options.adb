@@ -1327,7 +1327,7 @@ is
    -- Delete_Transient --
    ----------------------
 
-   function Delete_Transient (Transient : String) return Boolean
+   function Delete_Transient (Transient : Transient_Name) return Boolean
 
    is
       use Wp_Common;
@@ -1351,7 +1351,8 @@ is
          Result := Wp_Cache_Delete (Transient, "transient");
       else
          declare
-            Option_Timeout : constant String := "_transient_timeout_" & Transient;
+            Option_Timeout : constant String :=
+              "_transient_timeout_" & Transient;
             Option         : constant String := "_transient_" & Transient;
          begin
             Result := Delete_Option (Option);
@@ -1379,7 +1380,7 @@ is
    -- Delete_Transient --
    ----------------------
 
-   procedure Delete_Transient (Transient : String)
+   procedure Delete_Transient (Transient : Transient_Name)
    is
       Unused : constant Boolean := Delete_Transient (Transient);
    begin
@@ -1390,7 +1391,7 @@ is
    -- Get_Transient --
    -------------------
 
-   function Get_Transient (Transient : String)
+   function Get_Transient (Transient : Transient_Name)
                            return Multi_Type
    is
       use Php.Misc;
@@ -1484,7 +1485,7 @@ is
    -- Set_Transient --
    -------------------
 
-   function Set_Transient (Transient  : String;
+   function Set_Transient (Transient  : Transient_Name;
                            Value      : Multi_Type;
                            Expiration : Integer := 0)
                            return Boolean
@@ -1615,7 +1616,7 @@ is
       return Result;
    end Set_Transient;
 
-   procedure Set_Transient (Transient  : String;
+   procedure Set_Transient (Transient  : Transient_Name;
                             Value      : Multi_Type;
                             Expiration : Integer := 0)
    is
@@ -2712,7 +2713,7 @@ is
    -- Delete_Site_Transient --
    ---------------------------
 
-   procedure Delete_Site_Transient (Transient : String)
+   procedure Delete_Site_Transient (Transient : Transient_Name)
    is
       use Wp_Common;
       use Inc_Caches;
@@ -2770,7 +2771,7 @@ is
    -- Get_Site_Transient --
    ------------------------
 
-   function Get_Site_Transient (Transient : String) return Multi_Type is
+   function Get_Site_Transient (Transient : Transient_Name) return Multi_Type is
       use Php.Lists;
       use Php.Misc;
       use Wp_Common;
@@ -2881,15 +2882,28 @@ is
    -- Get_Site_Transient --
    ------------------------
 
-   function Get_Site_Transient (Transient : String)
+   function Get_Site_Transient (Transient : Transient_Name)
                                 return Adi_Themes.Theme_API_List
    is (raise Program_Error with "not implemented");
+
+   ------------------------
+   -- Get_Site_Transient --
+   ------------------------
+
+   function Get_Site_Transient (Transient : Transient_Name) return Array_Type
+   is
+      Arry : constant Multi_Type := Get_Site_Transient (Transient);
+   begin
+      Logging.Log ("get_site_transient", "not implemented");
+      return Empty_Array;
+      -- return as_Array (Arry);
+   end Get_Site_Transient;
 
    ------------------------
    -- Set_Site_Transient --
    ------------------------
 
-   function Set_Site_Transient (Transient  : String;
+   function Set_Site_Transient (Transient  : Transient_Name;
                                 Value      : Array_Type;
                                 Expiration : Integer := 0)
                                 return Boolean
@@ -3027,6 +3041,18 @@ is
    procedure Set_Site_Transient
      (Transient  : String;
       Value      : Adi_Themes.Theme_API_List;
+      Expiration : Integer := 0) is
+   begin
+      raise Program_Error with "not implemented";
+   end Set_Site_Transient;
+
+   ------------------------
+   -- Set_Site_Transient --
+   ------------------------
+
+   procedure Set_Site_Transient
+     (Transient  : String;
+      Value      : Boolean;
       Expiration : Integer := 0) is
    begin
       raise Program_Error with "not implemented";

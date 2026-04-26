@@ -396,4 +396,17 @@ is
       return Result;
    end Array_Change_Key_Case;
 
+   ---------------
+   -- Array_Sum --
+   ---------------
+
+   function Array_Sum (Arry : Array_Type) return Integer is
+      Sum : Integer := 0;
+   begin
+      for A in Arry.Iterate loop
+         Sum := @ + As_Integer (Element (A));
+      end loop;
+      return Sum;
+   end Array_Sum;
+
 end Php.Arrays;

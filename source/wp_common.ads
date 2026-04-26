@@ -9,6 +9,7 @@ with Array_Lists;
 with Arrays;
 with Lists;
 
+with Adi_Plugin_Install;
 with Adi_Translation_Install;
 with Adi_Themes;
 
@@ -40,6 +41,26 @@ package Wp_Common
 is
    use Arrays;
    use Lists;
+
+   function Apply_Filters
+     (Hook_Name : String; Value : List_Type; Plugin : Array_Type)
+      return List_Type;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Plugin_Install.Plugin_API_Result; -- Boolean;
+      Action    : String;
+      Args      : Adi_Plugin_Install.Plugin_API_Args)
+      return Adi_Plugin_Install.Plugin_API_Result;
+
+   function Apply_Filters
+     (Hook_Name : String; Value : Adi_Plugin_Install.Plugin_API_Args)
+      return Adi_Plugin_Install.Plugin_API_Args;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Plugin_Install.Plugin_API_Args;
+      Action    : String) return Adi_Plugin_Install.Plugin_API_Args;
 
    function Apply_Filters
      (Hook_Name : String;

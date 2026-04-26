@@ -298,4 +298,56 @@ is
       Logging.Log ("php.unlink", "not implemented");
    end Unlink;
 
+   -------------
+   -- Is_Good --
+   -------------
+
+   function Is_Good (Handle : Dir_Handle) return Boolean is
+      use Ada.Directories;
+   begin
+      return More_Entries (Handle.Handle);
+   end Is_Good;
+
+   -------------
+   -- Opendir --
+   -------------
+
+   function Opendir (Directory : String) return Dir_Handle is
+      use Ada.Directories;
+   begin
+      return Dir : Dir_Handle do
+         Start_Search
+           (Dir.Handle,
+            Directory => Directory,
+            Pattern   => "*",
+            Filter    =>
+              (Ada.Directories.Directory => True,
+               Ordinary_File             => True,
+               Special_File              => False));
+      end return;
+   end Opendir;
+
+   -------------
+   -- Readdir --
+   -------------
+
+   function Readdir (Handle : in out Dir_Handle) return String is
+      use Ada.Directories;
+
+      Ent : Directory_Entry_Type;
+   begin
+      Get_Next_Entry (Handle.Handle, Ent);
+      return Simple_Name (Ent);
+   end Readdir;
+
+   --------------
+   -- Closedir --
+   --------------
+
+   procedure Closedir (Handle : in out Dir_Handle) is
+      use Ada.Directories;
+   begin
+      End_Search (Handle.Handle);
+   end Closedir;
+
 end Php.Files;

@@ -112,7 +112,9 @@ is
 
    function Strtoupper (Item : String) return String;
    function Strtolower (Item : String) return String;
+
    function UC_First   (Item : String) return String;
+   function UC_Words   (Item : String) return String;
 
    function Strcmp (Left  : String;
                     Right : String)

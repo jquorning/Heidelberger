@@ -9,6 +9,7 @@
 with Logging;
 
 with Class_Plugins_List_Tables;
+with Class_Plugin_Install_List_Tables;
 with Class_Posts_List_Tables;
 with Class_Terms_List_Tables;
 with Class_Theme_Install_List_Tables;
@@ -38,6 +39,9 @@ is
 
       elsif Class_Name = "WP_Theme_Install_List_Table" then
          return Class_Theme_Install_List_Tables.X_Construct (Args);
+
+      elsif Class_Name = "WP_Plugin_Install_List_Table" then
+         return Class_Plugin_Install_List_Tables.X_Construct (Args);
 
       end if;
       raise Program_Error with "no class_name " & Class_Name;

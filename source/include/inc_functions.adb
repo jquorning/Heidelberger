@@ -2059,6 +2059,16 @@ is
       return Referer_Field;
    end Wp_Referer_Field;
 
+   ----------------------
+   -- Wp_Referer_Field --
+   ----------------------
+
+   procedure Wp_Referer_Field (Echo : Boolean := True) is
+      Unused : constant String := Wp_Referer_Field (Echo);
+   begin
+      null;
+   end Wp_Referer_Field;
+
    --
    -- Retrieves or displays original referer hidden field for forms.
    --
@@ -8438,16 +8448,38 @@ is
    -- Wp_Update_PHP_Annotation --
    ------------------------------
 
-   procedure Wp_Update_PHP_Annotation
-     (Before : String := "<p class=""description"">"; After : String := "</p>")
+   function Wp_Update_PHP_Annotation
+     (Before  : String := "<p class=""description"">";
+      After   : String := "</p>";
+      Display : Boolean := True) return String
    is
       use Php.Echoing;
 
       Annotation : constant String := Wp_Get_Update_PHP_Annotation;
    begin
       if Annotation /= "" then
-         Echo (Before & Annotation & After);
+         if Display then
+            Echo (Before & Annotation & After);
+         else
+            return Before & Annotation & After;
+         end if;
       end if;
+      return "";
+   end Wp_Update_PHP_Annotation;
+
+   ------------------------------
+   -- Wp_Update_PHP_Annotation --
+   ------------------------------
+
+   procedure Wp_Update_PHP_Annotation
+     (Before  : String := "<p class=""description"">";
+      After   : String := "</p>";
+      Display : Boolean := True)
+   is
+      Unused : constant String :=
+        Wp_Update_PHP_Annotation (Before, After, Display);
+   begin
+      null;
    end Wp_Update_PHP_Annotation;
 
    ----------------------------------

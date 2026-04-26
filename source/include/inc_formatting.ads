@@ -48,9 +48,8 @@ is
    -- @param bool   reset Set to true for unit testing. Translated patterns will reset.
    -- @return string The string replaced with HTML entities.
    --
-   function Wp_Texturize (Text  : String;
-                          Reset : Boolean := False)
-                          return String;
+   function Wp_Texturize
+     (Text : String; Reset : Boolean := False) return String;
 
    --
    -- Implements a logic tree to determine whether or not "7"." represents seven feet,
@@ -66,12 +65,12 @@ is
    -- @param string close_quote The closing quote char to use for replacement.
    -- @return string The haystack value after primes and quotes replacements.
    --
-   function Wptexturize_Primes (Haystack    : String;
-                                Needle      : String;
-                                Prime       : String;
-                                Open_Quote  : String;
-                                Close_Quote : String)
-                                return String;
+   function Wptexturize_Primes
+     (Haystack    : String;
+      Needle      : String;
+      Prime       : String;
+      Open_Quote  : String;
+      Close_Quote : String) return String;
 
    --
    -- Searches for disabled element tags. Pushes element to stack on tag open
@@ -91,9 +90,7 @@ is
    --                                   are not allowed in tag names.
    --
    procedure X_Wptexturize_Pushpop_Element
-               (Text              : String;
-                Stack             : in out List_Type;
-                Disabled_Elements : List_Type);
+     (Text : String; Stack : in out List_Type; Disabled_Elements : List_Type);
 
    --
    -- Retrieves the regular expression for shortcodes.
@@ -105,8 +102,8 @@ is
    -- @param string[] tagnames Array of shortcodes to find.
    -- @return string The regular expression
    --
-   function X_Get_Wptexturize_Shortcode_Regex (Tagnames : List_Type)
-                                               return String;
+   function X_Get_Wptexturize_Shortcode_Regex
+     (Tagnames : List_Type) return String;
 
    --
    -- Retrieves the combined regular expression for HTML and shortcodes.
@@ -120,8 +117,8 @@ is
    --                                _get_wptexturize_shortcode_regex().
    -- @return string The regular expression
    --
-   function X_Get_Wptexturize_Split_Regex (Shortcode_Regex : String := "")
-                                           return String;
+   function X_Get_Wptexturize_Split_Regex
+     (Shortcode_Regex : String := "") return String;
 
    --
    -- Parses a string into variables to be stored in an array.
@@ -131,8 +128,7 @@ is
    -- @param string $string The string to be parsed.
    -- @param array  $array  Variables will be stored in this array.
    --
-   procedure Wp_Parse_Str (Str  :     String;
-                           Arry : out Array_Type);
+   procedure Wp_Parse_Str (Str : String; Arry : out Array_Type);
 
    --
    -- Converts lone less than signs.
@@ -144,8 +140,7 @@ is
    -- @param string text Text to be converted.
    -- @return string Converted text.
    --
-   function Wp_Pre_KSES_Less_Than (Text : String)
-                                   return String;
+   function Wp_Pre_KSES_Less_Than (Text : String) return String;
 
    --
    -- Callback function used by preg_replace.
@@ -155,8 +150,7 @@ is
    -- @param string[] matches Populated by matches to preg_replace.
    -- @return string The text returned after esc_html if needed.
    --
-   function Wp_Pre_KSES_Less_Than_Callback (Matches : List_Type)
-                                            return String;
+   function Wp_Pre_KSES_Less_Than_Callback (Matches : List_Type) return String;
 
    --
    -- Converts a number of special characters into their HTML entities.
@@ -189,11 +183,11 @@ is
    -- @return string The encoded text with HTML entities.
    --
    function X_Wp_Specialchars
-              (Item          : String;
-               Quote_Style   : Php.HTML.Flag_Type := Php.HTML.ENT_NOQUOTES;
-               Charset       : String  := ""; -- Boolean := False;
-               Double_Encode : Boolean := False)
-               return String;
+     (Item          : String;
+      Quote_Style   : Php.HTML.Flag_Type := Php.HTML.ENT_NOQUOTES;
+      Charset       : String := "";
+      -- Boolean := False;
+      Double_Encode : Boolean := False) return String;
 
    --
    -- Sanitizes an HTML classname to ensure it only contains valid characters.
@@ -211,9 +205,8 @@ is
    --                        up as an empty string. Defaults to an empty string.
    -- @return string The sanitized value
    --
-   function Sanitize_HTML_Class (Class    : String;
-                                 Fallback : String := "")
-                                 return String;
+   function Sanitize_HTML_Class
+     (Class : String; Fallback : String := "") return String;
 
    --
    -- Sanitizes a URL for database or redirect usage.
@@ -229,9 +222,8 @@ is
    --                            Defaults to return value of wp_allowed_protocols().
    -- @return string The cleaned URL after esc_url() is run with the "db" context.
    --
-   function Sanitize_URL (URL       : String;
-                          Protocols : List_Type := Empty_List)
-                          return String;
+   function Sanitize_URL
+     (URL : String; Protocols : List_Type := Empty_List) return String;
 
    --
    -- Sanitizes a string into a slug, which can be used in URLs or HTML attributes.
@@ -252,10 +244,10 @@ is
    --                              through remove_accents(). Default "save".
    -- @return string The sanitized string.
    --
-   function Sanitize_Title (Title          : String;
-                            Fallback_Title : String := "";
-                            Context        : String := "save")
-                            return String;
+   function Sanitize_Title
+     (Title          : String;
+      Fallback_Title : String := "";
+      Context        : String := "save") return String;
 
    --
    -- Sanitizes a username, stripping out unsafe characters.
@@ -272,9 +264,8 @@ is
    --                         Default false.
    -- @return string The sanitized username, after passing through filters.
    --
-   function Sanitize_User (Username : String;
-                           Strict   : Boolean := False)
-                           return String;
+   function Sanitize_User
+     (Username : String; Strict : Boolean := False) return String;
 
    --
    -- Sanitizes a title with the "query" context.
@@ -286,8 +277,7 @@ is
    -- @param string title The string to be sanitized.
    -- @return string The sanitized string.
    --
-   function Sanitize_Title_For_Query (Title : String)
-                                      return String;
+   function Sanitize_Title_For_Query (Title : String) return String;
 
    --
    -- Sanitizes a title, replacing whitespace and a few other characters with dashes.
@@ -305,10 +295,9 @@ is
    --                          "display".
    -- @return string The sanitized title.
    --
-   function Sanitize_Title_With_Dashes (Title     : String;
-                                        Raw_Title : String := "";
-                                        Context   : String := "display")
-                                        return String;
+   function Sanitize_Title_With_Dashes
+     (Title : String; Raw_Title : String := ""; Context : String := "display")
+      return String;
 
    --
    -- Performs a deep string replace operation to ensure the values in search are
@@ -328,9 +317,8 @@ is
    --                              otherwise known as the haystack.
    -- @return string The string with the replaced values.
    --
-   function X_Deep_Replace (Search  : List_Type;
-                            Subject : String)
-                            return String;
+   function X_Deep_Replace
+     (Search : List_Type; Subject : String) return String;
 
    --
    -- Checks and cleans a URL.
@@ -349,10 +337,10 @@ is
    --                An empty string is returned if `url` specifies a protocol other
    --                than those in `protocols`, or if `url` contains an empty string.
    --
-   function ESC_URL (URL       : String;
-                     Protocols : List_Type := Empty_List;
-                     X_Context : String    := "display")
-                    return String;
+   function ESC_URL
+     (URL       : String;
+      Protocols : List_Type := Empty_List;
+      X_Context : String := "display") return String;
 
    --
    -- Sanitizes a URL for database or redirect usage.
@@ -369,9 +357,9 @@ is
    --                            Defaults to return value of wp_allowed_protocols().
    -- @return string The cleaned URL after sanitize_url() is run.
    --
-   function ESC_URL_Raw (URL       : String;
-                         Protocols : List_Type := Empty_List) -- null
-                         return String;
+   function ESC_URL_Raw
+     (URL : String; Protocols : List_Type := Empty_List) -- null
+      return String;
 
    --
    -- Navigates through an array, object, or scalar, and removes slashes from
@@ -382,11 +370,9 @@ is
    -- @param mixed value The value to be stripped.
    -- @return mixed Stripped value.
    --
-   function Strip_Slashes_Deep (Value : Array_Type)
-                                return Array_Type;
+   function Strip_Slashes_Deep (Value : Array_Type) return Array_Type;
 
-   function Strip_Slashes_Deep (Value : String)
-                                return String;
+   function Strip_Slashes_Deep (Value : String) return String;
 
    --
    -- Callback function for `stripslashes_deep()` which strips slashes from strings.
@@ -396,8 +382,7 @@ is
    -- @param mixed value The array or string to be stripped.
    -- @return mixed The stripped value.
    --
-   function Strip_Slashes_From_Strings_Only (Value : String)
-                                             return String;
+   function Strip_Slashes_From_Strings_Only (Value : String) return String;
 
    --
    -- Navigates through an array, object, or scalar, and encodes the values to be used
@@ -408,11 +393,9 @@ is
    -- @param mixed value The array or string to be encoded.
    -- @return mixed The encoded value.
    --
-   function URL_Encode_Deep (Value : Array_Type)
-                             return Array_Type;
+   function URL_Encode_Deep (Value : Array_Type) return Array_Type;
 
-   function URL_Encode_Deep (Value : String)
-                             return String;
+   function URL_Encode_Deep (Value : String) return String;
 
    --
    -- Navigates through an array, object, or scalar, and raw-encodes the values to be
@@ -423,8 +406,7 @@ is
    -- @param mixed value The array or string to be encoded.
    -- @return mixed The encoded value.
    --
-   function Raw_URL_Encode_Deep (Value : Array_Type)
-                                 return Array_Type;
+   function Raw_URL_Encode_Deep (Value : Array_Type) return Array_Type;
 
    --
    -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
@@ -438,8 +420,7 @@ is
    -- @param string text The text to be escaped.
    -- @return string Escaped text.
    --
-   function ESC_JS (Text : String)
-                    return String;
+   function ESC_JS (Text : String) return String;
 
    --
    -- Escaping for HTML blocks.
@@ -449,8 +430,7 @@ is
    -- @param string text
    -- @return string
    --
-   function ESC_HTML (Item : String)
-                      return String;
+   function ESC_HTML (Item : String) return String;
 
    --
    -- Escaping for HTML attributes.
@@ -460,8 +440,7 @@ is
    -- @param string text
    -- @return string
    --
-   function ESC_Attr (Text : String)
-                      return String;
+   function ESC_Attr (Text : String) return String;
 
    --
    -- Converts full URL paths to absolute paths.
@@ -475,8 +454,7 @@ is
    -- @param string link Full URL path.
    -- @return string Absolute path.
    --
-   function Wp_Make_Link_Relative (Link : String)
-                                   return String;
+   function Wp_Make_Link_Relative (Link : String) return String;
 
    --
    -- Sanitizes various option values based on the nature of the option.
@@ -492,9 +470,7 @@ is
    -- @param string value  The unsanitised value.
    -- @return string Sanitized value.
    --
-   function Sanitize_Option (Option : String;
-                             Value  : String)
-                             return String;
+   function Sanitize_Option (Option : String; Value : String) return String;
 
    --
    -- Escapes data for use in a MySQL query.
@@ -515,12 +491,10 @@ is
    -- @param string|array data Unescaped data.
    -- @return string|array Escaped data, in the same type as supplied.
    --
-   function ESC_SQL (Data : List_Type)
-                     return List_Type
+   function ESC_SQL (Data : List_Type) return List_Type
    is (raise Program_Error with "not implemented");
 
-   function ESC_SQL (Data : String)
-                     return String;
+   function ESC_SQL (Data : String) return String;
 
    --
    -- Checks for invalid UTF8 in a string.
@@ -532,9 +506,8 @@ is
    --                      Default false.
    -- @return string The checked text.
    --
-   function Wp_Check_Invalid_UTF8 (Item  : String;
-                                   Strip : Boolean := False)
-                                   return String;
+   function Wp_Check_Invalid_UTF8
+     (Item : String; Strip : Boolean := False) return String;
 
    --
    -- Converts all accent characters to ASCII characters.
@@ -928,9 +901,8 @@ is
    --                       (e.g. "de_DE"). Defaults to the current locale.
    -- @return string Filtered string with replaced "nice" characters.
    --
-   function Remove_Accents (Item   : String;
-                            Locale : String := "")
-                            return String;
+   function Remove_Accents
+     (Item : String; Locale : String := "") return String;
 
    --
    -- Verifies that an email is valid.
@@ -943,9 +915,8 @@ is
    -- @param bool   deprecated Deprecated.
    -- @return string|false Valid email address on success, false on failure.
    --
-   function Is_Email (Email      : String;
-                      Deprecated : Boolean := False)
-                      return String;
+   function Is_Email
+     (Email : String; Deprecated : Boolean := False) return String;
 
    --
    -- Determines the difference between two timestamps.
@@ -961,9 +932,7 @@ is
    --                 becomes time() if not set.
    -- @return string Human readable time difference.
    --
-   function Human_Time_Diff (From : Integer;
-                             To   : Integer := 0)
-                             return String;
+   function Human_Time_Diff (From : Integer; To : Integer := 0) return String;
 
    --
    -- Appends a trailing slash.
@@ -979,8 +948,7 @@ is
    -- @param string string What to add the trailing slash to.
    -- @return string String with trailing slash added.
    --
-   function Trailing_Slash_It (Item : String)
-                               return String;
+   function Trailing_Slash_It (Item : String) return String;
 
    --
    -- Removes trailing forward slashes and backslashes if they exist.
@@ -993,8 +961,7 @@ is
    -- @param string string What to remove the trailing slashes from.
    -- @return string String without the trailing slashes.
    --
-   function Un_Trailing_Slash_It (Item : String)
-                                  return String;
+   function Un_Trailing_Slash_It (Item : String) return String;
 
    --
    -- Safely extracts not more than the first count characters from HTML string.
@@ -1011,10 +978,76 @@ is
    --                     Defaults to empty string.
    -- @return string The excerpt.
    --
-   function Wp_HTML_Excerpt (Str   : String;
-                             Count : Integer;
-                             More  : String := "")
-                             return String;
+   function Wp_HTML_Excerpt
+     (Str : String; Count : Integer; More : String := "") return String;
+
+   --
+   -- Adds a base URL to relative links in passed content.
+   --
+   -- By default it supports the "src" and "href" attributes. However this can be
+   -- changed via the 3rd param.
+   --
+   -- @since 2.7.0
+   --
+   -- @global string _links_add_base
+   --
+   -- @param string content String to search for links in.
+   -- @param string base    The base URL to prefix to links.
+   -- @param array  attrs   The attributes which should be processed.
+   -- @return string The processed content.
+   --
+   function Links_Add_Base_URL
+     (Content : String;
+      Base    : String;
+      Attrs   : List_Type := List_Type'["src", "href"]) return String;
+
+   --
+   -- Callback to add a base URL to relative links in passed content.
+   --
+   -- @since 2.7.0
+   -- @access private
+   --
+   -- @global string _links_add_base
+   --
+   -- @param string m The matched link.
+   -- @return string The processed link.
+   --
+   function X_Links_Add_Base (M : List_Type) return String;
+
+   --
+   -- Adds a Target attribute to all links in passed content.
+   --
+   -- This function by default only applies to `<a>` tags, however this can be
+   -- modified by the 3rd param.
+   --
+   ----NOTE:* Any current target attributed will be stripped and replaced.
+   --
+   -- @since 2.7.0
+   --
+   -- @global string _links_add_target
+   --
+   -- @param string   content String to search for links in.
+   -- @param string   target  The Target to add to the links.
+   -- @param string[] tags    An array of tags to apply to.
+   -- @return string The processed content.
+   --
+   function Links_Add_Target
+     (Content : String;
+      Target  : String := "_blank";
+      Tags    : Array_Type := Build ("a", "")) return String;
+
+   --
+   -- Callback to add a target attribute to all links in passed content.
+   --
+   -- @since 2.7.0
+   -- @access private
+   --
+   -- @global string _links_add_target
+   --
+   -- @param string m The matched link.
+   -- @return string The processed link.
+   --
+   function X_Links_Add_Target (M : List_Type) return String;
 
    --
    -- Strips out all characters not allowed in a locale name.
@@ -1024,8 +1057,7 @@ is
    -- @param string locale_name The locale name to be sanitized.
    -- @return string The sanitized value.
    --
-   function Sanitize_Locale_Name (Locale_Name : String)
-                                  return String;
+   function Sanitize_Locale_Name (Locale_Name : String) return String;
 
    --
    -- Sanitizes a string key.
@@ -1038,8 +1070,7 @@ is
    -- @param string key String key.
    -- @return string Sanitized key.
    --
-   function Sanitize_Key (Key : String)
-                          return String;
+   function Sanitize_Key (Key : String) return String;
 
    --
    -- i18n-friendly version of basename().
@@ -1050,9 +1081,7 @@ is
    -- @param string suffix If the filename ends in suffix this will also be cut off.
    -- @return string
    --
-   function Wp_Basename (Path   : String;
-                         Suffix : String := "")
-                         return String;
+   function Wp_Basename (Path : String; Suffix : String := "") return String;
 
    --
    -- Maps a function to all non-iterable elements of an array or an object.
@@ -1068,13 +1097,10 @@ is
    --
    type Callable is access function (Item : String) return String;
 
-   function Map_Deep (Value    : Array_Type;
-                      Callback : Callable)
-                      return Array_Type;
+   function Map_Deep
+     (Value : Array_Type; Callback : Callable) return Array_Type;
 
-   function Map_Deep (Value    : String;
-                      Callback : Callable)
-                      return String;
+   function Map_Deep (Value : String; Callback : Callable) return String;
 
    --
    -- WordPress implementation of PHP sprintf() with filters.
@@ -1089,9 +1115,7 @@ is
    -- @param mixed  ...args Arguments to be formatted into the pattern string.
    -- @return string The formatted string.
    --
-   function Wp_Sprintf (Pattern : String;
-                        Arg_1   : List_Type)
-                        return String;
+   function Wp_Sprintf (Pattern : String; Arg_1 : List_Type) return String;
 
    --
    -- Properly strips all HTML tags including script and style
@@ -1108,9 +1132,8 @@ is
    --               and white space chars
    -- @return string The processed string.
    --
-   function Wp_Strip_All_Tags (Item          : String;
-                               Remove_Breaks : Boolean := False)
-                               return String;
+   function Wp_Strip_All_Tags
+     (Item : String; Remove_Breaks : Boolean := False) return String;
 
    --
    -- Sanitizes a string from user input or from the database.
@@ -1130,8 +1153,7 @@ is
    -- @param string str String to sanitize.
    -- @return string Sanitized string.
    --
-   function Sanitize_Text_Field (Str : String)
-                                 return String;
+   function Sanitize_Text_Field (Str : String) return String;
 
    --
    -- Internal helper function to sanitize a string from user input or from the
@@ -1144,9 +1166,8 @@ is
    -- @param bool   keep_newlines Optional. Whether to keep newlines. Default: false.
    -- @return string Sanitized string.
    --
-   function X_Sanitize_Text_Fields (Str           : String;
-                                    Keep_Newlines : Boolean := False)
-                                    return String;
+   function X_Sanitize_Text_Fields
+     (Str : String; Keep_Newlines : Boolean := False) return String;
 
    --
    -- Returns the regexp for common whitespace characters.
@@ -1159,8 +1180,7 @@ is
    --
    -- @return string The spaces regexp.
    --
-   function Wp_Spaces_Regexp
-            return String;
+   function Wp_Spaces_Regexp return String;
 
    --
    -- Prints the important emoji-related styles.
@@ -1169,8 +1189,8 @@ is
    --
    procedure Print_Emoji_Styles;
 
-   function Print_Emoji_Styles
-     is new Helpers_2.Generic_Call_Procedure (Print_Emoji_Styles);
+   function Print_Emoji_Styles is new
+     Helpers_2.Generic_Call_Procedure (Print_Emoji_Styles);
 
    --
    -- Prints the inline Emoji detection script if it is not already printed.
@@ -1179,8 +1199,8 @@ is
    --
    procedure Print_Emoji_Detection_Script;
 
-   function Print_Emoji_Detection_Script
-     is new Helpers_2.Generic_Call_Procedure (Print_Emoji_Detection_Script);
+   function Print_Emoji_Detection_Script is new
+     Helpers_2.Generic_Call_Procedure (Print_Emoji_Detection_Script);
 
    --
    -- Prints inline Emoji detection script.
@@ -1203,8 +1223,7 @@ is
    -- @param string|array value String or array of data to slash.
    -- @return string|array Slashed `value`, in the same type as supplied.
    --
-   function Wp_Slash (Value : String)
-                      return String;
+   function Wp_Slash (Value : String) return String;
 
    --
    -- Removes slashes from a string or recursively removes slashes from strings
@@ -1218,15 +1237,12 @@ is
    -- @param string|array value String or array of data to unslash.
    -- @return string|array Unslashed `value`, in the same type as supplied.
    --
-   function Wp_Unslash (Value : String)
-                        return String;
+   function Wp_Unslash (Value : String) return String;
 
-   function Wp_Unslash (Value : Array_Type)
-                        return Array_Type
+   function Wp_Unslash (Value : Array_Type) return Array_Type
    is (raise Program_Error with "not implemented");
 
-   function Wp_Unslash (Value : String)
-                        return List_Type
+   function Wp_Unslash (Value : String) return List_Type
    is (raise Program_Error with "not implemented");
 
 end Inc_Formatting;

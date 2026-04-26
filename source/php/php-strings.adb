@@ -490,6 +490,13 @@ is
       return Copy;
    end UC_First;
 
+   --------------
+   -- UC_Words --
+   --------------
+
+   function UC_Words   (Item : String) return String
+   is (raise Program_Error with "not implemented");
+
    ------------
    -- Strcmp --
    ------------

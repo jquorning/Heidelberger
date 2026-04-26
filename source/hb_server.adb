@@ -41,6 +41,7 @@ package body HB_Server is
         (Dispatcher, "/wp-admin/load-scripts.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/load-styles.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/plugins.php", Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/plugin-install.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/post.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/themes.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/theme-install.php", Binder.Render'Access);

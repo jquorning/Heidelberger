@@ -25,4 +25,6 @@ is
                     Flags : Integer := SORT_REGULAR)
                     is null;
 
+   procedure UASort (Arry : in out Array_Type); -- ; Callback :
+
 end Php.Sorting;

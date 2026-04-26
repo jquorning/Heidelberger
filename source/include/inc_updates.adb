@@ -10,308 +10,300 @@ package body Inc_Updates
 is
    procedure Dummy is null;
 
--- --
--- -- Checks WordPress version against the newest version.
--- --
--- -- The WordPress version, PHP version, and locale is sent.
--- --
--- -- Checks against the WordPress server at api.wordpress.org. Will only check
--- -- if WordPress isn"t installing.
--- --
--- -- @since 2.3.0
--- --
--- -- @global string wp_version       Used to check against the newest WordPress version.
--- -- @global wpdb   wpdb             WordPress database abstraction object.
--- -- @global string wp_local_package Locale code of the package.
--- --
--- -- @param array extra_stats Extra statistics to report to the WordPress.org API.
--- -- @param bool  force_check Whether to bypass the transient cache and force a fresh update check.
--- --                           Defaults to false, true if extra_stats is set.
--- --
--- function wp_version_check( extra_stats = array(), force_check = false ) then
---         global wpdb, wp_local_package;
+   -- --
+   -- -- Checks WordPress version against the newest version.
+   -- --
+   -- -- The WordPress version, PHP version, and locale is sent.
+   -- --
+   -- -- Checks against the WordPress server at api.wordpress.org. Will only check
+   -- -- if WordPress isn"t installing.
+   -- --
+   -- -- @since 2.3.0
+   -- --
+   -- -- @global string wp_version       Used to check against the newest WordPress version.
+   -- -- @global wpdb   wpdb             WordPress database abstraction object.
+   -- -- @global string wp_local_package Locale code of the package.
+   -- --
+   -- -- @param array extra_stats Extra statistics to report to the WordPress.org API.
+   -- -- @param bool  force_check Whether to bypass the transient cache and force a fresh update check.
+   -- --                           Defaults to false, true if extra_stats is set.
+   -- --
+   -- function wp_version_check( extra_stats = array(), force_check = false ) then
+   --         global wpdb, wp_local_package;
 
---         if ( wp_installing() ) then
---                 return;
---         end;
+   --         if ( wp_installing() ) then
+   --                 return;
+   --         end;
 
---         -- Include an unmodified wp_version.
---         require ABSPATH . WPINC . "/version.php";
---         php_version = PHP_VERSION;
+   --         -- Include an unmodified wp_version.
+   --         require ABSPATH . WPINC . "/version.php";
+   --         php_version = PHP_VERSION;
 
---         current      = get_site_transient( "update_core" );
---         translations = wp_get_installed_translations( "core" );
+   --         current      = get_site_transient( "update_core" );
+   --         translations = wp_get_installed_translations( "core" );
 
---         -- Invalidate the transient when wp_version changes.
---         if ( is_object( current ) and then wp_version not== current->version_checked ) then
---                 current = false;
---         end;
+   --         -- Invalidate the transient when wp_version changes.
+   --         if ( is_object( current ) and then wp_version not== current->version_checked ) then
+   --                 current = false;
+   --         end;
 
---         if ( not is_object( current ) ) then
---                 current                  = new stdClass;
---                 current->updates         = array();
---                 current->version_checked = wp_version;
---         end;
+   --         if ( not is_object( current ) ) then
+   --                 current                  = new stdClass;
+   --                 current->updates         = array();
+   --                 current->version_checked = wp_version;
+   --         end;
 
---         if ( not empty( extra_stats ) ) then
---                 force_check = true;
---         end;
+   --         if ( not empty( extra_stats ) ) then
+   --                 force_check = true;
+   --         end;
 
---         -- Wait 1 minute between multiple version check requests.
---         timeout          = MINUTE_IN_SECONDS;
---         time_not_changed = isset( current->last_checked ) and then timeout > ( time() - current->last_checked );
+   --         -- Wait 1 minute between multiple version check requests.
+   --         timeout          = MINUTE_IN_SECONDS;
+   --         time_not_changed = isset( current->last_checked ) and then timeout > ( time() - current->last_checked );
 
---         if ( not force_check and then time_not_changed ) then
---                 return;
---         end;
+   --         if ( not force_check and then time_not_changed ) then
+   --                 return;
+   --         end;
 
---         --
---         -- Filters the locale requested for WordPress core translations.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string locale Current locale.
---         --
---         locale = apply_filters( "core_version_check_locale", get_locale() );
+   --         --
+   --         -- Filters the locale requested for WordPress core translations.
+   --         --
+   --         -- @since 2.8.0
+   --         --
+   --         -- @param string locale Current locale.
+   --         --
+   --         locale = apply_filters( "core_version_check_locale", get_locale() );
 
---         -- Update last_checked for current to prevent multiple blocking requests if request hangs.
---         current->last_checked = time();
---         set_site_transient( "update_core", current );
+   --         -- Update last_checked for current to prevent multiple blocking requests if request hangs.
+   --         current->last_checked = time();
+   --         set_site_transient( "update_core", current );
 
---         if ( method_exists( wpdb, "db_version" ) ) then
---                 mysql_version = preg_replace( "/[^0-9.].*/", "", wpdb->db_version() );
---         end; else then
---                 mysql_version = "N/A";
---         end;
+   --         if ( method_exists( wpdb, "db_version" ) ) then
+   --                 mysql_version = preg_replace( "/[^0-9.].*/", "", wpdb->db_version() );
+   --         end; else then
+   --                 mysql_version = "N/A";
+   --         end;
 
---         if ( is_multisite() ) then
---                 num_blogs         = get_blog_count();
---                 wp_install        = network_site_url();
---                 multisite_enabled = 1;
---         end; else then
---                 multisite_enabled = 0;
---                 num_blogs         = 1;
---                 wp_install        = home_url( "/" );
---         end;
+   --         if ( is_multisite() ) then
+   --                 num_blogs         = get_blog_count();
+   --                 wp_install        = network_site_url();
+   --                 multisite_enabled = 1;
+   --         end; else then
+   --                 multisite_enabled = 0;
+   --                 num_blogs         = 1;
+   --                 wp_install        = home_url( "/" );
+   --         end;
 
---         extensions = get_loaded_extensions();
---         sort( extensions, SORT_STRING | SORT_FLAG_CASE );
---         query = array(
---                 "version"            => wp_version,
---                 "php"                => php_version,
---                 "locale"             => locale,
---                 "mysql"              => mysql_version,
---                 "local_package"      => isset( wp_local_package ) ? wp_local_package : "",
---                 "blogs"              => num_blogs,
---                 "users"              => get_user_count(),
---                 "multisite_enabled"  => multisite_enabled,
---                 "initial_db_version" => get_site_option( "initial_db_version" ),
---                 "extensions"         => array_combine( extensions, array_map( "phpversion", extensions ) ),
---                 "platform_flags"     => array(
---                         "os"   => PHP_OS,
---                         "bits" => PHP_INT_SIZE === 4 ? 32 : 64,
---                 ),
---                 "image_support"      => array(),
---         );
+   --         extensions = get_loaded_extensions();
+   --         sort( extensions, SORT_STRING | SORT_FLAG_CASE );
+   --         query = array(
+   --                 "version"            => wp_version,
+   --                 "php"                => php_version,
+   --                 "locale"             => locale,
+   --                 "mysql"              => mysql_version,
+   --                 "local_package"      => isset( wp_local_package ) ? wp_local_package : "",
+   --                 "blogs"              => num_blogs,
+   --                 "users"              => get_user_count(),
+   --                 "multisite_enabled"  => multisite_enabled,
+   --                 "initial_db_version" => get_site_option( "initial_db_version" ),
+   --                 "extensions"         => array_combine( extensions, array_map( "phpversion", extensions ) ),
+   --                 "platform_flags"     => array(
+   --                         "os"   => PHP_OS,
+   --                         "bits" => PHP_INT_SIZE === 4 ? 32 : 64,
+   --                 ),
+   --                 "image_support"      => array(),
+   --         );
 
---         if ( function_exists( "gd_info" ) ) then
---                 gd_info = gd_info();
---                 -- Filter to supported values.
---                 gd_info = array_filter( gd_info );
+   --         if ( function_exists( "gd_info" ) ) then
+   --                 gd_info = gd_info();
+   --                 -- Filter to supported values.
+   --                 gd_info = array_filter( gd_info );
 
---                 -- Add data for GD WebP and AVIF support.
---                 query["image_support"]["gd"] = array_keys(
---                         array_filter(
---                                 array(
---                                         "webp" => isset( gd_info["WebP Support"] ),
---                                         "avif" => isset( gd_info["AVIF Support"] ),
---                                 )
---                         )
---                 );
---         end;
+   --                 -- Add data for GD WebP and AVIF support.
+   --                 query["image_support"]["gd"] = array_keys(
+   --                         array_filter(
+   --                                 array(
+   --                                         "webp" => isset( gd_info["WebP Support"] ),
+   --                                         "avif" => isset( gd_info["AVIF Support"] ),
+   --                                 )
+   --                         )
+   --                 );
+   --         end;
 
---         if ( class_exists( "Imagick" ) ) then
---                 -- Add data for Imagick WebP and AVIF support.
---                 query["image_support"]["imagick"] = array_keys(
---                         array_filter(
---                                 array(
---                                         "webp" => not empty( Imagick::queryFormats( "WEBP" ) ),
---                                         "avif" => not empty( Imagick::queryFormats( "AVIF" ) ),
---                                 )
---                         )
---                 );
---         end;
+   --         if ( class_exists( "Imagick" ) ) then
+   --                 -- Add data for Imagick WebP and AVIF support.
+   --                 query["image_support"]["imagick"] = array_keys(
+   --                         array_filter(
+   --                                 array(
+   --                                         "webp" => not empty( Imagick::queryFormats( "WEBP" ) ),
+   --                                         "avif" => not empty( Imagick::queryFormats( "AVIF" ) ),
+   --                                 )
+   --                         )
+   --                 );
+   --         end;
 
---         --
---         -- Filters the query arguments sent as part of the core version check.
---         --
---         -- WARNING: Changing this data may result in your site not receiving security updates.
---         -- Please exercise extreme caution.
---         --
---         -- @since 4.9.0
---         --
---         -- @param array query then
---         --     Version check query arguments.
---         --
---         --     @type string version            WordPress version number.
---         --     @type string php                PHP version number.
---         --     @type string locale             The locale to retrieve updates for.
---         --     @type string mysql              MySQL version number.
---         --     @type string local_package      The value of the wp_local_package global, when set.
---         --     @type int    blogs              Number of sites on this WordPress installation.
---         --     @type int    users              Number of users on this WordPress installation.
---         --     @type int    multisite_enabled  Whether this WordPress installation uses Multisite.
---         --     @type int    initial_db_version Database version of WordPress at time of installation.
---         -- end;
---         --
---         query = apply_filters( "core_version_check_query_args", query );
+   --         --
+   --         -- Filters the query arguments sent as part of the core version check.
+   --         --
+   --         -- WARNING: Changing this data may result in your site not receiving security updates.
+   --         -- Please exercise extreme caution.
+   --         --
+   --         -- @since 4.9.0
+   --         --
+   --         -- @param array query then
+   --         --     Version check query arguments.
+   --         --
+   --         --     @type string version            WordPress version number.
+   --         --     @type string php                PHP version number.
+   --         --     @type string locale             The locale to retrieve updates for.
+   --         --     @type string mysql              MySQL version number.
+   --         --     @type string local_package      The value of the wp_local_package global, when set.
+   --         --     @type int    blogs              Number of sites on this WordPress installation.
+   --         --     @type int    users              Number of users on this WordPress installation.
+   --         --     @type int    multisite_enabled  Whether this WordPress installation uses Multisite.
+   --         --     @type int    initial_db_version Database version of WordPress at time of installation.
+   --         -- end;
+   --         --
+   --         query = apply_filters( "core_version_check_query_args", query );
 
---         post_body = array(
---                 "translations" => wp_json_encode( translations ),
---         );
+   --         post_body = array(
+   --                 "translations" => wp_json_encode( translations ),
+   --         );
 
---         if ( is_array( extra_stats ) ) then
---                 post_body = array_merge( post_body, extra_stats );
---         end;
+   --         if ( is_array( extra_stats ) ) then
+   --                 post_body = array_merge( post_body, extra_stats );
+   --         end;
 
---         -- Allow for WP_AUTO_UPDATE_CORE to specify beta/RC/development releases.
---         if ( defined( "WP_AUTO_UPDATE_CORE" )
---                 and then in_array( WP_AUTO_UPDATE_CORE, array( "beta", "rc", "development", "branch-development" ), true )
---         ) then
---                 query["channel"] = WP_AUTO_UPDATE_CORE;
---         end;
+   --         -- Allow for WP_AUTO_UPDATE_CORE to specify beta/RC/development releases.
+   --         if ( defined( "WP_AUTO_UPDATE_CORE" )
+   --                 and then in_array( WP_AUTO_UPDATE_CORE, array( "beta", "rc", "development", "branch-development" ), true )
+   --         ) then
+   --                 query["channel"] = WP_AUTO_UPDATE_CORE;
+   --         end;
 
---         url      = "http://api.wordpress.org/core/version-check/1.7/?" . http_build_query( query, "", "&" );
---         http_url = url;
---         ssl      = wp_http_supports( array( "ssl" ) );
+   --         url      = "http://api.wordpress.org/core/version-check/1.7/?" . http_build_query( query, "", "&" );
+   --         http_url = url;
+   --         ssl      = wp_http_supports( array( "ssl" ) );
 
---         if ( ssl ) then
---                 url = set_url_scheme( url, "https" );
---         end;
+   --         if ( ssl ) then
+   --                 url = set_url_scheme( url, "https" );
+   --         end;
 
---         doing_cron = wp_doing_cron();
+   --         doing_cron = wp_doing_cron();
 
---         options = array(
---                 "timeout"    => doing_cron ? 30 : 3,
---                 "user-agent" => "WordPress/" . wp_version . "; " . home_url( "/" ),
---                 "headers"    => array(
---                         "wp_install" => wp_install,
---                         "wp_blog"    => home_url( "/" ),
---                 ),
---                 "body"       => post_body,
---         );
+   --         options = array(
+   --                 "timeout"    => doing_cron ? 30 : 3,
+   --                 "user-agent" => "WordPress/" . wp_version . "; " . home_url( "/" ),
+   --                 "headers"    => array(
+   --                         "wp_install" => wp_install,
+   --                         "wp_blog"    => home_url( "/" ),
+   --                 ),
+   --                 "body"       => post_body,
+   --         );
 
---         response = wp_remote_post( url, options );
+   --         response = wp_remote_post( url, options );
 
---         if ( ssl and then is_wp_error( response ) ) then
---                 trigger_error(
---                         sprintf(
---                                 /* translators: %s: Support forums URL.--
---                                 __( "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>." ),
---                                 __( "https://wordpress.org/support/forums/" )
---                         ) . " " . __( "(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)" ),
---                         headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
---                 );
---                 response = wp_remote_post( http_url, options );
---         end;
+   --         if ( ssl and then is_wp_error( response ) ) then
+   --                 trigger_error(
+   --                         sprintf(
+   --                                 /* translators: %s: Support forums URL.--
+   --                                 __( "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>." ),
+   --                                 __( "https://wordpress.org/support/forums/" )
+   --                         ) . " " . __( "(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)" ),
+   --                         headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
+   --                 );
+   --                 response = wp_remote_post( http_url, options );
+   --         end;
 
---         if ( is_wp_error( response ) || 200 not== wp_remote_retrieve_response_code( response ) ) then
---                 return;
---         end;
+   --         if ( is_wp_error( response ) || 200 not== wp_remote_retrieve_response_code( response ) ) then
+   --                 return;
+   --         end;
 
---         body = trim( wp_remote_retrieve_body( response ) );
---         body = json_decode( body, true );
+   --         body = trim( wp_remote_retrieve_body( response ) );
+   --         body = json_decode( body, true );
 
---         if ( not is_array( body ) || not isset( body["offers"] ) ) then
---                 return;
---         end;
+   --         if ( not is_array( body ) || not isset( body["offers"] ) ) then
+   --                 return;
+   --         end;
 
---         offers = body["offers"];
+   --         offers = body["offers"];
 
---         foreach ( offers as &offer ) then
---                 foreach ( offer as offer_key => value ) then
---                         if ( "packages" === offer_key ) then
---                                 offer["packages"] = (object) array_intersect_key(
---                                         array_map( "esc_url", offer["packages"] ),
---                                         array_fill_keys( array( "full", "no_content", "new_bundled", "partial", "rollback" ), "" )
---                                 );
---                         end; elseif ( "download" === offer_key ) then
---                                 offer["download"] = esc_url( value );
---                         end; else then
---                                 offer[ offer_key ] = esc_html( value );
---                         end;
---                 end;
---                 offer = (object) array_intersect_key(
---                         offer,
---                         array_fill_keys(
---                                 array(
---                                         "response",
---                                         "download",
---                                         "locale",
---                                         "packages",
---                                         "current",
---                                         "version",
---                                         "php_version",
---                                         "mysql_version",
---                                         "new_bundled",
---                                         "partial_version",
---                                         "notify_email",
---                                         "support_email",
---                                         "new_files",
---                                 ),
---                                 ""
---                         )
---                 );
---         end;
+   --         foreach ( offers as &offer ) then
+   --                 foreach ( offer as offer_key => value ) then
+   --                         if ( "packages" === offer_key ) then
+   --                                 offer["packages"] = (object) array_intersect_key(
+   --                                         array_map( "esc_url", offer["packages"] ),
+   --                                         array_fill_keys( array( "full", "no_content", "new_bundled", "partial", "rollback" ), "" )
+   --                                 );
+   --                         end; elseif ( "download" === offer_key ) then
+   --                                 offer["download"] = esc_url( value );
+   --                         end; else then
+   --                                 offer[ offer_key ] = esc_html( value );
+   --                         end;
+   --                 end;
+   --                 offer = (object) array_intersect_key(
+   --                         offer,
+   --                         array_fill_keys(
+   --                                 array(
+   --                                         "response",
+   --                                         "download",
+   --                                         "locale",
+   --                                         "packages",
+   --                                         "current",
+   --                                         "version",
+   --                                         "php_version",
+   --                                         "mysql_version",
+   --                                         "new_bundled",
+   --                                         "partial_version",
+   --                                         "notify_email",
+   --                                         "support_email",
+   --                                         "new_files",
+   --                                 ),
+   --                                 ""
+   --                         )
+   --                 );
+   --         end;
 
---         updates                  = new stdClass();
---         updates->updates         = offers;
---         updates->last_checked    = time();
---         updates->version_checked = wp_version;
+   --         updates                  = new stdClass();
+   --         updates->updates         = offers;
+   --         updates->last_checked    = time();
+   --         updates->version_checked = wp_version;
 
---         if ( isset( body["translations"] ) ) then
---                 updates->translations = body["translations"];
---         end;
+   --         if ( isset( body["translations"] ) ) then
+   --                 updates->translations = body["translations"];
+   --         end;
 
---         set_site_transient( "update_core", updates );
+   --         set_site_transient( "update_core", updates );
 
---         if ( not empty( body["ttl"] ) ) then
---                 ttl = (int) body["ttl"];
+   --         if ( not empty( body["ttl"] ) ) then
+   --                 ttl = (int) body["ttl"];
 
---                 if ( ttl and then ( time() + ttl < wp_next_scheduled( "wp_version_check" ) ) ) then
---                         -- Queue an event to re-run the update check in ttl seconds.
---                         wp_schedule_single_event( time() + ttl, "wp_version_check" );
---                 end;
---         end;
+   --                 if ( ttl and then ( time() + ttl < wp_next_scheduled( "wp_version_check" ) ) ) then
+   --                         -- Queue an event to re-run the update check in ttl seconds.
+   --                         wp_schedule_single_event( time() + ttl, "wp_version_check" );
+   --                 end;
+   --         end;
 
---         -- Trigger background updates if running non-interactively, and we weren"t called from the update handler.
---         if ( doing_cron and then not doing_action( "wp_maybe_auto_update" ) ) then
---                 --
---                 -- Fires during wp_cron, starting the auto-update process.
---                 --
---                 -- @since 3.9.0
---                 --
---                 do_action( "wp_maybe_auto_update" );
---         end;
--- end;
+   --         -- Trigger background updates if running non-interactively, and we weren"t called from the update handler.
+   --         if ( doing_cron and then not doing_action( "wp_maybe_auto_update" ) ) then
+   --                 --
+   --                 -- Fires during wp_cron, starting the auto-update process.
+   --                 --
+   --                 -- @since 3.9.0
+   --                 --
+   --                 do_action( "wp_maybe_auto_update" );
+   --         end;
+   -- end;
 
--- --
--- -- Checks for available updates to plugins based on the latest versions hosted on WordPress.org.
--- --
--- -- Despite its name this function does not actually perform any updates, it only checks for available updates.
--- --
--- -- A list of all plugins installed is sent to WP, along with the site locale.
--- --
--- -- Checks against the WordPress server at api.wordpress.org. Will only check
--- -- if WordPress isn"t installing.
--- --
--- -- @since 2.3.0
--- --
--- -- @global string wp_version The WordPress version string.
--- --
--- -- @param array extra_stats Extra statistics to report to the WordPress.org API.
--- --
--- function wp_update_plugins( extra_stats = array() ) then
+   -----------------------
+   -- Wp_Update_Plugins --
+   -----------------------
+
+   procedure Wp_Update_Plugins (Extra_Stats : Array_Type := Empty_Array) is
+   begin
+      raise Program_Error with "not implemented";
+   end Wp_Update_Plugins;
+
 --         if ( wp_installing() ) then
 --                 return;
 --         end;

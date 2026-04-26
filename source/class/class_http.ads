@@ -561,6 +561,9 @@ is
         -- -- @return string An Absolute URL, in a failure condition where the URL cannot be parsed, the relative URL will be returned.
         -- --
         -- public static function make_absolute_url( maybe_relative_path, url ) then
+   function Make_Absolute_URL
+     (Maybe_Relative_Path : String; URL : String) return String
+   is (raise Program_Error with "not implemented");
         --         if ( empty( url ) ) then
         --                 return maybe_relative_path;
         --         end;

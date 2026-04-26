@@ -259,7 +259,7 @@ is
                                      return Array_Type
                                      is (Empty_Array);
 
-   type Unique_Flags is (Sort_String);
+   type Unique_Flags is (Sort_Regular, Sort_String);
 
    function Array_Unique (Arry  : Array_Type;
                           Flags : Unique_Flags := Sort_String)
@@ -299,5 +299,7 @@ is
 
    procedure Arsort (Arry : in out Array_Type)
    is null;
+
+   function Array_Sum (Arry : Array_Type) return Integer;
 
 end Php.Arrays;

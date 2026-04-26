@@ -551,7 +551,11 @@ is
    ----------------
 
    function Preg_Quote (Str : String; Delimiter : String := "") return String
-   is (raise Program_Error with "not implemented");
+   is
+   begin
+      Logging.Log ("preg_quote", "not implemented");
+      return Str & "XXX-E94";
+   end Preg_Quote;
 
    ---------------------------
    -- Preg_Replace_Callback --

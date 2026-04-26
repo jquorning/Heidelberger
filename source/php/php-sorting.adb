@@ -2,6 +2,8 @@
 --
 --
 
+with Logging;
+
 package body Php.Sorting
 is
 
@@ -15,5 +17,15 @@ is
    begin
       raise Program_Error with "not implemented";
    end USort;
+
+   ------------
+   -- USSort --
+   ------------
+
+   procedure UASort (Arry : in out Array_Type) is
+      -- ; Callback :
+   begin
+      Logging.Log ("uasort", "not implemented");
+   end UASort;
 
 end Php.Sorting;

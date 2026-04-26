@@ -25,6 +25,7 @@ with Adm_Install;
 with Adm_Load_Scripts;
 with Adm_Load_Styles;
 with Adm_Plugins;
+with Adm_Plugin_Install;
 with Adm_Post;
 with Adm_Privacy;
 with Adm_Themes;
@@ -146,6 +147,9 @@ is
 
       elsif Index (URL, "/wp-admin/plugins.php") /= 0 then
          Adm_Plugins.Render;
+
+      elsif Index (URL, "/wp-admin/plugin-install.php") /= 0 then
+         Adm_Plugin_Install.Render;
 
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;

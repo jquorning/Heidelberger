@@ -11,6 +11,62 @@ package body Wp_Common
 is
 
    function Apply_Filters
+     (Hook_Name : String; Value : List_Type; Plugin : Array_Type)
+      return List_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Plugin_Install.Plugin_API_Result; -- Boolean;
+      Action    : String;
+      Args      : Adi_Plugin_Install.Plugin_API_Args)
+      return Adi_Plugin_Install.Plugin_API_Result
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String; Value : Adi_Plugin_Install.Plugin_API_Args)
+      return Adi_Plugin_Install.Plugin_API_Args
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+     (Hook_Name : String;
+      Value     : Adi_Plugin_Install.Plugin_API_Args;
+      Action    : String) return Adi_Plugin_Install.Plugin_API_Args
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
      (Hook_Name : String;
       Value     : Adi_Themes.Themes_API_Result; -- Boolean;
       Action    : String;
