@@ -11,6 +11,23 @@ package body Wp_Common
 is
 
    function Apply_Filters
+     (Hook_Name : String;
+      Value     : String;
+      Format    : String;
+      Timestamp : Integer;
+      GMT       : Boolean)
+      return String
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
      (Hook_Name : String; Value : List_Type; Plugin : Array_Type)
       return List_Type
    is

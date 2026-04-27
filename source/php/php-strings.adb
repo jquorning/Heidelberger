@@ -805,8 +805,13 @@ is
                B := B + 1;
                A := A + 2;
             elsif Format (A + 2) in 's' | 'd' then
-               Append (Buffer, Args (B));
-               B := B + 1;
+               declare
+                  Index : constant Natural :=
+                    Natural'Value (Format (A + 1 .. A + 1));
+               begin
+                  Append (Buffer, Args (Index));
+               end;
+               -- B := B + 1;
                A := A + 3;
             elsif Format (A + 3) in 's' | 'd' then
                Append (Buffer, Args (B));

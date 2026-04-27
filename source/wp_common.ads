@@ -43,6 +43,14 @@ is
    use Lists;
 
    function Apply_Filters
+     (Hook_Name : String;
+      Value     : String;
+      Format    : String;
+      Timestamp : Integer;
+      GMT       : Boolean)
+      return String;
+
+   function Apply_Filters
      (Hook_Name : String; Value : List_Type; Plugin : Array_Type)
       return List_Type;
 

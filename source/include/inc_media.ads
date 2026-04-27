@@ -16,13 +16,12 @@ is
    use Arrays;
    use Lists;
 
-   type Image_Src_Type is
-     record
-        Source  : UStrings.UString;
-        Width   : Integer;
-        Height  : Integer;
-        Resized : Boolean;
-     end record;
+   type Image_Src_Type is record
+      Source  : UStrings.UString;
+      Width   : Integer;
+      Height  : Integer;
+      Resized : Boolean;
+   end record;
 
    --
    -- Retrieves additional image sizes.
@@ -33,8 +32,7 @@ is
    --
    -- @return array Additional images size data.
    --
-   function Wp_Get_Additional_Image_Sizes
-            return Array_Type;
+   function Wp_Get_Additional_Image_Sizes return Array_Type;
 
    --
    -- Scales an image to fit a particular size (such as "thumb" or "medium").
@@ -62,9 +60,8 @@ is
    --     @type bool   3 Whether the image is a resized image.
    -- }
    --
-   function Image_Downsize (Id   : Integer;
-                            Size : String := "medium")
-                            return Image_Src_Type
+   function Image_Downsize
+     (Id : Integer; Size : String := "medium") return Image_Src_Type
    is (Source  => UStrings.Null_UString,
        Width   => 0,
        Height  => 0,
@@ -85,14 +82,14 @@ is
    -- @return string[]|WP_Taxonomy[] Array of names or objects of registered
    --                                taxonomies for attachments.
    --
-   type Wp_Taxonomy_Array is array (Positive range <>)
-     of Class_Taxonomy.Wp_Taxonomy;
+   type Wp_Taxonomy_Array is
+     array (Positive range <>) of Class_Taxonomy.Wp_Taxonomy;
 
    Empty_Taxonomy_Array : constant Wp_Taxonomy_Array := (1 .. 0 => <>);
 
-   function Get_Taxonomies_For_Attachments (Output : String := "names")
-                                            return Wp_Taxonomy_Array
-                                            is (Empty_Taxonomy_Array);
+   function Get_Taxonomies_For_Attachments
+     (Output : String := "names") return Wp_Taxonomy_Array
+   is (Empty_Taxonomy_Array);
 
    --
    -- Determines whether to add the `loading` attribute to the specified tag in the
@@ -106,10 +103,9 @@ is
    --                         or the function name from where this was called.
    -- @return bool Whether to add the attribute.
    --
-   function Wp_Lazy_Loading_Enabled (Tag_Name : String;
-                                     Context  : String)
-                                     return Boolean
-                                     is (True);
+   function Wp_Lazy_Loading_Enabled
+     (Tag_Name : String; Context : String) return Boolean
+   is (True);
 
    --
    -- Determines the maximum upload size allowed in php.ini.
@@ -118,8 +114,7 @@ is
    --
    -- @return int Allowed upload size.
    --
-   function Wp_Max_Upload_Size
-            return Natural;
+   function Wp_Max_Upload_Size return Natural;
 
    --
    -- Gets the available intermediate image size names.
@@ -128,8 +123,7 @@ is
    --
    -- @return string[] An array of image size names.
    --
-   function Get_Intermediate_Image_Sizes
-            return List_Type;
+   function Get_Intermediate_Image_Sizes return List_Type;
 
    --
    -- Returns a normalized list of all currently registered image sub-sizes.
@@ -141,8 +135,7 @@ is
    -- @return array[] Associative array of arrays of image sub-size information,
    --                 keyed by image size name.
    --
-   function Wp_Get_Registered_Image_Subsizes
-            return Array_Type;
+   function Wp_Get_Registered_Image_Subsizes return Array_Type;
 
    --
    -- Retrieves an image to represent an attachment.
@@ -167,10 +160,9 @@ is
    --
 
    function Wp_Get_Attachment_Image_Src
-              (Attachment_Id : Integer;
-               Size          : String  := "thumbnail";
-               Icon          : Boolean := False)
-               return Image_Src_Type;
+     (Attachment_Id : Integer;
+      Size          : String := "thumbnail";
+      Icon          : Boolean := False) return Image_Src_Type;
 
    --
    -- Gets the URL of an image attachment.
@@ -189,10 +181,9 @@ is
    --                      image URL will be returned.
    --
    function Wp_Get_Attachment_Image_URL
-              (Attachment_Id : Integer;
-               Size          : String  := "thumbnail";
-               Icon          : Boolean := False)
-               return String;
+     (Attachment_Id : Integer;
+      Size          : String := "thumbnail";
+      Icon          : Boolean := False) return String;
 
    --
    -- Gets the default value to use for a `loading` attribute on an element.
@@ -221,8 +212,7 @@ is
    --                     "eager", or a boolean `false`, to indicate that the
    --                     `loading` attribute should be skipped.
    --
-   function Wp_Get_Loading_Attr_Default (Context : String)
-                                         return String;
+   function Wp_Get_Loading_Attr_Default (Context : String) return String;
 
    --
    -- Gets the threshold for how many of the first content media elements to not
@@ -238,8 +228,8 @@ is
    --                   even if it already has been before. Default false.
    -- @return int The number of content media elements to not lazy-load.
    --
-   function Wp_Omit_Loading_Attr_Threshold (Force : Boolean := False)
-                                            return Integer;
+   function Wp_Omit_Loading_Attr_Threshold
+     (Force : Boolean := False) return Integer;
 
    --
    -- Increases an internal content media count variable.
@@ -250,8 +240,8 @@ is
    -- @param int amount Optional. Amount to increase by. Default 1.
    -- @return int The latest content media count, after the increase.
    --
-   function Wp_Increase_Content_Media_Count (Amount : Integer := 1)
-                                             return Integer;
+   function Wp_Increase_Content_Media_Count
+     (Amount : Integer := 1) return Integer;
 
    --
    -- Allows PHP's getimagesize() to be debuggable when necessary.
@@ -264,12 +254,29 @@ is
    --                          reference).
    -- @return array|false Array of image information or false on failure.
    --
-   function Wp_Getimagesize (Filename   : String;
-                             Image_Info : out Array_Type) -- null
-                             return List_Type
-                             is (Empty_List);
+   function Wp_Getimagesize
+     (Filename : String; Image_Info : out Array_Type) -- null
+      return List_Type
+   is (Empty_List);
 
-   function Wp_Getimagesize (Filename : String)
-                             return List_Type;
+   function Wp_Getimagesize (Filename : String) return List_Type;
+
+   --
+   -- Enqueues all scripts, styles, settings, and templates necessary to use
+   -- all media JS APIs.
+   --
+   -- @since 3.5.0
+   --
+   -- @global int       content_width
+   -- @global wpdb      wpdb          WordPress database abstraction object.
+   -- @global WP_Locale wp_locale     WordPress date and time locale object.
+   --
+   -- @param array args then
+   --     Arguments for enqueuing media scripts.
+   --
+   --     @type int|WP_Post post Post ID or post object.
+   -- end;
+   --
+   procedure Wp_Enqueue_Media (Args : Array_Type := Empty_Array);
 
 end Inc_Media;

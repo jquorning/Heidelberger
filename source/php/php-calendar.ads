@@ -34,6 +34,9 @@ is
                     Format   : String)
                     return String;
 
+   function Date_Create
+     (Datetime : String := "now"; Timezone : Date_Time_Zone) return Date_Time;
+
    type Date_Time_Immutable is tagged private;
 
    function X_Construct (Datetime : String := "now";

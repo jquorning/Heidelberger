@@ -14,6 +14,7 @@ with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
+with Php.Misc;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -28,16 +29,20 @@ with Helpers_3;
 with UStrings;
 with Wp_Common;
 
-with Class_Taxonomy;
-with Class_Terms;
 with Adi_Posts;
 with Adi_Screens;
+with Adi_Users;
+
+with Class_Taxonomy;
+with Class_Terms;
+
 with Inc_Admin_Bar;
 with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
+with Inc_KSES;
 with Inc_Link_Templates;
 with Inc_L10n;
 with Inc_Options;
@@ -1123,38 +1128,49 @@ is
 --         end if;
 -- end Parent_Dropdown;
 
---    --
---    -- Prints out option HTML elements for role selectors.
---    --
---    -- @since 2.1.0
---    --
---    -- @param string selected Slug for the role that should be already selected.
---    --
---    procedure Wp_Dropdown_Roles (Selected : String := "")
---    is
---       R : UString;
+   -----------------------
+   -- Wp_Dropdown_Roles --
+   -----------------------
 
---       Editable_Roles : Array_Type := Array_Reverse (Get_Editable_Roles);  -- ()
---    begin
---       for A of Editable_Roles loop
---          declare
---             Role    : Key_Type   := A.Key;
---             Details : Value_Type := A.Value;
---             Name    : String     := Translate_User_Role (Details ("name"));
---          begin
---             -- Preselect specified role.
---             if Selected = Role then
---                Append (R, "\n\t<option selected=""selected"" value=""" &
---                           Esc_Attr (Role) & """>name</option>");
---             else
---                Append (R, "\n\t<option value=""" & Esc_Attr (Role) &
---                           """>name</option>");
---             end if;
---          end;
---       end loop;
+   procedure Wp_Dropdown_Roles (Selected : String := "") is
+      use Php.Arrays;
+      use Php.Echoing;
+      use UStrings;
+      use Adi_Users;
+      use Inc_Formatting;
+      use Inc_L10n;
 
---       echo (-R);
---    end Hb_Dropdown_Roles;
+      R : UString;
+
+      Editable_Roles : constant Array_Type :=
+        Array_Reverse (Get_Editable_Roles);
+   begin
+      for A in Editable_Roles.Iterate loop
+         declare
+            Role    : constant String := Key (A);
+            Details : constant Array_Type := As_Array (Element (A));
+            Name    : constant String :=
+              Translate_User_Role (Get_As_String (Details, "name"));
+         begin
+            -- Preselect specified role.
+            if Selected = Role then
+               Append
+                 (R,
+                  "\n\t<option selected=""selected"" value="""
+                  & ESC_Attr (Role)
+                  & """>name</option>");
+            else
+               Append
+                 (R,
+                  "\n\t<option value="""
+                  & ESC_Attr (Role)
+                  & """>name</option>");
+            end if;
+         end;
+      end loop;
+
+      Echo (-R);
+   end Wp_Dropdown_Roles;
 
 -- --
 -- -- Outputs the form used by the importers to accept the data to be imported.
@@ -2040,109 +2056,142 @@ is
 --        ));
 -- end Add_Settings_Field;
 
--- --
--- -- Prints out all settings sections added to a particular settings page.
--- --
--- -- Part of the Settings API. Use this in a settings page callback function
--- -- to output all the sections and fields that were added to that page with
--- -- add_settings_section() and add_settings_field()
--- --
--- -- @global array wp_settings_sections Storage array of all settings sections added to admin pages.
--- -- @global array wp_settings_fields Storage array of settings fields and info about their pages/sections.
--- -- @since 2.7.0
--- --
--- -- @param string page The slug name of the page whose settings sections you want to output.
--- --
--- procedure Do_Settings_Sections (Page : String)
--- is
--- begin
---         global (Hb_Settings_Sections, Hb_Settings_Fields);
+   --------------------------
+   -- Do_Settings_Sections --
+   --------------------------
 
---         if not Isset (Hb_Settings_Sections (page)) then
---                 return;
---         end if;
+   procedure Do_Settings_Sections (Page : String) is
+      use Php.Echoing;
+      use Php.Strings;
+      use Inc_Formatting;
+      use Inc_KSES;
+      -- global (Wp_Settings_Sections, Wp_Settings_Fields);
 
---         for Section of Hb_Settings_Sections (Page) loop  --  (array)
---                 if "" /= Section ("before_section") then
---                         if  "" /= Section ("section_class") then
---                                 echo (Wp_Kses_Post (sprintf (Section ("before_section"), esc_attr (Section ("section_class")))));
---                         else
---                                 echo (Wp_Kses_Post (Section ("before_section")));
---                         end if;
---                 end if;
+      Wp_Settings_Sections : Array_Type renames
+        Globals.Global_Wp_Settings_Sections;
 
---                 if Section ("title") then
---                         echo ("<h2>" & Section ("title") & "</h2>\n");
---                 end if;
+      Wp_Settings_Fields : Array_Type renames
+        Globals.Global_Wp_Settings_Fields;
+   begin
+      if not Isset (Wp_Settings_Sections, Page) then
+         return;
+      end if;
 
---                 if Section ("callback") then
---                         Call_User_Func (Section ("callback"), Section);
---                 end if;
+      for A in As_Array (Get (Wp_Settings_Sections, Page)).Iterate loop
+         declare
+            Section : constant Array_Type := As_Array (Element (A));
+         begin
+            --  (array)
+            if "" /= Get_As_String (Section, "before_section") then
+               if "" /= Get_As_String (Section, "section_class") then
+                  Echo
+                    (Wp_KSES_Post
+                       (Sprintf
+                          (Get_As_String (Section, "before_section"),
+                           [ESC_Attr
+                              (Get_As_String (Section, "section_class"))])));
+               else
+                  Echo
+                    (Wp_KSES_Post (Get_As_String (Section, "before_section")));
+               end if;
+            end if;
 
---                 if
---                   not Isset (Hb_Settings_Fields) or else
---                   not Isset (Hb_Settings_Fields (Page)) or else
---                   not isset (Hb_Settings_Fields (Page) (Section ("id")))
---                 then
---                         goto Continue;
---                 end if;
---                 echo ("<table class=""form-table"" role=""presentation"">");
---                 Do_Settings_Fields (Page, Section ("id"));
---                 echo ("</table>");
+            if Get_As_String (Section, "title") /= "" then
+               Echo ("<h2>" & Get_As_String (Section, "title") & "</h2>\n");
+            end if;
 
---                 if "" /= Section ("after_section") then
---                         echo (hb_Kses_Post (Section ("after_section")));
---                 end if;
---         end loop;
--- end Do_Settings_Sections;
+            if Kind_Of (Get (Section, "callback")) = Kind_Callable then
+               Echo ("XXX-E91");
+            -- Php.Misc.Call_User_Func
+            --   (As_Callable (Get (Section, "callback")), Section);
 
--- --
--- -- Prints out the settings fields for a particular settings section.
--- --
--- -- Part of the Settings API. Use this in a settings page to output
--- -- a specific section. Should normally be called by do_settings_sections()
--- -- rather than directly.
--- --
--- -- @global array wp_settings_fields Storage array of settings fields and their pages/sections.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string page Slug title of the admin page whose settings fields you want to show.
--- -- @param string section Slug title of the settings section whose fields you want to show.
--- --
--- procedure Do_Settings_Fields (Page    : String;
---                               Section : String)
--- is
--- begin
---         global (Hb_Settings_Fields);
+            end if;
 
---         if not Isset (Hb_Settings_Fields (Page) (Section)) then
---                 return;
---         end if;
+            if Wp_Settings_Fields.Is_Empty -- not Isset (Wp_Settings_Fields)
+              or else not Isset (Wp_Settings_Fields, Page)
+              or else not Isset_2
+                            (Wp_Settings_Fields,
+                             Key_1 => Page,
+                             Key_2 => Get_As_String (Section, "id"))
+            then
+               goto Continue;
+            end if;
 
---         for Field of Hb_Settings_Fields (Page) (Section) loop
---                 Class := "";
+            Echo ("<table class=""form-table"" role=""presentation"">");
+            Do_Settings_Fields (Page, Get_As_String (Section, "id"));
+            Echo ("</table>");
 
---                 if not Empty (Field ("args") ("class")) then
---                         Class := " class=""" & Esc_Attr (Field ("args") ("class")) & """";
---                 end if;
+            if "" /= Get_As_String (Section, "after_section") then
+               Echo (Wp_KSES_Post (Get_As_String (Section, "after_section")));
+            end if;
+         end;
 
---                 echo ("<tr" & Class & ">");
+         <<Continue>>
+      end loop;
+   end Do_Settings_Sections;
 
---                 if not Empty (Field ("args") ("label_for")) then
---                         Echo ("<th scope=""row""><label for=""" &
---                               Esc_Attr (Field ("args") ("label_for")) & """>" &
---                               Field ("title") & "</label></th>");
---                 else
---                         Echo ("<th scope=""row"">" & Field ("title") & "</th>");
---                 end if;
+   -----------------------
+   -- Do_Settings_Field --
+   -----------------------
 
---                 echo ("<td>");
---                 Call_User_Func (Field ("callback"), Field ("args"));
---                 echo ("</td>");
---                 echo ("</tr>");
---         end loop;
--- end Do_Settings_Fields;
+   procedure Do_Settings_Fields (Page : String; Section : String) is
+      use Php.Echoing;
+      use Php.Strings;
+      use UStrings;
+      use Inc_Formatting;
+      -- global (Wp_Settings_Fields);
+
+      Wp_Settings_Fields : Array_Type renames
+        Globals.Global_Wp_Settings_Fields;
+   begin
+      if not Isset_2 (Wp_Settings_Fields, Key_1 => Page, Key_2 => Section) then
+         return;
+      end if;
+
+      for F in
+        As_Array
+          (Get (Ref_2 (Wp_Settings_Fields, Key_1 => Page, Key_2 => Section)))
+          .Iterate
+      loop
+         declare
+            Field : constant Array_Type := As_Array (Element (F));
+            Class : UString;
+         begin
+            if not Empty (As_String (Get (Ref_2 (Field, "args", "class"))))
+            then
+               Class :=
+                 +" class="""
+                 & ESC_Attr
+                     (As_String (Get (Ref_2 (Field, "args", "class"))) & """");
+            end if;
+            Echo ("<tr" & (-Class) & ">");
+
+            if not Empty (As_String (Get (Ref_2 (Field, "args", "label_for"))))
+            then
+               Echo
+                 ("<th scope=""row""><label for="""
+                  & ESC_Attr
+                      (As_String (Get (Ref_2 (Field, "args", "label_for"))))
+                  & """>"
+                  & Get_As_String (Field, "title")
+                  & "</label></th>");
+            else
+               Echo
+                 ("<th scope=""row"">"
+                  & Get_As_String (Field, "title")
+                  & "</th>");
+            end if;
+
+            Echo ("<td>");
+            Echo ("XXX-E92");
+            -- Php.Misc.Call_User_Func
+            --   (As_Callable (Get (Field, "callback")),
+            --    As_Array (Get (Field, "args")));
+            Echo ("</td>");
+            Echo ("</tr>");
+         end;
+      end loop;
+   end Do_Settings_Fields;
 
 -- --
 -- -- Registers a settings error to be displayed to the user.

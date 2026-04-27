@@ -283,25 +283,21 @@ package body Inc_L10n is
 --         return translation;
 -- end;
 
--- --
--- -- Removes last item on a pipe-delimited string.
--- --
--- -- Meant for removing the last item in a string, such as "Role name|User role". The original
--- -- string will be returned if no pipe "|" characters are found in the string.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string string A pipe-delimited string.
--- -- @return string Either string or everything before the last pipe.
--- --
--- function before_last_bar( string ) then
---         last_bar = strrpos( string, "|" );
---         if ( false === last_bar ) then
---                 return string;
---         end; else then
---                 return substr( string, 0, last_bar );
---         end;
--- end;
+---------------------
+-- Before_Last_Bar --
+---------------------
+
+   function Before_Last_Bar (Item : String) return String is
+      use Php.Strings;
+
+      Last_Bar : constant Natural := Strrpos (Item, "|");
+   begin
+      if 0 = Last_Bar then
+         return Item;
+      else
+         return Substr (Item, 1, Last_Bar);
+      end if;
+   end Before_Last_Bar;
 
    ------------------------------------
    -- Translate_With_Gettext_Context --
@@ -1465,29 +1461,17 @@ package body Inc_L10n is
       -- return Isset (L10n, Domain);
    end Is_Textdomain_Loaded;
 
--- --
--- -- Translates role name.
--- --
--- -- Since the role names are in the database and not in the source there
--- -- are dummy gettext calls to get them into the POT file and this function
--- -- properly translates them back.
--- --
--- -- The before_last_bar() call is needed, because older installations keep the roles
--- -- using the old context format: "Role name|User role" and just skipping the
--- -- content after the last bar is easier than fixing them in the DB. New installations
--- -- won"t suffer from that problem.
--- --
--- -- @since 2.8.0
--- -- @since 5.2.0 Added the `domain` parameter.
--- --
--- -- @param string name   The role name.
--- -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                       Default "default".
--- -- @return string Translated role name on success, original name on failure.
--- --
--- function translate_user_role( name, domain = "default" ) then
---         return translate_with_gettext_context( before_last_bar( name ), "User role", domain );
--- end;
+   -------------------------
+   -- Translate_User_Role --
+   -------------------------
+
+   function Translate_User_Role
+     (Name : String; Domain : String := "default") return String is
+   begin
+      return
+        Translate_With_Gettext_Context
+          (Before_Last_Bar (Name), "User role", Domain);
+   end Translate_User_Role;
 
    -----------------------------
    -- Get_Available_Languages --

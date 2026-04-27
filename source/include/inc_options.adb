@@ -5,6 +5,7 @@
 -- @subpackage Option
 --
 
+with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
 with Php.Misc;
@@ -649,16 +650,17 @@ is
       end if;
    end Wp_Protect_Special_Option;
 
--- --
--- -- Prints option value after sanitizing for forms.
--- --
--- -- @since 1.5.0
--- --
--- -- @param string option Option name.
--- --
--- function form_option( option ) then
---         echo esc_attr( get_option( option ) );
--- end;
+   -----------------
+   -- Form_Option --
+   -----------------
+
+   procedure Form_Option (Option : String) is
+      use Php.Echoing;
+      use Inc_Formatting;
+      use Inc_Options;
+   begin
+      Echo (ESC_Attr (Get_Option (Option)));
+   end Form_Option;
 
    ------------------------
    -- Wp_Load_Alloptions --

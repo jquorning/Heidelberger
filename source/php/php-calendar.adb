@@ -2,6 +2,8 @@
 --
 --
 
+with Logging;
+
 package body Php.Calendar
 is
 
@@ -9,9 +11,12 @@ is
    -- Date_Time_Zone --
    --------------------
 
-   function X_Construct (Timezone : String)
-                         return Date_Time_Zone
-   is (raise Program_Error with "not implemented");
+   function X_Construct (Timezone : String) return Date_Time_Zone is
+      DTZ : Date_Time_Zone;
+   begin
+      Logging.Log ("date_time_zone.x_construct", "not implemented");
+      return DTZ;
+   end X_Construct;
 
    ---------------
    -- Date_Time --
@@ -38,6 +43,10 @@ is
    function Format (Datetime : Date_Time;
                     Format   : String)
                     return String
+   is (raise Program_Error with "not implemented");
+
+   function Date_Create
+     (Datetime : String := "now"; Timezone : Date_Time_Zone) return Date_Time
    is (raise Program_Error with "not implemented");
 
    -------------------------

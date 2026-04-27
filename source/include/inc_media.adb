@@ -14,6 +14,7 @@ with Php.Strings;
 with Array_Lists;
 with Constants;
 with Globals;
+with Logging;
 with Wp_Common;
 
 with Inc_Formatting;
@@ -4436,6 +4437,10 @@ is
 -- -- end;
 -- --
 -- function wp_enqueue_media( args = array() ) then
+   procedure Wp_Enqueue_Media (Args : Array_Type := Empty_Array) is
+   begin
+      Logging.Log ("wp_enqueue_media", "not implemented");
+   end Wp_Enqueue_Media;
 --         -- Enqueue me just once per page, please.
 --         if ( did_action( "wp_enqueue_media" ) ) then
 --                 return;

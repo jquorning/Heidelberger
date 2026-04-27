@@ -139,6 +139,15 @@ is
       end;
    end Current_Time;
 
+   ------------------
+   -- Current_Time --
+   ------------------
+
+   function Current_Time
+     (Typ : String; GMT : Boolean := False)
+      return Integer
+   is (999);
+
    ----------------------
    -- Current_DateTime --
    ----------------------
@@ -196,52 +205,76 @@ is
       Timestamp_With_Offset : Integer := 0;
       -- Boolean := False;
       GMT                   : Boolean := False) return String
-   is (raise Program_Error with "not implemented");
-   --         timestamp = timestamp_with_offset;
+   is
+      use Php.Calendar;
+      use Php.Misc;
+      use Wp_Common;
 
-   --         // If timestamp is omitted it should be current time (summed with offset, unless `gmt` is true).
-   --         if ( ! is_numeric( timestamp ) ) then
-   --                 // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
-   --                 timestamp = current_time( "timestamp", gmt );
-   --         end;
+      function Dd (Timestamp : Integer) return String;
 
-   --         /*
-   --         -- This is a legacy implementation quirk that the returned timestamp is also with offset.
-   --         -- Ideally this function should never be used to produce a timestamp.
-   --         --
-   --         if ( "U" === format ) then
-   --                 date = timestamp;
-   --         end; elseif ( gmt && false === timestamp_with_offset ) then // Current time in UTC.
-   --                 date = wp_date( format, null, new DateTimeZone( "UTC" ) );
-   --         end; elseif ( false === timestamp_with_offset ) then // Current time in site"s timezone.
-   --                 date = wp_date( format );
-   --         end; else then
-   --                 /*
-   --                 -- Timestamp with offset is typically produced by a UTC `strtotime()` call on an input without timezone.
-   --                 -- This is the best attempt to reverse that operation into a local time to use.
-   --                 --
-   --                 local_time = gmdate( "Y-m-d H:i:s", timestamp );
-   --                 timezone   = wp_timezone();
-   --                 datetime   = date_create( local_time, timezone );
-   --                 date       = wp_date( format, datetime->getTimestamp(), timezone );
-   --         end;
+      --------
+      -- Dd --
+      --------
 
-   --         --
-   --         -- Filters the date formatted based on the locale.
-   --         --
-   --         -- @since 2.8.0
-   --         --
-   --         -- @param string date      Formatted date string.
-   --         -- @param string format    Format to display the date.
-   --         -- @param int    timestamp A sum of Unix timestamp and timezone offset in seconds.
-   --         --                          Might be without offset if input omitted timestamp but requested GMT.
-   --         -- @param bool   gmt       Whether to use GMT timezone. Only applies if timestamp was not provided.
-   --         --                          Default false.
-   --         --
-   --         date = apply_filters( "date_i18n", date, format, timestamp, gmt );
+      function Dd (Timestamp : Integer) return String is
+         --
+         -- Timestamp with offset is typically produced by a UTC `strtotime()` call on an input without timezone.
+         -- This is the best attempt to reverse that operation into a local time to use.
+         --
+         Local_Time : constant String := GMdate ("Y-m-d H:i:s", Timestamp);
+         Timezone   : constant Date_Time_Zone := Wp_Timezone;
+         Datetime   : constant Date_Time := Date_Create (Local_Time, Timezone);
+      begin
+         return Wp_Date (Format, Datetime.Get_Timestamp, Timezone); -- ()
+      end Dd;
 
-   --         return date;
-   -- end;
+      Timestamp_2 : constant Integer := Timestamp_With_Offset;
+
+      -- If timestamp is omitted it should be current time (summed with offset, unless `gmt` is true).
+      Timestamp : constant Integer :=
+        (if Timestamp_2 = 0 -- not Is_Numeric (Timestamp)
+         then
+           Current_Time ("timestamp", GMT)
+         else Timestamp_2);
+
+      Time_Null          : Time_Type;
+      Date_Time_Zone_UTC : constant Date_Time_Zone := X_Construct ("UTC");
+
+      --
+      -- This is a legacy implementation quirk that the returned timestamp is also with offset.
+      -- Ideally this function should never be used to produce a timestamp.
+      --
+      Date_2 : String :=
+        (if "U" = Format
+         then "XXX-E90"
+         -- Timestamp
+         elsif GMT and then 0 = Timestamp_With_Offset -- False
+         then
+           -- Current time in UTC.
+           Wp_Date (Format, Time_Null, Date_Time_Zone_UTC)
+         elsif 0 = Timestamp_With_Offset -- False
+         then
+           -- Current time in site's timezone.
+           Wp_Date (Format)
+         else Dd (Timestamp));
+
+      --
+      -- Filters the date formatted based on the locale.
+      --
+      -- @since 2.8.0
+      --
+      -- @param string date      Formatted date string.
+      -- @param string format    Format to display the date.
+      -- @param int    timestamp A sum of Unix timestamp and timezone offset in seconds.
+      --                          Might be without offset if input omitted timestamp but requested GMT.
+      -- @param bool   gmt       Whether to use GMT timezone. Only applies if timestamp was not provided.
+      --                          Default false.
+      --
+      Date : constant String :=
+        Apply_Filters ("date_i18n", Date_2, Format, Timestamp, GMT);
+   begin
+      return Date;
+   end Date_I18n;
 
    -------------
    -- Wp_Date --
@@ -249,13 +282,12 @@ is
 
    function Wp_Date
      (Format    : String;
-      Timestamp : Php.Calendar.Time_Type;
-      -- null
-      Timezone  : Php.Calendar.Date_Time_Zone) -- = null
+      Timestamp : Php.Calendar.Time_Type := Time_Null;
+      Timezone  : Php.Calendar.Date_Time_Zone := Date_Time_Zone_Null)
       return String is
    begin
-      raise Program_Error with "not implemented";
-      return "";
+      Logging.Log ("wp_date", "not implemented");
+      return "XXX-E89";
    end Wp_Date;
 
    --         global wp_locale;
@@ -6721,17 +6753,18 @@ is
    --         end;
    -- end;
 
-   --
-   -- Gives a nicely-formatted list of timezone strings.
-   --
-   -- @since 2.9.0
-   -- @since 4.7.0 Added the `locale` parameter.
-   --
-   -- @param string selected_zone Selected timezone.
-   -- @param string locale        Optional. Locale to load the timezones in. Default current site locale.
-   -- @return string
-   --
-   -- function wp_timezone_choice( selected_zone, locale = null ) then
+   ------------------------
+   -- Wp_Timezone_Choice --
+   ------------------------
+
+   function Wp_Timezone_Choice
+     (Selected_Zone : String; Locale : String := "") return String -- null
+   is
+   begin
+      Logging.Log ("wp_timezone_choice", "not implemented");
+      return "XXX-E91";
+   end Wp_Timezone_Choice;
+
    --         static mo_loaded = false, locale_loaded = null;
 
    --         continents = array( "Africa", "America", "Antarctica", "Arctic", "Asia", "Atlantic", "Australia", "Europe", "Indian", "Pacific" );

@@ -44,6 +44,10 @@ is
      (Typ : String; GMT : Boolean := False) -- 0
       return String;
 
+   function Current_Time
+     (Typ : String; GMT : Boolean := False) -- 0
+      return Integer;
+
    --
    -- Retrieves the current time as an object using the site"s timezone.
    --
@@ -137,11 +141,13 @@ is
    -- @return string|false The date, translated if locale specifies it. False on
    --                      invalid timestamp input.
    --
+   Time_Null : Php.Calendar.Time_Type;
+   Date_Time_Zone_Null : Php.Calendar.Date_Time_Zone;
+
    function Wp_Date
      (Format    : String;
-      Timestamp : Php.Calendar.Time_Type;
-      -- null
-      Timezone  : Php.Calendar.Date_Time_Zone) -- = null
+      Timestamp : Php.Calendar.Time_Type := Time_Null;
+      Timezone  : Php.Calendar.Date_Time_Zone := Date_Time_Zone_Null)
       return String;
 
    --
@@ -1339,6 +1345,19 @@ is
    -- @return int The ID of the main network.
    --
    function Get_Main_Network_Id return Integer;
+
+   --
+   -- Gives a nicely-formatted list of timezone strings.
+   --
+   -- @since 2.9.0
+   -- @since 4.7.0 Added the `locale` parameter.
+   --
+   -- @param string selected_zone Selected timezone.
+   -- @param string locale        Optional. Locale to load the timezones in. Default current site locale.
+   -- @return string
+   --
+   function Wp_Timezone_Choice
+     (Selected_Zone : String; Locale : String := "") return String; -- null
 
    --
    -- Retrieves a list of protocols to allow in HTML attributes.

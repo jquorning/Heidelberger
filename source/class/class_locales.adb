@@ -6,6 +6,8 @@
 -- @since 4.6.0
 --
 
+with Helpers;
+
 package body Class_Locales
 is
 
@@ -136,21 +138,15 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Retrieves the full translated weekday word.
---         --
---         -- Week starts on translated Sunday and can be fetched
---         -- by using 0 (zero). So the week starts with 0 (zero)
---         -- and ends on Saturday with is fetched by using 6 (six).
---         --
---         -- @since 2.1.0
---         --
---         -- @param int weekday_number 0 for Sunday through 6 Saturday.
---         -- @return string Full translated weekday.
---         --
---         public function get_weekday( weekday_number ) then
---                 return this.weekday[ weekday_number ];
---         end;
+   -----------------
+   -- Get_Weekday --
+   -----------------
+
+   function Get_Weekday
+     (This : Wp_Locale; Weekday_Number : Integer) return String is
+   begin
+      return Get_As_String (This.Weekday, Helpers.Image (Weekday_Number));
+   end Get_Weekday;
 
 --         --
 --         -- Retrieves the translated weekday initial.

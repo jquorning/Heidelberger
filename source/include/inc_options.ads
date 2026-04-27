@@ -157,6 +157,15 @@ is
    procedure Wp_Protect_Special_Option (Option : String);
 
    --
+   -- Prints option value after sanitizing for forms.
+   --
+   -- @since 1.5.0
+   --
+   -- @param string option Option name.
+   --
+   procedure Form_Option (Option : String);
+
+   --
    -- Loads and caches all autoloaded options, if available or all options.
    --
    -- @since 2.2.0

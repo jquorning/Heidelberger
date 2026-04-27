@@ -151,4 +151,32 @@ is
       return 999;
    end Strtotime;
 
+   -------------------
+   -- Timezone_Open --
+   -------------------
+
+   function Timezone_Open
+     (Timezone : String) return Php.Calendar.Date_Time_Zone
+   is
+      use Php.Calendar;
+
+      DTZ : Date_Time_Zone;
+   begin
+      Logging.Log ("timezone_open", "not implemented");
+      return DTZ;
+   end Timezone_Open;
+
+   ------------------------------
+   -- Timezone_Transitions_Get --
+   ------------------------------
+
+   function Timezone_Transitions_Get
+     (Object          : Php.Calendar.Date_Time_Zone;
+      Timestamp_Begin : Integer := Integer'First;
+      Timestamp_End   : Integer := Integer'Last) return Array_Type is
+   begin
+      Logging.Log ("timezone_transitions_get", "not implemented");
+      return Empty_Array;
+   end Timezone_Transitions_Get;
+
 end Php.Misc;

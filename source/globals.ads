@@ -111,6 +111,9 @@ is
    Global_Type : UStrings.UString;
    Global_Term : UStrings.UString;
 
+   Global_Wp_Settings_Fields   : Array_Type;
+   Global_Wp_Settings_Sections : Array_Type;
+
    --
    --
    --

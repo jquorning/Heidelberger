@@ -103,6 +103,15 @@ package Adi_Templates is
    --
    procedure Wp_Comment_Trashnotice;
 
+   --
+   -- Prints out option HTML elements for role selectors.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string selected Slug for the role that should be already selected.
+   --
+   procedure Wp_Dropdown_Roles (Selected : String := "");
+
    -- package Term_Arrays is new
    --    Ada.Containers.Vectors (Index_Type   => Positive,
    --                            Element_Type => Inc_Class_Wp_Terms.Wp_Term,
@@ -216,6 +225,37 @@ package Adi_Templates is
 
    procedure Do_Meta_Boxes
      (Screen : String; Context : String; Data_Object : Multi_Type);
+
+   --
+   -- Prints out all settings sections added to a particular settings page.
+   --
+   -- Part of the Settings API. Use this in a settings page callback function
+   -- to output all the sections and fields that were added to that page with
+   -- add_settings_section() and add_settings_field()
+   --
+   -- @global array wp_settings_sections Storage array of all settings sections added to admin pages.
+   -- @global array wp_settings_fields Storage array of settings fields and info about their pages/sections.
+   -- @since 2.7.0
+   --
+   -- @param string page The slug name of the page whose settings sections you want to output.
+   --
+   procedure Do_Settings_Sections (Page : String);
+
+   --
+   -- Prints out the settings fields for a particular settings section.
+   --
+   -- Part of the Settings API. Use this in a settings page to output
+   -- a specific section. Should normally be called by do_settings_sections()
+   -- rather than directly.
+   --
+   -- @global array wp_settings_fields Storage array of settings fields and their pages/sections.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string page    Slug title of the admin page whose settings fields you want to show.
+   -- @param string section Slug title of the settings section whose fields you want to show.
+   --
+   procedure Do_Settings_Fields (Page : String; Section : String);
 
    --
    -- Echoes a submit button, with provided text and appropriate class(es).

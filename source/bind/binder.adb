@@ -24,6 +24,7 @@ with Adm_Index;
 with Adm_Install;
 with Adm_Load_Scripts;
 with Adm_Load_Styles;
+with Adm_Options_General;
 with Adm_Plugins;
 with Adm_Plugin_Install;
 with Adm_Post;
@@ -159,6 +160,9 @@ is
 
       elsif Index (URL, "/wp-admin/theme-install.php") /= 0 then
          Adm_Theme_Install.Render;
+
+      elsif Index (URL, "/wp-admin/options-general.php") /= 0 then
+         Adm_Options_General.Render;
 
       elsif Index (URL, "/wp-admin/load-scripts.php") /= 0 then
          MIME := Javascript;

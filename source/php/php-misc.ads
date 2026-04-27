@@ -2,6 +2,8 @@
 --
 --
 
+with Php.Calendar;
+
 with Arrayable_Interfaces;
 with Arrays;
 with Lists;
@@ -89,6 +91,14 @@ is
    function Timezone_Identifiers_List (A : String)
             return List_Type
             is (Empty_List);
+
+   function Timezone_Open
+     (Timezone : String) return Php.Calendar.Date_Time_Zone;
+
+   function Timezone_Transitions_Get
+     (Object          : Php.Calendar.Date_Time_Zone;
+      Timestamp_Begin : Integer := Integer'First;
+      Timestamp_End   : Integer := Integer'Last) return Array_Type;
 
    function Hash_Equals (Hash_1 : String;
                          Hash_2 : String)

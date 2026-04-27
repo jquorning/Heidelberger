@@ -24,9 +24,10 @@ is
    use Lists;
 
    package String_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => POMO_MO.MO,
-                                              "="          => POMO_MO."=");
+     Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type     => String,
+        Element_Type => POMO_MO.MO,
+        "="          => POMO_MO."=");
 
    -- package String_Maps is new
    --    Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
@@ -34,7 +35,7 @@ is
    --                                            "="          => POMO_Translations."=");
 
    package String_Sets is new
-      Ada.Containers.Indefinite_Ordered_Sets (Element_Type => String);
+     Ada.Containers.Indefinite_Ordered_Sets (Element_Type => String);
 
    Textdomain_Registry : Class_Textdomain_Registry.Wp_Textdomain_Registry;
    L10n                : String_Maps.Map;
@@ -43,8 +44,7 @@ is
    Global_Locale           : UStrings.UString;
    Global_Wp_Local_Package : UStrings.UString;
 
-   function Array_Keys (Map : String_Maps.Map)
-                        return List_Type;
+   function Array_Keys (Map : String_Maps.Map) return List_Type;
 
    --
    -- Retrieves the current locale.
@@ -66,8 +66,7 @@ is
    --
    -- @return string The locale of the blog or from the {@see "locale"} hook.
    --
-   function Get_Locale
-            return String;
+   function Get_Locale return String;
 
    --
    -- Retrieves the locale of a user.
@@ -80,13 +79,11 @@ is
    -- @param int|WP_User user User's ID or a WP_User object. Defaults to current user.
    -- @return string The locale of the user.
    --
-   function Get_User_Locale (User : Integer := 0)
-                             return String
-                             is ("en_US");
+   function Get_User_Locale (User : Integer := 0) return String
+   is ("en_US");
 
-   function Get_User_Locale (User : Class_Users.Wp_User)
-                             return String
-                             is ("en_US");
+   function Get_User_Locale (User : Class_Users.Wp_User) return String
+   is ("en_US");
 
    --
    -- Determines the current locale desired for the request.
@@ -97,8 +94,20 @@ is
    --
    -- @return string The determined locale.
    --
-   function Determine_Locale
-            return String;
+   function Determine_Locale return String;
+
+   --
+   -- Removes last item on a pipe-delimited string.
+   --
+   -- Meant for removing the last item in a string, such as "Role name|User role". The original
+   -- string will be returned if no pipe "|" characters are found in the string.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string string A pipe-delimited string.
+   -- @return string Either string or everything before the last pipe.
+   --
+   function Before_Last_Bar (Item : String) return String;
 
    --
    -- Retrieves the translation of text in the context defined in context.
@@ -118,10 +127,9 @@ is
    --                        translated strings. Default "default".
    -- @return string Translated text on success, original text on failure.
    --
-   function Translate_With_Gettext_Context (Text    : String;
-                                            Context : String;
-                                            Domain  : String := "default")
-                                            return String;
+   function Translate_With_Gettext_Context
+     (Text : String; Context : String; Domain : String := "default")
+      return String;
 
    --
    -- Retrieves the translation of text and escapes it for safe use in an attribute.
@@ -136,9 +144,8 @@ is
    --                      translated strings. Default "default".
    -- @return string Translated text on success, original text on failure.
    --
-   function ESC_Attr_XX (Text   : String;
-                         Domain : String := "default")
-                         return String;
+   function ESC_Attr_XX
+     (Text : String; Domain : String := "default") return String;
 
    --
    -- Retrieves the translation of text.
@@ -156,10 +163,9 @@ is
    --                       translated strings. Default "default".
    -- @return string Translated text.
    --
-   function Translate (Text   : String;
-                       Domain : String := "default")
-                       return String
-                       is (Text);
+   function Translate
+     (Text : String; Domain : String := "default") return String
+   is (Text);
 
    --
    -- Retrieves the translation of text.
@@ -174,10 +180,8 @@ is
    --                       translated strings. Default "default".
    -- @return string Translated text.
    --
-   function X (Text   : String;
-               Domain : String := "default")
-               return String
-               is (Text);
+   function X (Text : String; Domain : String := "default") return String
+   is (Text);
 
    function "abs" (Item : String) return String;
 
@@ -196,10 +200,9 @@ is
    --                        translated strings. Default "default".
    -- @return string Translated text.
    --
-   function ESC_Attr_X (Text    : String;
-                        Context : String;
-                        Domain  : String := "default")
-                        return String;
+   function ESC_Attr_X
+     (Text : String; Context : String; Domain : String := "default")
+      return String;
 
    --
    -- Translates string with gettext context, and escapes it for safe use in HTML
@@ -216,10 +219,9 @@ is
    --                       translated strings. Default "default".
    -- @return string Translated text.
    --
-   function ESC_HTML_X (Text    : String;
-                        Context : String;
-                        Domain  : String := "default")
-                        return String;
+   function ESC_HTML_X
+     (Text : String; Context : String; Domain : String := "default")
+      return String;
 
    --
    -- Displays translated text.
@@ -230,8 +232,7 @@ is
    -- @param string domain Optional. Text domain. Unique identifier for retrieving
    --                       translated strings. Default "default".
    --
-   procedure X_E (Text   : String;
-                  Domain : String := "default");
+   procedure X_E (Text : String; Domain : String := "default");
 
    --
    -- Displays translated text that has been escaped for safe use in an attribute.
@@ -247,8 +248,7 @@ is
    -- @param string domain Optional. Text domain. Unique identifier for retrieving
    --                       translated strings. Default "default".
    --
-   procedure ESC_Attr_E (Text   : String;
-                         Domain : String := "default");
+   procedure ESC_Attr_E (Text : String; Domain : String := "default");
 
    --
    -- Displays translated text that has been escaped for safe use in HTML output.
@@ -264,8 +264,7 @@ is
    -- @param string domain Optional. Text domain. Unique identifier for retrieving
    --                       translated strings. Default "default".
    --
-   procedure ESC_HTML_E (Text   : String;
-                         Domain : String := "default");
+   procedure ESC_HTML_E (Text : String; Domain : String := "default");
 
    --
    -- Retrieves translated string with gettext context.
@@ -284,10 +283,9 @@ is
    --                        translated strings. Default "default".
    -- @return string Translated context string without pipe.
    --
-   function X_X (Text    : String;
-                 Context : String;
-                 Domain  : String := "default")
-                 return String;
+   function X_X
+     (Text : String; Context : String; Domain : String := "default")
+      return String;
 
    --
    -- Displays translated string with gettext context.
@@ -299,9 +297,8 @@ is
    -- @param string domain  Optional. Text domain. Unique identifier for retrieving
    --                        translated strings. Default "default".
    --
-   procedure X_Ex (Text    : String;
-                   Context : String;
-                   Domain  : String := "default");
+   procedure X_Ex
+     (Text : String; Context : String; Domain : String := "default");
 
    --
    -- Translates and retrieves the singular or plural form based on the supplied
@@ -326,11 +323,11 @@ is
    --                       translated strings. Default "default".
    -- @return string The translated singular or plural form.
    --
-   function X_N (Single : String;
-                 Plural : String;
-                 Number : Integer;
-                 Domain : String := "default")
-                 return String;
+   function X_N
+     (Single : String;
+      Plural : String;
+      Number : Integer;
+      Domain : String := "default") return String;
 
    --
    -- Translates and retrieves the singular or plural form based on the supplied
@@ -360,17 +357,16 @@ is
    --                        translated strings. Default "default".
    -- @return string The translated singular or plural form.
    --
-   function X_Nx (Single  : String;
-                  Plural  : String;
-                  Number  : String;
-                  Context : String;
-                  Domain  : String := "default")
-                  return String
-                  is ("XXX-902");
+   function X_Nx
+     (Single  : String;
+      Plural  : String;
+      Number  : String;
+      Context : String;
+      Domain  : String := "default") return String
+   is ("XXX-902");
 
-   function X_N_Noop (Arg_1, Arg_2 : String)
-                      return Array_Type
-                      is (Empty_Array);
+   function X_N_Noop (Arg_1, Arg_2 : String) return Array_Type
+   is (Empty_Array);
 
    --
    -- Registers plural strings in POT file, but does not translate them.
@@ -402,12 +398,11 @@ is
    --     @type string|null domain   Text domain.
    -- }
    --
-   function X_N_Noop (Singular : String;
-                      Plural   : String;
-                      Domain   : String := "default") -- null
-                      return List_Type -- String_Array
-                      is (Empty_List);
---                    is (Empty_String_Array);
+   function X_N_Noop
+     (Singular : String; Plural : String; Domain : String := "default") -- null
+      return List_Type -- String_Array
+   is (Empty_List);
+   --                    is (Empty_String_Array);
 
    --
    -- Loads a .mo file into the text domain domain.
@@ -435,14 +430,12 @@ is
    -- @param string locale Optional. Locale. Default is the current locale.
    -- @return bool True on success, false on failure.
    --
-   procedure Load_Textdomain (Domain : String;
-                              Mofile : String;
-                              Locale : String := "");
+   procedure Load_Textdomain
+     (Domain : String; Mofile : String; Locale : String := "");
 
-   function Load_Textdomain (Domain : String;
-                             Mofile : String;
-                             Locale : String := "") -- null
-                             return Boolean;
+   function Load_Textdomain
+     (Domain : String; Mofile : String; Locale : String := "") -- null
+      return Boolean;
 
    --
    -- Loads plugin and theme text domains just-in-time.
@@ -464,8 +457,7 @@ is
    --                      strings.
    -- @return bool True when the textdomain is successfully loaded, false otherwise.
    --
-   function X_Load_Textdomain_Just_In_Time (Domain : String)
-                                            return Boolean;
+   function X_Load_Textdomain_Just_In_Time (Domain : String) return Boolean;
 
    --
    -- Returns the Translations instance for a text domain.
@@ -480,8 +472,8 @@ is
    --                       strings.
    -- @return Translations|NOOP_Translations A Translations instance.
    --
-   function Get_Translations_For_Domain (Domain : String)
-                                         return POMO_Translations.Translations;
+   function Get_Translations_For_Domain
+     (Domain : String) return POMO_Translations.Translations;
 
    procedure Get_Translations_For_Domain (Domain : String);
 
@@ -496,6 +488,29 @@ is
    -- @return bool Whether there are translations.
    --
    function Is_Textdomain_Loaded (Domain : String) return Boolean;
+
+   --
+   -- Translates role name.
+   --
+   -- Since the role names are in the database and not in the source there
+   -- are dummy gettext calls to get them into the POT file and this function
+   -- properly translates them back.
+   --
+   -- The before_last_bar() call is needed, because older installations keep the roles
+   -- using the old context format: "Role name|User role" and just skipping the
+   -- content after the last bar is easier than fixing them in the DB. New installations
+   -- won't suffer from that problem.
+   --
+   -- @since 2.8.0
+   -- @since 5.2.0 Added the `domain` parameter.
+   --
+   -- @param string name   The role name.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
+   --                       Default "default".
+   -- @return string Translated role name on success, original name on failure.
+   --
+   function Translate_User_Role
+     (Name : String; Domain : String := "default") return String;
 
    --
    -- Gets all available languages based on the presence of *.mo files in a given
@@ -513,8 +528,9 @@ is
    --                   are present. Language codes are formed by stripping the .mo
    --                   extension from the language file names.
    --
-   function Get_Available_Languages (Dir : String := "") -- null
-                                     return List_Type;
+   function Get_Available_Languages
+     (Dir : String := "") -- null
+      return List_Type;
 
    --
    -- Displays or returns a Language selector.
@@ -562,8 +578,7 @@ is
    -- @return string HTML dropdown list of languages.
    --
    function Wp_Dropdown_Languages
-              (Args : Array_Type := Empty_Array)
-               return String;
+     (Args : Array_Type := Empty_Array) return String;
 
    procedure Wp_Dropdown_Languages (Args : Array_Type);
 
@@ -583,12 +598,11 @@ is
    --                          again.
    -- @return bool Whether textdomain was unloaded.
    --
-   procedure Unload_Textdomain (Domain     : String;
-                                Reloadable : Boolean := False);
+   procedure Unload_Textdomain
+     (Domain : String; Reloadable : Boolean := False);
 
-   function Unload_Textdomain (Domain     : String;
-                               Reloadable : Boolean := False)
-                               return Boolean;
+   function Unload_Textdomain
+     (Domain : String; Reloadable : Boolean := False) return Boolean;
 
    --
    -- Loads default translated strings based on locale.
@@ -604,8 +618,9 @@ is
    --                      get_locale().
    -- @return bool Whether the textdomain was loaded.
    --
-   function Load_Default_Textdomain (Locale : String := "") -- null
-                                     return Boolean;
+   function Load_Default_Textdomain
+     (Locale : String := "") -- null
+      return Boolean;
    procedure Load_Default_Textdomain (Locale : String := ""); -- null
 
    --
@@ -646,11 +661,9 @@ is
    -- @return string|false The translated strings in JSON encoding on success,
    --                      false if the script textdomain could not be loaded.
    --
-   function Load_Script_Textdomain (Handle : String;
-                                    Domain : String;
-                                    Path   : String)
-                                    return String
-                                    is ("XXX-311");
+   function Load_Script_Textdomain
+     (Handle : String; Domain : String; Path : String) return String
+   is ("XXX-311");
 
    --
    -- Determines whether the current locale is right-to-left (RTL).
@@ -665,9 +678,8 @@ is
    --
    -- @return bool Whether locale is RTL.
    --
-   function Is_RTL
-            return Boolean
-            is (False);
+   function Is_RTL return Boolean
+   is (False);
 
    --
    -- Switches the translations according to the given locale.
@@ -679,8 +691,7 @@ is
    -- @param string locale The locale.
    -- @return bool True on success, false on failure.
    --
-   function Switch_To_Locale (Locale : String)
-                              return Boolean;
+   function Switch_To_Locale (Locale : String) return Boolean;
 
    --
    -- Restores the translations according to the previous locale.
@@ -691,8 +702,7 @@ is
    --
    -- @return string|false Locale on success, false on error.
    --
-   function Restore_Previous_Locale
-            return String;
+   function Restore_Previous_Locale return String;
 
    procedure Restore_Previous_Locale;
 
@@ -709,10 +719,11 @@ is
    --
    -- @return string|string[]|array[] Translated settings.
    --
-   function Translate_Settings_Using_I18n_Schema (I18n_Schema : String; -- Array_Type;
-                                                  Settings    : Array_Type;
-                                                  Textdomain  : String)
-                                                  return Array_Type;
+   function Translate_Settings_Using_I18n_Schema
+     (I18n_Schema : String;
+      -- Array_Type;
+      Settings    : Array_Type;
+      Textdomain  : String) return Array_Type;
 
    --
    -- Retrieves the list item separator based on the locale.

@@ -5,6 +5,7 @@
 -- @subpackage Administration
 --
 
+with Php.Echoing;
 with Php.Files;
 with Php.Sorting;
 with Php.Strings;
@@ -14,6 +15,7 @@ with Constants;
 with UStrings;
 
 with Inc_Caches;
+with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
@@ -2292,19 +2294,24 @@ is
 --         return allowed_options;
 -- end;
 
--- --
--- -- Outputs nonce, action, and option_page fields for a settings page.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string option_group A settings group name. This should match the group name
--- --                             used in register_setting().
--- --
--- function settings_fields( option_group ) then
---         echo "<input type="hidden" name="option_page" value="" . esc_attr( option_group ) . "" />";
---         echo "<input type="hidden" name="action" value="update" />";
---         wp_nonce_field( "option_group-options" );
--- end;
+   ---------------------
+   -- Settings_Fields --
+   ---------------------
+
+   procedure Settings_Fields (Option_Group : String) is
+      use Php.Echoing;
+      use UStrings;
+      use Inc_Formatting;
+      use Inc_Functions;
+   begin
+      Echo
+        ("<input type=""hidden"" name=""option_page"" value="""""
+         & ESC_Attr (Option_Group)
+         & """ />"
+         & NL);
+      Echo ("<input type=""hidden"" name=""action"" value=""update"" />" & NL);
+      Wp_Nonce_Field ("option_group-options");
+   end Settings_Fields;
 
 -- --
 -- -- Clears the plugins cache used by get_plugins() and by default, the plugin updates cache.
